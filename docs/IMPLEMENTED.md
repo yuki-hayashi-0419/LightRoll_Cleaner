@@ -6,60 +6,43 @@
 
 ## 現在の実装状況
 
-### バージョン: 0.3.0（Phase 1 基盤構築 進行中）
+### バージョン: 0.4.0（Phase 1 基盤構築 完了）
 
-**アプリ機能**: デザインシステム基盤が完成し、一貫したUIスタイルでの開発が可能に。グラスモーフィズム効果を使った美しいカードやボタンが実装可能。Protocol層の定義により、各機能モジュールの実装準備が整った。
+**アプリ機能**: Core Infrastructure（M1）が完全に完成。アプリ全体で統一されたログ出力、パフォーマンス計測、エラーハンドリングが可能に。100以上のユーティリティ関数により開発効率が大幅に向上。460以上のユニットテストで品質を担保。
 
 ---
 
-## 基盤構築（Phase 1 進行中）
+## 完了モジュール
 
-### デザインシステム完成 - 2025-11-28（本セッション）
+### M1: Core Infrastructure - 完了（2025-11-28）
 
-#### タイポグラフィ（15フォントスタイル）
-- **Dynamic Type完全対応**: 全フォントスタイルがアクセシビリティ設定に追従
-- **4カテゴリ構成**:
-  - Display系（largeTitle, title1〜3）
-  - Body系（headline, body, callout, subheadline）
-  - Supporting系（footnote, caption, caption2）
-  - 数値専用（largeNumber, mediumNumber, smallNumber, monospaced）
-- **便利な拡張API**: `.lightRollTextStyle()` / `.primaryStyle()` / `.secondaryStyle()`
+**ユーザー視点でできるようになったこと**:
+- アプリ全体で統一されたログ出力とパフォーマンス計測が可能になった
+- 開発効率化のための豊富なユーティリティ関数（100以上）が利用可能になった
+- エラーハンドリングと設定管理の基盤が完成し、堅牢なアプリ動作を実現
 
-#### グラスモーフィズム（iOS 17+対応、iOS 26準備済み）
-- **5段階のスタイル**: ultraThin / thin / regular / thick / chrome
-- **4種の形状**: roundedRectangle / capsule / circle / continuousRoundedRectangle
-- **即使用可能なコンポーネント**:
-  - `GlassCardView` - グラス効果カード
-  - `GlassButtonStyle` - グラスボタンスタイル（`.buttonStyle(.glass())`）
-- **便利な拡張API**: `.glassCard()` / `.glassCapsule()` / `.glassCircle()` / `.adaptiveGlass()`
+**技術的成果**:
+- 10タスク完了 / 16時間
+- 460テスト（全て合格）
+- 6段階ログレベル、9種類カテゴリ、OSLog統合
+- String, Array, Date, Optional, FileManager, Collection, Result の拡張
 
-#### スペーシングシステム（8ptグリッド）
-- **8段階のスペーシング**: xxs(2) / xs(4) / sm(8) / md(12) / lg(16) / xl(24) / xxl(32) / xxxl(40)
-- **6段階の角丸**: XS(4) / SM(8) / MD(12) / LG(16) / XL(20) / XXL(24)
-- **7段階のアイコンサイズ**: XS(12) / SM(16) / MD(20) / LG(24) / XL(32) / XXL(48) / Huge(64)
-- **EdgeInsets拡張**: `.LightRoll.card` / `.LightRoll.button` など
-- **便利な拡張API**: `.componentPadding()` / `.cardPadding()` / `.ensureMinTouchTarget()`
+---
 
-#### Protocol層（各モジュールのインターフェース定義）
-- **UseCase Protocols**: ScanPhotos / GroupPhotos / DeletePhotos / RestorePhotos / GetStatistics / AnalyzePhoto / SelectBestShot / Purchase / CheckDeletionLimit
-- **ViewModel Protocols**: Dashboard / PhotoGroup / Settings / Deletion の各画面用
-- **Service Protocols**: PhotoLibrary / ImageAnalysis / Storage / StoreKit / Notification の各サービス用
-- **Repository Protocols**: Photo / User / Config の各データアクセス用
+## 進行中モジュール
 
-### Core Infrastructure - 2025-11-28
+### M4: UI Components - 部分完了（4/14タスク）
 
-#### プロジェクト基盤
-- Xcodeプロジェクト作成完了（iOS 17+/SwiftUI/SPM構成）
-- 5層アーキテクチャ（Domain/Data/Presentation/Core/Utils）
+**ユーザー視点でできるようになったこと**:
+- デザインシステム基盤が完成し、一貫したUIスタイルでの開発が可能
+- グラスモーフィズム効果を使った美しいカードやボタンが実装可能
+- Dynamic Type完全対応で、アクセシビリティ設定に追従するフォント
 
-#### 設定・状態管理
-- AppConfig実装（設定永続化・検証機能）
-- AppState実装（@Observable対応のアプリ状態管理）
-- 統一エラー型定義（LightRollError）
-- DIコンテナ基盤（ServiceLocatorパターン）
-
-#### カラーパレット（16色セット）
-- ダークモード完全対応、アクセシビリティ考慮済み
+**完了コンポーネント**:
+- カラーパレット（16色セット、ダークモード対応）
+- タイポグラフィ（15フォントスタイル）
+- グラスモーフィズム（5スタイル、4シェイプ）
+- スペーシングシステム（8ptグリッド）
 
 ---
 
@@ -67,7 +50,7 @@
 
 | 観点 | 状態 | 説明 |
 |------|------|------|
-| アプリ起動 | **実装中** | 基本構造動作可能、デザインシステム適用準備完了 |
+| アプリ起動 | **基盤完成** | Core基盤完了、デザインシステム適用準備完了 |
 | 写真スキャン | 設計完了 | Photos Framework統合の仕様策定済み |
 | 類似写真検出 | 設計完了 | Vision/pHash併用アルゴリズム設計済み |
 | 一括削除 | 設計完了 | 安全な削除フローを仕様化済み |
@@ -78,17 +61,14 @@
 
 ## 次回実装予定
 
-### Phase 1 継続 - Core Infrastructure（M1）
-- [ ] M1-T04: Logger実装
-- [ ] M1-T09〜T12: ユニットテスト
+### Phase 2 - データ層（M2: Photo Access）
+- [ ] M2-T01〜T02: 写真ライブラリ権限設定
+- [ ] M2-T03〜T07: 写真モデル・リポジトリ実装
+- [ ] M2-T08〜T12: スキャナー・キャッシュ実装
 
 ### Phase 1 継続 - UI Components（M4）
-- [ ] M4-T05〜T08: 共通コンポーネント（ボタン、進捗表示、空状態）
-
-### Phase 2 - データ層（M2）
-- [ ] Photos Framework統合
-- [ ] 写真スキャン機能
-- [ ] メタデータ取得
+- [ ] M4-T05〜T08: 共通コンポーネント（サムネイル、グリッド、カード）
+- [ ] M4-T09〜T14: インタラクション要素（ボタン、ダイアログ、トースト）
 
 ---
 
@@ -99,6 +79,7 @@
 | 0.1.0 | 2025-11-27 | 設計フェーズ完了 |
 | 0.2.0 | 2025-11-28 | 基盤構築開始（Core + カラーパレット） |
 | 0.3.0 | 2025-11-28 | デザインシステム基盤完成（Typography + Glass + Spacing + Protocols） |
+| 0.4.0 | 2025-11-28 | M1: Core Infrastructure完了（Logger + Extensions + Tests） |
 | 1.0.0 | 予定 | 初回リリース（MVP） |
 
 ---

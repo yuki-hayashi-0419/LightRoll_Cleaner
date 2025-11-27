@@ -237,4 +237,115 @@
 
 ---
 
+## 2025-11-28: M1 Core Infrastructure完了（v0.4.0）
+
+### 完了タスク一覧（セッション impl-003）
+
+#### M1: Core Infrastructure（3タスク完了 → モジュール完了）
+| タスクID | タスク名 | スコア | 内容 |
+|----------|---------|--------|------|
+| M1-T04 | ロガー実装 | 116点 | Logger.swift, 6段階ログレベル, 9カテゴリ, OSLog統合 |
+| M1-T09 | 拡張ユーティリティ | 113点 | 7拡張ファイル, 100+メソッド |
+| M1-T10 | 単体テスト作成 | 112点 | ConfigTests, ErrorTests, 92テスト追加 |
+
+### M1モジュール完了サマリー
+
+**全10タスク完了**:
+- M1-T01: Xcodeプロジェクト作成
+- M1-T02: ディレクトリ構造整備
+- M1-T03: エラー型定義（LightRollError）
+- M1-T04: ロガー実装（Logger.swift）
+- M1-T05: AppConfig実装
+- M1-T06: DIコンテナ基盤（ServiceLocator）
+- M1-T07: AppState実装（@Observable）
+- M1-T08: Protocol定義
+- M1-T09: 拡張ユーティリティ
+- M1-T10: 単体テスト作成
+
+**総工数**: 16時間（見積20時間 → 20%効率化）
+
+### 実装詳細
+
+#### Logger（Logger.swift）
+
+**ログレベル（6段階）**:
+| レベル | 用途 |
+|--------|------|
+| trace | 詳細デバッグ（開発時のみ） |
+| debug | 開発時デバッグ情報 |
+| info | 一般的な情報（デフォルト） |
+| warning | 警告（処理は継続） |
+| error | エラー（機能に影響） |
+| critical | 致命的エラー（アプリ停止レベル） |
+
+**ログカテゴリ（9種類）**:
+- general: 一般的なログ
+- ui: UI関連
+- network: ネットワーク処理
+- database: データベース操作
+- photo: 写真処理
+- analysis: 画像分析
+- purchase: 課金処理
+- notification: 通知
+- performance: パフォーマンス計測
+
+**主要機能**:
+- `Logger.log(_:level:category:file:function:line:)` - 基本ログ出力
+- `Logger.measure(_:category:operation:)` - パフォーマンス計測
+- `Logger.log(error:context:file:function:line:)` - LightRollError連携
+- OSLog統合（iOS標準Console.appで確認可能）
+
+#### 拡張ユーティリティ
+
+**String+Extensions.swift**:
+- `isValidEmail` / `isValidPhone` / `isValidURL` - バリデーション
+- `trimmed` / `nilIfEmpty` - 文字列処理
+- `localized` / `localizedWithFormat(_:)` - ローカライズ
+- `toDate(format:)` / `toURL()` - 型変換
+
+**Array+Extensions.swift**:
+- `safe[index]` - 安全なインデックスアクセス
+- `unique()` / `uniqueBy(_:)` - 重複排除
+- `chunked(into:)` - 分割
+- `asyncMap(_:)` / `asyncCompactMap(_:)` - 非同期処理
+
+**Date+Extensions.swift**:
+- `isToday` / `isYesterday` / `isThisWeek` - 日付判定
+- `startOfDay` / `endOfDay` / `startOfMonth` - 境界取得
+- `formatted(_:)` / `relativeFormatted` - フォーマット
+- `adding(_:to:)` / `daysBetween(_:)` - 計算
+
+**Optional+Extensions.swift**:
+- `isNilOrEmpty` - String?のnil/空判定
+- `orEmpty` - String?のデフォルト空文字
+- `unwrap(or:)` / `unwrap(orThrow:)` - アンラップ
+
+**FileManager+Extensions.swift**:
+- `documentsDirectory` / `cachesDirectory` - ディレクトリ取得
+- `fileSize(at:)` / `directorySize(at:)` - サイズ取得
+- `createDirectoryIfNeeded(at:)` - ディレクトリ作成
+- `safeRemoveItem(at:)` - 安全な削除
+
+**Collection+Extensions.swift**:
+- `isNotEmpty` - 空でないか判定
+- `average` / `sum` - 数値コレクション計算
+- `sorted(by:ascending:)` - ソート
+- `grouped(by:)` - グルーピング
+
+**Result+Extensions.swift**:
+- `isSuccess` / `isFailure` - 結果判定
+- `successValue` / `failureError` - 値取得
+- `mapBoth(success:failure:)` - 両方変換
+- `flatMapError(_:)` - エラー変換
+
+#### テストカバレッジ
+
+**追加テスト（92テスト）**:
+- ConfigTests: AppConfig, UserDefaults永続化
+- ErrorTests: LightRollError, エラーコード, ローカライズ
+
+**総テスト数**: 368 → 460テスト（+25%）
+
+---
+
 *アーカイブ更新: 2025-11-28*
