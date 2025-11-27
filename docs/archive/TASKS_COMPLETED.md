@@ -141,4 +141,44 @@
   - LayoutMetrics、EdgeInsets拡張
 - **テスト**: 69テスト全パス
 
+### M1-T04: ロガー実装
+- **完了日**: 2025-11-28
+- **セッション**: impl-003
+- **品質スコア**: 116/120点
+- **成果物**:
+  - Logger.swift（約780行のロギングシステム）
+  - 6段階ログレベル（verbose, debug, info, warning, error, fault）
+  - 9種類カテゴリ（general, photoLibrary, analysis, storage, ui, network, purchase, performance, debug）
+  - パフォーマンス計測機能
+  - LightRollError連携
+  - OSLog統合、メモリ内ログ保存
+- **テスト**: 41テスト全パス
+
+### M1-T09: 拡張ユーティリティ
+- **完了日**: 2025-11-28
+- **セッション**: impl-003
+- **品質スコア**: 113/120点
+- **成果物**:
+  - String+Extensions.swift
+  - Array+Extensions.swift
+  - Date+Extensions.swift
+  - Optional+Extensions.swift
+  - FileManager+Extensions.swift
+  - Collection+Extensions.swift
+  - Result+Extensions.swift
+  - 100以上のユーティリティメソッド
+  - Swift Concurrency対応（asyncMap, concurrentMap等）
+- **テスト**: 73テスト全パス
+
+### M1-T10: 単体テスト作成
+- **完了日**: 2025-11-28
+- **セッション**: impl-003
+- **品質スコア**: 112/120点
+- **成果物**:
+  - ConfigTests.swift（45テスト）
+  - ErrorTests.swift（47テスト）
+  - 全エラー型・設定型のテストカバレッジ100%
+- **テスト**: 92テスト追加（368→460テスト）
+- **備考**: **M1モジュール完了**
+
 ---
