@@ -5,13 +5,6 @@
 ## User settings
 xcuserdata/
 
-## compatibility with Xcode 8 and earlier (Workspaces)
-*.xcscmblueprint
-*.xccheckout
-
-## compatibility with Xcode 3 and earlier (Workspaces)
-!default.xcworkspace
-
 ## Obj-C/Swift specific
 *.hmap
 
@@ -27,16 +20,14 @@ playground.xcworkspace
 # Swift Package Manager
 #
 # Add this line if you want to avoid checking in source code from Swift Package Manager dependencies.
-Packages/
-Package.pins
-Package.resolved
-*.xcodeproj
+# Packages/
+# Package.pins
+# Package.resolved
+# *.xcodeproj
 #
-# Xcode automatically generates this directory with a hierarchical list of all
-# workspace files for Xcode's auto-complete. Xcode can also re-create it
-# if needed, so it's fully safe to exclude.
-#
-.swiftpm
+# Xcode automatically generates this directory with a .xcworkspacedata file and xcuserdata
+# hence it is not needed unless you have added a package configuration file to your project
+# .swiftpm
 
 .build/
 
@@ -46,21 +37,17 @@ Package.resolved
 # you should judge for yourself, the pros and cons are mentioned at:
 # https://guides.cocoapods.org/using/using-cocoapods.html#should-i-check-the-pods-directory-into-source-control
 #
-Pods/
+# Pods/
 #
 # Add this line if you want to avoid checking in source code from the Xcode workspace
-*.xcworkspace
+# *.xcworkspace
 
 # Carthage
 #
 # Add this line if you want to avoid checking in source code from Carthage dependencies.
-Carthage/Checkouts
+# Carthage/Checkouts
 
 Carthage/Build/
-
-# Accio dependency management
-Dependencies/
-.accio/
 
 # fastlane
 #
@@ -73,51 +60,3 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
-
-# Code Injection
-#
-# After new calculation, these injection files can be removed from the source tree.
-#
-iOSInjectionProject/
-
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-
-# Thumbnails
-._*
-
-# Files that might appear in the root of a volume
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-.VolumeIcon.icns
-.com.apple.timemachine.donotpresent
-
-# Directories potentially created on remote AFP share
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
-
-# IDE
-.idea/
-*.swp
-*.swo
-*~
-
-# Environment
-.env
-.env.local
-.env.*.local
-
-# Build outputs
-build/
-DerivedData/
-
-# Archives
-*.xcarchive

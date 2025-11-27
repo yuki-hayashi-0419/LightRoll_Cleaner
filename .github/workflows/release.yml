@@ -1,0 +1,95 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - 'v*'
+
+env:
+  SCHEME: LightRollCleaner
+
+jobs:
+  # Releaseビルド
+  release-build:
+    name: Release Build
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.2.app
+
+      - name: Build Release
+        run: |
+          xcodebuild build \
+            -scheme ${{ env.SCHEME }} \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            | xcpretty
+
+  # E2Eテスト
+  e2e-test:
+    name: E2E Tests
+    runs-on: macos-latest
+    needs: release-build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.2.app
+
+      - name: Run E2E Tests
+        run: |
+          xcodebuild test \
+            -scheme "${SCHEME}UITests" \
+            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            | xcpretty
+
+  # セキュリティ監査
+  security-audit:
+    name: Security Audit
+    runs-on: macos-latest
+    needs: release-build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for Secrets
+        run: |
+          # APIキー、パスワード等の検出
+          if grep -rE "(api_key|apikey|password|secret)" --include="*.swift" src/; then
+            echo "Potential secrets found in code"
+            exit 1
+          fi
+          echo "No secrets detected"
+
+      - name: Check Network Calls
+        run: |
+          # 外部ネットワーク呼び出しの検出（写真データ送信防止）
+          if grep -rE "URLSession|Alamofire|AF\." --include="*.swift" src/ | grep -v "StoreKit\|RevenueCat"; then
+            echo "WARNING: Network calls detected - verify no photo data is transmitted"
+          fi
+          echo "Network audit complete"
+
+  # リリースノート生成
+  create-release:
+    name: Create Release
+    runs-on: macos-latest
+    needs: [e2e-test, security-audit]
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          generate_release_notes: true
+          draft: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

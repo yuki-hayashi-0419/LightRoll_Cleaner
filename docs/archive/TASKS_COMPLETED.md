@@ -45,3 +45,62 @@
 - **成果物**: `docs/CRITICAL/ARCHITECTURE.md` に選定プロセスを追加
 
 ---
+
+## 2025-11-28 完了
+
+### M1-T01: Xcodeプロジェクト作成
+- **完了日**: 2025-11-28
+- **セッション**: impl-001
+- **品質スコア**: 112/120点
+- **成果物**:
+  - `LightRoll_Cleaner.xcworkspace`
+  - `LightRoll_Cleaner.xcodeproj`
+  - `LightRoll_CleanerPackage/` (SPM Feature)
+  - `LightRoll_CleanerUITests/`
+- **設定**:
+  - Bundle ID: com.lightroll.cleaner
+  - iOS 17.0+、SwiftUI、Universal対応
+
+### M1-T02: ディレクトリ構造整備
+- **完了日**: 2025-11-28
+- **セッション**: impl-001
+- **品質スコア**: 111/120点
+- **成果物**:
+  - MVVM + Repository Pattern に基づく18ディレクトリ
+  - Core/DI, Config, Errors / Models / Views / ViewModels / Repositories / Services / Utils
+
+### M1-T03: エラー型定義
+- **完了日**: 2025-11-28
+- **セッション**: impl-001
+- **品質スコア**: 113/120点
+- **成果物**:
+  - LightRollError（5カテゴリ）
+  - PhotoLibraryError、AnalysisError、StorageError、ConfigurationError
+  - LocalizedError、Equatable準拠
+
+### M1-T05: AppConfig実装
+- **完了日**: 2025-11-28
+- **セッション**: impl-001
+- **成果物**: アプリケーション設定管理クラス
+
+### M1-T06: DIコンテナ基盤
+- **完了日**: 2025-11-28
+- **セッション**: impl-001
+- **成果物**: 依存性注入コンテナ実装
+
+### M1-T07: AppState実装
+- **完了日**: 2025-11-28
+- **セッション**: impl-001
+- **成果物**: アプリケーション状態管理
+
+### M4-T01: カラーパレット定義
+- **完了日**: 2025-11-28
+- **セッション**: impl-001
+- **品質スコア**: 100/120点
+- **成果物**:
+  - DesignSystem.swift
+  - Colors.xcassets（16色セット）
+  - ダークモード/ライトモード両対応
+  - Color.LightRoll.xxx でアクセス
+
+---
