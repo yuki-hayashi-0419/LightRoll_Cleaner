@@ -1,5 +1,64 @@
 # LightRoll Cleaner - System Architecture
 
+## 0. アーキテクチャ選定
+
+### 0.1 選定プロセス
+
+本プロジェクトでは、3つのアーキテクチャ候補を定量評価し、最適なアーキテクチャを選定しました。
+
+### 0.2 候補アーキテクチャ
+
+#### パターンA: シンプル重視（軽量MVC/MVVM）
+```
+Views (SwiftUI) → ViewModels (@Observable) → Services (具象クラス) → Frameworks
+```
+- 最小限の抽象化、Protocol層なし
+- iOS 17の`@Observable`マクロを積極活用
+- 開発速度最速だがテスタビリティに難あり
+
+#### パターンB: バランス重視（MVVM + Repository）【採用】
+```
+Views → ViewModels (ObservableObject) → Repository Protocols → Implementations → Frameworks
+```
+- Repository PatternでデータアクセスをProtocol化
+- UseCaseは省略（ViewModelが直接Repositoryを使用）
+- テスタビリティと開発速度のバランス
+
+#### パターンC: スケーラビリティ重視（Clean Architecture）
+```
+Views → ViewModels → UseCases → Domain → Repositories → Frameworks
+```
+- 4層アーキテクチャ、完全なレイヤー分離
+- DIコンテナ（Swinject）使用
+- エンタープライズ級だが過度なオーバーヘッド
+
+### 0.3 定量評価マトリクス
+
+| 指標 | 重み | A (シンプル) | B (バランス) | C (Clean) |
+|-----|-----|-------------|-------------|-----------|
+| **開発速度** | 30% | 95点 | 75点 | 55点 |
+| **コスト** | 20% | 90点 | 75点 | 50点 |
+| **スケーラビリティ** | 25% | 50点 | 80点 | 90点 |
+| **保守性** | 25% | 45点 | 85点 | 90点 |
+| **総合スコア** | 100% | **70.25点** | **78.75点** | **71.5点** |
+
+### 0.4 選定結果と理由
+
+**採用: パターンB（MVVM + Repository）**
+
+**選定理由:**
+1. **プロジェクト規模への適合**: 190時間/9モジュール構成に最適なオーバーヘッド
+2. **テスト要件の充足**: カバレッジ80%要件をRepositoryモックで達成可能
+3. **将来拡張への対応**: iPad/iCloud対応時もRepository差替で対応可能
+4. **チーム規模への適合**: 個人/スモールチーム向けに過度な抽象化を回避
+
+**トレードオフ:**
+- パターンAから得るもの: テスタビリティ(+40点)、スケーラビリティ(+30点)
+- パターンAから失うもの: 開発速度(-20点)、初期コスト(-15点)
+- パターンCと比較: UseCase層を省略し複雑性を抑制
+
+---
+
 ## 1. アーキテクチャ概要
 
 ### 1.1 全体構成
@@ -17,27 +76,29 @@
 │  └────────────────────────┬────────────────────────┘            │
 └───────────────────────────┼─────────────────────────────────────┘
                             │
-┌───────────────────────────┼─────────────────────────────────────┐
+                            │ protocol依存
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
 │                      Domain Layer                                │
-│  ┌────────────────────────┴────────────────────────┐            │
-│  │                  Use Cases                       │            │
-│  │  ┌──────────┐ ┌──────────┐ ┌──────────────────┐ │            │
-│  │  │  Scan    │ │  Group   │ │  Delete/Restore  │ │            │
-│  │  │  Photos  │ │  Photos  │ │     Photos       │ │            │
-│  │  └────┬─────┘ └────┬─────┘ └────────┬─────────┘ │            │
-│  └───────┼────────────┼────────────────┼───────────┘            │
-│          │            │                │                         │
-│  ┌───────┴────────────┴────────────────┴───────────┐            │
-│  │              Domain Models                       │            │
-│  │  Photo, PhotoGroup, StorageInfo, UserSettings    │            │
-│  └─────────────────────────────────────────────────┘            │
-└─────────────────────────────────────────────────────────────────┘
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │              Repository Protocols                        │    │
+│  │  PhotoRepositoryProtocol / AnalysisRepositoryProtocol    │    │
+│  │  SettingsRepositoryProtocol / PurchaseRepositoryProtocol │    │
+│  └────────────────────────┬────────────────────────────────┘    │
+│                           │                                      │
+│  ┌────────────────────────┴────────────────────────────────┐    │
+│  │              Domain Models                               │    │
+│  │  Photo, PhotoGroup, StorageInfo, UserSettings            │    │
+│  └─────────────────────────────────────────────────────────┘    │
+└───────────────────────────┬─────────────────────────────────────┘
                             │
-┌───────────────────────────┼─────────────────────────────────────┐
+                            │ 実装
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
 │                       Data Layer                                 │
-│  ┌────────────────────────┴────────────────────────┐            │
-│  │                 Repositories                     │            │
-│  └────────────────────────┬────────────────────────┘            │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │              Repository Implementations                  │    │
+│  └────────────────────────┬────────────────────────────────┘    │
 │                           │                                      │
 │  ┌─────────────┬──────────┼──────────┬─────────────┐            │
 │  │             │          │          │             │            │
@@ -49,9 +110,14 @@
 
 ### 1.2 設計パターン
 - **MVVM (Model-View-ViewModel)**: UI層の責務分離
-- **Repository Pattern**: データソースの抽象化
-- **Dependency Injection**: テスタビリティの確保
+- **Repository Pattern**: データソースの抽象化（テスタビリティの要）
+- **Dependency Injection**: ViewModelへのRepository注入
 - **Protocol Oriented Programming**: 柔軟な実装の入れ替え
+
+### 1.3 採用しなかったパターン
+- **UseCase層**: 現時点のビジネスロジック複雑性では過剰（将来追加可能）
+- **Coordinator Pattern**: NavigationStack/NavigationPathで十分
+- **DIコンテナ（Swinject等）**: @Environment/@EnvironmentObjectで代替
 
 ---
 
@@ -71,6 +137,8 @@
 
 #### ViewModels
 ```swift
+/// ViewModelの基本プロトコル
+/// Repository Protocolに依存し、テスト時にモック注入可能
 protocol ViewModelProtocol: ObservableObject {
     associatedtype State
     associatedtype Action
@@ -78,30 +146,62 @@ protocol ViewModelProtocol: ObservableObject {
     var state: State { get }
     func send(_ action: Action)
 }
+
+// 例: HomeViewModel
+@MainActor
+final class HomeViewModel: ObservableObject {
+    // Repositoryはprotocol型で保持（テスタビリティ確保）
+    private let photoRepository: PhotoRepositoryProtocol
+    private let analysisRepository: AnalysisRepositoryProtocol
+
+    @Published private(set) var state: HomeState = .initial
+
+    init(
+        photoRepository: PhotoRepositoryProtocol = PhotoRepository(),
+        analysisRepository: AnalysisRepositoryProtocol = AnalysisRepository()
+    ) {
+        self.photoRepository = photoRepository
+        self.analysisRepository = analysisRepository
+    }
+
+    func send(_ action: HomeAction) {
+        // アクション処理
+    }
+}
 ```
 
 ### 2.2 Domain Layer
 
-#### Use Cases
+#### Repository Protocols（テスタビリティの要）
 ```swift
-// 写真スキャン
-protocol ScanPhotosUseCaseProtocol {
-    func execute() async throws -> ScanResult
+/// 写真リポジトリプロトコル
+/// Photos Frameworkへのアクセスを抽象化
+protocol PhotoRepositoryProtocol {
+    func fetchAllPhotos() async throws -> [Photo]
+    func deletePhotos(_ photos: [Photo]) async throws
+    func moveToTrash(_ photos: [Photo]) async throws
+    func restoreFromTrash(_ photos: [Photo]) async throws
 }
 
-// グルーピング
-protocol GroupPhotosUseCaseProtocol {
-    func execute(photos: [Photo]) async throws -> [PhotoGroup]
+/// 分析リポジトリプロトコル
+/// Vision/CoreMLへのアクセスを抽象化
+protocol AnalysisRepositoryProtocol {
+    func analyzePhoto(_ photo: Photo) async throws -> PhotoAnalysisResult
+    func findSimilarPhotos(_ photos: [Photo]) async throws -> [[Photo]]
+    func detectBlurryPhotos(_ photos: [Photo]) async throws -> [Photo]
 }
 
-// 削除処理
-protocol DeletePhotosUseCaseProtocol {
-    func execute(photos: [Photo], permanent: Bool) async throws
+/// 設定リポジトリプロトコル
+protocol SettingsRepositoryProtocol {
+    func load() -> UserSettings
+    func save(_ settings: UserSettings)
 }
 
-// 復元処理
-protocol RestorePhotosUseCaseProtocol {
-    func execute(photos: [Photo]) async throws
+/// 課金リポジトリプロトコル
+protocol PurchaseRepositoryProtocol {
+    func fetchProducts() async throws -> [Product]
+    func purchase(_ product: Product) async throws -> PurchaseResult
+    func restorePurchases() async throws
 }
 ```
 
@@ -142,38 +242,102 @@ struct StorageInfo {
 
 ### 2.3 Data Layer
 
-#### Repositories
+#### Repository Implementations
 ```swift
-protocol PhotoRepositoryProtocol {
-    func fetchAllPhotos() async throws -> [Photo]
-    func deletePhotos(_ photos: [Photo]) async throws
-    func moveToTrash(_ photos: [Photo]) async throws
-    func restoreFromTrash(_ photos: [Photo]) async throws
+/// PhotoRepositoryの実装
+/// Photos Frameworkを直接使用
+final class PhotoRepository: PhotoRepositoryProtocol {
+    func fetchAllPhotos() async throws -> [Photo] {
+        // PHAssetを取得してPhotoに変換
+    }
+
+    func deletePhotos(_ photos: [Photo]) async throws {
+        // PHAssetChangeRequestで削除
+    }
+    // ...
 }
 
-protocol AnalysisRepositoryProtocol {
-    func analyzePhoto(_ photo: Photo) async throws -> PhotoAnalysisResult
-    func findSimilarPhotos(_ photos: [Photo]) async throws -> [[Photo]]
-    func detectBlurryPhotos(_ photos: [Photo]) async throws -> [Photo]
-}
+/// テスト用モックリポジトリ
+final class MockPhotoRepository: PhotoRepositoryProtocol {
+    var mockPhotos: [Photo] = []
+    var deletePhotosCalled = false
 
-protocol SettingsRepositoryProtocol {
-    func load() -> UserSettings
-    func save(_ settings: UserSettings)
-}
+    func fetchAllPhotos() async throws -> [Photo] {
+        return mockPhotos
+    }
 
-protocol PurchaseRepositoryProtocol {
-    func fetchProducts() async throws -> [Product]
-    func purchase(_ product: Product) async throws -> PurchaseResult
-    func restorePurchases() async throws
+    func deletePhotos(_ photos: [Photo]) async throws {
+        deletePhotosCalled = true
+    }
+    // ...
 }
 ```
 
 ---
 
-## 3. データフロー
+## 3. 依存性注入パターン
 
-### 3.1 写真スキャンフロー
+### 3.1 @Environment経由のDI
+```swift
+// DIキー定義
+private struct PhotoRepositoryKey: EnvironmentKey {
+    static let defaultValue: PhotoRepositoryProtocol = PhotoRepository()
+}
+
+extension EnvironmentValues {
+    var photoRepository: PhotoRepositoryProtocol {
+        get { self[PhotoRepositoryKey.self] }
+        set { self[PhotoRepositoryKey.self] = newValue }
+    }
+}
+
+// Viewでの使用
+struct HomeView: View {
+    @Environment(\.photoRepository) private var photoRepository
+    @StateObject private var viewModel: HomeViewModel
+
+    init() {
+        // EnvironmentからRepositoryを取得してViewModelに注入
+    }
+}
+
+// テストでの使用
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        HomeView()
+            .environment(\.photoRepository, MockPhotoRepository())
+    }
+}
+```
+
+### 3.2 イニシャライザ注入（推奨）
+```swift
+// ViewModelへの直接注入（テストで使用）
+let mockRepo = MockPhotoRepository()
+mockRepo.mockPhotos = [testPhoto1, testPhoto2]
+let viewModel = HomeViewModel(photoRepository: mockRepo)
+
+// テストケース
+func testScanPhotos() async throws {
+    // Given
+    let mockRepo = MockPhotoRepository()
+    mockRepo.mockPhotos = [Photo.mock()]
+    let sut = HomeViewModel(photoRepository: mockRepo)
+
+    // When
+    sut.send(.scan)
+    await sut.waitForScanComplete()
+
+    // Then
+    XCTAssertEqual(sut.state.photos.count, 1)
+}
+```
+
+---
+
+## 4. データフロー
+
+### 4.1 写真スキャンフロー
 ```
 User Action: スキャン開始
        │
@@ -183,41 +347,35 @@ User Action: スキャン開始
 │  send(.scan)     │
 └────────┬─────────┘
          │
+         │ protocol経由
          ▼
-┌──────────────────┐
-│ ScanPhotosUseCase│
-│   execute()      │
-└────────┬─────────┘
-         │
-    ┌────┴────┐
-    ▼         ▼
-┌───────┐ ┌──────────┐
-│Photos │ │ Analysis │
-│ Repo  │ │   Repo   │
-└───┬───┘ └────┬─────┘
-    │          │
-    ▼          ▼
-[PHAssets]  [Vision/ML分析]
-    │          │
-    └────┬─────┘
-         │
-         ▼
-┌──────────────────┐
-│ GroupPhotosUseCase│
-│   execute()       │
-└────────┬─────────┘
-         │
-         ▼
-   [PhotoGroup配列]
-         │
-         ▼
+┌──────────────────┐     ┌──────────────────┐
+│ PhotoRepository  │     │ AnalysisRepository│
+│  (Protocol)      │     │   (Protocol)      │
+└────────┬─────────┘     └────────┬─────────┘
+         │                        │
+         ▼                        ▼
+┌──────────────────┐     ┌──────────────────┐
+│ PhotoRepository  │     │AnalysisRepository│
+│  (Implementation)│     │ (Implementation) │
+└────────┬─────────┘     └────────┬─────────┘
+         │                        │
+         ▼                        ▼
+    [PHAssets]            [Vision/ML分析]
+         │                        │
+         └──────────┬─────────────┘
+                    │
+                    ▼
+           [PhotoGroup配列]
+                    │
+                    ▼
 ┌──────────────────┐
 │   HomeViewModel  │
 │ state.groups =   │
 └──────────────────┘
 ```
 
-### 3.2 削除フロー
+### 4.2 削除フロー
 ```
 User Action: 削除確認
        │
@@ -229,10 +387,11 @@ User Action: 削除確認
          │ 確認
          ▼
 ┌──────────────────┐
-│DeletePhotosUseCase│
-│ moveToTrash()    │
+│  GroupViewModel  │
+│ send(.delete)    │
 └────────┬─────────┘
          │
+         │ protocol経由
          ▼
 ┌──────────────────┐
 │  PhotoRepository │
@@ -253,9 +412,9 @@ User Action: 削除確認
 
 ---
 
-## 4. 画像分析アーキテクチャ
+## 5. 画像分析アーキテクチャ
 
-### 4.1 分析パイプライン
+### 5.1 分析パイプライン
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │                    Analysis Pipeline                          │
@@ -273,7 +432,7 @@ User Action: 削除確認
 └──────────────────────────────────────────────────────────────┘
 ```
 
-### 4.2 使用フレームワーク
+### 5.2 使用フレームワーク
 | 処理 | フレームワーク | 用途 |
 |------|---------------|------|
 | 特徴抽出 | Vision (VNFeaturePrintObservation) | 類似画像判定 |
@@ -281,7 +440,7 @@ User Action: 削除確認
 | ブレ検出 | Vision (VNDetectImageQuality) | 品質スコア |
 | スクショ判定 | CoreML / ヒューリスティック | 画面キャプチャ検出 |
 
-### 4.3 類似度判定ロジック
+### 5.3 類似度判定ロジック
 ```swift
 // コサイン類似度でグルーピング
 func calculateSimilarity(
@@ -299,9 +458,9 @@ let similarityThreshold: Float = 0.85
 
 ---
 
-## 5. 状態管理
+## 6. 状態管理
 
-### 5.1 AppState
+### 6.1 AppState
 ```swift
 @MainActor
 final class AppState: ObservableObject {
@@ -315,7 +474,7 @@ final class AppState: ObservableObject {
 }
 ```
 
-### 5.2 Navigation
+### 6.2 Navigation
 ```swift
 enum NavigationDestination: Hashable {
     case groupList
@@ -328,9 +487,9 @@ enum NavigationDestination: Hashable {
 
 ---
 
-## 6. エラーハンドリング
+## 7. エラーハンドリング
 
-### 6.1 エラー型定義
+### 7.1 エラー型定義
 ```swift
 enum LightRollError: LocalizedError {
     case photoAccessDenied
@@ -351,16 +510,16 @@ enum LightRollError: LocalizedError {
 }
 ```
 
-### 6.2 エラー表示
+### 7.2 エラー表示
 - 非致命的エラー: トースト通知
 - 致命的エラー: アラートダイアログ
 - 権限エラー: 設定アプリへの誘導
 
 ---
 
-## 7. セキュリティアーキテクチャ
+## 8. セキュリティアーキテクチャ
 
-### 7.1 データ保護
+### 8.1 データ保護
 ```
 ┌─────────────────────────────────────────┐
 │              Device Only                 │
@@ -381,7 +540,7 @@ enum LightRollError: LocalizedError {
 └─────────────────────────────────────────┘
 ```
 
-### 7.2 権限フロー
+### 8.2 権限フロー
 ```
 アプリ起動
     │
@@ -407,14 +566,14 @@ enum LightRollError: LocalizedError {
 
 ---
 
-## 8. パフォーマンス最適化
+## 9. パフォーマンス最適化
 
-### 8.1 並行処理
+### 9.1 並行処理
 - `TaskGroup`を使用した並列画像分析
 - `AsyncStream`によるプログレス通知
 - メインスレッドブロッキングの回避
 
-### 8.2 メモリ管理
+### 9.2 メモリ管理
 ```swift
 // サムネイルサイズの最適化
 let thumbnailSize = CGSize(width: 200, height: 200)
@@ -432,36 +591,54 @@ func processPhotos(_ photos: [Photo]) async {
 }
 ```
 
-### 8.3 キャッシング戦略
+### 9.3 キャッシング戦略
 - 分析結果: NSCache + ディスクキャッシュ
 - サムネイル: PHCachingImageManager
 - 統計情報: UserDefaults
 
 ---
 
-## 9. 将来の拡張性
+## 10. 将来の拡張性
 
-### 9.1 予定機能
+### 10.1 予定機能
 - [ ] iPad対応
 - [ ] iCloud写真対応
 - [ ] ウィジェット
 - [ ] Siriショートカット
 
-### 9.2 拡張ポイント
+### 10.2 拡張ポイント
 - `GroupType`の追加による新しいグルーピング
 - 分析アルゴリズムのプラグイン化
 - 外部ストレージ連携（将来）
 
+### 10.3 UseCase層の追加（将来オプション）
+ビジネスロジックが複雑化した場合、ViewModelとRepositoryの間にUseCase層を追加可能：
+```swift
+// 将来追加する場合の例
+protocol ScanPhotosUseCaseProtocol {
+    func execute() async throws -> ScanResult
+}
+
+final class ScanPhotosUseCase: ScanPhotosUseCaseProtocol {
+    private let photoRepository: PhotoRepositoryProtocol
+    private let analysisRepository: AnalysisRepositoryProtocol
+
+    func execute() async throws -> ScanResult {
+        // 複雑なビジネスロジックをカプセル化
+    }
+}
+```
+
 ---
 
-## 10. 技術的制約
+## 11. 技術的制約
 
-### 10.1 Photos Framework制限
+### 11.1 Photos Framework制限
 - 完全削除にはユーザー確認が必須
 - PHAssetの変更は非同期
 - アルバム情報の変更に制限あり
 
-### 10.2 デバイス制約
+### 11.2 デバイス制約
 - iOS 16以上（Vision API要件）
 - メモリ制限（バックグラウンド時は特に）
 - バッテリー消費への配慮
@@ -469,3 +646,4 @@ func processPhotos(_ photos: [Photo]) async {
 ---
 
 *最終更新: 2025-11-27*
+*アーキテクチャ選定: パターンB（MVVM + Repository）*
