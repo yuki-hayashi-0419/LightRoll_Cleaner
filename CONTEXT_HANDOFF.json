@@ -1,34 +1,91 @@
 {
   "project": {
     "name": "LightRoll_Cleaner",
-    "description": "写真・動画ライブラリのクリーンアップツール",
+    "description": "写真・動画ライブラリのクリーンアップツール（iOS）",
     "created_at": "2025-11-27",
-    "version": "0.0.1"
+    "version": "0.0.1",
+    "tech_stack": ["Swift", "SwiftUI", "Photos Framework"],
+    "platform": "iOS"
+  },
+  "initialization": {
+    "status": "completed",
+    "commit_id": "b3cce23",
+    "completed_at": "2025-11-27"
   },
   "last_session": {
     "date": "2025-11-27",
+    "session_id": "init-001",
     "completed_modules": [],
-    "completed_tasks": [],
+    "completed_tasks": [
+      "Git初期化",
+      "ディレクトリ構造作成",
+      "基本ファイル作成",
+      "初回コミット"
+    ],
     "in_progress_tasks": []
   },
   "next_session": {
-    "suggested_modules": [],
-    "priority_tasks": [],
-    "notes": "初期設定完了。次回は基本機能モジュールの設計から開始"
+    "suggested_modules": [
+      "core-architecture",
+      "photo-access-module"
+    ],
+    "priority_tasks": [
+      "Xcodeプロジェクト作成",
+      "基本アーキテクチャ設計",
+      "Photos Framework統合準備"
+    ],
+    "blockers": [],
+    "notes": "プロジェクト初期化完了。次回はXcodeプロジェクトの作成と基本機能モジュールの設計から開始"
+  },
+  "modules": {
+    "planned": [
+      {
+        "name": "duplicate-detection",
+        "description": "重複ファイル検出機能",
+        "status": "planned"
+      },
+      {
+        "name": "similar-image-grouping",
+        "description": "類似画像グルーピング機能",
+        "status": "planned"
+      },
+      {
+        "name": "storage-analyzer",
+        "description": "ストレージ使用状況分析機能",
+        "status": "planned"
+      }
+    ],
+    "completed": [],
+    "in_progress": []
   },
   "mcp_status": {
     "installed": [],
-    "pending": [],
+    "pending": ["xcodebuildmcp"],
     "configured": false
   },
   "context_optimization": {
-    "last_optimized": "2025-11-27",
+    "last_optimized": "2025-11-27T23:20:00+09:00",
+    "task_count": 0,
     "progress_entries_count": 0,
-    "archived_tasks_count": 0
+    "archived_tasks_count": 0,
+    "next_optimization_trigger": "10 tasks or module completion"
+  },
+  "file_structure": {
+    "docs": {
+      "CRITICAL": "重要ドキュメント（常時読み込み推奨）",
+      "modules": "モジュール仕様書",
+      "archive": "アーカイブ済みドキュメント"
+    },
+    "src/modules": "ソースコード（モジュール別）",
+    "tests": "テストコード"
   },
   "dependencies": {
     "external": [],
     "internal": []
   },
-  "notes": []
+  "known_issues": [],
+  "notes": [
+    "プロジェクト初期化完了（2025-11-27）",
+    "iOSアプリとしてXcodeプロジェクト作成が必要"
+  ]
 }
