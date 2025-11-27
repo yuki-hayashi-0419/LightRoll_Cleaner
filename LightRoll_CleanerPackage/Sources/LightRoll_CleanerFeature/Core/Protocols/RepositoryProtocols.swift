@@ -195,7 +195,7 @@ public struct PhotoAnalysisResult: Sendable {
 }
 
 /// ストレージ情報（仮定義）
-public struct StorageInfo: Sendable {
+public struct StorageInfo: Sendable, Equatable {
     public let totalCapacity: Int64
     public let usedCapacity: Int64
     public let photosSize: Int64

@@ -3,50 +3,54 @@
     "name": "LightRoll_Cleaner",
     "description": "写真・動画ライブラリのクリーンアップツール（iOS）",
     "created_at": "2025-11-27",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "tech_stack": ["Swift", "SwiftUI", "Photos Framework", "Vision Framework", "StoreKit 2"],
     "platform": "iOS",
     "min_deployment_target": "iOS 17.0"
   },
   "current_phase": {
     "phase": "implementation_phase_1",
-    "description": "Phase 1（基盤構築）進行中 - M1 6/10完了、M4 1/14完了",
+    "description": "Phase 1（基盤構築）進行中 - M1 7/10完了、M4 4/14完了",
     "next_phase": "implementation_phase_1_completion"
   },
   "last_session": {
     "date": "2025-11-28",
-    "session_id": "impl-001",
+    "session_id": "impl-002",
     "completed_tasks": [
-      "M1-T01: Xcodeプロジェクト作成 (112/120点)",
-      "M1-T02: ディレクトリ構造整備 (111/120点)",
-      "M1-T03: エラー型定義 (113/120点)",
-      "M1-T05: AppConfig実装 (111/120点)",
-      "M1-T06: DIコンテナ基盤 (114/120点)",
-      "M1-T07: AppState実装 (115/120点)",
-      "M4-T01: カラーパレット定義 (100/120点)"
+      "M1-T08: Protocol定義 (106/120点)",
+      "M4-T02: タイポグラフィ定義 (108/120点)",
+      "M4-T03: グラスモーフィズム実装 (112/120点)",
+      "M4-T04: Spacing定義 (112/120点)"
     ],
-    "completed_task_count": 7,
-    "test_results": "63テスト全パス",
-    "average_quality_score": "111点 (92.5%)",
+    "completed_task_count": 4,
+    "test_results": "244テスト全パス",
+    "average_quality_score": "110点 (91.7%)",
     "in_progress_tasks": []
+  },
+  "cumulative_progress": {
+    "total_completed_tasks": 11,
+    "total_tasks": 118,
+    "completion_percentage": 9.3,
+    "total_tests": 244,
+    "all_tests_passing": true
   },
   "next_session": {
     "recommended_start": "development_continue",
     "recommended_action": "continue_implementation",
     "start_instructions": [
       "1. CONTEXT_HANDOFF.jsonを読み、前回の状態を確認",
-      "2. M1-T08（Protocol定義）から開始 - M1完了の鍵",
-      "3. 必要に応じてM1-T04（ロガー）やM4-T02（タイポグラフィ）を並行実装"
+      "2. M1残りタスク（T04, T09, T10）でM1完了を目指す",
+      "3. M4-T05以降のUIコンポーネント実装に着手可能"
     ],
     "priority_tasks": [
-      "M1-T08: Protocol定義（高優先度 - M2/M3の依存元）",
-      "M1-T04: ロガー実装（中優先度）",
-      "M4-T02: タイポグラフィ定義（M4-T01完了で着手可能）"
+      "M1-T04: ロガー実装（M1完了に必要）",
+      "M1-T09: 拡張ユーティリティ（M1完了に必要）",
+      "M1-T10: 単体テスト作成（M1完了に必要）"
     ],
     "optional_parallel_tasks": [
-      "M1-T09: 拡張ユーティリティ",
-      "M4-T03: グラスモーフィズム実装",
-      "M4-T04: Spacing定義"
+      "M4-T05: PhotoThumbnail実装（M4後半開始）",
+      "M4-T06: PhotoGrid実装",
+      "M4-T07: StorageIndicator実装"
     ],
     "blockers": [],
     "prerequisites": []
@@ -54,8 +58,8 @@
   "modules": {
     "completed": [],
     "in_progress": [
-      {"id": "M1", "name": "Core Infrastructure", "completed_tasks": 6, "total_tasks": 10, "status": "in_progress"},
-      {"id": "M4", "name": "UI Components", "completed_tasks": 1, "total_tasks": 14, "status": "in_progress"}
+      {"id": "M1", "name": "Core Infrastructure", "completed_tasks": 7, "total_tasks": 10, "status": "in_progress", "remaining": ["M1-T04", "M1-T09", "M1-T10"]},
+      {"id": "M4", "name": "UI Components", "completed_tasks": 4, "total_tasks": 14, "status": "in_progress", "remaining": ["M4-T05", "M4-T06", "M4-T07", "M4-T08", "M4-T09", "M4-T10", "M4-T11", "M4-T12", "M4-T13", "M4-T14"]}
     ],
     "pending": [
       {"id": "M2", "name": "Photo Access & Scanning", "tasks": 12, "hours": 20.5, "status": "ready"},
@@ -72,40 +76,40 @@
       "phase": 1,
       "name": "基盤構築",
       "modules": ["M1", "M4前半"],
-      "tasks": "M1-T01〜M1-T08, M4-T01〜M4-T04",
+      "tasks": "M1-T01〜M1-T10, M4-T01〜M4-T04",
       "status": "in_progress",
       "progress": {
-        "completed_tasks": 7,
-        "total_tasks": 12,
-        "percentage": 58
+        "completed_tasks": 11,
+        "total_tasks": 14,
+        "percentage": 78.6
       }
     },
     {
       "phase": 2,
       "name": "データ層",
       "modules": ["M2", "M3"],
-      "tasks": "M2-T01〜M2-T09, M3-T01〜M3-T12",
+      "tasks": "M2-T01〜M2-T12, M3-T01〜M3-T13",
       "status": "pending"
     },
     {
       "phase": 3,
       "name": "UI層",
       "modules": ["M4後半", "M5"],
-      "tasks": "M4-T05〜M4-T14, M5-T01〜M5-T12",
+      "tasks": "M4-T05〜M4-T14, M5-T01〜M5-T13",
       "status": "pending"
     },
     {
       "phase": 4,
       "name": "機能完成",
       "modules": ["M6", "M8"],
-      "tasks": "M6-T01〜M6-T13, M8-T01〜M8-T13",
+      "tasks": "M6-T01〜M6-T14, M8-T01〜M8-T14",
       "status": "pending"
     },
     {
       "phase": 5,
       "name": "仕上げ",
       "modules": ["M7", "M9", "テスト"],
-      "tasks": "M7-T01〜M7-T12, M9-T01〜M9-T14, 単体テスト",
+      "tasks": "M7-T01〜M7-T13, M9-T01〜M9-T15",
       "status": "pending"
     }
   ],
@@ -117,23 +121,23 @@
   },
   "context_optimization": {
     "last_optimized": "2025-11-28",
-    "optimization_session": "opt-002",
-    "session_count": 6,
-    "completed_task_count": 7,
-    "progress_entries_count": 5,
-    "archived_tasks_count": 10,
+    "optimization_session": "opt-003",
+    "session_count": 7,
+    "completed_task_count": 11,
+    "progress_entries_count": 6,
+    "archived_tasks_count": 14,
     "archived_modules": [],
     "context_usage_estimate": "low",
     "tasks_archived_this_session": [
-      "M1-T01", "M1-T02", "M1-T03", "M1-T05", "M1-T06", "M1-T07", "M4-T01"
+      "M1-T08", "M4-T02", "M4-T03", "M4-T04"
     ],
     "next_optimization_trigger": "M1完了時 または 15タスク完了時"
   },
   "quality_metrics": {
-    "total_tests": 63,
-    "tests_passed": 63,
+    "total_tests": 244,
+    "tests_passed": 244,
     "tests_failed": 0,
-    "average_score": 111,
+    "average_score": 110,
     "passing_threshold": 96,
     "all_tasks_passing": true
   },
@@ -163,7 +167,8 @@
     "設計ドキュメント完成（2025-11-27）",
     "アーキテクチャ選定完了: MVVM + Repository Pattern（2025-11-27）",
     "Phase 1実装開始（2025-11-28）",
-    "7タスク完了、63テスト全パス、平均品質スコア111点（2025-11-28）",
-    "コンテキスト最適化実行: 7タスクをアーカイブ、TASKS.md軽量化（2025-11-28）"
+    "impl-001: 7タスク完了、63テスト全パス、平均品質スコア111点（2025-11-28）",
+    "impl-002: 4タスク完了、244テスト全パス、平均品質スコア110点（2025-11-28）",
+    "Phase 1進捗: 78.6%（11/14タスク完了）、M1完了まで残り3タスク"
   ]
 }

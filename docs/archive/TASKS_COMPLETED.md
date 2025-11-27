@@ -103,4 +103,42 @@
   - ダークモード/ライトモード両対応
   - Color.LightRoll.xxx でアクセス
 
+### M1-T08: Protocol定義
+- **完了日**: 2025-11-28
+- **セッション**: impl-002
+- **品質スコア**: 106/120点
+- **成果物**:
+  - UseCaseProtocols.swift（12プロトコル定義）
+  - ViewModelProtocols.swift（9プロトコル定義）
+  - ServiceProtocols.swift（8プロトコル定義）
+- **テスト**: 95テスト全パス
+
+### M4-T02: タイポグラフィ定義
+- **完了日**: 2025-11-28
+- **セッション**: impl-002
+- **品質スコア**: 108/120点
+- **成果物**:
+  - Typography.swift（15フォントスタイル定義）
+  - Dynamic Type完全対応
+- **テスト**: 31テスト全パス
+
+### M4-T03: グラスモーフィズム実装
+- **完了日**: 2025-11-28
+- **セッション**: impl-002
+- **品質スコア**: 112/120点
+- **成果物**:
+  - GlassMorphism.swift（5スタイル、4シェイプ）
+  - GlassCardView、GlassButtonStyle
+  - iOS 26 Liquid Glass前方互換
+- **テスト**: 49テスト全パス
+
+### M4-T04: Spacing定義
+- **完了日**: 2025-11-28
+- **セッション**: impl-002
+- **品質スコア**: 112/120点
+- **成果物**:
+  - Spacing.swift（8ptグリッドシステム）
+  - LayoutMetrics、EdgeInsets拡張
+- **テスト**: 69テスト全パス
+
 ---
