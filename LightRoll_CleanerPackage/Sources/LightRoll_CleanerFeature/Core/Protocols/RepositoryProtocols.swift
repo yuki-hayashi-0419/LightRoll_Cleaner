@@ -194,36 +194,8 @@ public struct PhotoAnalysisResult: Sendable {
     }
 }
 
-/// ストレージ情報（仮定義）
-public struct StorageInfo: Sendable, Equatable {
-    public let totalCapacity: Int64
-    public let usedCapacity: Int64
-    public let photosSize: Int64
-    public let reclaimableSize: Int64
-
-    public init(
-        totalCapacity: Int64 = 0,
-        usedCapacity: Int64 = 0,
-        photosSize: Int64 = 0,
-        reclaimableSize: Int64 = 0
-    ) {
-        self.totalCapacity = totalCapacity
-        self.usedCapacity = usedCapacity
-        self.photosSize = photosSize
-        self.reclaimableSize = reclaimableSize
-    }
-
-    /// 使用率（0.0〜1.0）
-    public var usageRatio: Double {
-        guard totalCapacity > 0 else { return 0 }
-        return Double(usedCapacity) / Double(totalCapacity)
-    }
-
-    /// 空き容量
-    public var freeCapacity: Int64 {
-        return max(0, totalCapacity - usedCapacity)
-    }
-}
+// 注意: StorageInfo は PhotoAccess/Models/StorageInfo.swift で正式に定義されています。
+// ここでの仮定義は削除されました。
 
 /// ユーザー設定（仮定義）
 public struct UserSettings: Sendable, Equatable {

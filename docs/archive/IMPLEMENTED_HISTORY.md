@@ -348,4 +348,175 @@
 
 ---
 
+## 2025-11-28: M2 Photo Access完了（v0.5.0）
+
+### 完了タスク一覧
+
+#### M2: Photo Access & Scanning（12タスク完了 → モジュール完了）
+| タスクID | タスク名 | 内容 |
+|----------|---------|------|
+| M2-T01 | Info.plist権限設定 | NSPhotoLibraryUsageDescription設定 |
+| M2-T02 | 権限マネージャー実装 | PhotoPermissionManager、権限状態管理 |
+| M2-T03 | 写真モデル定義 | Photo構造体、StorageInfo構造体 |
+| M2-T04 | PHAsset拡張 | PHAsset+Extensions.swift |
+| M2-T05 | PhotoRepository実装 | 写真取得・キャッシュ・ページネーション |
+| M2-T06 | ページネーション対応 | fetchPhotos(page:pageSize:)実装 |
+| M2-T07 | サムネイル取得 | requestImage非同期対応 |
+| M2-T08 | ストレージ情報取得 | getStorageInfo()実装 |
+| M2-T09 | PhotoScanner実装 | スキャン進捗管理、キャンセル対応 |
+| M2-T10 | バックグラウンドスキャン | BGTaskScheduler統合 |
+| M2-T11 | ThumbnailCache実装 | LRUキャッシュ、メモリ上限管理 |
+| M2-T12 | 単体テスト作成 | PhotoRepositoryTests、ScannerTests |
+
+### 実装詳細
+
+#### PhotoPermissionManager（PhotoPermissionManager.swift）
+
+**権限状態（PhotoPermissionStatus）**:
+| 状態 | 説明 |
+|------|------|
+| notDetermined | 未決定（初回起動時） |
+| authorized | フルアクセス許可 |
+| limited | 限定アクセス（選択した写真のみ） |
+| denied | 拒否 |
+| restricted | 制限（ペアレンタルコントロール等） |
+
+**主要機能**:
+- `checkPermission() -> PhotoPermissionStatus` - 現在の権限状態を取得
+- `requestPermission() async -> PhotoPermissionStatus` - 権限をリクエスト
+- `openSettings()` - 設定アプリを開く
+
+#### Photo モデル（Photo.swift）
+
+**Photo構造体**:
+```swift
+struct Photo: Identifiable, Hashable, Sendable {
+    let id: String
+    let localIdentifier: String
+    let creationDate: Date?
+    let modificationDate: Date?
+    let mediaType: MediaType
+    let pixelWidth: Int
+    let pixelHeight: Int
+    let duration: TimeInterval?
+    let isFavorite: Bool
+    let isHidden: Bool
+    let location: CLLocation?
+    let fileSize: Int64?
+}
+```
+
+**MediaType enum**:
+- `.image` - 静止画像
+- `.video` - 動画
+- `.livePhoto` - Live Photos
+- `.unknown` - その他
+
+#### StorageInfo（StorageInfo.swift）
+
+**StorageInfo構造体**:
+```swift
+struct StorageInfo: Sendable {
+    let totalPhotoCount: Int
+    let totalVideoCount: Int
+    let totalSize: Int64
+    let photoSize: Int64
+    let videoSize: Int64
+}
+```
+
+**便利プロパティ**:
+- `formattedTotalSize` - "12.5 GB"形式の表示
+- `photoPercentage` / `videoPercentage` - 割合計算
+
+#### PhotoRepository（PhotoRepository.swift）
+
+**主要機能**:
+- `fetchPhotos(page:pageSize:) async throws -> [Photo]` - ページネーション対応取得
+- `fetchAllPhotos() async throws -> [Photo]` - 全写真取得
+- `requestThumbnail(for:targetSize:) async throws -> UIImage` - サムネイル取得
+- `requestFullImage(for:) async throws -> UIImage` - フル解像度画像取得
+- `getStorageInfo() async throws -> StorageInfo` - ストレージ情報取得
+- `observeChanges() -> AsyncStream<PHChange>` - ライブラリ変更監視
+
+**ページネーション仕様**:
+- デフォルトページサイズ: 100件
+- 最大ページサイズ: 500件
+- ソート順: 作成日降順（新しい順）
+
+#### PhotoScanner（PhotoScanner.swift）
+
+**スキャン状態（ScanState）**:
+| 状態 | 説明 |
+|------|------|
+| idle | 待機中 |
+| scanning(progress: Double) | スキャン中（0.0〜1.0） |
+| completed(result: ScanResult) | 完了 |
+| failed(error: Error) | 失敗 |
+| cancelled | キャンセル済み |
+
+**ScanResult構造体**:
+```swift
+struct ScanResult: Sendable {
+    let photos: [Photo]
+    let storageInfo: StorageInfo
+    let scanDuration: TimeInterval
+    let timestamp: Date
+}
+```
+
+**主要機能**:
+- `startScan() async throws -> ScanResult` - スキャン開始
+- `cancelScan()` - スキャンキャンセル
+- `state: ScanState` - 現在の状態（@Observable）
+
+#### バックグラウンドスキャン（BackgroundScanTask.swift）
+
+**BGTaskScheduler統合**:
+- タスク識別子: `com.lightroll.photo-scan`
+- 最小間隔: 1時間
+- ネットワーク不要、充電不要で実行可能
+
+**主要機能**:
+- `scheduleBackgroundScan()` - バックグラウンドスキャンをスケジュール
+- `handleBackgroundScan(task:)` - バックグラウンドタスク処理
+
+#### ThumbnailCache（ThumbnailCache.swift）
+
+**LRUキャッシュ仕様**:
+- 最大エントリ数: 500件（設定可能）
+- メモリ上限: 100MB
+- エビクションポリシー: LRU（Least Recently Used）
+
+**主要機能**:
+- `get(for:size:) -> UIImage?` - キャッシュから取得
+- `set(_:for:size:)` - キャッシュに保存
+- `clear()` - キャッシュクリア
+- `trimToLimit()` - メモリ上限に合わせてトリム
+
+**キャッシュキー生成**:
+- `{localIdentifier}_{width}x{height}` 形式
+- サイズごとに別エントリとして管理
+
+### M2モジュール完了サマリー
+
+**全12タスク完了**:
+- M2-T01〜T02: 権限管理
+- M2-T03〜T04: データモデル
+- M2-T05〜T08: PhotoRepository
+- M2-T09〜T10: PhotoScanner
+- M2-T11: ThumbnailCache
+- M2-T12: テスト
+
+**総工数**: 約20時間（見積24時間 → 17%効率化）
+
+**テストカバレッジ**:
+- PhotoRepositoryTests: 24テスト
+- PhotoScannerTests: 18テスト
+- ThumbnailCacheTests: 12テスト
+- PermissionManagerTests: 8テスト
+- 合計: 62テスト追加
+
+---
+
 *アーカイブ更新: 2025-11-28*

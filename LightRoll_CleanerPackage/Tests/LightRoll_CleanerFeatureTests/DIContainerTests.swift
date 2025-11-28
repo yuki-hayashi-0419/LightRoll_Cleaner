@@ -133,15 +133,15 @@ struct DIContainerTests {
         let mockRepo = MockStorageRepository()
         mockRepo.mockStorageInfo = StorageInfo(
             totalCapacity: 100,
-            usedCapacity: 50,
-            photosSize: 20,
-            reclaimableSize: 10
+            availableCapacity: 50,
+            photosUsedCapacity: 20,
+            reclaimableCapacity: 10
         )
 
         let info = await mockRepo.fetchStorageInfo()
         #expect(info.totalCapacity == 100)
-        #expect(info.usedCapacity == 50)
-        #expect(info.usageRatio == 0.5)
+        #expect(info.availableCapacity == 50)
+        #expect(info.usagePercentage == 0.5)
     }
 
     @MainActor
@@ -184,29 +184,24 @@ struct ModelTests {
         #expect(asset.fileSize == 2048)
     }
 
-    @Test("StorageInfoのusageRatioが正しく計算される")
-    func testStorageInfoUsageRatio() {
+    @Test("StorageInfoのusagePercentageが正しく計算される")
+    func testStorageInfoUsagePercentage() {
         let info = StorageInfo(
             totalCapacity: 1000,
-            usedCapacity: 750,
-            photosSize: 500,
-            reclaimableSize: 100
+            availableCapacity: 250,
+            photosUsedCapacity: 500,
+            reclaimableCapacity: 100
         )
 
-        #expect(info.usageRatio == 0.75)
-        #expect(info.freeCapacity == 250)
+        #expect(info.usagePercentage == 0.75)
+        #expect(info.usedCapacity == 750)
     }
 
-    @Test("StorageInfoのtotalCapacityが0の場合usageRatioは0")
+    @Test("StorageInfoのtotalCapacityが0の場合usagePercentageは0")
     func testStorageInfoZeroCapacity() {
-        let info = StorageInfo(
-            totalCapacity: 0,
-            usedCapacity: 0,
-            photosSize: 0,
-            reclaimableSize: 0
-        )
+        let info = StorageInfo.empty
 
-        #expect(info.usageRatio == 0)
+        #expect(info.usagePercentage == 0)
     }
 
     @Test("UserSettingsのデフォルト値が正しい")

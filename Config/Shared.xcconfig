@@ -28,6 +28,14 @@ INFOPLIST_KEY_UISupportedInterfaceOrientations = portrait
 INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = portrait landscape-left landscape-right portrait-upside-down
 
 // ==========================================
+// Privacy - Photo Library Access
+// ==========================================
+// 写真ライブラリ読み取りアクセスの説明
+INFOPLIST_KEY_NSPhotoLibraryUsageDescription = 重複・類似写真の検出とストレージ最適化のため、写真ライブラリへのアクセスが必要です。
+// 写真ライブラリ書き込みアクセスの説明（将来的に必要になる可能性）
+INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = 写真を保存するために写真ライブラリへの書き込みアクセスが必要です。
+
+// ==========================================
 // Entitlements
 // ==========================================
 // AI agents can modify Config/LightRoll_Cleaner.entitlements to add capabilities

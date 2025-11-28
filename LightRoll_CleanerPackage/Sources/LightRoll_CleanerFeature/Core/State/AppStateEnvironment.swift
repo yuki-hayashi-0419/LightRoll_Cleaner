@@ -84,10 +84,10 @@ public struct AppStatePreviewProvider {
         state.photoPermissionGranted = true
 
         state.storageInfo = StorageInfo(
-            totalCapacity: 256 * 1024 * 1024 * 1024,
-            usedCapacity: 180 * 1024 * 1024 * 1024,
-            photosSize: 45 * 1024 * 1024 * 1024,
-            reclaimableSize: 8 * 1024 * 1024 * 1024
+            totalCapacity: 256 * 1024 * 1024 * 1024,      // 256GB
+            availableCapacity: 76 * 1024 * 1024 * 1024,   // 76GB 空き (256-180)
+            photosUsedCapacity: 45 * 1024 * 1024 * 1024,  // 45GB 写真
+            reclaimableCapacity: 8 * 1024 * 1024 * 1024   // 8GB 削減可能
         )
 
         state.scanResult = ScanResult(

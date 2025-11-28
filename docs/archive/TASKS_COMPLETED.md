@@ -182,3 +182,126 @@
 - **備考**: **M1モジュール完了**
 
 ---
+
+## M2: Photo Access & Scanning - 完了 (2025-11-28)
+
+**モジュールサマリー**
+- **完了日**: 2025-11-28
+- **セッション**: impl-005, impl-006
+- **タスク数**: 12/12完了
+- **総工数**: 20.5h
+- **平均品質スコア**: 111.5/120点 (92.9%)
+- **総テスト数**: 829テスト全パス
+
+### M2-T01: Info.plist権限設定
+- **完了日**: 2025-11-28
+- **セッション**: impl-005
+- **品質スコア**: 116/120点
+- **成果物**:
+  - Shared.xcconfig: NSPhotoLibraryUsageDescription追加
+  - 日本語説明文設定、ビルド確認済み
+
+### M2-T02: PhotoPermissionManager実装
+- **完了日**: 2025-11-28
+- **セッション**: impl-005
+- **品質スコア**: 118/120点
+- **成果物**:
+  - PhotoPermissionManager.swift: 権限チェック・リクエスト機能
+  - @Observable、@MainActor対応、SettingsOpenerProtocol対応
+  - PHAuthorizationStatus拡張（isAuthorized, needsSettingsRedirect等）
+- **テスト**: 24テスト全パス
+
+### M2-T03: Photoモデル実装
+- **完了日**: 2025-11-28
+- **セッション**: impl-005
+- **品質スコア**: 110/120点
+- **成果物**:
+  - Photo.swift（約424行のドメインモデル）
+  - StorageInfo.swift（約299行のストレージ情報モデル）
+- **テスト**: 69テスト全パス
+
+### M2-T04: PHAsset拡張
+- **完了日**: 2025-11-28
+- **セッション**: impl-005
+- **品質スコア**: 113/120点
+- **成果物**:
+  - PHAsset+Extensions.swift: toPhoto(), getFileSize()実装
+  - 計算プロパティ: isScreenshot, isLivePhoto, megapixels等
+  - コレクション拡張: toPhotos(progress:)付き一括変換
+- **テスト**: 45テスト全パス
+
+### M2-T05: PhotoRepository基盤
+- **完了日**: 2025-11-28
+- **セッション**: impl-005
+- **品質スコア**: 112/120点
+- **成果物**:
+  - PhotoRepository.swift: fetchAllPhotos, fetchThumbnail, getStorageInfo
+  - PhotoFetchOptions: ソート順、フィルタ、ファイルサイズ取得オプション
+  - PHCachingImageManagerによるキャッシュ管理
+- **テスト**: 23テスト全パス
+
+### M2-T06: 写真一覧取得
+- **完了日**: 2025-11-28
+- **セッション**: impl-006
+- **品質スコア**: 111/120点
+- **成果物**:
+  - PhotoRepository拡張: フィルタリング、ページネーション、バッチ取得
+  - PhotoPage/PhotoPageAsset: ページネーション対応
+  - AsyncSequence: fetchAllPhotosAsStream実装
+
+### M2-T07: サムネイル取得
+- **完了日**: 2025-11-28
+- **セッション**: impl-006
+- **品質スコア**: 106/120点
+- **成果物**:
+  - ThumbnailRequestOptions: ビルダーパターン、品質設定
+  - ThumbnailResult/ThumbnailBatchProgress構造体
+  - fetchThumbnail拡張: プリロード、キャッシュ戦略管理
+
+### M2-T08: ストレージ情報取得
+- **完了日**: 2025-11-28
+- **セッション**: impl-006
+- **品質スコア**: 108/120点
+- **成果物**:
+  - StorageService: デバイスストレージ情報、写真使用量計算
+  - volumeAvailableCapacityForImportantUsage API活用
+  - キャッシュ機構: NSLock保護、有効期限管理
+
+### M2-T09: PhotoScanner実装
+- **完了日**: 2025-11-28
+- **セッション**: impl-006
+- **品質スコア**: 112/120点
+- **成果物**:
+  - PhotoScanner: @Observable、@MainActor対応
+  - ScanState/PhotoScanProgress/ScanOptions
+  - Task cancellation対応、進捗通知
+
+### M2-T10: バックグラウンドスキャン
+- **完了日**: 2025-11-28
+- **セッション**: impl-006
+- **品質スコア**: 114/120点
+- **成果物**:
+  - BackgroundScanManager: BGTaskScheduler統合
+  - BGAppRefreshTask/BGProcessingTaskサポート
+  - プラットフォーム条件付きコンパイル（iOS/tvOS）
+
+### M2-T11: ThumbnailCache実装
+- **完了日**: 2025-11-28
+- **セッション**: impl-006
+- **品質スコア**: 108/120点
+- **成果物**:
+  - ThumbnailCache: NSCacheベース、スレッドセーフ
+  - ThumbnailCachePolicy/ThumbnailCacheStatistics
+  - メモリ警告対応、ヒット率追跡
+
+### M2-T12: 単体テスト作成
+- **完了日**: 2025-11-28
+- **セッション**: impl-006
+- **品質スコア**: 110/120点
+- **成果物**:
+  - PhotoAccessIntegrationTests: 統合テスト15件
+  - PhotoAccessEdgeCaseTests: エッジケース23件
+  - MockPhotoLibrary: テストヘルパー強化
+- **備考**: **M2モジュール完了**
+
+---

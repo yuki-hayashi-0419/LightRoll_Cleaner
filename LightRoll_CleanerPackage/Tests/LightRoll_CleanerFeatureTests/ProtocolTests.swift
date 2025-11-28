@@ -163,8 +163,10 @@ struct UseCaseProtocolTests {
     @Test("StatisticsOutputが正しく初期化される")
     func statisticsOutput() {
         let storageInfo = StorageInfo(
-            totalCapacity: 128 * 1024 * 1024 * 1024,
-            usedCapacity: 64 * 1024 * 1024 * 1024
+            totalCapacity: 128 * 1024 * 1024 * 1024,       // 128GB
+            availableCapacity: 64 * 1024 * 1024 * 1024,    // 64GB 空き
+            photosUsedCapacity: 30 * 1024 * 1024 * 1024,   // 30GB 写真
+            reclaimableCapacity: 5 * 1024 * 1024 * 1024    // 5GB 削減可能
         )
 
         let stats = GroupStatistics(
@@ -205,7 +207,7 @@ struct ViewModelStateTests {
 
     @Test("HomeViewDataが正しく初期化される")
     func homeViewData() {
-        let storageInfo = StorageInfo()
+        let storageInfo = StorageInfo.empty
         let data = HomeViewData(storageInfo: storageInfo)
 
         #expect(data.groups.isEmpty)
@@ -362,13 +364,15 @@ struct MockImplementationTests {
         let mock = MockStorageRepository()
         mock.mockStorageInfo = StorageInfo(
             totalCapacity: 100,
-            usedCapacity: 50
+            availableCapacity: 50,
+            photosUsedCapacity: 30,
+            reclaimableCapacity: 10
         )
 
         let info = await mock.fetchStorageInfo()
 
         #expect(info.totalCapacity == 100)
-        #expect(info.usedCapacity == 50)
+        #expect(info.availableCapacity == 50)
     }
 
     @Test("MockSettingsRepositoryがプロトコルに準拠している")
@@ -429,7 +433,7 @@ struct SendableConformanceTests {
     @Test("StatisticsOutputがSendable")
     func statisticsOutputSendable() async {
         let output = StatisticsOutput(
-            storageInfo: StorageInfo(),
+            storageInfo: StorageInfo.empty,
             totalPhotos: 100
         )
 

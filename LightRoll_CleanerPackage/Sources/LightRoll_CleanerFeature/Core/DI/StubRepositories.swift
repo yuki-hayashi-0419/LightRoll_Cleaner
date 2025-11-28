@@ -86,11 +86,12 @@ public final class StubStorageRepository: StorageRepositoryProtocol, @unchecked 
 
     public func fetchStorageInfo() async -> StorageInfo {
         // スタブ: ダミーデータを返す
+        // 新しい StorageInfo 構造に対応
         return StorageInfo(
-            totalCapacity: 128 * 1024 * 1024 * 1024,  // 128GB
-            usedCapacity: 64 * 1024 * 1024 * 1024,    // 64GB
-            photosSize: 16 * 1024 * 1024 * 1024,      // 16GB
-            reclaimableSize: 2 * 1024 * 1024 * 1024   // 2GB
+            totalCapacity: 128 * 1024 * 1024 * 1024,      // 128GB
+            availableCapacity: 64 * 1024 * 1024 * 1024,   // 64GB 空き
+            photosUsedCapacity: 16 * 1024 * 1024 * 1024,  // 16GB 写真
+            reclaimableCapacity: 2 * 1024 * 1024 * 1024   // 2GB 削減可能
         )
     }
 
@@ -231,7 +232,7 @@ public final class MockAnalysisRepository: AnalysisRepositoryProtocol, @unchecke
 /// MockStorageRepository（テスト用）
 public final class MockStorageRepository: StorageRepositoryProtocol, @unchecked Sendable {
 
-    public var mockStorageInfo: StorageInfo = StorageInfo()
+    public var mockStorageInfo: StorageInfo = .empty
 
     public init() {}
 
