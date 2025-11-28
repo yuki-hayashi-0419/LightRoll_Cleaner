@@ -51,7 +51,7 @@ struct AppStateTests {
     @Test("ナビゲーションパスが正しく動作する")
     func testNavigationPath() {
         let appState = AppState(forTesting: true)
-        let group = PhotoGroup(type: .similar)
+        let group = PhotoGroup(type: .similar, photoIds: ["test1", "test2"])
 
         appState.navigate(to: .groupDetail(group))
         #expect(appState.navigationPath.count == 1)
@@ -484,7 +484,7 @@ struct NavigationDestinationTests {
 
     @Test("NavigationDestinationのタイトルが設定されている")
     func testTitles() {
-        let group = PhotoGroup(type: .similar)
+        let group = PhotoGroup(type: .similar, photoIds: ["test1", "test2"])
         let photo = PhotoAsset(id: "1")
         let context = DeleteConfirmationContext(photoIds: ["1"])
         let result = ScanResult.empty

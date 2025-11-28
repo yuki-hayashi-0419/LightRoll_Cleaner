@@ -109,23 +109,16 @@ public struct AppStatePreviewProvider {
             PhotoGroup(
                 id: UUID(),
                 type: .similar,
-                photos: [
-                    PhotoAsset(id: "1", creationDate: Date(), fileSize: 1024 * 1024),
-                    PhotoAsset(id: "2", creationDate: Date(), fileSize: 2048 * 1024),
-                    PhotoAsset(id: "3", creationDate: Date(), fileSize: 512 * 1024)
-                ],
-                bestShotIndex: 0,
-                totalSize: 3_584 * 1024
+                photoIds: ["1", "2", "3"],
+                fileSizes: [1024 * 1024, 2048 * 1024, 512 * 1024],
+                bestShotIndex: 0
             ),
             PhotoGroup(
                 id: UUID(),
                 type: .screenshot,
-                photos: [
-                    PhotoAsset(id: "4", creationDate: Date(), fileSize: 256 * 1024),
-                    PhotoAsset(id: "5", creationDate: Date(), fileSize: 256 * 1024)
-                ],
-                bestShotIndex: nil,
-                totalSize: 512 * 1024
+                photoIds: ["4", "5"],
+                fileSizes: [256 * 1024, 256 * 1024],
+                bestShotIndex: nil
             )
         ]
 

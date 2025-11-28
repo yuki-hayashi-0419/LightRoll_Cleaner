@@ -375,29 +375,18 @@ struct StorageRepositoryIntegrationTests {
         let storageService = StorageService()
 
         // テスト用のPhotoGroupを作成
-        let photos1 = [
-            PhotoAsset(id: "p1", creationDate: Date(), fileSize: 1_000_000),
-            PhotoAsset(id: "p2", creationDate: Date(), fileSize: 2_000_000),
-            PhotoAsset(id: "p3", creationDate: Date(), fileSize: 3_000_000)
-        ]
         let group1 = PhotoGroup(
-            id: UUID(),
             type: .similar,
-            photos: photos1,
-            bestShotIndex: 0, // p1がベストショット
-            totalSize: 6_000_000
+            photoIds: ["p1", "p2", "p3"],
+            fileSizes: [1_000_000, 2_000_000, 3_000_000],
+            bestShotIndex: 0 // p1がベストショット
         )
 
-        let photos2 = [
-            PhotoAsset(id: "p4", creationDate: Date(), fileSize: 4_000_000),
-            PhotoAsset(id: "p5", creationDate: Date(), fileSize: 5_000_000)
-        ]
         let group2 = PhotoGroup(
-            id: UUID(),
-            type: .selfie, // GroupType.duplicate は存在しない
-            photos: photos2,
-            bestShotIndex: 1, // p5がベストショット
-            totalSize: 9_000_000
+            type: .selfie,
+            photoIds: ["p4", "p5"],
+            fileSizes: [4_000_000, 5_000_000],
+            bestShotIndex: 1 // p5がベストショット
         )
 
         // 回収可能容量を計算

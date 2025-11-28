@@ -57,7 +57,14 @@ public final class StubAnalysisRepository: AnalysisRepositoryProtocol, @unchecke
     public init() {}
 
     public func analyzePhoto(_ photo: PhotoAsset) async throws -> PhotoAnalysisResult {
-        return PhotoAnalysisResult(photoId: photo.id)
+        return PhotoAnalysisResult(
+            photoId: photo.id,
+            qualityScore: 0.8,
+            blurScore: 0.2,
+            brightnessScore: 0.5,
+            contrastScore: 0.5,
+            saturationScore: 0.5
+        )
     }
 
     public func findSimilarPhotos(_ photos: [PhotoAsset]) async throws -> [[PhotoAsset]] {
@@ -209,7 +216,14 @@ public final class MockAnalysisRepository: AnalysisRepositoryProtocol, @unchecke
     public init() {}
 
     public func analyzePhoto(_ photo: PhotoAsset) async throws -> PhotoAnalysisResult {
-        return mockResults[photo.id] ?? PhotoAnalysisResult(photoId: photo.id)
+        return mockResults[photo.id] ?? PhotoAnalysisResult(
+            photoId: photo.id,
+            qualityScore: 0.8,
+            blurScore: 0.2,
+            brightnessScore: 0.5,
+            contrastScore: 0.5,
+            saturationScore: 0.5
+        )
     }
 
     public func findSimilarPhotos(_ photos: [PhotoAsset]) async throws -> [[PhotoAsset]] {

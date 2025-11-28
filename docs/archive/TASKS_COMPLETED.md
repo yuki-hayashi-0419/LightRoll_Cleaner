@@ -305,3 +305,36 @@
 - **備考**: **M2モジュール完了**
 
 ---
+
+## M3: Image Analysis & Grouping - 進行中 (2025-11-28〜)
+
+### M3-T01: PhotoAnalysisResultモデル
+- **完了日**: 2025-11-28
+- **セッション**: impl-007
+- **品質スコア**: 115/120点
+- **成果物**:
+  - PhotoAnalysisResult.swift（約580行のドメインモデル）
+  - FaceAngle構造体: 顔の向き情報（yaw, pitch, roll）
+  - AnalysisIssue列挙型: blurry, lowQuality, overexposed, underexposed, screenshot
+  - AnalysisThresholds: 閾値設定（Sendable対応）
+  - Builder: スレッドセーフなビルダーパターン（NSLock）
+  - Array拡張: フィルタリング、ソート、統計
+- **テスト**: 52テスト全パス（6スイート）
+
+### M3-T02: PhotoGroupモデル
+- **完了日**: 2025-11-28
+- **セッション**: impl-007
+- **品質スコア**: 112/120点
+- **成果物**:
+  - PhotoGroup.swift（約824行のドメインモデル）
+  - GroupType列挙型: similar, selfie, screenshot, blurry, largeVideo, duplicate
+  - 各タイプの表示属性: displayName, icon, description, emoji, sortOrder
+  - 動作フラグ: isAutoDeleteRecommended, needsBestShotSelection
+  - PhotoGroup構造体: Identifiable, Hashable, Sendable, Codable, Comparable
+  - ビルダーパターン: withBestShot, withSelection, adding, removing, withCustomName
+  - PhotoGroupStatistics: 統計情報構造体
+  - GroupingOptions: グルーピングオプション設定（DateRange付き）
+  - Array拡張: フィルタリング、ソート、統計メソッド
+- **テスト**: 86+テスト全パス（11スイート）
+
+---

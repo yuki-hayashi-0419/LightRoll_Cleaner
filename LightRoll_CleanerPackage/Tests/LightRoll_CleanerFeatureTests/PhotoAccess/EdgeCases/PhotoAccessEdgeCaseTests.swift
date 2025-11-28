@@ -160,15 +160,16 @@ struct LargePhotoLibraryEdgeCaseTests {
             let startIndex = groupIndex * photosPerGroup
             let endIndex = min(startIndex + photosPerGroup, photoCount)
             let groupPhotos = Array(photos[startIndex..<endIndex])
-            let totalSize = groupPhotos.reduce(0) { $0 + $1.fileSize }
+            let photoIds = groupPhotos.map { $0.id }
+            let fileSizes = groupPhotos.map { $0.fileSize }
 
             let types: [GroupType] = [.similar, .selfie, .screenshot, .blurry, .largeVideo]
             let group = PhotoGroup(
                 id: UUID(),
                 type: types[groupIndex % types.count],
-                photos: groupPhotos,
-                bestShotIndex: 0,
-                totalSize: totalSize
+                photoIds: photoIds,
+                fileSizes: fileSizes,
+                bestShotIndex: 0
             )
             groups.append(group)
         }

@@ -134,6 +134,7 @@ public struct ThumbnailRequestOptions: Sendable, Equatable, Hashable {
 
     #if canImport(UIKit)
     /// スケールファクターを考慮した実際のピクセルサイズ
+    @MainActor
     public var targetSize: CGSize {
         let scale = UIScreen.main.scale
         return CGSize(

@@ -410,9 +410,12 @@ public final class BackgroundScanManager: BackgroundScanManagerProtocol, @unchec
 
         // ハンドラーが設定されている場合は処理を実行
         if let handler = taskHandler {
-            Task {
-                await handler.handleBackgroundRefresh()
-                task.setTaskCompleted(success: true)
+            // BGTaskはSendableではないため、nonisolated(unsafe)で明示的にキャプチャ
+            nonisolated(unsafe) let bgTask = task
+            let sendableHandler = handler
+            Task.detached { @Sendable in
+                await sendableHandler.handleBackgroundRefresh()
+                bgTask.setTaskCompleted(success: true)
             }
         } else {
             task.setTaskCompleted(success: true)
@@ -431,9 +434,12 @@ public final class BackgroundScanManager: BackgroundScanManagerProtocol, @unchec
 
         // ハンドラーが設定されている場合は処理を実行
         if let handler = taskHandler {
-            Task {
-                await handler.handleBackgroundProcessing()
-                task.setTaskCompleted(success: true)
+            // BGTaskはSendableではないため、nonisolated(unsafe)で明示的にキャプチャ
+            nonisolated(unsafe) let bgTask = task
+            let sendableHandler = handler
+            Task.detached { @Sendable in
+                await sendableHandler.handleBackgroundProcessing()
+                bgTask.setTaskCompleted(success: true)
             }
         } else {
             task.setTaskCompleted(success: true)

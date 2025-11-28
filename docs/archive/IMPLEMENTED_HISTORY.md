@@ -519,4 +519,126 @@ struct ScanResult: Sendable {
 
 ---
 
-*アーカイブ更新: 2025-11-28*
+## 2025-11-28: M3 Image Analysis基盤（v0.6.0）
+
+### 完了タスク一覧（セッション impl-007）
+
+#### M3: Image Analysis & Grouping（2タスク完了）
+| タスクID | タスク名 | 内容 |
+|----------|---------|------|
+| M3-T01 | PhotoAnalysisResultモデル | 写真分析結果のドメインモデル |
+| M3-T02 | PhotoGroupモデル | 写真グループのドメインモデル |
+
+### 実装詳細
+
+#### PhotoAnalysisResult（PhotoAnalysisResult.swift）
+
+**分析指標（12種類）**:
+| プロパティ | 型 | 説明 |
+|-----------|-----|------|
+| qualityScore | Float | 総合品質スコア（0.0〜1.0） |
+| blurScore | Float | ブレスコア（高いほどブレ大） |
+| brightnessScore | Float | 明るさ（0.5が適正） |
+| contrastScore | Float | コントラスト |
+| saturationScore | Float | 彩度 |
+| faceCount | Int | 検出された顔の数 |
+| faceQualityScores | [Float] | 各顔の品質スコア |
+| faceAngles | [FaceAngle] | 各顔の向き情報 |
+| isScreenshot | Bool | スクリーンショット判定 |
+| isSelfie | Bool | 自撮り判定 |
+| featurePrintHash | Data? | 特徴量ハッシュ（類似度比較用） |
+
+**判定機能**:
+- `isBlurry`: ブレ判定（閾値0.4以上）
+- `isHighQuality`: 高品質判定（閾値0.7以上）
+- `isLowQuality`: 低品質判定（閾値0.4未満）
+- `isOverexposed`: 明るすぎ（閾値0.8以上）
+- `isUnderexposed`: 暗すぎ（閾値0.2以下）
+- `isDeletionCandidate`: 削除候補判定
+- `issues`: 問題点リスト
+
+**補助型**:
+- `FaceAngle`: 顔の向き（yaw/pitch/roll）
+- `AnalysisIssue`: 問題種別（blurry/lowQuality/overexposed/underexposed）
+- `AnalysisThresholds`: 判定閾値定数
+- `Builder`: ビルダーパターンでの構築
+
+**配列拡張（Array<PhotoAnalysisResult>）**:
+- `sortedByQuality()`: 品質順ソート
+- `sortedBySharpness()`: シャープネス順ソート
+- `filterDeletionCandidates()`: 削除候補フィルタ
+- `filterHighQuality()`: 高品質フィルタ
+- `filterWithFaces()`: 顔検出フィルタ
+- `filterSelfies()`: 自撮りフィルタ
+- `filterScreenshots()`: スクショフィルタ
+- `filterBlurry()`: ブレ写真フィルタ
+
+#### PhotoGroup（PhotoGroup.swift）
+
+**GroupType（6種類）**:
+| タイプ | 説明 | アイコン |
+|--------|------|---------|
+| similar | 類似写真（連写含む） | square.on.square |
+| selfie | 自撮り写真 | person.crop.circle |
+| screenshot | スクリーンショット | rectangle.dashed |
+| blurry | ブレ・ピンボケ写真 | camera.metering.unknown |
+| largeVideo | 大容量動画 | video.fill |
+| duplicate | 重複写真（完全一致） | doc.on.doc |
+
+**PhotoGroup構造体**:
+```swift
+struct PhotoGroup: Identifiable, Hashable, Sendable {
+    let id: UUID
+    let type: GroupType
+    var photoIds: [String]
+    var fileSizes: [Int64]
+    var bestShotIndex: Int?
+    var isSelected: Bool
+    let createdAt: Date
+    let similarityScore: Float?
+    var customName: String?
+}
+```
+
+**主要機能**:
+- `reclaimableSize`: 削減可能サイズ計算
+- `reclaimableCount`: 削減可能写真数
+- `bestShotId`: ベストショットID取得
+- `deletionCandidateIds`: 削除候補ID一覧
+- `savingsPercentage`: 削減率計算
+
+**ミューテーション**:
+- `withBestShot(at:)`: ベストショット設定
+- `withSelection(_:)`: 選択状態変更
+- `adding(photoId:fileSize:)`: 写真追加
+- `removing(photoId:)`: 写真削除
+
+**補助型**:
+- `PhotoGroupStatistics`: グループ統計情報
+- `GroupingOptions`: グルーピングオプション（類似度閾値、フィルタ設定等）
+
+**配列拡張（Array<PhotoGroup>）**:
+- フィルタ: `filterByType()`, `validGroups`, `selectedGroups`, `withBestShot`
+- ソート: `sortedByReclaimableSize`, `sortedByPhotoCount`, `sortedByDate`, `sortedByType`
+- 統計: `statistics`, `totalReclaimableSize`, `totalPhotoCount`
+- 検索: `group(withId:)`, `groups(containing:)`
+- 一括操作: `settingSelection()`, `groupedByType`, `allDeletionCandidateIds`
+
+### 技術的特徴
+
+**Swift Concurrency対応**:
+- 全モデルが `Sendable` 準拠
+- `Builder` クラスは `NSLock` でスレッドセーフ実装
+- 非同期分析処理との安全な連携
+
+**Codable対応**:
+- 全モデルが JSON シリアライズ可能
+- キャッシュやファイル保存に対応
+
+**値型設計**:
+- `struct` ベースで不変性を重視
+- ミューテーションは新インスタンスを返す関数型スタイル
+
+---
+
+*アーカイブ更新: 2025-11-28 (impl-007)*

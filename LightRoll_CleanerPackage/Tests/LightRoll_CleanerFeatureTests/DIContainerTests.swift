@@ -88,7 +88,7 @@ struct DIContainerTests {
     @Test("makeGroupDetailViewModelがViewModelを生成する")
     func testMakeGroupDetailViewModel() async throws {
         let container = DIContainer.shared
-        let group = PhotoGroup(type: .similar)
+        let group = PhotoGroup(type: .similar, photoIds: ["test1", "test2"])
         let viewModel = container.makeGroupDetailViewModel(group: group)
         #expect(viewModel != nil)
         #expect(viewModel.group.type == .similar)
@@ -216,10 +216,10 @@ struct ModelTests {
 
     @Test("PhotoGroupが正しく初期化される")
     func testPhotoGroupInitialization() {
-        let group = PhotoGroup(type: .screenshot)
+        let group = PhotoGroup(type: .screenshot, photoIds: ["test-4", "test-5"])
 
         #expect(group.type == .screenshot)
-        #expect(group.photos.isEmpty)
+        #expect(group.photoIds.count == 2)
         #expect(group.bestShotIndex == nil)
     }
 
@@ -228,7 +228,7 @@ struct ModelTests {
         #expect(GroupType.similar.displayName == "類似写真")
         #expect(GroupType.selfie.displayName == "自撮り")
         #expect(GroupType.screenshot.displayName == "スクリーンショット")
-        #expect(GroupType.blurry.displayName == "ブレ・ピンボケ")
+        #expect(GroupType.blurry.displayName == "ブレ写真")
         #expect(GroupType.largeVideo.displayName == "大容量動画")
     }
 }

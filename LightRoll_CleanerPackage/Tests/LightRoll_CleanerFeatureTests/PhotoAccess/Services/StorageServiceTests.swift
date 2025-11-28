@@ -36,13 +36,11 @@ struct StorageServiceTests {
         photos: [PhotoAsset],
         bestShotIndex: Int? = 0
     ) -> PhotoGroup {
-        let totalSize = photos.reduce(0) { $0 + $1.fileSize }
-        return PhotoGroup(
-            id: UUID(),
+        PhotoGroup(
             type: type,
-            photos: photos,
-            bestShotIndex: bestShotIndex,
-            totalSize: totalSize
+            photoIds: photos.map { $0.id },
+            fileSizes: photos.map { $0.fileSize },
+            bestShotIndex: bestShotIndex
         )
     }
 
@@ -129,16 +127,16 @@ struct StorageServiceTests {
 
         // 3枚の写真を持つグループ（ベストショット未指定）
         let photos = [
-            makePhotoAsset(id: "photo-1", fileSize: 1_000_000),  // 最初の写真は保持
-            makePhotoAsset(id: "photo-2", fileSize: 2_000_000),  // 削除候補
-            makePhotoAsset(id: "photo-3", fileSize: 3_000_000),  // 削除候補
+            makePhotoAsset(id: "photo-1", fileSize: 1_000_000),  // 全て削除候補
+            makePhotoAsset(id: "photo-2", fileSize: 2_000_000),  // 全て削除候補
+            makePhotoAsset(id: "photo-3", fileSize: 3_000_000),  // 全て削除候補
         ]
         let group = makePhotoGroup(photos: photos, bestShotIndex: nil)
 
         let reclaimable = await service.estimateReclaimableSpace(from: [group])
 
-        // 最初の写真以外の合計: 2_000_000 + 3_000_000 = 5_000_000
-        #expect(reclaimable == 5_000_000)
+        // ベストショット未指定の場合、全ての写真が削減可能: 1_000_000 + 2_000_000 + 3_000_000 = 6_000_000
+        #expect(reclaimable == 6_000_000)
     }
 
     @Test("複数グループの回収可能容量を正しく計算できる")

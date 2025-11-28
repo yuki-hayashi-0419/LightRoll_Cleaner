@@ -580,7 +580,7 @@ extension ThumbnailCache {
     public func preload(
         assetIds: [String],
         size: CGSize,
-        loader: @escaping (String) async throws -> UIImage
+        loader: @escaping @Sendable (String) async throws -> UIImage
     ) async {
         await withTaskGroup(of: Void.self) { group in
             for assetId in assetIds {

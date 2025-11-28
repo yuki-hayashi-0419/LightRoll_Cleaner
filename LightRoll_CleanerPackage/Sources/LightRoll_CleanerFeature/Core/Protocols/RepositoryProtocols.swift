@@ -171,28 +171,8 @@ public struct PhotoAsset: Identifiable, Hashable, Sendable {
     }
 }
 
-/// 写真分析結果（仮定義）
-public struct PhotoAnalysisResult: Sendable {
-    public let photoId: String
-    public let qualityScore: Float
-    public let hasFaces: Bool
-    public let isBlurry: Bool
-    public let isScreenshot: Bool
-
-    public init(
-        photoId: String,
-        qualityScore: Float = 0,
-        hasFaces: Bool = false,
-        isBlurry: Bool = false,
-        isScreenshot: Bool = false
-    ) {
-        self.photoId = photoId
-        self.qualityScore = qualityScore
-        self.hasFaces = hasFaces
-        self.isBlurry = isBlurry
-        self.isScreenshot = isScreenshot
-    }
-}
+// 注意: PhotoAnalysisResult は ImageAnalysis/Models/PhotoAnalysisResult.swift で正式に定義されています。
+// ここでの仮定義は削除されました。
 
 // 注意: StorageInfo は PhotoAccess/Models/StorageInfo.swift で正式に定義されています。
 // ここでの仮定義は削除されました。

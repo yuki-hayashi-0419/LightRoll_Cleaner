@@ -520,7 +520,8 @@ public final class PhotoRepository: PhotoRepositoryProtocol, @unchecked Sendable
             for photo in photos {
                 group.addTask { [weak self] in
                     guard let self = self else { return nil }
-                    guard let asset = self.fetchPHAsset(by: photo.id) else {
+                    // MainActor隔離されたメソッドを呼び出すため、MainActor.runを使用
+                    guard let asset = await MainActor.run(body: { self.fetchPHAsset(by: photo.id) }) else {
                         return nil
                     }
                     do {

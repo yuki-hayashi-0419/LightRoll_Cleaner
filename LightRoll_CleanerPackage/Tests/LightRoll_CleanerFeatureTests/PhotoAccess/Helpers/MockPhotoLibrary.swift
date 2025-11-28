@@ -290,14 +290,12 @@ public enum MockPhotoGroupFactory {
         bestShotIndex: Int? = 0
     ) -> PhotoGroup {
         let photos = MockPhotoAssetFactory.createBatch(count: photoCount)
-        let totalSize = photos.reduce(0) { $0 + $1.fileSize }
 
         return PhotoGroup(
-            id: UUID(),
             type: type,
-            photos: photos,
-            bestShotIndex: bestShotIndex,
-            totalSize: totalSize
+            photoIds: photos.map { $0.id },
+            fileSizes: photos.map { $0.fileSize },
+            bestShotIndex: bestShotIndex
         )
     }
 
@@ -331,14 +329,11 @@ public enum MockPhotoGroupFactory {
         type: GroupType = .similar,
         bestShotIndex: Int? = 0
     ) -> PhotoGroup {
-        let totalSize = photos.reduce(0) { $0 + $1.fileSize }
-
-        return PhotoGroup(
-            id: UUID(),
+        PhotoGroup(
             type: type,
-            photos: photos,
-            bestShotIndex: bestShotIndex,
-            totalSize: totalSize
+            photoIds: photos.map { $0.id },
+            fileSizes: photos.map { $0.fileSize },
+            bestShotIndex: bestShotIndex
         )
     }
 }

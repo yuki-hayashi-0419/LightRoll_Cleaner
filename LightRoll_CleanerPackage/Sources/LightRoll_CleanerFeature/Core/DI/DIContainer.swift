@@ -195,69 +195,8 @@ public final class DIContainer: ObservableObject {
     #endif
 }
 
-// MARK: - PhotoGroup (Placeholder)
-
-/// 写真グループ（仮定義）
-public struct PhotoGroup: Identifiable, Hashable, Sendable {
-    public let id: UUID
-    public let type: GroupType
-    public let photos: [PhotoAsset]
-    public let bestShotIndex: Int?
-    public let totalSize: Int64
-
-    public init(
-        id: UUID = UUID(),
-        type: GroupType,
-        photos: [PhotoAsset] = [],
-        bestShotIndex: Int? = nil,
-        totalSize: Int64 = 0
-    ) {
-        self.id = id
-        self.type = type
-        self.photos = photos
-        self.bestShotIndex = bestShotIndex
-        self.totalSize = totalSize
-    }
-}
-
-/// グループタイプ
-public enum GroupType: String, CaseIterable, Sendable {
-    case similar       // 類似写真
-    case selfie        // 自撮り
-    case screenshot    // スクリーンショット
-    case blurry        // ブレ・ピンボケ
-    case largeVideo    // 大容量動画
-
-    public var displayName: String {
-        switch self {
-        case .similar:
-            return "類似写真"
-        case .selfie:
-            return "自撮り"
-        case .screenshot:
-            return "スクリーンショット"
-        case .blurry:
-            return "ブレ・ピンボケ"
-        case .largeVideo:
-            return "大容量動画"
-        }
-    }
-
-    public var iconName: String {
-        switch self {
-        case .similar:
-            return "photo.on.rectangle"
-        case .selfie:
-            return "person.crop.circle"
-        case .screenshot:
-            return "camera.viewfinder"
-        case .blurry:
-            return "circle.slash"
-        case .largeVideo:
-            return "video.fill"
-        }
-    }
-}
+// 注意: PhotoGroup と GroupType は ImageAnalysis/Models/PhotoGroup.swift で正式に定義されています。
+// ここでの仮定義は削除されました。
 
 // MARK: - Placeholder ViewModels
 
@@ -315,8 +254,10 @@ public final class GroupDetailViewModel: ObservableObject {
         isDeleting = true
         defer { isDeleting = false }
 
-        let photosToDelete = group.photos.filter { selectedPhotos.contains($0.id) }
-        try await photoRepository.deletePhotos(photosToDelete)
+        // 選択された写真IDをPhotoAssetに変換して削除
+        let photoIdsToDelete = group.photoIds.filter { selectedPhotos.contains($0) }
+        let assetsToDelete = photoIdsToDelete.map { PhotoAsset(id: $0) }
+        try await photoRepository.deletePhotos(assetsToDelete)
     }
 }
 

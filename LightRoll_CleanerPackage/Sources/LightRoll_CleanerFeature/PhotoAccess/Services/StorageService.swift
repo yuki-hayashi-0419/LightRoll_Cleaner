@@ -245,31 +245,9 @@ public final class StorageService: StorageServiceProtocol, @unchecked Sendable {
     /// - Parameter groups: 削除候補のPhotoGroup配列
     /// - Returns: 回収可能容量（バイト）
     public func estimateReclaimableSpace(from groups: [PhotoGroup]) async -> Int64 {
-        guard !groups.isEmpty else { return 0 }
-
-        var totalReclaimable: Int64 = 0
-
-        for group in groups {
-            // ベストショット以外の写真の合計サイズを計算
-            if let bestIndex = group.bestShotIndex {
-                // ベストショット以外のファイルサイズを合計
-                for (index, photo) in group.photos.enumerated() {
-                    if index != bestIndex {
-                        totalReclaimable += photo.fileSize
-                    }
-                }
-            } else {
-                // ベストショットが設定されていない場合は、
-                // 最初の写真以外を削除候補とする
-                for (index, photo) in group.photos.enumerated() {
-                    if index > 0 {
-                        totalReclaimable += photo.fileSize
-                    }
-                }
-            }
-        }
-
-        return totalReclaimable
+        // PhotoGroup の reclaimableSize プロパティを使用して合計を計算
+        // 各グループの削減可能サイズ（ベストショット以外）を集計
+        groups.reduce(0) { $0 + $1.reclaimableSize }
     }
 
     /// 指定された写真配列の合計サイズを計算

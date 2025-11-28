@@ -156,6 +156,8 @@ public struct GroupBreakdown: Equatable, Hashable, Sendable {
             return blurryCount
         case .largeVideo:
             return largeVideoCount
+        case .duplicate:
+            return 0 // 重複写真は類似写真に含まれる（将来的に分離予定）
         }
     }
 }
