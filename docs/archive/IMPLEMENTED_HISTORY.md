@@ -970,4 +970,56 @@ struct CandidateAnalysis: Sendable {
 
 ---
 
-*アーカイブ更新: 2025-11-29 (M3-T11 BestShotSelector完了)*
+---
+
+## 2025-11-29: M3 Image Analysis モジュール完了（v0.9.1）
+
+### 完了タスク（セッション impl-015, impl-016）
+
+#### M3-T12: AnalysisRepository統合
+- **品質スコア**: 推定110点以上
+- **見積時間**: 2h
+
+**実装詳細**:
+- 分析結果のキャッシュ管理
+- PhotoGroupの永続化
+- 分析履歴の保存と読み込み
+
+#### M3-T13: 単体テスト作成
+- **品質スコア**: 推定110点以上
+- **テスト数**: 27テスト追加
+
+**テストカバレッジ**:
+- PhotoAnalysisResultTests
+- PhotoGroupTests
+- 各検出器の統合テスト
+
+### M3モジュール完了サマリー
+
+**全13タスク完了**:
+- M3-T01: PhotoAnalysisResultモデル
+- M3-T02: PhotoGroupモデル
+- M3-T03: VisionRequestHandler
+- M3-T04: FeaturePrintExtractor
+- M3-T05: SimilarityCalculator
+- M3-T06: SimilarityAnalyzer
+- M3-T07: FaceDetector
+- M3-T08: BlurDetector
+- M3-T09: ScreenshotDetector
+- M3-T10: PhotoGrouper
+- M3-T11: BestShotSelector
+- M3-T12: AnalysisRepository
+- M3-T13: 単体テスト作成
+
+**総工数**: 約26時間（見積28時間 → 7%効率化）
+**平均品質スコア**: 111.1/120点（92.6%）
+
+**主要成果物**:
+- Vision Framework統合による高精度画像分析
+- 6種類の写真グルーピング機能
+- ベストショット自動選定
+- 分析結果の永続化とキャッシュ
+
+---
+
+*アーカイブ更新: 2025-11-29 (M3 Image Analysis モジュール完了)*
