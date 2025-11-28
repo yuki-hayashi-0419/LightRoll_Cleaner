@@ -43,6 +43,8 @@ final class PhotoGrouper {
     func groupSelfies(_ photos: [Photo]) -> PhotoGroup?
     func groupScreenshots(_ photos: [Photo]) -> PhotoGroup?
     func groupBlurryPhotos(_ photos: [Photo], results: [PhotoAnalysisResult]) -> PhotoGroup?
+    func groupLargeVideos(_ photos: [Photo]) -> PhotoGroup?
+    func groupDuplicates(_ photos: [Photo]) -> [PhotoGroup]  // ファイルサイズ・ピクセルサイズが同一の写真を検出
 }
 ```
 
@@ -95,6 +97,7 @@ enum GroupType: CaseIterable {
     case screenshot    // スクリーンショット
     case blurry        // ブレ・ピンボケ
     case largeVideo    // 大容量動画
+    case duplicate     // 重複写真（同一ファイル）
 
     var displayName: String {
         switch self {
@@ -103,6 +106,7 @@ enum GroupType: CaseIterable {
         case .screenshot: return "スクリーンショット"
         case .blurry: return "ブレ写真"
         case .largeVideo: return "大容量動画"
+        case .duplicate: return "重複写真"
         }
     }
 
@@ -112,6 +116,7 @@ enum GroupType: CaseIterable {
         case .selfie: return "person.crop.circle"
         case .screenshot: return "rectangle.dashed"
         case .blurry: return "camera.metering.unknown"
+        case .duplicate: return "doc.on.doc"
         case .largeVideo: return "video.fill"
         }
     }

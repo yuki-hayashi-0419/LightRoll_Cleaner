@@ -783,4 +783,110 @@ struct SimilarPair: Sendable, Hashable {
 
 ---
 
-*アーカイブ更新: 2025-11-28 (impl-008)*
+## 2025-11-29: M3 PhotoGrouper実装（v0.8.0）
+
+### 完了タスク（セッション impl-013）
+
+#### M3-T10: PhotoGrouper実装
+- **品質スコア**: 114/120点（95.0%）
+- **改善履歴**: 初回102点 -> 第1ループ後114点（+12点改善）
+
+### 実装詳細
+
+#### PhotoGrouper（PhotoGrouper.swift）
+
+**actor設計**:
+- スレッドセーフな写真グルーピングサービス
+- 依存性注入によるテスタビリティ向上
+- 進捗コールバック対応
+
+**6種類のグルーピング機能**:
+
+| メソッド | 検出対象 | 依存サービス |
+|---------|---------|-------------|
+| `groupSimilarPhotos()` | 類似写真 | SimilarityAnalyzer |
+| `groupSelfies()` | セルフィー | FaceDetector |
+| `groupScreenshots()` | スクリーンショット | ScreenshotDetector |
+| `groupBlurryPhotos()` | ブレ写真 | BlurDetector |
+| `groupLargeVideos()` | 大容量動画 | 閾値判定（デフォルト100MB） |
+| `groupDuplicates()` | 重複写真 | ファイルサイズ+ピクセルサイズ一致 |
+
+**GroupingOptions構造体**:
+```swift
+struct GroupingOptions: Sendable {
+    let similarityThreshold: Float      // 類似度閾値（デフォルト0.85）
+    let blurThreshold: Float            // ブレ閾値（デフォルト100）
+    let largeVideoThreshold: Int64      // 大容量動画閾値（デフォルト100MB）
+    let includeScreenshots: Bool        // スクリーンショット含む
+    let includeSelfies: Bool            // セルフィー含む
+    let includeBlurry: Bool             // ブレ写真含む
+    let includeLargeVideos: Bool        // 大容量動画含む
+    let minGroupSize: Int               // 最小グループサイズ（デフォルト2）
+}
+
+// プリセット
+static let `default`: GroupingOptions
+static let strict: GroupingOptions     // 高精度（閾値0.90）
+static let relaxed: GroupingOptions    // 緩め（閾値0.75）
+```
+
+**進捗範囲**:
+| フェーズ | 進捗範囲 | 処理内容 |
+|---------|---------|---------|
+| 1 | 0.0〜0.1 | 重複検出 |
+| 2 | 0.1〜0.4 | 類似写真グルーピング |
+| 3 | 0.4〜0.6 | セルフィーグルーピング |
+| 4 | 0.6〜0.7 | スクリーンショットグルーピング |
+| 5 | 0.7〜0.9 | ブレ写真グルーピング |
+| 6 | 0.9〜1.0 | 大容量動画グルーピング |
+
+**PhotoGrouperProtocol**:
+```swift
+public protocol PhotoGrouperProtocol: Actor {
+    func groupPhotos(_ assets: [PHAsset], progress: ...) async throws -> [PhotoGroup]
+    func groupPhotos(_ photos: [Photo], progress: ...) async throws -> [PhotoGroup]
+    func groupSimilarPhotos(...) async throws -> [PhotoGroup]
+    func groupSelfies(...) async throws -> [PhotoGroup]
+    func groupScreenshots(...) async throws -> [PhotoGroup]
+    func groupBlurryPhotos(...) async throws -> [PhotoGroup]
+    func groupLargeVideos(...) async throws -> [PhotoGroup]
+    func groupDuplicates(_ assets: [PHAsset]) async throws -> [PhotoGroup]
+}
+```
+
+### テストカバレッジ
+
+**PhotoGrouperTests（33テスト）**:
+- 初期化テスト: 2件
+- 空配列動作テスト: 6件
+- 各グルーピング基本動作: 6件
+- 進捗範囲調整テスト: 6件
+- オプション設定テスト: 5件
+- プロトコル準拠テスト: 1件
+- 統合テスト: 3件
+- エラーハンドリング: 1件
+- パフォーマンステスト: 1件
+- エッジケーステスト: 2件
+
+### M3モジュール進捗
+
+**完了タスク（10/13）**:
+- M3-T01: PhotoAnalysisResultモデル
+- M3-T02: PhotoGroupモデル
+- M3-T03: VisionRequestHandler
+- M3-T04: FeaturePrintExtractor
+- M3-T05: SimilarityCalculator
+- M3-T06: SimilarityAnalyzer
+- M3-T07: FaceDetector
+- M3-T08: BlurDetector
+- M3-T09: ScreenshotDetector
+- M3-T10: PhotoGrouper ✅ **NEW**
+
+**残タスク（3/13）**:
+- M3-T11: BestShotSelector実装
+- M3-T12: AnalysisRepository統合
+- M3-T13: 単体テスト作成
+
+---
+
+*アーカイブ更新: 2025-11-29 (M3-T10 PhotoGrouper完了)*
