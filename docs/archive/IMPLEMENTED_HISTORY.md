@@ -641,4 +641,146 @@ struct PhotoGroup: Identifiable, Hashable, Sendable {
 
 ---
 
-*アーカイブ更新: 2025-11-28 (impl-007)*
+---
+
+## 2025-11-28: M3 Vision Framework基盤（v0.7.0）
+
+### 完了タスク一覧（セッション impl-008）
+
+#### M3: Image Analysis & Grouping（3タスク完了）
+| タスクID | タスク名 | 内容 |
+|----------|---------|------|
+| M3-T03 | VisionRequestHandler | Vision Frameworkの統括管理クラス（actor実装） |
+| M3-T04 | FeaturePrintExtractor | 画像特徴量抽出サービス（並列処理対応） |
+| M3-T05 | SimilarityCalculator | コサイン類似度計算エンジン（マトリクス生成） |
+
+### 実装詳細
+
+#### VisionRequestHandler（VisionRequestHandler.swift）
+
+**actor設計**:
+- スレッドセーフなVision Framework操作
+- リクエストのキューイング・優先度管理
+- エラーハンドリングと再試行ロジック
+
+**主要機能**:
+- `performRequest(_:on:) async throws -> VNRequest` - 汎用リクエスト実行
+- `generateFeaturePrint(for:) async throws -> VNFeaturePrintObservation` - 特徴量抽出
+- `detectFaces(in:) async throws -> [VNFaceObservation]` - 顔検出
+- `detectRectangles(in:) async throws -> [VNRectangleObservation]` - 矩形検出
+- `classifyImage(_:) async throws -> [VNClassificationObservation]` - 画像分類
+
+**エラーハンドリング**:
+- `VisionError`: カスタムエラー型
+  - `.requestFailed(Error)` - リクエスト失敗
+  - `.noResults` - 結果なし
+  - `.invalidImage` - 無効な画像
+  - `.cancelled` - キャンセル
+
+#### FeaturePrintExtractor（FeaturePrintExtractor.swift）
+
+**並列処理対応**:
+- TaskGroupによる並列特徴量抽出
+- 設定可能な最大同時実行数（デフォルト: 4）
+- 進捗報告コールバック対応
+
+**主要機能**:
+- `extract(from:) async throws -> FeaturePrintResult` - 単一画像の特徴量抽出
+- `extractBatch(_:progress:) async throws -> [FeaturePrintResult]` - バッチ抽出
+- `extractFromAssets(_:progress:) async throws -> [String: FeaturePrintResult]` - PHAsset対応
+
+**FeaturePrintResult構造体**:
+```swift
+struct FeaturePrintResult: Sendable {
+    let identifier: String
+    let featurePrint: VNFeaturePrintObservation
+    let extractionTime: TimeInterval
+    let imageSize: CGSize
+}
+```
+
+**パフォーマンス最適化**:
+- 画像リサイズ（最大1024px）による処理効率化
+- メモリ効率の良いストリーミング処理
+- キャンセル対応（Task.checkCancellation）
+
+#### SimilarityCalculator（SimilarityCalculator.swift）
+
+**コサイン類似度計算**:
+- VNFeaturePrintObservationの距離計算
+- 類似度スコア（0.0〜1.0）への変換
+- 閾値ベースのグルーピング
+
+**主要機能**:
+- `calculateSimilarity(between:and:) -> Float` - 2画像間の類似度
+- `generateSimilarityMatrix(for:) async throws -> SimilarityMatrix` - マトリクス生成
+- `findSimilarPairs(in:threshold:) async throws -> [SimilarPair]` - 類似ペア検出
+- `groupBySimilarity(_:threshold:) async throws -> [[String]]` - 類似グループ化
+
+**SimilarityMatrix構造体**:
+```swift
+struct SimilarityMatrix: Sendable {
+    let identifiers: [String]
+    let matrix: [[Float]]
+
+    func similarity(between id1: String, and id2: String) -> Float?
+    func findSimilar(to identifier: String, threshold: Float) -> [(String, Float)]
+}
+```
+
+**SimilarPair構造体**:
+```swift
+struct SimilarPair: Sendable, Hashable {
+    let identifier1: String
+    let identifier2: String
+    let similarity: Float
+}
+```
+
+**グルーピングアルゴリズム**:
+- Union-Find（素集合データ構造）による効率的なグループ化
+- O(n * α(n)) の準線形時間計算量
+- 閾値カスタマイズ（デフォルト: 0.85）
+
+### 技術的特徴
+
+**Swift 6.1完全準拠**:
+- actor によるスレッドセーフ設計
+- async/await による非同期処理
+- Sendable 準拠による型安全な並行処理
+
+**Vision Framework活用**:
+- VNGenerateImageFeaturePrintRequest による特徴量抽出
+- VNFeaturePrintObservation.computeDistance() による距離計算
+- CGImageSource による効率的な画像読み込み
+
+**テストカバレッジ**:
+- VisionRequestHandlerTests: 18テスト
+- FeaturePrintExtractorTests: 22テスト
+- SimilarityCalculatorTests: 22テスト
+- 合計: 62テスト追加
+
+**品質スコア**: 106/120点（88.3%）
+
+### M3モジュール進捗
+
+**完了タスク（5/13）**:
+- M3-T01: PhotoAnalysisResultモデル
+- M3-T02: PhotoGroupモデル
+- M3-T03: VisionRequestHandler
+- M3-T04: FeaturePrintExtractor
+- M3-T05: SimilarityCalculator
+
+**残タスク（8/13）**:
+- M3-T06: SimilarityAnalyzer実装
+- M3-T07: 顔検出実装
+- M3-T08: ブレ検出実装
+- M3-T09: スクリーンショット検出
+- M3-T10: PhotoGrouper実装
+- M3-T11: BestShotSelector実装
+- M3-T12: AnalysisRepository統合
+- M3-T13: 単体テスト作成
+
+---
+
+*アーカイブ更新: 2025-11-28 (impl-008)*
