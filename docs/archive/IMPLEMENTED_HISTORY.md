@@ -889,4 +889,85 @@ public protocol PhotoGrouperProtocol: Actor {
 
 ---
 
-*アーカイブ更新: 2025-11-29 (M3-T10 PhotoGrouper完了)*
+---
+
+## 2025-11-29: M3 BestShotSelector実装（v0.9.0）
+
+### 完了タスク（セッション impl-014）
+
+#### M3-T11: BestShotSelector実装
+- **品質スコア**: TBD（品質検証待ち）
+- **見積時間**: 2h
+
+### 実装詳細
+
+#### BestShotSelector（BestShotSelector.swift）
+
+**actor設計**:
+- スレッドセーフなベストショット選定サービス
+- FaceDetector, BlurDetectorとの連携
+- グループ単位での自動選定
+
+**選定基準（BestShotCriteria）**:
+
+| 基準 | 説明 | 重み付け |
+|------|------|---------|
+| default | バランス重視 | シャープネス50%、顔品質30%、顔人数20% |
+| sharpnessFirst | シャープネス重視 | シャープネス80%、顔品質20% |
+| faceQualityFirst | 顔品質重視 | 顔品質60%、シャープネス30%、顔人数10% |
+| portrait | ポートレート向け | 顔品質70%、シャープネス30% |
+
+**主要機能**:
+- `selectBestShot(from:criteria:) async throws -> BestShotResult` - グループからベストショット選定
+- `selectBestShots(from:criteria:) async throws -> [BestShotResult]` - 複数グループの一括処理
+- `analyzeCandidates(_:) async throws -> [CandidateAnalysis]` - 候補分析情報取得
+
+**BestShotResult構造体**:
+```swift
+struct BestShotResult: Sendable {
+    let groupId: UUID
+    let bestShotId: String
+    let score: Float
+    let analysisDetails: CandidateAnalysis
+    let alternativeIds: [String]  // 次点候補
+}
+```
+
+**CandidateAnalysis構造体**:
+```swift
+struct CandidateAnalysis: Sendable {
+    let photoId: String
+    let sharpnessScore: Float
+    let faceQualityScore: Float
+    let faceCount: Int
+    let overallScore: Float
+}
+```
+
+**ユーザー視点での機能**:
+- グループ内の写真から自動的にベストショットを選定
+- シャープネス、顔の品質、顔の人数を総合評価して最適な写真を推奨
+- 用途に応じた選定基準（デフォルト、シャープネス重視、顔品質重視、ポートレート）を選択可能
+
+### M3モジュール進捗
+
+**完了タスク（11/13）**:
+- M3-T01: PhotoAnalysisResultモデル
+- M3-T02: PhotoGroupモデル
+- M3-T03: VisionRequestHandler
+- M3-T04: FeaturePrintExtractor
+- M3-T05: SimilarityCalculator
+- M3-T06: SimilarityAnalyzer
+- M3-T07: FaceDetector
+- M3-T08: BlurDetector
+- M3-T09: ScreenshotDetector
+- M3-T10: PhotoGrouper
+- M3-T11: BestShotSelector ✅ **NEW**
+
+**残タスク（2/13）**:
+- M3-T12: AnalysisRepository統合
+- M3-T13: 単体テスト作成
+
+---
+
+*アーカイブ更新: 2025-11-29 (M3-T11 BestShotSelector完了)*
