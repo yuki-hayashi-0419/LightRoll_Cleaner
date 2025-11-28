@@ -8,6 +8,7 @@
 
 import Testing
 import Vision
+import CoreImage
 @testable import LightRoll_CleanerFeature
 
 // MARK: - VisionRequestHandlerTests

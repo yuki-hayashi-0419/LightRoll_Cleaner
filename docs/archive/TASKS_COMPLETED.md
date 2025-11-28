@@ -370,4 +370,20 @@
   - SimilarityMatrix、SimilarityPair構造体
 - **テスト**: 20テスト全パス
 
+### M3-T06: SimilarityAnalyzer実装
+- **完了日**: 2025-11-28
+- **セッション**: impl-009
+- **品質スコア**: 108/120点
+- **成果物**:
+  - SimilarityAnalyzer.swift: 類似写真グループ検出エンジン（約550行）
+  - SimilarPhotoGroup構造体: グループ情報モデル（Identifiable, Hashable, Sendable, Codable, Comparable）
+  - SimilarityAnalysisOptions: 3プリセット（default/strict/relaxed）
+  - UnionFindデータ構造: 効率的なグラフクラスタリング（経路圧縮、ランク結合）
+  - findSimilarGroups(): PHAsset/Photo配列から類似グループ検出
+  - findSimilarPhotos(): 特定写真に類似する写真を検索
+  - 進捗コールバック: 3フェーズ（特徴量抽出60%、類似ペア検出30%、グループ化10%）
+  - Array拡張: groups(containing:), groups(withMinSize:), totalPhotoCount, averageGroupSize
+- **テスト**: 14テスト全パス
+- **ユーザー視点**: 連写やバースト撮影した類似写真を自動でグループ化し、整理しやすくする
+
 ---

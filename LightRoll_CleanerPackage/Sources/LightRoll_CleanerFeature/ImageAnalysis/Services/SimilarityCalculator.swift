@@ -8,7 +8,7 @@
 //
 
 import Foundation
-import Vision
+@preconcurrency import Vision
 
 // MARK: - SimilarityCalculator
 
@@ -187,7 +187,7 @@ public actor SimilarityCalculator {
         // バッチごとに処理
         let batches = observations.chunked(into: batchSize)
 
-        for (batchIndex, batch) in batches.enumerated() {
+        for (_, batch) in batches.enumerated() {
             // バッチ内のペアを検出
             let batchPairs = try await findSimilarPairs(
                 in: Array(batch),

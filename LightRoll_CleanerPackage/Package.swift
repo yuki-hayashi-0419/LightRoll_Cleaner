@@ -20,6 +20,9 @@ let package = Package(
             name: "LightRoll_CleanerFeature",
             resources: [
                 .process("Resources")
+            ],
+            swiftSettings: [
+                .swiftLanguageMode(.v5)
             ]
         ),
         .testTarget(

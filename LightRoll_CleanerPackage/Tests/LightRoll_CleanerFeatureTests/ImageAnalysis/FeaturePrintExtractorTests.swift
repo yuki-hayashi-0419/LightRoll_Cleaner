@@ -202,16 +202,11 @@ struct FeaturePrintExtractorTests {
         // モックデータを作成
         let mockHash = Data(count: elementCount * MemoryLayout<Float>.size)
 
-        // FeaturePrintResult の内部イニシャライザは使用できないため、
-        // 代替として簡易的な構造体を返す
-        // 注: 実際の使用時は VNFeaturePrintObservation から生成する
-        return FeaturePrintResult(
-            id: UUID(),
+        // Swift 5モードでは静的ファクトリメソッドを使用
+        return FeaturePrintResult.mock(
             photoId: photoId,
             featurePrintHash: mockHash,
-            extractedAt: Date(),
-            elementCount: elementCount,
-            elementType: .float
+            elementCount: elementCount
         )
     }
 }
@@ -219,20 +214,34 @@ struct FeaturePrintExtractorTests {
 // MARK: - FeaturePrintResult + Mock Initializer
 
 extension FeaturePrintResult {
-    /// テスト用のイニシャライザ
-    fileprivate init(
-        id: UUID,
-        photoId: String,
-        featurePrintHash: Data,
-        extractedAt: Date,
-        elementCount: Int,
-        elementType: VNElementType
-    ) {
-        self.id = id
-        self.photoId = photoId
-        self.featurePrintHash = featurePrintHash
-        self.extractedAt = extractedAt
-        self.elementCount = elementCount
-        self.elementType = elementType
+    /// テスト用のイニシャライザ（モック用）
+    /// - Note: Swift 5モードでは、通常のCodableデコーダー経由で生成するのが安全
+    static func mock(
+        id: UUID = UUID(),
+        photoId: String = "test-photo-id",
+        featurePrintHash: Data = Data(repeating: 0, count: 128),
+        extractedAt: Date = Date(),
+        elementCount: Int = 128,
+        elementType: VNElementType = .float
+    ) -> FeaturePrintResult {
+        // JSONエンコード/デコードを使用して安全にインスタンスを作成
+        let encoder = JSONEncoder()
+        let decoder = JSONDecoder()
+
+        let mockData: [String: Any] = [
+            "id": id.uuidString,
+            "photoId": photoId,
+            "featurePrintHash": featurePrintHash.base64EncodedString(),
+            "extractedAt": extractedAt.timeIntervalSince1970,
+            "elementCount": elementCount,
+            "elementType": elementType.rawValue
+        ]
+
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: mockData)
+            return try decoder.decode(FeaturePrintResult.self, from: jsonData)
+        } catch {
+            fatalError("Failed to create mock FeaturePrintResult: \(error)")
+        }
     }
 }

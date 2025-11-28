@@ -8,7 +8,7 @@
 //
 
 import Foundation
-import Vision
+@preconcurrency import Vision
 import CoreImage
 import Photos
 
@@ -191,14 +191,36 @@ public actor VisionRequestHandler {
                 }
 
                 // UIImage から CIImage を作成
-                guard let uiImage = image,
-                      let ciImage = CIImage(image: uiImage) else {
+                guard let uiImage = image else {
                     let error = AnalysisError.visionFrameworkError(
-                        "CIImage への変換に失敗しました"
+                        "画像の取得に失敗しました"
                     )
                     continuation.resume(throwing: error)
                     return
                 }
+
+                // UIImage/NSImage -> CIImage への変換
+                #if os(iOS)
+                // iOS環境: UIImage.cgImage を使用
+                guard let cgImage = uiImage.cgImage else {
+                    let error = AnalysisError.visionFrameworkError(
+                        "CGImage の取得に失敗しました"
+                    )
+                    continuation.resume(throwing: error)
+                    return
+                }
+                let ciImage = CIImage(cgImage: cgImage)
+                #else
+                // macOS環境: NSImage から CGImage を取得
+                guard let cgImage = uiImage.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+                    let error = AnalysisError.visionFrameworkError(
+                        "CGImage の取得に失敗しました"
+                    )
+                    continuation.resume(throwing: error)
+                    return
+                }
+                let ciImage = CIImage(cgImage: cgImage)
+                #endif
 
                 continuation.resume(returning: ciImage)
             }
@@ -209,7 +231,7 @@ public actor VisionRequestHandler {
 // MARK: - VisionRequestOptions
 
 /// Vision リクエスト実行時のオプション
-public struct VisionRequestOptions: Sendable {
+public struct VisionRequestOptions: @unchecked Sendable {
 
     /// 実行時の QoS（Quality of Service）
     public let qos: DispatchQoS.QoSClass
@@ -271,7 +293,7 @@ public struct VisionRequestOptions: Sendable {
 // MARK: - VisionRequestResult
 
 /// Vision リクエストの実行結果
-public struct VisionRequestResult: Sendable {
+public struct VisionRequestResult: @unchecked Sendable {
 
     /// 実行されたリクエストの配列
     public let requests: [VNRequest]
@@ -311,7 +333,7 @@ public struct VisionRequestResult: Sendable {
         requests.allSatisfy { request in
             // results が空でない、または error が nil ならば完了とみなす
             if let imageBased = request as? VNImageBasedRequest {
-                return !imageBased.results.isEmpty || request.results != nil
+                return !(imageBased.results?.isEmpty ?? true) || request.results != nil
             }
             return request.results != nil
         }
@@ -323,7 +345,7 @@ public struct VisionRequestResult: Sendable {
             // VNRequest には標準の error プロパティがないため、
             // results が空かどうかで判定
             if let imageBased = request as? VNImageBasedRequest {
-                return imageBased.results.isEmpty
+                return imageBased.results?.isEmpty ?? true
             }
             return request.results == nil || (request.results?.isEmpty ?? true)
         }

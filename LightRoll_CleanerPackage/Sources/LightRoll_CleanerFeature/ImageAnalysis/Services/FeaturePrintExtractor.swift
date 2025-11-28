@@ -8,7 +8,7 @@
 //
 
 import Foundation
-import Vision
+@preconcurrency import Vision
 import Photos
 
 // MARK: - FeaturePrintExtractor
@@ -311,7 +311,7 @@ extension FeaturePrintResult: Codable {
 
         // VNElementType を Int から復元
         let elementTypeRaw = try container.decode(UInt.self, forKey: .elementType)
-        elementType = VNElementType(rawValue: elementTypeRaw)
+        elementType = VNElementType(rawValue: elementTypeRaw) ?? .float
     }
 
     public func encode(to encoder: Encoder) throws {
