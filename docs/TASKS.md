@@ -60,14 +60,14 @@
 | M5-T05 | HomeViewModel実装 | **スキップ** | - | - | MV Pattern採用のためスキップ |
 | M5-T06 | StorageOverviewCard実装 | **完了** | 高 | 2h | M4-T07 |
 | M5-T07 | HomeView実装 | **完了** | 高 | 2.5h | M5-T06 |
-| M5-T08 | GroupListViewModel実装 | 未着手 | 高 | 2h | M3-T10 |
-| M5-T09 | GroupListView実装 | 未着手 | 高 | 2.5h | M5-T08,M4-T08 |
+| M5-T08 | GroupListViewModel実装 | **スキップ** | - | - | MV Pattern採用のためスキップ |
+| M5-T09 | GroupListView実装 | **完了** | 高 | 2.5h | M4-T08 |
 | M5-T10 | GroupDetailViewModel実装 | 未着手 | 高 | 2h | M5-T08 |
 | M5-T11 | GroupDetailView実装 | 未着手 | 高 | 2.5h | M5-T10,M4-T06 |
 | M5-T12 | Navigation設定 | 未着手 | 高 | 1.5h | M5-T07,M5-T09,M5-T11 |
 | M5-T13 | 単体テスト作成 | 未着手 | 中 | 2h | M5-T12 |
 
-**M5合計: 13タスク / 24時間 (6タスク完了: 9.5h、1タスクスキップ)**
+**M5合計: 13タスク / 24時間 (8タスク完了: 12h、2タスクスキップ)**
 
 - M5-T01 CleanupRecord: 422行、53テスト、96/100点
 - M5-T02 StorageStatistics: 458行、62テスト、98/100点
@@ -76,6 +76,8 @@
 - M5-T05 HomeViewModel: スキップ（MV Pattern採用のためViewModelは使用しない）
 - M5-T06 StorageOverviewCard: 735行、45テスト、95/100点
 - M5-T07 HomeView: 842行、44テスト、94/100点
+- M5-T08 GroupListViewModel: スキップ（MV Pattern採用のためViewModelは使用しない）
+- M5-T09 GroupListView: 952行、83テスト、95/100点
 
 ---
 
@@ -179,14 +181,14 @@
 | M2: Photo Access | 0 | 0h | 12 (20.5h) ✅ |
 | M3: Image Analysis | 0 | 0h | 13 (26h) ✅ |
 | M4: UI Components | 0 | 0h | 14 (17h) ✅ |
-| M5: Dashboard | 6 | 14.5h | 6 (9.5h) + 1スキップ |
+| M5: Dashboard | 4 | 10h | 8 (12h) + 2スキップ |
 | M6: Deletion & Safety | 14 | 25h | 0 |
 | M7: Notifications | 13 | 17.5h | 0 |
 | M8: Settings | 14 | 21h | 0 |
 | M9: Monetization | 15 | 25.5h | 0 |
-| **残合計** | **62** | **103.5h** | **55 (89h)** |
+| **残合計** | **60** | **99h** | **57 (91.5h)** |
 
-*進捗: 55/117タスク完了 (47.0%) / 89h/192.5h (46.2%)*
+*進捗: 57/117タスク完了 (48.7%) / 91.5h/190.5h (48.0%)*
 
 ---
 
@@ -224,4 +226,4 @@
 
 ---
 
-*最終更新: 2025-11-30 (M5-T06/T07完了 - ダッシュボードView層完成、89テスト追加 / 累計404テスト)*
+*最終更新: 2025-11-30 (M5-T08スキップ、M5-T09完了 - GroupListView実装、83テスト追加 / 累計487テスト)*

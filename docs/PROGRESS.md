@@ -5,6 +5,41 @@
 
 ---
 
+## 2025-11-30 | セッション: impl-026（M5-T08スキップ/T09完了 - GroupListView実装）
+
+### 完了項目（57タスク - 本セッション1タスク追加、1スキップ）
+- [x] M5-T08: GroupListViewModel実装 → **スキップ**（MV Pattern採用のためViewModelは使用しない）
+
+- [x] M5-T09: GroupListView実装（95/100点）
+  - GroupListView.swift: グループリストビュー（952行）
+  - ViewState enum: loading, loaded, processing, error
+  - SortOrder enum: reclaimableSize, photoCount, date, type
+  - PhotoProvider protocol: 代表写真の依存注入
+  - フィルタリング機能（6種類のGroupType対応）
+  - ソート機能（4種類のソート順）
+  - 選択モード（マルチセレクト、全選択/全解除）
+  - 削除確認ダイアログ
+  - サマリーヘッダー（グループ数、写真数、削減可能サイズ）
+  - フィルタ/ソートバー（カプセルボタン）
+  - 空状態ビュー（フィルタ時/非フィルタ時）
+  - iOS/macOS両対応ツールバー
+  - 代表写真の遅延読み込みとキャッシュ
+  - 83テスト全パス（16スイート）
+
+### テスト結果
+- GroupListViewTests: 83テスト / 16スイート
+- **合計: 83テスト追加** (累計: 487テスト)
+
+### 品質評価
+- M5-T09: 95/100点 (合格)
+
+### Phase 4進捗
+- M5: Dashboard & Statistics - 8/13タスク完了 + 2スキップ (76.9%)
+- グループリストView完了: GroupListView
+- 残タスク: GroupDetailView, Navigation設定, 単体テスト作成
+
+---
+
 ## 2025-11-30 | セッション: impl-025（M5-T06/T07完了 - ダッシュボードView層実装）
 
 ### 完了項目（55タスク - 本セッション2タスク追加、1スキップ）
