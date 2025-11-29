@@ -544,4 +544,60 @@ struct PhotoThumbnail_Previews: PreviewProvider {
         .previewDisplayName("Photo Thumbnail (Light)")
     }
 }
+
+// MARK: - Modern Previews (iOS 17+)
+
+#Preview("通常状態") {
+    PhotoThumbnail(photo: MockPhoto.standard)
+        .frame(width: 120, height: 120)
+        .padding()
+        .background(
+            LinearGradient(
+                colors: [
+                    Color.LightRoll.background,
+                    Color.LightRoll.primary.opacity(0.1)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+}
+
+#Preview("選択状態") {
+    PhotoThumbnail(
+        photo: MockPhoto.standard,
+        isSelected: true
+    )
+    .frame(width: 120, height: 120)
+    .padding()
+    .background(
+        LinearGradient(
+            colors: [
+                Color.LightRoll.background,
+                Color.LightRoll.primary.opacity(0.1)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    )
+}
+
+#Preview("ベストショットバッジ") {
+    PhotoThumbnail(
+        photo: MockPhoto.standard,
+        showBadge: true
+    )
+    .frame(width: 120, height: 120)
+    .padding()
+    .background(
+        LinearGradient(
+            colors: [
+                Color.LightRoll.background,
+                Color.LightRoll.primary.opacity(0.1)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    )
+}
 #endif

@@ -439,4 +439,84 @@ struct ActionButton_Previews: PreviewProvider {
         .previewDisplayName("Action Button (Light)")
     }
 }
+
+// MARK: - Modern Previews (iOS 17+)
+
+#Preview("プライマリスタイル") {
+    VStack(spacing: LRSpacing.md) {
+        ActionButton(
+            title: "写真を削除",
+            icon: "trash",
+            style: .primary
+        ) {
+            print("削除アクション")
+        }
+    }
+    .padding()
+    .background(
+        LinearGradient(
+            colors: [
+                Color.LightRoll.background,
+                Color.LightRoll.primary.opacity(0.1)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    )
+}
+
+#Preview("セカンダリスタイル") {
+    VStack(spacing: LRSpacing.md) {
+        ActionButton(
+            title: "キャンセル",
+            icon: "xmark",
+            style: .secondary
+        ) {
+            print("キャンセル")
+        }
+    }
+    .padding()
+    .background(
+        LinearGradient(
+            colors: [
+                Color.LightRoll.background,
+                Color.LightRoll.primary.opacity(0.1)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    )
+}
+
+#Preview("ローディング＆無効化") {
+    VStack(spacing: LRSpacing.md) {
+        ActionButton(
+            title: "処理中...",
+            style: .primary,
+            isLoading: true
+        ) {
+            print("処理中")
+        }
+
+        ActionButton(
+            title: "無効化",
+            icon: "exclamationmark.triangle",
+            style: .primary,
+            isDisabled: true
+        ) {
+            print("無効化")
+        }
+    }
+    .padding()
+    .background(
+        LinearGradient(
+            colors: [
+                Color.LightRoll.background,
+                Color.LightRoll.primary.opacity(0.1)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    )
+}
 #endif

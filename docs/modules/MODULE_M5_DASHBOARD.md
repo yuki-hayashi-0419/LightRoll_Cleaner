@@ -106,44 +106,85 @@
 
 ## 3. 主要コンポーネント
 
-### 3.1 ViewModels
+### 3.1 Views（MV Pattern - ViewModelを使用しない）
+
 ```swift
-// ViewModels/HomeViewModel.swift
+// Views/HomeView.swift
 @MainActor
-final class HomeViewModel: ObservableObject {
-    @Published var storageInfo: StorageInfo?
-    @Published var photoGroups: [PhotoGroup] = []
-    @Published var cleanupHistory: [CleanupRecord] = []
-    @Published var isScanning: Bool = false
-    @Published var scanProgress: Double = 0.0
+struct HomeView: View {
+    @Environment(PhotoScanner.self) private var scanner
+    @Environment(StorageService.self) private var storageService
 
-    func startScan() async
-    func refreshStorageInfo() async
+    @State private var viewState: ViewState = .loading
+    @State private var storageInfo: StorageInfo?
+    @State private var photoGroups: [PhotoGroup] = []
+    @State private var cleanupHistory: [CleanupRecord] = []
+    @State private var scanProgress: Double = 0.0
+
+    enum ViewState {
+        case loading
+        case loaded
+        case scanning(progress: Double)
+        case error(String)
+    }
+
+    var body: some View { ... }
 }
 
-// ViewModels/GroupListViewModel.swift
+// Views/GroupListView.swift
 @MainActor
-final class GroupListViewModel: ObservableObject {
-    @Published var groups: [PhotoGroup] = []
-    @Published var selectedPhotoIds: Set<String> = []
+struct GroupListView: View {
+    let groupType: GroupType
+    @Environment(PhotoGrouper.self) private var grouper
 
-    func selectAllExceptBest()
-    func deleteSelectedPhotos() async throws
+    @State private var groups: [PhotoGroup] = []
+    @State private var selectedPhotoIds: Set<String> = []
+    @State private var viewState: ViewState = .loading
+
+    var body: some View { ... }
 }
 
-// ViewModels/GroupDetailViewModel.swift
+// Views/GroupDetailView.swift
 @MainActor
-final class GroupDetailViewModel: ObservableObject {
-    @Published var group: PhotoGroup
-    @Published var selectedPhotoIds: Set<String> = []
-    @Published var currentPhotoIndex: Int = 0
+struct GroupDetailView: View {
+    let group: PhotoGroup
+    @Environment(BestShotSelector.self) private var bestShotSelector
 
-    func setBestShot(photoId: String)
-    func deleteSelectedPhotos() async throws
+    @State private var selectedPhotoIds: Set<String> = []
+    @State private var currentPhotoIndex: Int = 0
+    @State private var bestShotId: String?
+
+    var body: some View { ... }
 }
 ```
 
-### 3.2 Use Cases
+### 3.2 Services（@Observable）
+
+```swift
+// Services/DashboardService.swift
+@Observable
+@MainActor
+final class DashboardService {
+    var isScanning: Bool = false
+    var scanProgress: Double = 0.0
+    var lastScanResult: ScanResult?
+
+    func startScan() async throws -> ScanResult
+    func cancelScan()
+}
+
+// Services/CleanupHistoryService.swift
+@Observable
+@MainActor
+final class CleanupHistoryService {
+    var history: [CleanupRecord] = []
+
+    func loadHistory() async
+    func recordCleanup(_ record: CleanupRecord) async
+}
+```
+
+### 3.3 Use Cases
 ```swift
 // UseCases/ScanPhotosUseCase.swift
 final class ScanPhotosUseCase: ScanPhotosUseCaseProtocol {
@@ -184,15 +225,14 @@ struct GroupSummary {
 ## 4. ディレクトリ構造
 
 ```
-src/modules/Dashboard/
+Sources/LightRollFeature/Dashboard/
 ├── Views/
 │   ├── HomeView.swift
 │   ├── GroupListView.swift
 │   └── GroupDetailView.swift
-├── ViewModels/
-│   ├── HomeViewModel.swift
-│   ├── GroupListViewModel.swift
-│   └── GroupDetailViewModel.swift
+├── Services/
+│   ├── DashboardService.swift
+│   └── CleanupHistoryService.swift
 ├── UseCases/
 │   ├── ScanPhotosUseCase.swift
 │   └── GetStatisticsUseCase.swift
@@ -265,21 +305,47 @@ src/modules/Dashboard/
 
 ## 8. 技術的考慮事項
 
-### 8.1 状態管理
-- ViewModelはMainActorで保護
-- DIContainerからの依存注入
-- Combineでの状態監視
+### 8.1 状態管理（MV Pattern）
+- ViewModelを使用しない: 状態は全てView内の@Stateで管理
+- @Environment: アプリ全体で共有するサービス（PhotoScanner, StorageService等）
+- @Observable: サービスクラスは@Observableマクロで監視可能に
+- 複雑な状態はenum ViewStateパターンで管理
 
-### 8.2 パフォーマンス
+### 8.2 依存性注入
+```swift
+// App Entry Point
+@main
+struct LightRollCleanerApp: App {
+    @State private var scanner = PhotoScanner()
+    @State private var storageService = StorageService()
+    @State private var dashboardService = DashboardService()
+
+    var body: some Scene {
+        WindowGroup {
+            HomeView()
+                .environment(scanner)
+                .environment(storageService)
+                .environment(dashboardService)
+        }
+    }
+}
+```
+
+### 8.3 非同期処理
+- .task修飾子: View表示時の初期データ取得（自動キャンセル対応）
+- .task(id:): 特定の値変更時にタスク再実行
+- .onChange(of:): 状態変更時の副作用処理
+
+### 8.4 パフォーマンス
 - LazyVStackでリスト表示
 - サムネイルの遅延読み込み
 - 大量データのページング検討
 
-### 8.3 UX
+### 8.5 UX
 - スキャン中のキャンセル機能
 - プルトゥリフレッシュ対応
 - スケルトンローディング
 
 ---
 
-*最終更新: 2025-11-27*
+*最終更新: 2025-11-30（MV Patternへ更新、Phase 4準備完了）*
