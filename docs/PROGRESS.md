@@ -258,5 +258,3 @@
 - **次タスク**: M3-T06 (SimilarityAnalyzer)
 
 *古いエントリ（impl-007, impl-006, impl-005, impl-003, impl-002, impl-001, init-001, design-001, optimize-001, arch-select-001）は `docs/archive/PROGRESS_ARCHIVE.md` に移動済み*
-
----
