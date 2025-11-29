@@ -236,6 +236,107 @@
 
 ---
 
+## アーカイブ: 2025-11-30 コンテキスト最適化（impl-023開始時）
+
+以下のエントリは impl-023 セッション開始時の最適化でアーカイブされました。
+
+---
+
+## 2025-11-29 | セッション: impl-014（M3-T11完了 - BestShotSelector実装）
+
+### 完了項目（37タスク - 本セッション1タスク追加）
+- [x] M3-T11: BestShotSelector実装（116/120点、96.7%）
+  - BestShotSelector.swift: グループ内ベストショット選定サービス（actor実装）
+  - PhotoQualityScore: 多次元品質スコアリングシステム
+    - シャープネス（0-1）
+    - 顔品質（0-1）: 顔角度・サイズ・数に基づく評価
+    - 露出品質（0-1）: 適正露出の評価
+    - 総合スコア: 重み付き合成（0-100スケール）
+  - SelectionOptions: 4プリセット（default/faceQuality/sharpness/portraitMode）
+    - カスタム重み設定（自動正規化）
+    - ゼロ重みハンドリング
+  - QualityLevel列挙型: excellent/good/acceptable/poorの4段階評価
+  - PhotoQualityScore拡張: Comparable, 配列操作（最高スコア・平均・ソート・フィルタリング）
+  - エラーハンドリング: 空グループ・単一写真・分析結果なしケース対応
+  - 20テスト全パス（0.172秒）
+
+### セッションサマリー
+- **累計完了タスク**: 37タスク（+1）
+- **総テスト数**: 1193テスト全パス（+20テスト追加、1173→1193）
+- **品質スコア**: 116/120点（96.7%）
+- **M3モジュール**: 11/13完了（84.6%）
+- **Phase 2進捗**: M2完了、M3進行中
+- **次タスク**: M3-T12 (AnalysisRepository統合)
+
+---
+
+## 2025-11-29 | セッション: impl-015（M3-T12〜T13完了 - Phase 2完了）
+
+### 完了項目（39タスク - 本セッション2タスク追加）
+- [x] M3-T12: AnalysisRepository統合（100/120点）
+  - AnalysisRepository.swift: 全分析機能の統合リポジトリ（actor実装）
+  - VisionRequestHandler、FeaturePrintExtractor、SimilarityCalculator連携
+  - FaceDetector、BlurDetector、ScreenshotDetector連携
+  - PhotoAnalysisResultとPhotoGroupモデルとの統合
+  - バッチ処理、進捗通知、キャンセル対応
+- [x] M3-T13: 単体テスト作成（120/120点 - 満点）
+  - 27テスト全パス（0.053秒）
+  - M3モジュール全コンポーネントのテストカバレッジ達成
+  - 統合テスト、エッジケーステスト完備
+
+### Phase 2完了報告
+- **M1: Core Infrastructure** - 10タスク完了（16h）
+- **M2: Photo Access** - 12タスク完了（20.5h）
+- **M3: Image Analysis** - 13タスク完了（26h）
+- **Phase 2合計**: 35タスク / 62.5時間
+
+---
+
+## 2025-11-29 | セッション: migration-v3.0（旧運用→v3.0マイグレーション）
+
+### 実施内容
+- v3.0ドキュメント管理構造への移行作業
+- ホワイトリスト外ファイルの整理・移動
+
+### 作業詳細
+1. **ディレクトリ作成**
+   - docs/archive/legacy/ - 旧運用ドキュメント保管用
+   - assets/images/, assets/icons/, assets/fonts/ - アセット用
+
+2. **ファイル移動（8件）** → docs/archive/legacy/
+3. **ファイル削除（1件）** - docs/CONTEXT_HANDOFF.json（重複）
+4. **ドキュメント生成（7件）**
+
+---
+
+## 2025-11-29 | セッション: impl-016（M4-T05完了 - PhotoThumbnail実装）
+
+### 完了項目（40タスク - 本セッション1タスク追加）
+- [x] M4-T05: PhotoThumbnail実装（95/120点）
+  - PhotoThumbnail.swift: 写真サムネイル表示コンポーネント
+  - 選択状態表示、バッジ表示、動画対応
+  - 25テスト全パス（0.001秒）
+
+---
+
+## 2025-11-29 | セッション: impl-017〜018（M4-T06〜T08完了）
+
+### 完了項目（43タスク）
+- [x] M4-T06: PhotoGrid実装（95/100点）
+- [x] M4-T07: StorageIndicator実装（95/100点）
+- [x] M4-T08: GroupCard実装（98/100点）
+
+---
+
+## 2025-11-29 | セッション: impl-019（M4-T09完了 - ActionButton実装）
+
+### 完了項目（44タスク - 本セッション1タスク追加）
+- [x] M4-T09: ActionButton実装（95/100点）
+  - ActionButton.swift: プライマリ/セカンダリアクションボタン
+  - 36テスト全パス
+
+---
+
 ## アーカイブ: 2025-11-30 コンテキスト最適化（impl-022終了時）
 
 以下のエントリは impl-022 セッション終了時にアーカイブされました。

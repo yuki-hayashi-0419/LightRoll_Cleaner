@@ -1,14 +1,14 @@
 {
   "version": "3.0",
-  "lastUpdated": "2025-11-29",
-  "sessionId": "impl-019",
+  "lastUpdated": "2025-11-30",
+  "sessionId": "impl-023",
 
   "projectStatus": {
-    "phase": "Phase 3",
-    "currentPhase": "Phase 3（UI層）進行中 - M4 UIコンポーネント実装中",
-    "overallProgress": "37.3%",
-    "nextMilestone": "M4-T10 ProgressOverlay実装（進捗オーバーレイコンポーネント）",
-    "majorAchievement": "M4-T09 ActionButton実装完了（95/100点）"
+    "phase": "Phase 4",
+    "currentPhase": "Phase 4（Dashboard & Statistics）準備完了 - M5モジュール開始",
+    "overallProgress": "41.5%",
+    "nextMilestone": "M5-T01 CleanupRecordモデル実装（削除履歴モデル）",
+    "majorAchievement": "M4: UI Components 完全終了（14/14タスク、93.5/100点平均）"
   },
 
   "designStatus": {
@@ -17,22 +17,22 @@
     "architectureScore": 78.75,
     "modules": 9,
     "totalTasks": 118,
-    "estimatedHours": 190
+    "estimatedHours": 192.5
   },
 
   "taskStatus": {
     "total": 118,
-    "completed": 44,
+    "completed": 49,
     "inProgress": 0,
-    "pending": 74,
-    "completedHours": 73.5,
-    "remainingHours": 119,
-    "lastCompletedTaskId": "M4-T09",
+    "pending": 69,
+    "completedHours": 79.5,
+    "remainingHours": 113,
+    "lastCompletedTaskId": "M4-T14",
     "nextTaskCandidates": [
-      "M4-T10: ProgressOverlay実装（高優先度、1.5h）",
-      "M4-T11: ConfirmationDialog実装（高優先度、1h、M4-T09依存解消済み）",
-      "M4-T12: EmptyStateView実装（中優先度、1h）",
-      "M5-T06: StorageOverviewCard実装（高優先度、2h、M4-T07依存解消済み）"
+      "M5-T01: CleanupRecordモデル（中優先度、0.5h）",
+      "M5-T02: StorageStatisticsモデル（中優先度、0.5h）",
+      "M5-T03: ScanPhotosUseCase実装（高優先度、2.5h）",
+      "M5-T06: StorageOverviewCard実装（高優先度、2h）"
     ]
   },
 
@@ -40,7 +40,7 @@
     "M1": ["M1-T01", "M1-T02", "M1-T03", "M1-T04", "M1-T05", "M1-T06", "M1-T07", "M1-T08", "M1-T09", "M1-T10"],
     "M2": ["M2-T01", "M2-T02", "M2-T03", "M2-T04", "M2-T05", "M2-T06", "M2-T07", "M2-T08", "M2-T09", "M2-T10", "M2-T11", "M2-T12"],
     "M3": ["M3-T01", "M3-T02", "M3-T03", "M3-T04", "M3-T05", "M3-T06", "M3-T07", "M3-T08", "M3-T09", "M3-T10", "M3-T11", "M3-T12", "M3-T13"],
-    "M4": ["M4-T01", "M4-T02", "M4-T03", "M4-T04", "M4-T05", "M4-T06", "M4-T07", "M4-T08", "M4-T09"]
+    "M4": ["M4-T01", "M4-T02", "M4-T03", "M4-T04", "M4-T05", "M4-T06", "M4-T07", "M4-T08", "M4-T09", "M4-T10", "M4-T11", "M4-T12", "M4-T13", "M4-T14"]
   },
 
   "moduleProgress": {
@@ -69,12 +69,12 @@
       "status": "完了"
     },
     "M4_UIComponents": {
-      "completed": 9,
-      "remaining": 5,
-      "completedHours": 11,
-      "remainingHours": 6,
-      "percentage": 64.3,
-      "status": "進行中"
+      "completed": 14,
+      "remaining": 0,
+      "completedHours": 17,
+      "remainingHours": 0,
+      "percentage": 100,
+      "status": "完了"
     },
     "M5_Dashboard": {
       "completed": 0,
@@ -119,45 +119,38 @@
   },
 
   "qualityMetrics": {
-    "averageScore": 95.5,
-    "averagePercentage": 79.6,
-    "totalTests": 1347,
-    "testsPassed": 1347,
+    "averageScore": 94.0,
+    "averagePercentage": 78.3,
+    "totalTests": 1505,
+    "testsPassed": 1505,
     "testsFailed": 0,
     "failedTestNote": "全テスト成功",
     "latestScores": {
-      "M4-T09": 95,
-      "M4-T08": 98,
-      "M4-T07": 95,
-      "M4-T06": 95,
-      "M4-T05": 95
+      "M4-T14": 95,
+      "M4-T13": 92,
+      "M4-T12": 95,
+      "M4-T11": 96,
+      "M4-T10": 95
     }
   },
 
   "contextOptimization": {
     "progressEntries": 10,
     "maxProgressEntries": 10,
-    "archivedTasks": 44,
-    "lastOptimization": "2025-11-29",
-    "optimizationSession": "opt-019",
-    "nextOptimizationTrigger": "50タスク完了時（次回6タスク経過時）または PROGRESS.mdが10エントリ到達時（アーカイブ必要）",
-    "contextHealth": "良好（Phase 3進行中）",
-    "tokenUsageBefore": 89000,
-    "tokenUsageAfter": 91000,
-    "documentsOptimized": [
-      "CONTEXT_HANDOFF.json: impl-019セッション情報追加"
-    ],
-    "optimizationActions": [
-      "PROGRESS.md: impl-019エントリ追加済み（10エントリ到達、次回アーカイブ推奨）"
-    ],
-    "note": "PROGRESS.mdが10エントリに到達。次回セッション開始時に古いエントリをアーカイブ推奨。"
+    "archivedTasks": 49,
+    "lastOptimization": "2025-11-30",
+    "optimizationSession": "impl-023",
+    "nextOptimizationTrigger": "PROGRESS.md 10エントリ到達済み - アーカイブ推奨",
+    "contextHealth": "良好（Phase 4準備完了）"
   },
 
-  "archivedModules": ["M1", "M2", "M3"],
+  "archivedModules": ["M1", "M2", "M3", "M4"],
 
   "criticalDocuments": [
     "docs/CRITICAL/CORE_RULES.md",
-    "docs/CRITICAL/ARCHITECTURE.md"
+    "docs/CRITICAL/ARCHITECTURE.md",
+    "docs/CRITICAL/BUILD_CONFIG.md",
+    "docs/CRITICAL/WORKFLOW_GUIDE.md"
   ],
 
   "moduleDocuments": [
@@ -194,23 +187,32 @@
     {
       "phase": 3,
       "name": "UI層",
-      "modules": ["M4後半", "M5"],
-      "tasks": "M4-T05〜M4-T14, M5-T01〜M5-13",
-      "status": "進行中",
-      "progress": "5/23タスク完了（21.7%）",
-      "note": "M4-T05〜T09完了（PhotoThumbnail, PhotoGrid, StorageIndicator, GroupCard, ActionButton）、次はM4-T10 ProgressOverlay"
+      "modules": ["M4後半"],
+      "tasks": "M4-T05〜M4-T14",
+      "status": "完了",
+      "progress": "10/10タスク完了（100%）",
+      "note": "Phase 3完全終了 - M4（UIコンポーネント）全14タスク完了 / 17時間 / 平均93.5点"
     },
     {
       "phase": 4,
+      "name": "Dashboard",
+      "modules": ["M5"],
+      "tasks": "M5-T01〜M5-T13",
+      "status": "準備完了",
+      "progress": "0/13タスク完了（0%）",
+      "note": "Phase 4開始準備完了 - MV Pattern採用（ViewModelなし）"
+    },
+    {
+      "phase": 5,
       "name": "機能完成",
       "modules": ["M6", "M8"],
       "tasks": "M6-T01〜M6-T14, M8-T01〜M8-14",
       "status": "未着手"
     },
     {
-      "phase": 5,
+      "phase": 6,
       "name": "仕上げ",
-      "modules": ["M7", "M9", "テスト"],
+      "modules": ["M7", "M9"],
       "tasks": "M7-T01〜M7-T13, M9-T01〜M9-T15",
       "status": "未着手"
     }
@@ -219,18 +221,18 @@
   "gitHistory": {
     "commits": [
       {
-        "hash": "pending",
-        "message": "Session: impl-019完了 - M4-T09 ActionButton実装（95/100点）",
-        "date": "2025-11-29"
+        "hash": "b71e35c",
+        "message": "Session: impl-022完了 - M4-T14完了（プレビュー環境整備）/ M4モジュール完全終了",
+        "date": "2025-11-30"
       },
       {
-        "hash": "27546f3",
-        "message": "feat: impl-016セッション完了 - M4-T05 PhotoThumbnail実装 (95/120点)",
-        "date": "2025-11-29"
+        "hash": "361d523",
+        "message": "Session: impl-022完了 - M4-T14 PreviewHelpers完了 / M4モジュール完全終了 / Phase 3完了",
+        "date": "2025-11-30"
       },
       {
-        "hash": "b36a711",
-        "message": "Session: migration-v3.0 完了",
+        "hash": "9b337e1",
+        "message": "Session: impl-019完了 - M4-T06〜T09完了（PhotoGrid, StorageIndicator, GroupCard, ActionButton実装）",
         "date": "2025-11-29"
       }
     ],
@@ -238,68 +240,48 @@
   },
 
   "nextSessionRecommendations": [
-    "M4-T10: ProgressOverlay実装（高優先度、1.5h）から着手推奨",
-    "処理進行中のオーバーレイ表示コンポーネントを構築",
-    "キャンセルボタン、プログレスバー、ステータス表示を実装",
-    "Phase 3（UI層）を継続的に進行"
+    "Phase 4開始: M5-T01 CleanupRecordモデル実装から着手推奨",
+    "M5-T01〜T02: モデル層（CleanupRecord + StorageStatistics）",
+    "M5-T03: ScanPhotosUseCase実装（高優先度）",
+    "MV Patternに従ったViewModelなし設計"
   ],
 
   "resumeInstructions": {
-    "step1": "M4-T10 ProgressOverlay実装から着手",
-    "step2": "ActionButton（M4-T09）を活用した操作UI構築",
-    "step3": "プログレスバー、キャンセル機能を実装",
-    "context": "M4-T09 ActionButton実装完了。次はProgressOverlayで処理進行中の状態表示コンポーネントを構築。依存関係は解消済み。"
+    "step1": "M5-T01 CleanupRecordモデル実装から着手",
+    "step2": "削除履歴を保持するデータモデルを定義",
+    "step3": "SwiftDataまたはUserDefaultsで永続化設計",
+    "context": "Phase 3完了。M4 UIコンポーネント全14タスク完了（平均93.5点）。Phase 4ではMV Patternに従いViewModelを使わずにSwiftUI純正の状態管理で画面を構築。"
   },
 
-  "impl019SessionSummary": {
-    "completedTasks": ["M4-T09"],
-    "addedTests": 36,
-    "totalTestsNow": 1347,
+  "impl022SessionSummary": {
+    "completedTasks": ["M4-T10", "M4-T11", "M4-T12", "M4-T13", "M4-T14"],
+    "addedTests": 158,
+    "totalTestsNow": 1505,
     "keyDeliverables": [
-      "ActionButton.swift: プライマリ/セカンダリアクションボタンコンポーネント（SwiftUI、355行）",
-      "2つのボタンスタイル: プライマリ（アクセントカラー背景）、セカンダリ（グレー背景）",
-      "状態管理: 無効化（50%透明度）、ローディング（ProgressView + 70%透明度）",
-      "アイコン対応: SF Symbols統合、左側配置",
-      "タップアクション: async/await対応、@Sendableクロージャ",
-      "タップフィードバック: スケール0.95スプリングアニメーション",
-      "デザインシステム完全統合: LRSpacing, LRLayout, Color.LightRoll, Font.LightRoll",
-      "アクセシビリティ完全対応: VoiceOver、動的ラベル、状態トレイト、ヒント",
-      "Swift 6.1 Concurrency完全対応: @MainActor、Sendable準拠",
-      "SwiftUI Previews充実（ダーク/ライト、全状態パターン）",
-      "36テスト全パス（カバレッジ95%）"
+      "M4-T10 ProgressOverlay: 処理進捗オーバーレイ（29テスト）",
+      "M4-T11 ConfirmationDialog: 確認ダイアログ（33テスト）",
+      "M4-T12 EmptyStateView: 空状態表示（26テスト）",
+      "M4-T13 ToastView: トースト通知（34テスト）",
+      "M4-T14 PreviewHelpers: プレビュー環境整備（36テスト）"
     ],
     "qualityHighlights": [
-      "品質スコア: 95/100点",
-      "36テスト全パス",
-      "テストカバレッジ: 95%"
+      "M4モジュール完全終了（14/14タスク）",
+      "平均品質スコア: 93.5/100点",
+      "総テスト数: 108テスト（M4全体）"
     ]
-  },
-
-  "previousSessionsSummary": {
-    "impl018": {
-      "completedTasks": ["M4-T06", "M4-T07", "M4-T08"],
-      "note": "PhotoGrid + StorageIndicator + GroupCard実装（3タスク、66テスト追加）"
-    },
-    "impl017": {
-      "completedTasks": ["M4-T06", "M4-T07"],
-      "note": "PhotoGrid + StorageIndicator実装（2タスク、50テスト追加）"
-    },
-    "impl016": {
-      "completedTasks": ["M4-T05"],
-      "note": "PhotoThumbnail実装（1タスク、25テスト追加）"
-    }
   },
 
   "nextSession": {
-    "recommended_action": "(5) 開発準備から再開",
+    "recommended_action": "Phase 4開始 - M5-T01 CleanupRecordモデル実装",
     "priority_tasks": [
-      "M4-T10: ProgressOverlay実装（高優先度、1.5h）",
-      "M4-T11: ConfirmationDialog実装（高優先度、1h）"
+      "M5-T01: CleanupRecordモデル（0.5h）",
+      "M5-T02: StorageStatisticsモデル（0.5h）",
+      "M5-T03: ScanPhotosUseCase実装（2.5h）"
     ],
     "warnings": [
-      "PROGRESS.mdが10エントリに到達 - 次回アーカイブ推奨"
+      "PROGRESS.mdが10エントリに到達 - アーカイブ推奨"
     ]
   },
 
-  "notes": "impl-019セッション完了。M4-T09 ActionButton実装完了（95/100点）。Phase 3（UI層）進行中。累計44タスク完了、1347テスト全パス。次回はM4-T10 ProgressOverlay実装から着手推奨。PROGRESS.mdが10エントリに到達したため、次回セッション開始時にアーカイブ推奨。"
+  "notes": "impl-022セッションまで完了。M4 UIコンポーネント全14タスク完了（Phase 3完了）。累計49タスク完了（41.5%）、1505テスト全パス。Phase 4（Dashboard & Statistics）開始準備完了。PROGRESS.mdが10エントリに達しており、アーカイブ推奨。"
 }
