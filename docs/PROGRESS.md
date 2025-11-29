@@ -5,6 +5,46 @@
 
 ---
 
+## 2025-11-30 | セッション: impl-025（M5-T06/T07完了 - ダッシュボードView層実装）
+
+### 完了項目（55タスク - 本セッション2タスク追加、1スキップ）
+- [x] M5-T05: HomeViewModel実装 → **スキップ**（MV Pattern採用のためViewModelは使用しない）
+
+- [x] M5-T06: StorageOverviewCard実装（95/100点）
+  - StorageOverviewCard.swift: ストレージ概要カード（735行）
+  - 3つのDisplayStyle: full, compact, minimal
+  - GlassMorphism対応、グループサマリー表示
+  - 警告バッジ（正常/警告/危険状態）
+  - GroupSummaryRow: グループ一覧行コンポーネント
+  - 45テスト全パス（10スイート）
+
+- [x] M5-T07: HomeView実装（94/100点）
+  - HomeView.swift: ダッシュボードメインビュー（842行）
+  - ViewState enum: loading, loaded, scanning(progress), error
+  - スキャン実行・進捗表示・キャンセル機能
+  - クリーンアップ履歴表示（CleanupHistoryRow）
+  - スキャン結果表示（ResultRow）
+  - プルトゥリフレッシュ、エラーアラート
+  - iOS/macOS両対応ツールバー
+  - 44テスト全パス（12スイート）
+
+### テスト結果
+- StorageOverviewCardTests: 45テスト / 10スイート
+- HomeViewTests: 44テスト / 12スイート
+- **合計: 89テスト追加** (累計: 404テスト)
+
+### 品質評価
+- M5-T06: 95/100点 (合格)
+- M5-T07: 94/100点 (合格)
+- 平均: **94.5/100点**
+
+### Phase 4進捗
+- M5: Dashboard & Statistics - 6/13タスク完了 + 1スキップ (53.8%)
+- ダッシュボードView層完了: StorageOverviewCard + HomeView
+- 残タスク: GroupListView, GroupDetailView, Navigation設定
+
+---
+
 ## 2025-11-30 | セッション: impl-024（M5-T03/T04完了 - UseCase層実装）
 
 ### 完了項目（53タスク - 本セッション2タスク追加）
