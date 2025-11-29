@@ -2,88 +2,65 @@
 
 ## 0. アーキテクチャ選定
 
-### 0.1 選定プロセス
+### 0.1 採用パターン: MV Pattern（Model-View）
 
-本プロジェクトでは、3つのアーキテクチャ候補を定量評価し、最適なアーキテクチャを選定しました。
+**【2025-11-30更新】** 本プロジェクトは **MV Pattern** を採用しています。ViewModelを使用せず、SwiftUI本来の状態管理機能を最大限に活用します。
 
-### 0.2 候補アーキテクチャ
+### 0.2 MV Pattern の特徴
 
-#### パターンA: シンプル重視（軽量MVC/MVVM）
 ```
-Views (SwiftUI) → ViewModels (@Observable) → Services (具象クラス) → Frameworks
+Views (@State, @Environment) → Services (@Observable) → Frameworks
 ```
-- 最小限の抽象化、Protocol層なし
-- iOS 17の`@Observable`マクロを積極活用
-- 開発速度最速だがテスタビリティに難あり
 
-#### パターンB: バランス重視（MVVM + Repository）【採用】
-```
-Views → ViewModels (ObservableObject) → Repository Protocols → Implementations → Frameworks
-```
-- Repository PatternでデータアクセスをProtocol化
-- UseCaseは省略（ViewModelが直接Repositoryを使用）
-- テスタビリティと開発速度のバランス
+- **ViewModelなし**: 状態は全てView内の@Stateで管理
+- **@Observable**: サービス/モデルクラスは@Observableマクロで監視可能に
+- **@Environment**: アプリ全体で共有するサービスの依存性注入
+- **enum ViewState**: 複雑な状態は列挙型パターンで管理
 
-#### パターンC: スケーラビリティ重視（Clean Architecture）
-```
-Views → ViewModels → UseCases → Domain → Repositories → Frameworks
-```
-- 4層アーキテクチャ、完全なレイヤー分離
-- DIコンテナ（Swinject）使用
-- エンタープライズ級だが過度なオーバーヘッド
+### 0.3 採用理由
 
-### 0.3 定量評価マトリクス
+| 観点 | MV Pattern のメリット |
+|------|----------------------|
+| **SwiftUI親和性** | SwiftUI本来の設計思想に忠実 |
+| **シンプル性** | 中間層（ViewModel）を排除し、コードパスを短縮 |
+| **パフォーマンス** | @Observableは使用されるプロパティのみを追跡、再描画を最小化 |
+| **テスタビリティ** | Servicesをモック化してViewをテスト |
+| **保守性** | 状態の流れが直感的で追跡しやすい |
 
-| 指標 | 重み | A (シンプル) | B (バランス) | C (Clean) |
-|-----|-----|-------------|-------------|-----------|
-| **開発速度** | 30% | 95点 | 75点 | 55点 |
-| **コスト** | 20% | 90点 | 75点 | 50点 |
-| **スケーラビリティ** | 25% | 50点 | 80点 | 90点 |
-| **保守性** | 25% | 45点 | 85点 | 90点 |
-| **総合スコア** | 100% | **70.25点** | **78.75点** | **71.5点** |
+### 0.4 アーキテクチャ原則
 
-### 0.4 選定結果と理由
-
-**採用: パターンB（MVVM + Repository）**
-
-**選定理由:**
-1. **プロジェクト規模への適合**: 190時間/9モジュール構成に最適なオーバーヘッド
-2. **テスト要件の充足**: カバレッジ80%要件をRepositoryモックで達成可能
-3. **将来拡張への対応**: iPad/iCloud対応時もRepository差替で対応可能
-4. **チーム規模への適合**: 個人/スモールチーム向けに過度な抽象化を回避
-
-**トレードオフ:**
-- パターンAから得るもの: テスタビリティ(+40点)、スケーラビリティ(+30点)
-- パターンAから失うもの: 開発速度(-20点)、初期コスト(-15点)
-- パターンCと比較: UseCase層を省略し複雑性を抑制
+1. **Views as Pure State Expressions**: Viewは状態の表現に徹する
+2. **Single Source of Truth**: 状態は@Stateまたは@Environmentで一元管理
+3. **Declarative Side Effects**: .task修飾子で非同期処理を宣言的に記述
+4. **Environment for App-wide Services**: Router, Theme, Services等は@Environment経由
 
 ---
 
 ## 1. アーキテクチャ概要
 
-### 1.1 全体構成
+### 1.1 全体構成（MV Pattern）
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                      Presentation Layer                          │
+│                      View Layer (SwiftUI)                        │
 │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐           │
 │  │  Home    │ │  Group   │ │ Detail   │ │ Settings │           │
 │  │  View    │ │  List    │ │  View    │ │   View   │           │
+│  │ (@State) │ │ (@State) │ │ (@State) │ │ (@State) │           │
 │  └────┬─────┘ └────┬─────┘ └────┬─────┘ └────┬─────┘           │
 │       │            │            │            │                   │
-│  ┌────┴────────────┴────────────┴────────────┴─────┐            │
-│  │              ViewModel Layer                     │            │
-│  │  (ObservableObject, @Published properties)       │            │
-│  └────────────────────────┬────────────────────────┘            │
+│       └────────────┴────────────┴────────────┘                   │
+│                            │                                     │
+│                  @Environment(Service.self)                      │
 └───────────────────────────┼─────────────────────────────────────┘
                             │
-                            │ protocol依存
+                            │ @Observable Services
                             ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                      Domain Layer                                │
+│                      Service Layer                               │
 │  ┌─────────────────────────────────────────────────────────┐    │
-│  │              Repository Protocols                        │    │
-│  │  PhotoRepositoryProtocol / AnalysisRepositoryProtocol    │    │
-│  │  SettingsRepositoryProtocol / PurchaseRepositoryProtocol │    │
+│  │              @Observable Services                        │    │
+│  │  PhotoScanner / PhotoGrouper / BestShotSelector          │    │
+│  │  StorageService / DashboardService / TrashManager        │    │
 │  └────────────────────────┬────────────────────────────────┘    │
 │                           │                                      │
 │  ┌────────────────────────┴────────────────────────────────┐    │
@@ -92,12 +69,13 @@ Views → ViewModels → UseCases → Domain → Repositories → Frameworks
 │  └─────────────────────────────────────────────────────────┘    │
 └───────────────────────────┬─────────────────────────────────────┘
                             │
-                            │ 実装
+                            │ actor / Repository
                             ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                       Data Layer                                 │
 │  ┌─────────────────────────────────────────────────────────┐    │
-│  │              Repository Implementations                  │    │
+│  │              Actors & Repositories                       │    │
+│  │  PhotoRepository / AnalysisRepository / ThumbnailCache   │    │
 │  └────────────────────────┬────────────────────────────────┘    │
 │                           │                                      │
 │  ┌─────────────┬──────────┼──────────┬─────────────┐            │
@@ -109,23 +87,24 @@ Views → ViewModels → UseCases → Domain → Repositories → Frameworks
 ```
 
 ### 1.2 設計パターン
-- **MVVM (Model-View-ViewModel)**: UI層の責務分離
-- **Repository Pattern**: データソースの抽象化（テスタビリティの要）
-- **Dependency Injection**: ViewModelへのRepository注入
-- **Protocol Oriented Programming**: 柔軟な実装の入れ替え
+- **MV Pattern (Model-View)**: ViewModelを使わず、SwiftUI本来の状態管理を活用
+- **@Observable**: サービスの状態変化を自動追跡
+- **@Environment**: アプリ全体で共有するサービスの依存性注入
+- **Actor**: データアクセス層のスレッドセーフティ確保
 
 ### 1.3 採用しなかったパターン
+- **ViewModel層**: SwiftUIの@State/@Environmentで十分
 - **UseCase層**: 現時点のビジネスロジック複雑性では過剰（将来追加可能）
 - **Coordinator Pattern**: NavigationStack/NavigationPathで十分
-- **DIコンテナ（Swinject等）**: @Environment/@EnvironmentObjectで代替
+- **DIコンテナ（Swinject等）**: @Environmentで代替
 
 ---
 
 ## 2. レイヤー詳細
 
-### 2.1 Presentation Layer
+### 2.1 View Layer（SwiftUI）
 
-#### Views
+#### 画面構成
 ```swift
 // 画面構成
 - HomeView          // ダッシュボード（ストレージ情報、クイックアクション）
@@ -135,38 +114,58 @@ Views → ViewModels → UseCases → Domain → Repositories → Frameworks
 - TrashView         // ゴミ箱（復元機能）
 ```
 
-#### ViewModels
+#### View設計パターン（MV Pattern）
 ```swift
-/// ViewModelの基本プロトコル
-/// Repository Protocolに依存し、テスト時にモック注入可能
-protocol ViewModelProtocol: ObservableObject {
-    associatedtype State
-    associatedtype Action
+/// MV PatternのView実装例
+/// ViewModelなし、状態は@Stateで管理
+@MainActor
+struct HomeView: View {
+    // Services are injected via Environment
+    @Environment(PhotoScanner.self) private var scanner
+    @Environment(StorageService.self) private var storageService
 
-    var state: State { get }
-    func send(_ action: Action)
+    // Local state management
+    @State private var viewState: ViewState = .loading
+    @State private var storageInfo: StorageInfo?
+    @State private var photoGroups: [PhotoGroup] = []
+
+    enum ViewState {
+        case loading
+        case loaded
+        case scanning(progress: Double)
+        case error(String)
+    }
+
+    var body: some View {
+        // View implementation
+    }
+}
+```
+
+#### 状態管理の原則
+```swift
+// 1. @State: View固有のローカル状態
+@State private var isShowingSheet = false
+@State private var selectedItems: Set<String> = []
+
+// 2. @Environment: アプリ全体で共有するサービス
+@Environment(PhotoScanner.self) private var scanner
+
+// 3. enum ViewState: 複雑な状態の統合管理
+enum ViewState {
+    case loading
+    case loaded(data: [Item])
+    case error(String)
 }
 
-// 例: HomeViewModel
-@MainActor
-final class HomeViewModel: ObservableObject {
-    // Repositoryはprotocol型で保持（テスタビリティ確保）
-    private let photoRepository: PhotoRepositoryProtocol
-    private let analysisRepository: AnalysisRepositoryProtocol
+// 4. .task: 非同期処理（自動キャンセル対応）
+.task {
+    await loadData()
+}
 
-    @Published private(set) var state: HomeState = .initial
-
-    init(
-        photoRepository: PhotoRepositoryProtocol = PhotoRepository(),
-        analysisRepository: AnalysisRepositoryProtocol = AnalysisRepository()
-    ) {
-        self.photoRepository = photoRepository
-        self.analysisRepository = analysisRepository
-    }
-
-    func send(_ action: HomeAction) {
-        // アクション処理
-    }
+// 5. .task(id:): 値変更時の再実行
+.task(id: selectedGroupId) {
+    await loadGroupDetails(selectedGroupId)
 }
 ```
 
@@ -645,5 +644,36 @@ final class ScanPhotosUseCase: ScanPhotosUseCaseProtocol {
 
 ---
 
-*最終更新: 2025-11-27*
-*アーキテクチャ選定: パターンB（MVVM + Repository）*
+## 12. 開発フェーズ状況
+
+### 12.1 Phase完了状況
+
+| Phase | 内容 | ステータス | 完了日 |
+|-------|------|----------|--------|
+| **Phase 1** | 基盤構築（M1 Core Infrastructure） | 完了 | 2025-11-27 |
+| **Phase 2** | データ層（M2 Photo Access + M3 Image Analysis） | 完了 | 2025-11-29 |
+| **Phase 3** | UI層（M4 UI Components） | 完了 | 2025-11-30 |
+| **Phase 4** | Dashboard（M5 Dashboard & Statistics） | 次フェーズ | - |
+| **Phase 5** | 機能完成（M6 Deletion + M8 Settings） | 未着手 | - |
+| **Phase 6** | 仕上げ（M7 Notifications + M9 Monetization） | 未着手 | - |
+
+### 12.2 完了モジュール
+
+| モジュール | タスク数 | テスト数 | 平均品質スコア |
+|-----------|---------|---------|---------------|
+| M1 Core Infrastructure | 10 | - | - |
+| M2 Photo Access | 12 | 多数 | 111.5/120点 |
+| M3 Image Analysis | 13 | 27 | 111.1/120点 |
+| M4 UI Components | 14 | 108 | 93.5/100点 |
+| **合計** | **49** | **135+** | **高品質** |
+
+### 12.3 全体進捗
+- 完了タスク: 49/118 (41.5%)
+- 完了時間: 79.5h/192.5h (41.3%)
+- テスト総数: 1500+件
+
+---
+
+*最終更新: 2025-11-30*
+*アーキテクチャ: MV Pattern（ViewModelを使用しないSwiftUI本来の設計）*
+*Phase 3完了: M1 + M2 + M3 + M4*
