@@ -1,14 +1,14 @@
 {
-  "version": "2.1",
+  "version": "3.0",
   "lastUpdated": "2025-11-29",
-  "sessionId": "impl-015",
+  "sessionId": "migration-v3.0",
 
   "projectStatus": {
-    "phase": "Phase 2 完了 → Phase 3 準備中",
-    "currentPhase": "Phase 2完了（M1, M2, M3）- Phase 3（UI層）へ移行",
+    "phase": "Phase 3準備完了",
+    "currentPhase": "v3.0マイグレーション完了 - Phase 3（UI層）準備完了",
     "overallProgress": "33.1%",
-    "nextMilestone": "Phase 3開始 - M4-T05 PhotoThumbnail実装 または M5 Dashboard",
-    "majorAchievement": "Phase 2完了 - データ層完全実装（M1基盤 + M2写真アクセス + M3画像分析）"
+    "nextMilestone": "⑤ 開発準備から再開 - M4-T05 PhotoThumbnail実装 または M5 Dashboard",
+    "majorAchievement": "v3.0ディレクトリ構造への移行完了、Phase 2完了状態を維持"
   },
 
   "designStatus": {
@@ -134,7 +134,7 @@
   },
 
   "contextOptimization": {
-    "progressEntries": 7,
+    "progressEntries": 9,
     "maxProgressEntries": 10,
     "archivedTasks": 39,
     "lastOptimization": "2025-11-29",
@@ -332,5 +332,46 @@
     }
   },
 
-  "notes": "impl-015セッション完了。M3-T12（AnalysisRepository統合）とM3-T13（単体テスト）完了により、Phase 2（データ層）が完全終了。累計39タスク完了、1220テスト全パス、平均品質スコア110.0点（91.7%）。M3モジュール100%完了（13/13）。次回セッションからPhase 3（UI層）開始。M4-T05（PhotoThumbnail）またはM5（Dashboard）から着手推奨。データ層が完全に整っているため、UI実装に専念できる環境が整っている。"
+  "migrationV3SessionSummary": {
+    "date": "2025-11-29",
+    "type": "migration",
+    "version": "3.0",
+    "changes": [
+      "ディレクトリ構造をv3.0に更新（docs/CRITICAL/, docs/modules/, docs/archive/）",
+      "ホワイトリスト外ファイル8件をlegacy/へ移動",
+      "必須ドキュメント7件を生成（DATABASE_DESIGN.md, EXTERNAL_SERVICES.md等）",
+      "CONTEXT_HANDOFF.jsonをルートへ統合、バージョン3.0へ更新"
+    ],
+    "commit": "2bc11d4",
+    "filesRelocated": [
+      "CODE_STRUCTURE_GUIDE.md → legacy/",
+      "DESIGN_PHASE_SUMMARY.md → legacy/",
+      "HANDOVER.md → legacy/",
+      "MEMORY.md → legacy/",
+      "MODULE_M1_SUMMARY.md → legacy/",
+      "MODULE_M2_SUMMARY.md → legacy/",
+      "MODULE_M3_SUMMARY.md → legacy/",
+      "SESSION_SUMMARY.md → legacy/"
+    ],
+    "newDocuments": [
+      "docs/DATABASE_DESIGN.md",
+      "docs/EXTERNAL_SERVICES.md",
+      "docs/COST_ESTIMATE.md",
+      "docs/LEGAL_CHECKLIST.md",
+      "docs/UI_UX_GUIDE.md",
+      "docs/TEST_RESULTS.md",
+      "docs/SECURITY_AUDIT.md"
+    ]
+  },
+
+  "nextSession": {
+    "recommended_action": "⑤ 開発準備から再開",
+    "priority_tasks": [
+      "M4-T05: PhotoThumbnail実装（高優先度、2h）",
+      "M5-T01: CleanupRecordモデル（中優先度、0.5h）"
+    ],
+    "warnings": []
+  },
+
+  "notes": "v3.0マイグレーション完了。ディレクトリ構造をspec-context-optimizerのホワイトリストに準拠。ホワイトリスト外ファイル8件をlegacy/へ移動、必須ドキュメント7件を生成。Phase 2完了状態（M1+M2+M3、39タスク、1220テスト全パス、平均品質110.0点）を維持。次回セッションは⑤ 開発準備から再開し、M4-T05（PhotoThumbnail）またはM5-T01から着手推奨。"
 }

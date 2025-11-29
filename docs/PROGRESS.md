@@ -5,6 +5,44 @@
 
 ---
 
+## 2025-11-29 | セッション: migration-v3.0（旧運用→v3.0マイグレーション）
+
+### 実施内容
+- v3.0ドキュメント管理構造への移行作業
+- ホワイトリスト外ファイルの整理・移動
+
+### 作業詳細
+1. **ディレクトリ作成**
+   - docs/archive/legacy/ - 旧運用ドキュメント保管用
+   - assets/images/, assets/icons/, assets/fonts/ - アセット用
+
+2. **ファイル移動（8件）** → docs/archive/legacy/
+   - REVIEW_GUIDELINES.md
+   - PARALLEL_PLAN.md
+   - M3-T10_QUALITY_REVIEW_LOOP1.md
+   - validation_request_M3-T11.md
+   - OPTIMIZATION_REPORT_OPT009.md
+   - CONTEXT_OPTIMIZATION_REPORT_opt-014.md
+   - CONTEXT_OPTIMIZATION_REPORT_opt-015.md
+   - CONTEXT_STATUS_REPORT_2025-11-29.md
+
+3. **ファイル削除（1件）**
+   - docs/CONTEXT_HANDOFF.json（ルートと重複）
+
+4. **ドキュメント生成（7件）**
+   - docs/CRITICAL/BUILD_CONFIG.md
+   - docs/CRITICAL/WORKFLOW_GUIDE.md
+   - BUILD_ERRORS.md, DEVICE_ISSUES.md
+   - INCIDENT_LOG.md, FEEDBACK_LOG.md
+   - docs/archive/legacy/MIGRATION_LOG.md
+
+### セッションサマリー
+- **コミット**: 2bc11d4
+- **品質スコア**: N/A（マイグレーション作業）
+- **次タスク**: Phase 3開始 - M4-T05（PhotoThumbnail実装）
+
+---
+
 ## 2025-11-29 | セッション: impl-015（M3-T12〜T13完了 - Phase 2完了）🎉
 
 ### 完了項目（39タスク - 本セッション2タスク追加）
@@ -219,41 +257,6 @@
 - **Phase 2進捗**: M2完了、M3進行中
 - **次タスク**: M3-T06 (SimilarityAnalyzer)
 
----
-
-## 2025-11-28 | セッション: impl-007（M3モジュール開始）
-
-### 完了項目（28タスク - 本セッション2タスク追加）
-- [x] M3-T01: PhotoAnalysisResultモデル（115/120点）
-  - PhotoAnalysisResult.swift: 約580行のドメインモデル
-  - FaceAngle構造体: 顔の向き情報（yaw, pitch, roll）
-  - AnalysisIssue列挙型: blurry, lowQuality, overexposed, underexposed, screenshot
-  - AnalysisThresholds: 閾値設定（Sendable対応）
-  - Builder: スレッドセーフなビルダーパターン（NSLock）
-  - Array拡張: フィルタリング、ソート、統計
-  - 52テスト全パス（6スイート）
-- [x] M3-T02: PhotoGroupモデル（112/120点）
-  - PhotoGroup.swift: 約824行のドメインモデル
-  - GroupType列挙型: similar, selfie, screenshot, blurry, largeVideo, duplicate
-  - 各タイプの表示属性: displayName, icon, description, emoji, sortOrder
-  - 動作フラグ: isAutoDeleteRecommended, needsBestShotSelection
-  - PhotoGroup構造体: Identifiable, Hashable, Sendable, Codable, Comparable
-  - ビルダーパターン: withBestShot, withSelection, adding, removing, withCustomName
-  - PhotoGroupStatistics: 統計情報構造体
-  - GroupingOptions: グルーピングオプション設定（DateRange付き）
-  - Array拡張: フィルタリング、ソート、統計メソッド
-  - 86+テスト全パス（11スイート）
-
-### セッションサマリー
-- **累計完了タスク**: 28タスク（+2）
-- **総テスト数**: 964テスト（963パス / 1失敗は既存パフォーマンステスト）
-- **平均品質スコア**: 110.3点（91.9%）
-- **M3モジュール**: 2/13完了（15.4%）
-- **Phase 2進捗**: M2完了、M3進行中
-- **次タスク**: M3-T03 (VisionRequestHandler)
-
----
-
-*古いエントリ（impl-006, impl-005, impl-003, impl-002, impl-001, init-001, design-001, optimize-001, arch-select-001）は `docs/archive/PROGRESS_ARCHIVE.md` に移動済み*
+*古いエントリ（impl-007, impl-006, impl-005, impl-003, impl-002, impl-001, init-001, design-001, optimize-001, arch-select-001）は `docs/archive/PROGRESS_ARCHIVE.md` に移動済み*
 
 ---
