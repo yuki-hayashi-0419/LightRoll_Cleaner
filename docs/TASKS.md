@@ -43,17 +43,17 @@
 | タスクID | タスク名 | ステータス | 優先度 | 見積 | 依存 |
 |----------|----------|------------|--------|------|------|
 | M4-T05 | PhotoThumbnail実装 | 完了 | 高 | 2h | M4-T03 |
-| M4-T06 | PhotoGrid実装 | 未着手 | 高 | 2h | M4-T05 |
-| M4-T07 | StorageIndicator実装 | 未着手 | 高 | 1.5h | M4-T03 |
-| M4-T08 | GroupCard実装 | 未着手 | 高 | 1.5h | M4-T05 |
-| M4-T09 | ActionButton実装 | 未着手 | 中 | 1h | M4-T03 |
+| M4-T06 | PhotoGrid実装 | 完了 | 高 | 2h | M4-T05 |
+| M4-T07 | StorageIndicator実装 | 完了 | 高 | 1.5h | M4-T03 |
+| M4-T08 | GroupCard実装 | 完了 | 高 | 1.5h | M4-T05 |
+| M4-T09 | ActionButton実装 | 完了 | 中 | 1h | M4-T03 |
 | M4-T10 | ProgressOverlay実装 | 未着手 | 高 | 1.5h | M4-T03 |
 | M4-T11 | ConfirmationDialog実装 | 未着手 | 高 | 1h | M4-T09 |
 | M4-T12 | EmptyStateView実装 | 未着手 | 中 | 1h | M4-T03 |
 | M4-T13 | ToastView実装 | 未着手 | 中 | 1h | M4-T03 |
 | M4-T14 | プレビュー環境整備 | 未着手 | 中 | 1h | M4-T13 |
 
-**M4残: 9タスク / 11.5時間** (完了: 5タスク / 5.5時間 -> 一部アーカイブ済)
+**M4残: 5タスク / 6時間** (完了: 9タスク / 11時間 -> 一部アーカイブ済)
 
 ---
 
@@ -178,15 +178,15 @@
 | M1: Core Infrastructure | 0 | 0h | 10 (16h) ✅ |
 | M2: Photo Access | 0 | 0h | 12 (20.5h) ✅ |
 | M3: Image Analysis | 0 | 0h | 13 (26h) ✅ |
-| M4: UI Components | 9 | 11.5h | 5 (5.5h) |
+| M4: UI Components | 5 | 6h | 9 (11h) |
 | M5: Dashboard | 13 | 24h | 0 |
 | M6: Deletion & Safety | 14 | 25h | 0 |
 | M7: Notifications | 13 | 17.5h | 0 |
 | M8: Settings | 14 | 21h | 0 |
 | M9: Monetization | 15 | 25.5h | 0 |
-| **残合計** | **78** | **124.5h** | **40 (68h)** |
+| **残合計** | **74** | **119h** | **44 (73.5h)** |
 
-*進捗: 40/118タスク完了 (33.9%) / 68h/192.5h (35.3%)*
+*進捗: 44/118タスク完了 (37.3%) / 73.5h/192.5h (38.2%)*
 
 ---
 
@@ -215,4 +215,4 @@
 
 ---
 
-*最終更新: 2025-11-29 (Phase 3進行中 - M4-T05完了)*
+*最終更新: 2025-11-29 (Phase 3進行中 - M4-T09完了)*

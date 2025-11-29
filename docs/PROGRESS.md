@@ -5,6 +5,123 @@
 
 ---
 
+## 2025-11-29 | セッション: impl-019（M4-T09完了 - ActionButton実装）
+
+### 完了項目（44タスク - 本セッション1タスク追加）
+- [x] M4-T09: ActionButton実装（95/100点）
+  - ActionButton.swift: プライマリ/セカンダリアクションボタンコンポーネント（SwiftUI、355行）
+  - 2つのボタンスタイル: プライマリ（アクセントカラー背景）、セカンダリ（グレー背景）
+  - 状態管理: 無効化（50%透明度）、ローディング（ProgressView + 70%透明度）
+  - アイコン対応: SF Symbols統合、左側配置
+  - タップアクション: async/await対応、@Sendableクロージャ
+  - タップフィードバック: スケール0.95スプリングアニメーション、simultaneousGesture
+  - デザインシステム完全統合: LRSpacing, LRLayout, Color.LightRoll, Font.LightRoll
+  - アクセシビリティ完全対応: VoiceOver、動的ラベル、状態トレイト、ヒント
+  - Swift 6.1 Concurrency完全対応: @MainActor、Sendable準拠
+  - SwiftUI Previews充実（ダーク/ライト、全状態パターン）
+  - 36テスト全パス（カバレッジ95%、初期28テスト + 追加8テスト）
+
+### テスト品質サマリー
+- M4-T09 ActionButton:
+  - 総テストケース数: 36件（初期28件 + 追加8件）
+  - テストカバレッジ: 85% → 95%（+10%改善）
+  - カテゴリ別: 初期化2件、スタイル2件、無効化2件、ローディング2件、アイコン2件、アクション2件、アクセシビリティ6件（+3件）、エッジケース3件、ButtonStyle9件、統合3件
+  - 追加テスト内訳:
+    - effectiveOpacity検証: 3件（通常1.0、ローディング0.7、無効化0.5）
+    - accessibilityDescription検証: 3件（プライマリ、ローディング、無効化）
+    - accessibilityHint検証: 2件（通常「タップして実行」、ローディング「処理中です」）
+  - テスタビリティ改善: effectiveOpacity、accessibilityDescriptionをinternal化（DEBUG条件付き）
+  - 実行時間: 高速（詳細時間未記録）
+
+### セッションサマリー（更新）
+- **累計完了タスク**: 44タスク（+1）
+- **総テスト数**: 1347テスト全パス（+36テスト追加、1311→1347）
+- **品質スコア**: 95/100点
+- **M4モジュール**: 9/14完了（64.3%）
+- **Phase 3進捗**: M4進行中（デザインシステム+PhotoThumbnail+PhotoGrid+StorageIndicator+GroupCard+ActionButton完了）
+- **次タスク**: M4-T10 (ProgressOverlay実装) または M5-T06 (StorageOverviewCard実装 - M4-T07依存解消済み)
+
+---
+
+## 2025-11-29 | セッション: impl-018（M4-T06〜T08完了 - PhotoGrid + StorageIndicator + GroupCard実装）
+
+### 完了項目（43タスク - 本セッション3タスク追加）
+- [x] M4-T08: GroupCard実装（98/100点）
+  - GroupCard.swift: 類似写真グループ表示カードコンポーネント（SwiftUI）
+  - PhotoThumbnail活用: 最大3枚のサムネイルプレビュー、ベストショットバッジ対応
+  - プレースホルダー対応: 3枚未満の場合は自動パディング、空の場合は全てプレースホルダー
+  - 4種類のグループタイプ対応: 類似/スクリーンショット/ブレ/大容量動画
+  - グループ情報表示: タイトル、写真枚数、削減可能容量
+  - タップアクション + プレスアニメーション: GroupCardButtonStyleでスムーズな動き
+  - グラスモーフィズムデザイン: .glassCard()モディファイア適用
+  - アクセシビリティ完全対応（VoiceOver、説明的なラベル）
+  - SwiftUI Previews充実（ダーク/ライト、5パターン）
+  - 16テスト全パス（カバレッジ89%、実行時間0.004秒）
+
+### テスト品質サマリー
+- M4-T08 GroupCard:
+  - 総テストケース数: 16件
+  - テストカバレッジ: 89%
+  - カテゴリ別: 正常系9件、異常系4件、境界値2件、アクセシビリティ1件
+  - 実行時間: 0.004秒
+
+### セッションサマリー（更新）
+- **累計完了タスク**: 43タスク（+3）
+- **総テスト数**: 1311テスト全パス（+66テスト追加、1245→1311）
+- **品質スコア平均**: 96点（M4-T06: 95点、M4-T07: 95点、M4-T08: 98点）
+- **M4モジュール**: 8/14完了（57.1%）
+- **Phase 3進捗**: M4進行中（デザインシステム+PhotoThumbnail+PhotoGrid+StorageIndicator+GroupCard完了）
+- **次タスク**: M4-T09 (ActionButton実装) または M4-T10 (ProgressOverlay実装)
+
+---
+
+## 2025-11-29 | セッション: impl-017（M4-T06〜T07完了 - PhotoGrid + StorageIndicator実装）
+
+### 完了項目（42タスク - 本セッション2タスク追加）
+- [x] M4-T06: PhotoGrid実装（95/100点）
+  - PhotoGrid.swift: 写真グリッド表示コンポーネント（SwiftUI）
+  - LazyVGrid + ForEach パターンで効率的なグリッドレイアウト
+  - 選択状態管理: @Binding<Set<String>>で双方向バインディング
+  - ベストショットバッジ表示: 任意の写真にバッジを表示
+  - カスタマイズ可能な列数: デフォルト3列、1〜任意の列数に対応
+  - タップ/長押しハンドリング: カスタムコールバック対応、ハプティックフィードバック
+  - 空状態対応: EmptyState ビュー実装
+  - iOS/macOS両対応（条件付きコンパイル）
+  - アクセシビリティ完全対応（VoiceOver、選択状態トレイト）
+  - SwiftUI Previews充実（ダーク/ライト、6パターン）
+  - 20テスト全パス（カバレッジ100%）
+- [x] M4-T07: StorageIndicator実装（95/100点）
+  - StorageIndicator.swift: ストレージ使用量視覚化コンポーネント（SwiftUI）
+  - 2つのスタイル: バー形式 + リング形式
+  - 3段階の警告レベル: normal（青）、warning（オレンジ、90%以上）、critical（赤、95%以上）
+  - 削減可能容量の視覚化: 1GB以上の場合にオーバーレイで緑色バー表示
+  - アニメーション: 初期表示0.8秒、値変更0.5秒のスムーズな動き
+  - 詳細情報表示: 写真ライブラリ容量、削減可能容量、デバイス総容量をDetailRowで表示
+  - デザインシステム100%活用: LRSpacing, LRLayout, Color.LightRoll, Font.LightRoll
+  - アクセシビリティ完全対応（VoiceOver、状態説明、自動テスト用ID）
+  - SwiftUI Previews充実（ダーク/ライト、正常/警告/危険、バー/リング、詳細あり/なし）
+  - 30テスト全パス（カバレッジ98%）
+
+### テスト品質サマリー
+- M4-T06 PhotoGrid:
+  - 総テストケース数: 20件（既存9件 + 追加11件）
+  - テストカバレッジ: 32% → 100%（+68%改善）
+  - 実行時間: 0.001秒
+- M4-T07 StorageIndicator:
+  - 総テストケース数: 30件（既存14件 + 追加16件）
+  - テストカバレッジ: 73% → 98%（+25%改善）
+  - カテゴリ別カバー率: 正常系95%、異常系100%、境界値100%、視覚的95%、アクセシビリティ100%
+
+### セッションサマリー
+- **累計完了タスク**: 42タスク（+2）
+- **総テスト数**: 1295テスト全パス（+50テスト追加、1245→1295）
+- **品質スコア平均**: 95点（M4-T06: 95点、M4-T07: 95点）
+- **M4モジュール**: 7/14完了（50.0%）
+- **Phase 3進捗**: M4進行中（デザインシステム+PhotoThumbnail+PhotoGrid+StorageIndicator完了）
+- **次タスク**: M4-T08 (GroupCard実装) または M5-T06 (StorageOverviewCard実装 - M4-T07依存解消)
+
+---
+
 ## 2025-11-29 | セッション: impl-016（M4-T05完了 - PhotoThumbnail実装）
 
 ### 完了項目（40タスク - 本セッション1タスク追加）
@@ -265,36 +382,4 @@
 - **Phase 2進捗**: M2完了、M3進行中（Vision処理層+類似度分析+顔検出完了）
 - **次タスク**: M3-T08 (ブレ検出実装)
 
----
-
-## 2025-11-28 | セッション: impl-008（M3 Vision処理層完了）
-
-### 完了項目（31タスク - 本セッション3タスク追加）
-- [x] M3-T03: VisionRequestHandler実装（106/120点）
-  - VisionRequestHandler.swift: Vision Framework統合基盤
-  - VNRequest抽象化、エラーハンドリング
-  - VNImageRequestHandlerラッパー
-  - スレッドセーフな非同期処理
-  - 23テスト全パス
-- [x] M3-T04: FeaturePrintExtractor実装（107/120点）
-  - FeaturePrintExtractor.swift: 特徴量抽出
-  - VNGenerateImageFeaturePrintRequest統合
-  - BatchFeaturePrintResult構造体
-  - 進捗追跡、バッチ処理対応
-  - 19テスト全パス
-- [x] M3-T05: SimilarityCalculator実装（108/120点）
-  - SimilarityCalculator.swift: 類似度計算エンジン
-  - cosine similarity、Euclidean distance実装
-  - パフォーマンス最適化（vDSP活用）
-  - SimilarityMatrix、SimilarityPair構造体
-  - 20テスト全パス
-
-### セッションサマリー
-- **累計完了タスク**: 31タスク（+3）
-- **総テスト数**: 1026テスト（1025パス / 1失敗は既存パフォーマンステスト）
-- **平均品質スコア**: 107点（89.2%）
-- **M3モジュール**: 5/13完了（38.5%）
-- **Phase 2進捗**: M2完了、M3進行中
-- **次タスク**: M3-T06 (SimilarityAnalyzer)
-
-*古いエントリ（impl-007, impl-006, impl-005, impl-003, impl-002, impl-001, init-001, design-001, optimize-001, arch-select-001）は `docs/archive/PROGRESS_ARCHIVE.md` に移動済み*
+*古いエントリ（impl-008, impl-007, impl-006, impl-005, impl-003, impl-002, impl-001, init-001, design-001, optimize-001, arch-select-001）は `docs/archive/PROGRESS_ARCHIVE.md` に移動済み*
