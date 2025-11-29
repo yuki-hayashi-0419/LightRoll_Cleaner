@@ -1,14 +1,14 @@
 {
   "version": "3.0",
   "lastUpdated": "2025-11-30",
-  "sessionId": "impl-023",
+  "sessionId": "impl-026",
 
   "projectStatus": {
     "phase": "Phase 4",
-    "currentPhase": "Phase 4（Dashboard & Statistics）準備完了 - M5モジュール開始",
-    "overallProgress": "41.5%",
-    "nextMilestone": "M5-T01 CleanupRecordモデル実装（削除履歴モデル）",
-    "majorAchievement": "M4: UI Components 完全終了（14/14タスク、93.5/100点平均）"
+    "currentPhase": "Phase 4（Dashboard & Statistics）進行中 - M5モジュール76.9%完了",
+    "overallProgress": "48.7%",
+    "nextMilestone": "M5-T10 GroupDetailViewModel実装（MV Patternのためスキップ予定）",
+    "majorAchievement": "M5-T09 GroupListView完了（952行、83テスト、95/100点）"
   },
 
   "designStatus": {
@@ -16,23 +16,25 @@
     "architecture": "MV Pattern + SwiftUI Native State",
     "architectureScore": 78.75,
     "modules": 9,
-    "totalTasks": 118,
-    "estimatedHours": 192.5
+    "totalTasks": 117,
+    "estimatedHours": 190.5
   },
 
   "taskStatus": {
-    "total": 118,
-    "completed": 49,
+    "total": 117,
+    "completed": 57,
+    "skipped": 2,
     "inProgress": 0,
-    "pending": 69,
-    "completedHours": 79.5,
-    "remainingHours": 113,
-    "lastCompletedTaskId": "M4-T14",
+    "pending": 58,
+    "completedHours": 91.5,
+    "remainingHours": 99,
+    "lastCompletedTaskId": "M5-T09",
+    "skippedTasks": ["M5-T05", "M5-T08"],
     "nextTaskCandidates": [
-      "M5-T01: CleanupRecordモデル（中優先度、0.5h）",
-      "M5-T02: StorageStatisticsモデル（中優先度、0.5h）",
-      "M5-T03: ScanPhotosUseCase実装（高優先度、2.5h）",
-      "M5-T06: StorageOverviewCard実装（高優先度、2h）"
+      "M5-T10: GroupDetailViewModel実装（スキップ予定 - MV Pattern採用）",
+      "M5-T11: GroupDetailView実装（高優先度、2.5h）",
+      "M5-T12: Navigation設定（高優先度、1.5h）",
+      "M5-T13: 単体テスト作成（中優先度、2h）"
     ]
   },
 
@@ -40,7 +42,8 @@
     "M1": ["M1-T01", "M1-T02", "M1-T03", "M1-T04", "M1-T05", "M1-T06", "M1-T07", "M1-T08", "M1-T09", "M1-T10"],
     "M2": ["M2-T01", "M2-T02", "M2-T03", "M2-T04", "M2-T05", "M2-T06", "M2-T07", "M2-T08", "M2-T09", "M2-T10", "M2-T11", "M2-T12"],
     "M3": ["M3-T01", "M3-T02", "M3-T03", "M3-T04", "M3-T05", "M3-T06", "M3-T07", "M3-T08", "M3-T09", "M3-T10", "M3-T11", "M3-T12", "M3-T13"],
-    "M4": ["M4-T01", "M4-T02", "M4-T03", "M4-T04", "M4-T05", "M4-T06", "M4-T07", "M4-T08", "M4-T09", "M4-T10", "M4-T11", "M4-T12", "M4-T13", "M4-T14"]
+    "M4": ["M4-T01", "M4-T02", "M4-T03", "M4-T04", "M4-T05", "M4-T06", "M4-T07", "M4-T08", "M4-T09", "M4-T10", "M4-T11", "M4-T12", "M4-T13", "M4-T14"],
+    "M5": ["M5-T01", "M5-T02", "M5-T03", "M5-T04", "M5-T06", "M5-T07", "M5-T09"]
   },
 
   "moduleProgress": {
@@ -77,12 +80,13 @@
       "status": "完了"
     },
     "M5_Dashboard": {
-      "completed": 0,
-      "remaining": 13,
-      "completedHours": 0,
-      "remainingHours": 24,
-      "percentage": 0,
-      "status": "未着手"
+      "completed": 8,
+      "skipped": 2,
+      "remaining": 3,
+      "completedHours": 12,
+      "remainingHours": 6,
+      "percentage": 76.9,
+      "status": "進行中"
     },
     "M6_DeletionSafety": {
       "completed": 0,
@@ -119,29 +123,29 @@
   },
 
   "qualityMetrics": {
-    "averageScore": 94.0,
-    "averagePercentage": 78.3,
-    "totalTests": 1505,
-    "testsPassed": 1505,
+    "averageScore": 95.7,
+    "averagePercentage": 95.7,
+    "totalTests": 487,
+    "testsPassed": 487,
     "testsFailed": 0,
     "failedTestNote": "全テスト成功",
     "latestScores": {
-      "M4-T14": 95,
-      "M4-T13": 92,
-      "M4-T12": 95,
-      "M4-T11": 96,
-      "M4-T10": 95
+      "M5-T09": 95,
+      "M5-T07": 94,
+      "M5-T06": 95,
+      "M5-T04": 98,
+      "M5-T03": 95
     }
   },
 
   "contextOptimization": {
-    "progressEntries": 10,
+    "progressEntries": 9,
     "maxProgressEntries": 10,
     "archivedTasks": 49,
     "lastOptimization": "2025-11-30",
-    "optimizationSession": "impl-023",
-    "nextOptimizationTrigger": "PROGRESS.md 10エントリ到達済み - アーカイブ推奨",
-    "contextHealth": "良好（Phase 4準備完了）"
+    "optimizationSession": "impl-026",
+    "nextOptimizationTrigger": "PROGRESS.md 10エントリ到達時",
+    "contextHealth": "良好（Phase 4進行中）"
   },
 
   "archivedModules": ["M1", "M2", "M3", "M4"],
@@ -182,7 +186,7 @@
       "tasks": "M2-T01〜M2-T12, M3-T01〜M3-T13",
       "status": "完了",
       "progress": "25/25タスク完了（100%）",
-      "note": "Phase 2完全終了 - M1（基盤）+ M2（写真アクセス）+ M3（画像分析）= 35タスク / 62.5時間完了"
+      "note": "Phase 2完全終了"
     },
     {
       "phase": 3,
@@ -191,16 +195,16 @@
       "tasks": "M4-T05〜M4-T14",
       "status": "完了",
       "progress": "10/10タスク完了（100%）",
-      "note": "Phase 3完全終了 - M4（UIコンポーネント）全14タスク完了 / 17時間 / 平均93.5点"
+      "note": "Phase 3完全終了"
     },
     {
       "phase": 4,
       "name": "Dashboard",
       "modules": ["M5"],
       "tasks": "M5-T01〜M5-T13",
-      "status": "準備完了",
-      "progress": "0/13タスク完了（0%）",
-      "note": "Phase 4開始準備完了 - MV Pattern採用（ViewModelなし）"
+      "status": "進行中",
+      "progress": "8/11タスク完了 + 2スキップ（76.9%）",
+      "note": "MV Pattern採用（ViewModelスキップ）"
     },
     {
       "phase": 5,
@@ -221,67 +225,63 @@
   "gitHistory": {
     "commits": [
       {
-        "hash": "b71e35c",
-        "message": "Session: impl-022完了 - M4-T14完了（プレビュー環境整備）/ M4モジュール完全終了",
+        "hash": "b6abd1f",
+        "message": "feat: M5-T09 GroupListView実装完了 (95/100点)",
         "date": "2025-11-30"
       },
       {
-        "hash": "361d523",
-        "message": "Session: impl-022完了 - M4-T14 PreviewHelpers完了 / M4モジュール完全終了 / Phase 3完了",
+        "hash": "088b475",
+        "message": "feat: M5-T06/T07完了 - StorageOverviewCard + HomeView実装",
         "date": "2025-11-30"
       },
       {
-        "hash": "9b337e1",
-        "message": "Session: impl-019完了 - M4-T06〜T09完了（PhotoGrid, StorageIndicator, GroupCard, ActionButton実装）",
-        "date": "2025-11-29"
+        "hash": "976f5dc",
+        "message": "feat: M5-T03/T04完了 - UseCase層実装",
+        "date": "2025-11-30"
       }
     ],
     "branch": "main"
   },
 
   "nextSessionRecommendations": [
-    "Phase 4開始: M5-T01 CleanupRecordモデル実装から着手推奨",
-    "M5-T01〜T02: モデル層（CleanupRecord + StorageStatistics）",
-    "M5-T03: ScanPhotosUseCase実装（高優先度）",
-    "MV Patternに従ったViewModelなし設計"
+    "M5-T10: GroupDetailViewModel → MV Patternのためスキップ推奨",
+    "M5-T11: GroupDetailView実装（高優先度、2.5h）",
+    "M5-T12: Navigation設定（高優先度、1.5h）",
+    "M5-T13: 単体テスト作成（中優先度、2h）"
   ],
 
   "resumeInstructions": {
-    "step1": "M5-T01 CleanupRecordモデル実装から着手",
-    "step2": "削除履歴を保持するデータモデルを定義",
-    "step3": "SwiftDataまたはUserDefaultsで永続化設計",
-    "context": "Phase 3完了。M4 UIコンポーネント全14タスク完了（平均93.5点）。Phase 4ではMV Patternに従いViewModelを使わずにSwiftUI純正の状態管理で画面を構築。"
+    "step1": "M5-T10 GroupDetailViewModelはMV Patternのためスキップ",
+    "step2": "M5-T11 GroupDetailView実装から着手",
+    "step3": "グループ詳細画面を実装（写真一覧、選択、削除機能）",
+    "context": "Phase 4進行中。M5モジュール76.9%完了。MV Patternに従いViewModelなしでSwiftUI純正の状態管理で画面を構築。"
   },
 
-  "impl022SessionSummary": {
-    "completedTasks": ["M4-T10", "M4-T11", "M4-T12", "M4-T13", "M4-T14"],
-    "addedTests": 158,
-    "totalTestsNow": 1505,
+  "impl026SessionSummary": {
+    "completedTasks": ["M5-T09"],
+    "skippedTasks": ["M5-T08"],
+    "addedTests": 83,
+    "totalTestsNow": 487,
     "keyDeliverables": [
-      "M4-T10 ProgressOverlay: 処理進捗オーバーレイ（29テスト）",
-      "M4-T11 ConfirmationDialog: 確認ダイアログ（33テスト）",
-      "M4-T12 EmptyStateView: 空状態表示（26テスト）",
-      "M4-T13 ToastView: トースト通知（34テスト）",
-      "M4-T14 PreviewHelpers: プレビュー環境整備（36テスト）"
+      "M5-T09 GroupListView: グループリストビュー（952行、83テスト）"
     ],
     "qualityHighlights": [
-      "M4モジュール完全終了（14/14タスク）",
-      "平均品質スコア: 93.5/100点",
-      "総テスト数: 108テスト（M4全体）"
+      "GroupListView 95/100点",
+      "6種類のフィルタリング、4種類のソート",
+      "マルチセレクト、削除確認ダイアログ対応"
     ]
   },
 
   "nextSession": {
-    "recommended_action": "Phase 4開始 - M5-T01 CleanupRecordモデル実装",
+    "recommended_action": "M5-T11 GroupDetailView実装（M5-T10はスキップ）",
     "priority_tasks": [
-      "M5-T01: CleanupRecordモデル（0.5h）",
-      "M5-T02: StorageStatisticsモデル（0.5h）",
-      "M5-T03: ScanPhotosUseCase実装（2.5h）"
+      "M5-T10: スキップ（MV Pattern採用のためViewModelなし）",
+      "M5-T11: GroupDetailView実装（2.5h）",
+      "M5-T12: Navigation設定（1.5h）",
+      "M5-T13: 単体テスト作成（2h）"
     ],
-    "warnings": [
-      "PROGRESS.mdが10エントリに到達 - アーカイブ推奨"
-    ]
+    "warnings": []
   },
 
-  "notes": "impl-022セッションまで完了。M4 UIコンポーネント全14タスク完了（Phase 3完了）。累計49タスク完了（41.5%）、1505テスト全パス。Phase 4（Dashboard & Statistics）開始準備完了。PROGRESS.mdが10エントリに達しており、アーカイブ推奨。"
+  "notes": "impl-026セッション完了。M5-T08スキップ、M5-T09 GroupListView完了（952行、83テスト、95点）。累計57タスク完了（48.7%）、487テスト全パス。M5モジュール76.9%完了。次回はM5-T10スキップ後、M5-T11 GroupDetailViewから着手。"
 }

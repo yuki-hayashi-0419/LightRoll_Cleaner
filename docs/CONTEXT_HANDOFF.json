@@ -1,74 +1,287 @@
 {
-  "session_info": {
-    "last_session": "impl-022",
-    "session_date": "2025-11-30",
-    "session_summary": "M4-T14完了、M4モジュール完全終了、Phase 3完了"
+  "version": "3.0",
+  "lastUpdated": "2025-11-30",
+  "sessionId": "impl-026",
+
+  "projectStatus": {
+    "phase": "Phase 4",
+    "currentPhase": "Phase 4（Dashboard & Statistics）進行中 - M5モジュール76.9%完了",
+    "overallProgress": "48.7%",
+    "nextMilestone": "M5-T10 GroupDetailViewModel実装（MV Patternのためスキップ予定）",
+    "majorAchievement": "M5-T09 GroupListView完了（952行、83テスト、95/100点）"
   },
-  "current_state": {
-    "current_phase": "Phase 4",
-    "current_module": "M5 (Dashboard & Statistics)",
-    "current_task": null,
-    "next_task": "M5-T01 (CleanupRecordモデル)"
+
+  "designStatus": {
+    "completed": true,
+    "architecture": "MV Pattern + SwiftUI Native State",
+    "architectureScore": 78.75,
+    "modules": 9,
+    "totalTasks": 117,
+    "estimatedHours": 190.5
   },
-  "progress": {
-    "completed_tasks": 49,
-    "total_tasks": 118,
-    "completion_rate": "41.5%",
-    "completed_hours": 79.5,
-    "total_hours": 192.5,
-    "time_rate": "41.3%"
-  },
-  "quality": {
-    "recent_scores": [
-      {"task": "M4-T11", "score": 98},
-      {"task": "M4-T12", "score": 92},
-      {"task": "M4-T13", "score": 92},
-      {"task": "M4-T14", "score": 95}
-    ],
-    "average_score": 93.5,
-    "pass_rate": "100%"
-  },
-  "completed_modules": [
-    "M1: Core Infrastructure (10/10, 16h)",
-    "M2: Photo Access & Scanning (12/12, 20.5h)",
-    "M3: Image Analysis & Grouping (13/13, 26h)",
-    "M4: UI Components (14/14, 17h)"
-  ],
-  "next_actions": [
-    "M5-T01: CleanupRecordモデル実装",
-    "M5-T02: StorageStatisticsモデル実装",
-    "M5-T03: ScanPhotosUseCase実装"
-  ],
-  "failure_tracking": {
-    "recent_errors": [],
-    "resolved_issues": [
-      {
-        "session": "impl-021",
-        "issue": "ToastViewTests API mismatch",
-        "resolution": "Complete test file rewrite with correct API"
-      },
-      {
-        "session": "impl-020",
-        "issue": "EmptyStateViewTests file not created by agent",
-        "resolution": "Manual test creation with ActionTracker pattern"
-      }
+
+  "taskStatus": {
+    "total": 117,
+    "completed": 57,
+    "skipped": 2,
+    "inProgress": 0,
+    "pending": 58,
+    "completedHours": 91.5,
+    "remainingHours": 99,
+    "lastCompletedTaskId": "M5-T09",
+    "skippedTasks": ["M5-T05", "M5-T08"],
+    "nextTaskCandidates": [
+      "M5-T10: GroupDetailViewModel実装（スキップ予定 - MV Pattern採用）",
+      "M5-T11: GroupDetailView実装（高優先度、2.5h）",
+      "M5-T12: Navigation設定（高優先度、1.5h）",
+      "M5-T13: 単体テスト作成（中優先度、2h）"
     ]
   },
-  "mcp_status": {
-    "installed": [
-      "filesystem",
-      "xcodebuildmcp",
-      "context7",
-      "playwright",
-      "github",
-      "dart-flutter",
-      "serena",
-      "ios-simulator",
-      "figma",
-      "maestro",
-      "memory",
-      "sequential-thinking"
+
+  "completedTasks": {
+    "M1": ["M1-T01", "M1-T02", "M1-T03", "M1-T04", "M1-T05", "M1-T06", "M1-T07", "M1-T08", "M1-T09", "M1-T10"],
+    "M2": ["M2-T01", "M2-T02", "M2-T03", "M2-T04", "M2-T05", "M2-T06", "M2-T07", "M2-T08", "M2-T09", "M2-T10", "M2-T11", "M2-T12"],
+    "M3": ["M3-T01", "M3-T02", "M3-T03", "M3-T04", "M3-T05", "M3-T06", "M3-T07", "M3-T08", "M3-T09", "M3-T10", "M3-T11", "M3-T12", "M3-T13"],
+    "M4": ["M4-T01", "M4-T02", "M4-T03", "M4-T04", "M4-T05", "M4-T06", "M4-T07", "M4-T08", "M4-T09", "M4-T10", "M4-T11", "M4-T12", "M4-T13", "M4-T14"],
+    "M5": ["M5-T01", "M5-T02", "M5-T03", "M5-T04", "M5-T06", "M5-T07", "M5-T09"]
+  },
+
+  "moduleProgress": {
+    "M1_CoreInfrastructure": {
+      "completed": 10,
+      "remaining": 0,
+      "completedHours": 16,
+      "remainingHours": 0,
+      "percentage": 100,
+      "status": "完了"
+    },
+    "M2_PhotoAccess": {
+      "completed": 12,
+      "remaining": 0,
+      "completedHours": 20.5,
+      "remainingHours": 0,
+      "percentage": 100,
+      "status": "完了"
+    },
+    "M3_ImageAnalysis": {
+      "completed": 13,
+      "remaining": 0,
+      "completedHours": 26,
+      "remainingHours": 0,
+      "percentage": 100,
+      "status": "完了"
+    },
+    "M4_UIComponents": {
+      "completed": 14,
+      "remaining": 0,
+      "completedHours": 17,
+      "remainingHours": 0,
+      "percentage": 100,
+      "status": "完了"
+    },
+    "M5_Dashboard": {
+      "completed": 8,
+      "skipped": 2,
+      "remaining": 3,
+      "completedHours": 12,
+      "remainingHours": 6,
+      "percentage": 76.9,
+      "status": "進行中"
+    },
+    "M6_DeletionSafety": {
+      "completed": 0,
+      "remaining": 14,
+      "completedHours": 0,
+      "remainingHours": 25,
+      "percentage": 0,
+      "status": "未着手"
+    },
+    "M7_Notifications": {
+      "completed": 0,
+      "remaining": 13,
+      "completedHours": 0,
+      "remainingHours": 17.5,
+      "percentage": 0,
+      "status": "未着手"
+    },
+    "M8_Settings": {
+      "completed": 0,
+      "remaining": 14,
+      "completedHours": 0,
+      "remainingHours": 21,
+      "percentage": 0,
+      "status": "未着手"
+    },
+    "M9_Monetization": {
+      "completed": 0,
+      "remaining": 15,
+      "completedHours": 0,
+      "remainingHours": 25.5,
+      "percentage": 0,
+      "status": "未着手"
+    }
+  },
+
+  "qualityMetrics": {
+    "averageScore": 95.7,
+    "averagePercentage": 95.7,
+    "totalTests": 487,
+    "testsPassed": 487,
+    "testsFailed": 0,
+    "failedTestNote": "全テスト成功",
+    "latestScores": {
+      "M5-T09": 95,
+      "M5-T07": 94,
+      "M5-T06": 95,
+      "M5-T04": 98,
+      "M5-T03": 95
+    }
+  },
+
+  "contextOptimization": {
+    "progressEntries": 9,
+    "maxProgressEntries": 10,
+    "archivedTasks": 49,
+    "lastOptimization": "2025-11-30",
+    "optimizationSession": "impl-026",
+    "nextOptimizationTrigger": "PROGRESS.md 10エントリ到達時",
+    "contextHealth": "良好（Phase 4進行中）"
+  },
+
+  "archivedModules": ["M1", "M2", "M3", "M4"],
+
+  "criticalDocuments": [
+    "docs/CRITICAL/CORE_RULES.md",
+    "docs/CRITICAL/ARCHITECTURE.md",
+    "docs/CRITICAL/BUILD_CONFIG.md",
+    "docs/CRITICAL/WORKFLOW_GUIDE.md"
+  ],
+
+  "moduleDocuments": [
+    "docs/modules/MODULE_M1_CORE_INFRASTRUCTURE.md",
+    "docs/modules/MODULE_M2_PHOTO_ACCESS.md",
+    "docs/modules/MODULE_M3_IMAGE_ANALYSIS.md",
+    "docs/modules/MODULE_M4_UI_COMPONENTS.md",
+    "docs/modules/MODULE_M5_DASHBOARD.md",
+    "docs/modules/MODULE_M6_DELETION_SAFETY.md",
+    "docs/modules/MODULE_M7_NOTIFICATIONS.md",
+    "docs/modules/MODULE_M8_SETTINGS.md",
+    "docs/modules/MODULE_M9_MONETIZATION.md"
+  ],
+
+  "implementationPhases": [
+    {
+      "phase": 1,
+      "name": "基盤構築",
+      "modules": ["M1", "M4前半"],
+      "tasks": "M1-T01〜M1-T10, M4-T01〜M4-T04",
+      "status": "完了",
+      "progress": "14/14タスク完了（100%）",
+      "note": "Phase 1完了"
+    },
+    {
+      "phase": 2,
+      "name": "データ層",
+      "modules": ["M2", "M3"],
+      "tasks": "M2-T01〜M2-T12, M3-T01〜M3-T13",
+      "status": "完了",
+      "progress": "25/25タスク完了（100%）",
+      "note": "Phase 2完全終了"
+    },
+    {
+      "phase": 3,
+      "name": "UI層",
+      "modules": ["M4後半"],
+      "tasks": "M4-T05〜M4-T14",
+      "status": "完了",
+      "progress": "10/10タスク完了（100%）",
+      "note": "Phase 3完全終了"
+    },
+    {
+      "phase": 4,
+      "name": "Dashboard",
+      "modules": ["M5"],
+      "tasks": "M5-T01〜M5-T13",
+      "status": "進行中",
+      "progress": "8/11タスク完了 + 2スキップ（76.9%）",
+      "note": "MV Pattern採用（ViewModelスキップ）"
+    },
+    {
+      "phase": 5,
+      "name": "機能完成",
+      "modules": ["M6", "M8"],
+      "tasks": "M6-T01〜M6-T14, M8-T01〜M8-14",
+      "status": "未着手"
+    },
+    {
+      "phase": 6,
+      "name": "仕上げ",
+      "modules": ["M7", "M9"],
+      "tasks": "M7-T01〜M7-T13, M9-T01〜M9-T15",
+      "status": "未着手"
+    }
+  ],
+
+  "gitHistory": {
+    "commits": [
+      {
+        "hash": "b6abd1f",
+        "message": "feat: M5-T09 GroupListView実装完了 (95/100点)",
+        "date": "2025-11-30"
+      },
+      {
+        "hash": "088b475",
+        "message": "feat: M5-T06/T07完了 - StorageOverviewCard + HomeView実装",
+        "date": "2025-11-30"
+      },
+      {
+        "hash": "976f5dc",
+        "message": "feat: M5-T03/T04完了 - UseCase層実装",
+        "date": "2025-11-30"
+      }
     ],
-    "last_verified": "2025-11-30"
-  }
+    "branch": "main"
+  },
+
+  "nextSessionRecommendations": [
+    "M5-T10: GroupDetailViewModel → MV Patternのためスキップ推奨",
+    "M5-T11: GroupDetailView実装（高優先度、2.5h）",
+    "M5-T12: Navigation設定（高優先度、1.5h）",
+    "M5-T13: 単体テスト作成（中優先度、2h）"
+  ],
+
+  "resumeInstructions": {
+    "step1": "M5-T10 GroupDetailViewModelはMV Patternのためスキップ",
+    "step2": "M5-T11 GroupDetailView実装から着手",
+    "step3": "グループ詳細画面を実装（写真一覧、選択、削除機能）",
+    "context": "Phase 4進行中。M5モジュール76.9%完了。MV Patternに従いViewModelなしでSwiftUI純正の状態管理で画面を構築。"
+  },
+
+  "impl026SessionSummary": {
+    "completedTasks": ["M5-T09"],
+    "skippedTasks": ["M5-T08"],
+    "addedTests": 83,
+    "totalTestsNow": 487,
+    "keyDeliverables": [
+      "M5-T09 GroupListView: グループリストビュー（952行、83テスト）"
+    ],
+    "qualityHighlights": [
+      "GroupListView 95/100点",
+      "6種類のフィルタリング、4種類のソート",
+      "マルチセレクト、削除確認ダイアログ対応"
+    ]
+  },
+
+  "nextSession": {
+    "recommended_action": "M5-T11 GroupDetailView実装（M5-T10はスキップ）",
+    "priority_tasks": [
+      "M5-T10: スキップ（MV Pattern採用のためViewModelなし）",
+      "M5-T11: GroupDetailView実装（2.5h）",
+      "M5-T12: Navigation設定（1.5h）",
+      "M5-T13: 単体テスト作成（2h）"
+    ],
+    "warnings": []
+  },
+
+  "notes": "impl-026セッション完了。M5-T08スキップ、M5-T09 GroupListView完了（952行、83テスト、95点）。累計57タスク完了（48.7%）、487テスト全パス。M5モジュール76.9%完了。次回はM5-T10スキップ後、M5-T11 GroupDetailViewから着手。"
 }
