@@ -55,8 +55,8 @@
 |----------|----------|------------|--------|------|------|
 | M5-T01 | CleanupRecordモデル | **完了** | 中 | 0.5h | M1-T08 |
 | M5-T02 | StorageStatisticsモデル | **完了** | 中 | 0.5h | M3-T02 |
-| M5-T03 | ScanPhotosUseCase実装 | 未着手 | 高 | 2.5h | M2-T09,M3-T12 |
-| M5-T04 | GetStatisticsUseCase実装 | 未着手 | 中 | 1.5h | M5-T02 |
+| M5-T03 | ScanPhotosUseCase実装 | **完了** | 高 | 2.5h | M2-T09,M3-T12 |
+| M5-T04 | GetStatisticsUseCase実装 | **完了** | 中 | 1.5h | M5-T02 |
 | M5-T05 | HomeViewModel実装 | 未着手 | 高 | 2h | M5-T03,M5-T04 |
 | M5-T06 | StorageOverviewCard実装 | 未着手 | 高 | 2h | M4-T07 |
 | M5-T07 | HomeView実装 | 未着手 | 高 | 2.5h | M5-T05,M5-T06 |
@@ -67,10 +67,12 @@
 | M5-T12 | Navigation設定 | 未着手 | 高 | 1.5h | M5-T07,M5-T09,M5-T11 |
 | M5-T13 | 単体テスト作成 | 未着手 | 中 | 2h | M5-T12 |
 
-**M5合計: 13タスク / 24時間 (2タスク完了: 1h)**
+**M5合計: 13タスク / 24時間 (4タスク完了: 5h)**
 
 - M5-T01 CleanupRecord: 422行、53テスト、96/100点
 - M5-T02 StorageStatistics: 458行、62テスト、98/100点
+- M5-T03 ScanPhotosUseCase: 455行、34テスト、95/100点
+- M5-T04 GetStatisticsUseCase: 458行、58テスト、98/100点
 
 ---
 
@@ -174,14 +176,14 @@
 | M2: Photo Access | 0 | 0h | 12 (20.5h) ✅ |
 | M3: Image Analysis | 0 | 0h | 13 (26h) ✅ |
 | M4: UI Components | 0 | 0h | 14 (17h) ✅ |
-| M5: Dashboard | 11 | 23h | 2 (1h) |
+| M5: Dashboard | 9 | 19h | 4 (5h) |
 | M6: Deletion & Safety | 14 | 25h | 0 |
 | M7: Notifications | 13 | 17.5h | 0 |
 | M8: Settings | 14 | 21h | 0 |
 | M9: Monetization | 15 | 25.5h | 0 |
-| **残合計** | **67** | **112h** | **51 (80.5h)** |
+| **残合計** | **65** | **108h** | **53 (84.5h)** |
 
-*進捗: 51/118タスク完了 (43.2%) / 80.5h/192.5h (41.8%)*
+*進捗: 53/118タスク完了 (44.9%) / 84.5h/192.5h (43.9%)*
 
 ---
 
@@ -203,7 +205,8 @@
 
 4. **Phase 4 - Dashboard**（M5）← 現在進行中
    - M5-T01〜M5-T02（ドメインモデル）完了 ✅
-   - M5-T03〜M5-T13（ユースケース・ビュー）← 次
+   - M5-T03〜M5-T04（ユースケース）完了 ✅
+   - M5-T05〜M5-T13（ビュー層）← 次
    - MV Pattern採用（ViewModelなし）
 
 5. **Phase 5 - 機能完成**（M6, M8）
@@ -216,4 +219,4 @@
 
 ---
 
-*最終更新: 2025-11-30 (Phase 4開始 - M5-T01/T02完了、115テスト追加)*
+*最終更新: 2025-11-30 (M5-T03/T04完了 - UseCase層完成、92テスト追加 / 累計315テスト)*

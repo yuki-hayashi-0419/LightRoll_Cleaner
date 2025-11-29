@@ -38,6 +38,7 @@ public protocol NoInputUseCaseProtocol: Sendable {
 
 /// 写真スキャンUseCaseプロトコル
 /// 写真ライブラリのスキャンと分析を実行
+@MainActor
 public protocol ScanPhotosUseCaseProtocol: NoInputUseCaseProtocol where Output == ScanResult {
 
     /// スキャン進捗を監視するためのAsyncStream

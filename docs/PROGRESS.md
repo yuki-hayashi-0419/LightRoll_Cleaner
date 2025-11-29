@@ -5,6 +5,44 @@
 
 ---
 
+## 2025-11-30 | セッション: impl-024（M5-T03/T04完了 - UseCase層実装）
+
+### 完了項目（53タスク - 本セッション2タスク追加）
+- [x] M5-T03: ScanPhotosUseCase実装（95/100点）
+  - ScanPhotosUseCase.swift: 写真スキャンユースケース（455行）
+  - 4フェーズスキャン: preparing→fetchingPhotos→analyzing→grouping→optimizing→completed
+  - AsyncStream<ScanProgress>による進捗通知
+  - PhotoScanner/AnalysisRepository統合
+  - ScanPhotosUseCaseError: 5種類のエラーケース（LocalizedError対応）
+  - cancel()メソッド、isScanning状態管理
+  - 34テスト全パス（0.006秒）
+
+- [x] M5-T04: GetStatisticsUseCase実装（98/100点）
+  - GetStatisticsUseCase.swift: 統計情報取得ユースケース（458行）
+  - GetStatisticsUseCaseProtocol完全実装
+  - 3つのプロバイダープロトコル: CleanupRecordProvider, GroupProvider, LastScanDateProvider
+  - ExtendedStatistics: 拡張統計（shouldRecommendScan、累計削減容量等）
+  - GetStatisticsUseCaseError: 3種類のエラーケース
+  - ファクトリメソッド: create(permissionManager:)
+  - 58テスト全パス（0.006秒）
+
+### テスト結果
+- ScanPhotosUseCaseTests: 34テスト / 8スイート
+- GetStatisticsUseCaseTests: 58テスト / 16スイート
+- **合計: 92テスト追加** (累計: 315テスト)
+
+### 品質評価
+- M5-T03: 95/100点 (合格)
+- M5-T04: 98/100点 (合格)
+- 平均: **96.5/100点**
+
+### Phase 4進捗
+- M5: Dashboard & Statistics - 4/13タスク完了 (30.8%)
+- UseCase層完了: ScanPhotosUseCase + GetStatisticsUseCase
+- 残タスク: HomeView, GroupListView, GroupDetailView等（ビュー層）
+
+---
+
 ## 2025-11-30 | セッション: impl-023（M5-T01/T02完了 - Dashboard ドメインモデル / Phase 4開始）
 
 ### 完了項目（51タスク - 本セッション2タスク追加）
