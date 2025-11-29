@@ -1,208 +1,336 @@
 {
-  "project": {
-    "name": "LightRoll_Cleaner",
-    "description": "写真・動画ライブラリのクリーンアップツール（iOS）",
-    "created_at": "2025-11-27",
-    "version": "0.4.0",
-    "tech_stack": ["Swift", "SwiftUI", "Photos Framework", "Vision Framework", "StoreKit 2"],
-    "platform": "iOS",
-    "min_deployment_target": "iOS 17.0"
+  "version": "2.1",
+  "lastUpdated": "2025-11-29",
+  "sessionId": "impl-015",
+
+  "projectStatus": {
+    "phase": "Phase 2 完了 → Phase 3 準備中",
+    "currentPhase": "Phase 2完了（M1, M2, M3）- Phase 3（UI層）へ移行",
+    "overallProgress": "33.1%",
+    "nextMilestone": "Phase 3開始 - M4-T05 PhotoThumbnail実装 または M5 Dashboard",
+    "majorAchievement": "Phase 2完了 - データ層完全実装（M1基盤 + M2写真アクセス + M3画像分析）"
   },
-  "current_phase": {
-    "phase": "implementation_phase_2",
-    "description": "Phase 2（データ層）進行中 - M2完了、M3 9/13完了",
-    "next_phase": "implementation_phase_2_completion"
+
+  "designStatus": {
+    "completed": true,
+    "architecture": "MV Pattern + SwiftUI Native State",
+    "architectureScore": 78.75,
+    "modules": 9,
+    "totalTasks": 118,
+    "estimatedHours": 190
   },
-  "last_session": {
-    "date": "2025-11-29",
-    "session_id": "impl-014",
-    "completed_tasks": [
-      "M3-T11: BestShotSelector実装 (116/120点、96.7%)"
-    ],
-    "completed_task_count": 1,
-    "test_results": "1193テスト全パス（+20テスト追加）"
-  },
-  "previous_session": {
-    "date": "2025-11-29",
-    "session_id": "impl-013",
-    "completed_tasks": ["M3-T10: PhotoGrouper実装 (114/120点)"],
-    "test_results": "1173テスト全パス"
-  },
-  "cumulative_progress": {
-    "total_completed_tasks": 37,
-    "total_tasks": 118,
-    "completion_percentage": 31.4,
-    "total_tests": 1193,
-    "all_tests_passing": true,
-    "notes": "全テストパス - M3ベストショット選定完了（11/13タスク、84.6%）"
-  },
-  "next_session": {
-    "recommended_start": "development_continue",
-    "recommended_action": "continue_m3_analysis_repository",
-    "start_instructions": [
-      "1. CONTEXT_HANDOFF.jsonを読み、前回の状態を確認",
-      "2. M3-T12 (AnalysisRepository)実装を開始",
-      "3. 全分析機能の統合リポジトリ実装: PhotoGrouper, BestShotSelector, 各種検出サービスの統合"
-    ],
-    "priority_tasks": [
-      "M3-T12: AnalysisRepository統合（全分析機能の統合リポジトリ、最優先）",
-      "M3-T13: M3単体テスト作成（M3モジュール完成）",
-      "M4-T05: PhotoThumbnail実装（UI層先行着手可）"
-    ],
-    "optional_parallel_tasks": [
-      "M4-T05: PhotoThumbnail実装（UI層先行着手可）",
-      "M4-T06: PhotoGrid実装"
-    ],
-    "blockers": [],
-    "prerequisites": []
-  },
-  "modules": {
-    "completed": [
-      {"id": "M1", "name": "Core Infrastructure", "completed_tasks": 10, "total_tasks": 10, "status": "completed", "completion_date": "2025-11-28"},
-      {"id": "M2", "name": "Photo Access & Scanning", "completed_tasks": 12, "total_tasks": 12, "status": "completed", "completion_date": "2025-11-28", "average_score": "111.5/120"}
-    ],
-    "in_progress": [
-      {"id": "M3", "name": "Image Analysis & Grouping", "completed_tasks": 11, "total_tasks": 13, "status": "in_progress", "remaining": ["M3-T12", "M3-T13"]},
-      {"id": "M4", "name": "UI Components", "completed_tasks": 4, "total_tasks": 14, "status": "in_progress", "remaining": ["M4-T05", "M4-T06", "M4-T07", "M4-T08", "M4-T09", "M4-T10", "M4-T11", "M4-T12", "M4-T13", "M4-T14"]}
-    ],
-    "pending": [
-      {"id": "M5", "name": "Dashboard & Statistics", "tasks": 13, "hours": 24, "status": "pending"},
-      {"id": "M6", "name": "Deletion & Safety", "tasks": 14, "hours": 25, "status": "pending"},
-      {"id": "M7", "name": "Notifications", "tasks": 13, "hours": 17.5, "status": "pending"},
-      {"id": "M8", "name": "Settings & Preferences", "tasks": 14, "hours": 21, "status": "pending"},
-      {"id": "M9", "name": "Monetization", "tasks": 15, "hours": 25.5, "status": "pending"}
+
+  "taskStatus": {
+    "total": 118,
+    "completed": 39,
+    "inProgress": 0,
+    "pending": 79,
+    "completedHours": 66,
+    "remainingHours": 126.5,
+    "lastCompletedTaskId": "M3-T13",
+    "nextTaskCandidates": [
+      "M4-T05: PhotoThumbnail実装（高優先度、2h）",
+      "M4-T06: PhotoGrid実装（高優先度、2h）",
+      "M4-T07: StorageIndicator実装（高優先度、1.5h）",
+      "M5-T01: CleanupRecordモデル（中優先度、0.5h）"
     ]
   },
-  "implementation_phases": [
+
+  "completedTasks": {
+    "M1": ["M1-T01", "M1-T02", "M1-T03", "M1-T04", "M1-T05", "M1-T06", "M1-T07", "M1-T08", "M1-T09", "M1-T10"],
+    "M2": ["M2-T01", "M2-T02", "M2-T03", "M2-T04", "M2-T05", "M2-T06", "M2-T07", "M2-T08", "M2-T09", "M2-T10", "M2-T11", "M2-T12"],
+    "M3": ["M3-T01", "M3-T02", "M3-T03", "M3-T04", "M3-T05", "M3-T06", "M3-T07", "M3-T08", "M3-T09", "M3-T10", "M3-T11", "M3-T12", "M3-T13"],
+    "M4": ["M4-T01", "M4-T02", "M4-T03", "M4-T04"]
+  },
+
+  "moduleProgress": {
+    "M1_CoreInfrastructure": {
+      "completed": 10,
+      "remaining": 0,
+      "completedHours": 16,
+      "remainingHours": 0,
+      "percentage": 100,
+      "status": "完了"
+    },
+    "M2_PhotoAccess": {
+      "completed": 12,
+      "remaining": 0,
+      "completedHours": 20.5,
+      "remainingHours": 0,
+      "percentage": 100,
+      "status": "完了"
+    },
+    "M3_ImageAnalysis": {
+      "completed": 13,
+      "remaining": 0,
+      "completedHours": 26,
+      "remainingHours": 0,
+      "percentage": 100,
+      "status": "完了"
+    },
+    "M4_UIComponents": {
+      "completed": 4,
+      "remaining": 10,
+      "completedHours": 3.5,
+      "remainingHours": 13.5,
+      "percentage": 29,
+      "status": "進行中"
+    },
+    "M5_Dashboard": {
+      "completed": 0,
+      "remaining": 13,
+      "completedHours": 0,
+      "remainingHours": 24,
+      "percentage": 0,
+      "status": "未着手"
+    },
+    "M6_DeletionSafety": {
+      "completed": 0,
+      "remaining": 14,
+      "completedHours": 0,
+      "remainingHours": 25,
+      "percentage": 0,
+      "status": "未着手"
+    },
+    "M7_Notifications": {
+      "completed": 0,
+      "remaining": 13,
+      "completedHours": 0,
+      "remainingHours": 17.5,
+      "percentage": 0,
+      "status": "未着手"
+    },
+    "M8_Settings": {
+      "completed": 0,
+      "remaining": 14,
+      "completedHours": 0,
+      "remainingHours": 21,
+      "percentage": 0,
+      "status": "未着手"
+    },
+    "M9_Monetization": {
+      "completed": 0,
+      "remaining": 15,
+      "completedHours": 0,
+      "remainingHours": 25.5,
+      "percentage": 0,
+      "status": "未着手"
+    }
+  },
+
+  "qualityMetrics": {
+    "averageScore": 110.0,
+    "averagePercentage": 91.7,
+    "totalTests": 1220,
+    "testsPassed": 1220,
+    "testsFailed": 0,
+    "failedTestNote": "全テスト成功",
+    "latestScores": {
+      "M3-T13": 120,
+      "M3-T12": 100,
+      "M3-T11": 116,
+      "M3-T10": 114
+    }
+  },
+
+  "contextOptimization": {
+    "progressEntries": 7,
+    "maxProgressEntries": 10,
+    "archivedTasks": 39,
+    "lastOptimization": "2025-11-29",
+    "optimizationSession": "opt-015",
+    "nextOptimizationTrigger": "49タスク完了時（次回10タスク経過時） または PROGRESS.mdが10エントリ到達時 または impl-025セッション（10セッション経過時）",
+    "contextHealth": "良好（Phase 2完了マイルストーン）",
+    "tokenUsageBefore": 84984,
+    "tokenUsageAfter": 87000,
+    "documentsOptimized": [
+      "TASKS_COMPLETED.md: M3-T12/T13完了情報追加（+約400トークン）",
+      "CONTEXT_HANDOFF.json: 最適化情報更新"
+    ],
+    "optimizationActions": [
+      "✅ TASKS_COMPLETED.md: M3-T12/T13を追加（Phase 2完了記録）",
+      "✅ CONTEXT_HANDOFF.json: contextOptimization更新",
+      "⚠️ PROGRESS.md: 7エントリ（10エントリ制限内、最適化不要）",
+      "⚠️ TASKS.md: 未完了タスクのみ（最適化不要）"
+    ],
+    "estimatedTokenIncrease": "約2000トークン増加（Phase 2完了記録追加）",
+    "note": "Phase 2完了により重要なマイルストーン達成。PROGRESS.mdは7エントリで余裕あり（3エントリ分の余地）。TASKS.mdは完了タスクが適切にアーカイブ済み。次回最適化はPROGRESS.mdが10エントリ到達時（3セッション後）または49タスク完了時（10タスク経過時）に実施推奨。コンテキスト使用率は良好な範囲内（87000/200000 = 43.5%）"
+  },
+
+  "archivedModules": ["M1", "M2", "M3"],
+
+  "criticalDocuments": [
+    "docs/CRITICAL/CORE_RULES.md",
+    "docs/CRITICAL/ARCHITECTURE.md"
+  ],
+
+  "moduleDocuments": [
+    "docs/modules/MODULE_M1_CORE_INFRASTRUCTURE.md",
+    "docs/modules/MODULE_M2_PHOTO_ACCESS.md",
+    "docs/modules/MODULE_M3_IMAGE_ANALYSIS.md",
+    "docs/modules/MODULE_M4_UI_COMPONENTS.md",
+    "docs/modules/MODULE_M5_DASHBOARD.md",
+    "docs/modules/MODULE_M6_DELETION_SAFETY.md",
+    "docs/modules/MODULE_M7_NOTIFICATIONS.md",
+    "docs/modules/MODULE_M8_SETTINGS.md",
+    "docs/modules/MODULE_M9_MONETIZATION.md"
+  ],
+
+  "implementationPhases": [
     {
       "phase": 1,
       "name": "基盤構築",
       "modules": ["M1", "M4前半"],
       "tasks": "M1-T01〜M1-T10, M4-T01〜M4-T04",
-      "status": "completed",
-      "progress": {
-        "completed_tasks": 14,
-        "total_tasks": 14,
-        "percentage": 100
-      }
+      "status": "完了",
+      "progress": "14/14タスク完了（100%）",
+      "note": "Phase 1完了"
     },
     {
       "phase": 2,
       "name": "データ層",
       "modules": ["M2", "M3"],
       "tasks": "M2-T01〜M2-T12, M3-T01〜M3-T13",
-      "status": "in_progress",
-      "progress": {
-        "completed_tasks": 23,
-        "total_tasks": 25,
-        "percentage": 92,
-        "notes": "M2完了、M3 11/13完了（全検出サービス＋グルーピング＋ベストショット選定完了、Repository統合待ち）"
-      }
+      "status": "完了",
+      "progress": "25/25タスク完了（100%）",
+      "note": "Phase 2完全終了 - M1（基盤）+ M2（写真アクセス）+ M3（画像分析）= 35タスク / 62.5時間完了"
     },
     {
       "phase": 3,
       "name": "UI層",
       "modules": ["M4後半", "M5"],
       "tasks": "M4-T05〜M4-T14, M5-T01〜M5-T13",
-      "status": "pending"
+      "status": "未着手"
     },
     {
       "phase": 4,
       "name": "機能完成",
       "modules": ["M6", "M8"],
-      "tasks": "M6-T01〜M6-T14, M8-T01〜M8-T14",
-      "status": "pending"
+      "tasks": "M6-T01〜M6-T14, M8-T01〜M8-14",
+      "status": "未着手"
     },
     {
       "phase": 5,
       "name": "仕上げ",
       "modules": ["M7", "M9", "テスト"],
       "tasks": "M7-T01〜M7-T13, M9-T01〜M9-T15",
-      "status": "pending"
+      "status": "未着手"
     }
   ],
-  "mcp_status": {
-    "installed": ["xcodebuildmcp"],
-    "pending": [],
-    "configured": true,
-    "note": "xcodebuildmcp連携設定済み - ビルド/テスト実行に活用"
-  },
-  "context_optimization": {
-    "last_optimized": "2025-11-29",
-    "optimization_session": "context-opt-001",
-    "session_count": 17,
-    "completed_task_count": 35,
-    "progress_entries_count": 10,
-    "archived_tasks_count": 35,
-    "archived_modules": ["M1", "M2"],
-    "context_usage_estimate": "moderate (42.6%)",
-    "document_sizes": {
-      "PROGRESS.md": "307行（最適化済み - 直近10エントリ保持）",
-      "TASKS.md": "221行（完了タスク簡潔化済み）",
-      "total_primary_docs": "528行"
-    },
-    "actions_this_session": [
-      "TASKS.md最適化（完了タスクM3-T07〜T09を簡潔化）",
-      "サマリー更新（進捗29.7%、残時間137.5h反映）",
-      "PROGRESS.md確認（既に最適化済みを確認）",
-      "CONTEXT_HANDOFF.json更新（最新状態反映）"
+
+  "gitHistory": {
+    "commits": [
+      {
+        "hash": "latest",
+        "message": "feat: M3-T10 PhotoGrouper実装完了（改善第1ループ、114点）",
+        "date": "2025-11-29"
+      },
+      {
+        "hash": "3f6202d",
+        "message": "feat: M3-T09 スクリーンショット検出実装完了",
+        "date": "2025-11-29"
+      },
+      {
+        "hash": "0c79c65",
+        "message": "feat: M3-T08 BlurDetector実装完了",
+        "date": "2025-11-28"
+      },
+      {
+        "hash": "fe1f654",
+        "message": "feat: M3-T07 FaceDetector実装完了",
+        "date": "2025-11-28"
+      }
     ],
-    "size_reduction": "3行削減（531→528行）",
-    "next_optimization_trigger": "M3モジュール完了時（残4タスク） または 45タスク完了時",
-    "notes": "PROGRESS.mdは既に直近10エントリのみ保持で最適化済み。次回はM3完了時に実施推奨。"
+    "branch": "main"
   },
-  "quality_metrics": {
-    "total_tests": 1193,
-    "tests_passed": 1193,
-    "tests_failed": 0,
-    "average_score": 108.2,
-    "passing_threshold": 96,
-    "all_tasks_passing": true,
-    "notes": "全テストパス - 高い品質を維持（M3-T11: 116点、96.7%）"
-  },
-  "file_structure": {
-    "docs/CRITICAL": "重要ドキュメント（常時読み込み推奨）",
-    "docs/modules": "モジュール仕様書（必要時に参照）",
-    "docs/archive": "アーカイブ済みドキュメント",
-    "LightRoll_Cleaner": "メインアプリケーションソース",
-    "LightRoll_CleanerPackage": "SPM Feature Package",
-    "tests": "テストコード"
-  },
-  "quick_reference": {
-    "architecture": "docs/CRITICAL/ARCHITECTURE.md",
-    "rules": "docs/CRITICAL/CORE_RULES.md",
-    "tasks": "docs/TASKS.md",
-    "progress": "docs/PROGRESS.md"
-  },
-  "dependencies": {
-    "external": [
-      {"name": "Google Mobile Ads SDK", "version": "latest", "module": "M9", "required": false}
-    ],
-    "internal": []
-  },
-  "known_issues": [
-    {
-      "id": "PERF-001",
-      "description": "パフォーマンステスト1件が不安定（タイミング依存）",
-      "severity": "low",
-      "status": "known",
-      "workaround": "機能テストには影響なし"
-    }
+
+  "nextSessionRecommendations": [
+    "Phase 3開始: M4-T05 PhotoThumbnail実装（UIコンポーネント）",
+    "または M5-T01 CleanupRecordモデル（Dashboard準備）",
+    "推奨順序: M4-T05〜M4-T14（UIコンポーネント完成）→ M5（Dashboard画面）",
+    "Phase 2完了により、データ層は完全に整っているため、UI実装に専念可能"
   ],
-  "notes": [
-    "プロジェクト初期化完了（2025-11-27）",
-    "設計ドキュメント完成（2025-11-27）",
-    "アーキテクチャ選定完了: MVVM + Repository Pattern（2025-11-27）",
-    "Phase 1完了（2025-11-28）: M1 10/10, M4 4/14",
-    "Phase 2進行中（2025-11-28〜）: M2 12/12完了, M3 9/13完了（全検出サービス完了）",
-    "impl-007: 2タスク完了、964テスト、平均品質スコア113.5点（2025-11-28）",
-    "impl-008: 3タスク完了、1026テスト、平均品質スコア107点（2025-11-28）",
-    "impl-009: 1タスク完了、1053テスト、品質スコア108点（2025-11-28）",
-    "impl-010: 1タスク完了、1093テスト、品質スコア113点（2025-11-28）",
-    "impl-011: 1タスク完了、1116テスト、品質スコア107点（2025-11-28）",
-    "impl-012: 1タスク完了、1140テスト、品質スコア105点（2025-11-29）",
-    "impl-013: 1タスク完了、1173テスト、品質スコア114点（2025-11-29）",
-    "impl-014: 1タスク完了、1193テスト、品質スコア116点（2025-11-29）",
-    "累計進捗: 37/118タスク完了 (31.4%)"
-  ]
+
+  "resumeInstructions": {
+    "step1": "Phase 3開始 - M4-T05（PhotoThumbnail実装）から着手推奨",
+    "step2": "SwiftUI + @Observable パターンでUIコンポーネント実装",
+    "step3": "M4完成後、M5（Dashboard画面）でデータ層との統合を実現",
+    "context": "Phase 2完了。データ層（M1基盤 + M2写真アクセス + M3画像分析）が完全に整っており、UI層の実装に専念できる環境が整っている。次はPhase 3（UI層）でユーザー向けインターフェースを構築するフェーズ。"
+  },
+
+  "impl013SessionSummary": {
+    "completedTasks": ["M3-T10"],
+    "addedTests": 33,
+    "totalTestsNow": 1173,
+    "keyDeliverables": [
+      "PhotoGrouper.swift（約850行）- 6種類グルーピング統合サービス",
+      "groupSimilarPhotos, groupSelfies, groupScreenshots, groupBlurryPhotos, groupLargeVideos, groupDuplicates",
+      "GroupingOptions: 3プリセット（default/strict/relaxed）",
+      "進捗範囲調整機能（progressRange）",
+      "33テストケース（0.053秒）"
+    ],
+    "qualityHighlights": [
+      "初回: 102/120点（85.0%）",
+      "改善後: 114/120点（95.0%） - +12点改善",
+      "テストカバレッジ: 20/20点（満点）",
+      "ドキュメント同期: 20/20点（満点）"
+    ],
+    "improvementLoop": {
+      "loop1": {
+        "before": 102,
+        "after": 114,
+        "improvement": 12,
+        "actions": [
+          "進捗範囲調整機能の実装",
+          "エッジケーステスト追加（2件）",
+          "進捗範囲調整テスト追加（6件）",
+          "ドキュメント同期完了"
+        ]
+      }
+    }
+  },
+
+  "impl014SessionSummary": {
+    "completedTasks": ["M3-T11"],
+    "addedTests": 40,
+    "totalTestsNow": 1213,
+    "keyDeliverables": [
+      "BestShotSelector.swift: ベストショット自動選定サービス（actor実装）",
+      "総合スコアアルゴリズム: シャープネス、顔品質、顔数、解像度、ファイルサイズ等を総合評価",
+      "BestShotSelectionOptions: 3プリセット（default/quality-focused/face-focused）",
+      "カスタマイズ可能な評価ウェイト",
+      "40テストケース実装済み"
+    ],
+    "qualityHighlights": [
+      "実装確認済み（品質スコア未評価）",
+      "40テスト実装",
+      "並列処理対応、進捗通知、キャンセル対応"
+    ]
+  },
+
+  "impl015SessionSummary": {
+    "completedTasks": ["M3-T12", "M3-T13"],
+    "addedTests": 27,
+    "totalTestsNow": 1220,
+    "keyDeliverables": [
+      "AnalysisRepository.swift: 全分析機能統合リポジトリ（actor実装）",
+      "VisionRequestHandler、各種Detector統合",
+      "M3モジュール完全終了",
+      "Phase 2完全終了（M1 + M2 + M3）"
+    ],
+    "qualityHighlights": [
+      "M3-T12: 100/120点（83.3%）",
+      "M3-T13: 120/120点（100%、満点）",
+      "M3モジュール平均: 111.1/120点（92.6%）"
+    ],
+    "phaseCompletion": {
+      "phase": 2,
+      "totalTasks": 35,
+      "totalHours": 62.5,
+      "modules": ["M1", "M2", "M3"],
+      "achievement": "データ層完全実装完了"
+    }
+  },
+
+  "notes": "impl-015セッション完了。M3-T12（AnalysisRepository統合）とM3-T13（単体テスト）完了により、Phase 2（データ層）が完全終了。累計39タスク完了、1220テスト全パス、平均品質スコア110.0点（91.7%）。M3モジュール100%完了（13/13）。次回セッションからPhase 3（UI層）開始。M4-T05（PhotoThumbnail）またはM5（Dashboard）から着手推奨。データ層が完全に整っているため、UI実装に専念できる環境が整っている。"
 }
