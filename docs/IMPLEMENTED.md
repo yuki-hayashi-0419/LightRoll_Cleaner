@@ -5,13 +5,13 @@
 
 ---
 
-## 現在のバージョン: v0.9.20（M6開始・Phase 5進行中）
+## 現在のバージョン: v0.9.25（M6進行中・Phase 5 Deletion基盤完成）
 
 ### 進捗状況
 - **完了モジュール**: M1 Core Infrastructure, M2 Photo Access, M3 Image Analysis, M4 UI Components, M5 Dashboard & Statistics
-- **進行中モジュール**: **M6 Deletion & Trash（Phase 5開始）** ✨
-- **Phase 5進行中**: Deletion & Trash（1/14タスク完了）
-- **全体進捗**: 61/117タスク (52.1%)
+- **進行中モジュール**: **M6 Deletion & Trash（Phase 5進行中）** ✨
+- **Phase 5進行中**: Deletion & Trash（6/14タスク完了 - 42.9%）
+- **全体進捗**: 65/117タスク (55.6%)
 
 ---
 
@@ -293,6 +293,72 @@
 
 ユーザーから見て出来るようになったこと：
 - **ゴミ箱機能の基盤完成**: 削除した写真を30日間ゴミ箱で保持し、復元可能にする仕組みが整備された
+- **ゴミ箱データ永続化**: 削除した写真情報がアプリを閉じても保持される
+- **ゴミ箱管理サービス**: 写真の削除・復元・自動クリーンアップが全て動作可能に
+
+### M6-T02: TrashDataStore実装（100/100点）
+
+**実装内容:**
+- **TrashDataStore.swift** (421行)
+  - ゴミ箱写真のファイルシステムベース永続化
+  - JSONエンコード/デコードによるデータ保存
+  - ロード/保存/更新/削除の全CRUD操作
+  - 統計情報取得（totalCount, totalSize, expiringSoon等）
+  - 有効期限切れ写真の自動検出・クリーンアップ
+  - Actor-isolated実装でスレッドセーフ
+
+**テスト:**
+- **TrashDataStoreTests.swift** (468行、22テスト全パス)
+  - 保存・読み込みテスト（6件）
+  - 更新・削除テスト（4件）
+  - 統計情報テスト（4件）
+  - クリーンアップテスト（4件）
+  - エラーハンドリングテスト（4件）
+
+**セッション:** impl-031
+
+---
+
+### M6-T03: TrashManager基盤実装（100/100点）
+
+**実装内容:**
+- **TrashManager.swift** (417行)
+  - TrashManagerProtocol完全実装
+  - moveToTrash: 写真をゴミ箱に移動（メタデータ保持）
+  - restoreFromTrash: ゴミ箱から元の場所に復元
+  - cleanupExpiredPhotos: 30日経過した写真を自動削除
+  - permanentlyDelete: 指定した写真を完全削除
+  - 統計情報取得・イベント通知機能
+  - @Observable + @MainActor対応
+
+**テスト:**
+- **TrashManagerTests.swift** (642行、28テスト全パス)
+  - moveToTrashテスト（5件）
+  - restoreFromTrashテスト（5件）
+  - cleanupExpiredPhotosテスト（4件）
+  - permanentlyDeleteテスト（4件）
+  - 統計情報テスト（4件）
+  - エラーハンドリングテスト（6件）
+
+**技術的特徴:**
+- TrashDataStoreとの連携
+- DeletionReason追跡（手動選択、類似写真、ブレ写真等）
+- イベント通知（movedToTrash, restored, deleted等）
+- バッチ操作サポート（複数写真の一括処理）
+
+**セッション:** impl-031
+
+---
+
+### M6-T04/T05/T06: M6-T03に統合
+
+- **M6-T04 moveToTrash実装** → TrashManager.moveToTrash()に実装済み
+- **M6-T05 restoreFromTrash実装** → TrashManager.restoreFromTrash()に実装済み
+- **M6-T06 自動クリーンアップ** → TrashManager.cleanupExpiredPhotos()に実装済み
+
+**セッション:** impl-031
+
+---
 
 ### M6-T01: TrashPhotoモデル実装
 
@@ -327,4 +393,4 @@
 
 ---
 
-*最終更新: 2025-11-30 (M6-T01完了、**Phase 5開始！** - 61タスク完了 52.1%)*
+*最終更新: 2025-11-30 (M6-T02〜T06完了、**Phase 5 Deletion基盤完成！** - 65タスク完了 55.6%)*

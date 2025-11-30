@@ -5,6 +5,61 @@
 
 ---
 
+## 2025-11-30 | セッション: impl-031（M6-T02〜T06完了 - Phase 5 Deletion基盤完成）
+
+### 完了項目（65タスク - 本セッション5タスク追加）
+- [x] M6-T02: TrashDataStore実装（100/100点）
+  - TrashDataStore.swift: ゴミ箱データ永続化（421行）
+  - ファイルシステムベースの永続化（JSON）
+  - ロード/保存/更新/削除の全CRUD操作
+  - 統計情報取得、ファイルサイズ計算
+  - 有効期限切れ写真のクリーンアップ
+  - Sendable/Actor-isolated実装
+  - 22テスト全パス
+
+- [x] M6-T03: TrashManager基盤実装（100/100点）
+  - TrashManager.swift: ゴミ箱管理サービス（417行）
+  - TrashManagerProtocol完全実装
+  - moveToTrash: 写真をゴミ箱に移動
+  - restoreFromTrash: ゴミ箱から復元
+  - cleanupExpiredPhotos: 期限切れ自動削除
+  - permanentlyDelete: 完全削除
+  - 統計情報・イベント通知機能
+  - 28テスト全パス
+
+- [x] M6-T04: moveToTrash実装 → **M6-T03に含む**
+- [x] M6-T05: restoreFromTrash実装 → **M6-T03に含む**
+- [x] M6-T06: 自動クリーンアップ → **M6-T03に含む**
+
+### テスト結果
+- TrashDataStoreTests: 22テスト / 6スイート（全パス）
+- TrashManagerTests: 28テスト / 8スイート（全パス）
+- **合計: 50テスト追加** (累計: 603テスト)
+
+### 品質評価
+- M6-T02: 100/100点 (合格)
+  - 正常系テストカバレッジ: 25/25点
+  - 異常系テストカバレッジ: 20/20点
+  - 境界値テストカバレッジ: 15/15点
+  - コードスタイル準拠: 15/15点
+  - アーキテクチャ整合性: 15/15点
+  - テスト品質: 10/10点
+
+- M6-T03: 100/100点 (合格)
+  - 同上
+
+### Phase 5進捗
+- **M6: Deletion & Safety - 42.9%完了**
+  - 完了タスク: 6/14件
+  - **全体進捗**: 65/117タスク（55.6%）
+
+### 次のステップ
+- M6-T07: DeletePhotosUseCase実装（2h）
+- M6-T08: RestorePhotosUseCase実装（1.5h）
+- M6-T09: DeletionConfirmationService（1h）
+
+---
+
 ## 2025-11-30 | セッション: impl-030（M6-T01完了 - Phase 5 Deletion開始）
 
 ### 完了項目（61タスク - 本セッション1タスク追加）
