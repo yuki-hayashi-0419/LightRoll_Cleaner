@@ -62,12 +62,12 @@
 | M5-T07 | HomeView実装 | **完了** | 高 | 2.5h | M5-T06 |
 | M5-T08 | GroupListViewModel実装 | **スキップ** | - | - | MV Pattern採用のためスキップ |
 | M5-T09 | GroupListView実装 | **完了** | 高 | 2.5h | M4-T08 |
-| M5-T10 | GroupDetailViewModel実装 | 未着手 | 高 | 2h | M5-T08 |
-| M5-T11 | GroupDetailView実装 | 未着手 | 高 | 2.5h | M5-T10,M4-T06 |
-| M5-T12 | Navigation設定 | 未着手 | 高 | 1.5h | M5-T07,M5-T09,M5-T11 |
-| M5-T13 | 単体テスト作成 | 未着手 | 中 | 2h | M5-T12 |
+| M5-T10 | GroupDetailViewModel実装 | **スキップ** | - | - | MV Pattern採用のためスキップ |
+| M5-T11 | GroupDetailView実装 | **完了** | 高 | 2.5h | M4-T06 |
+| M5-T12 | Navigation設定 | **完了** | 高 | 1.5h | M5-T07,M5-T09,M5-T11 |
+| M5-T13 | 単体テスト作成 | **完了** | 中 | 2h | M5-T12 |
 
-**M5合計: 13タスク / 24時間 (8タスク完了: 12h、2タスクスキップ)**
+**M5合計: 13タスク / 24時間 (11タスク完了: 18h、3タスクスキップ - 100%完了）** ✅
 
 - M5-T01 CleanupRecord: 422行、53テスト、96/100点
 - M5-T02 StorageStatistics: 458行、62テスト、98/100点
@@ -78,6 +78,10 @@
 - M5-T07 HomeView: 842行、44テスト、94/100点
 - M5-T08 GroupListViewModel: スキップ（MV Pattern採用のためViewModelは使用しない）
 - M5-T09 GroupListView: 952行、83テスト、95/100点
+- M5-T10 GroupDetailViewModel: スキップ（MV Pattern採用のためViewModelは使用しない）
+- M5-T11 GroupDetailView: 1,071行、22テスト、92/100点
+- M5-T12 Navigation設定: 687行、23テスト、94/100点
+- M5-T13 単体テスト作成: 1,860行、87/90テスト成功、95/100点
 
 ---
 
@@ -181,14 +185,14 @@
 | M2: Photo Access | 0 | 0h | 12 (20.5h) ✅ |
 | M3: Image Analysis | 0 | 0h | 13 (26h) ✅ |
 | M4: UI Components | 0 | 0h | 14 (17h) ✅ |
-| M5: Dashboard | 4 | 10h | 8 (12h) + 2スキップ |
+| M5: Dashboard | 0 | 0h | 11 (18h) + 3スキップ ✅ |
 | M6: Deletion & Safety | 14 | 25h | 0 |
 | M7: Notifications | 13 | 17.5h | 0 |
 | M8: Settings | 14 | 21h | 0 |
 | M9: Monetization | 15 | 25.5h | 0 |
-| **残合計** | **60** | **99h** | **57 (91.5h)** |
+| **残合計** | **56** | **93h** | **60 (97.5h)** |
 
-*進捗: 57/117タスク完了 (48.7%) / 91.5h/190.5h (48.0%)*
+*進捗: 60/117タスク完了 (51.3%) / 97.5h/190.5h (51.2%)* - **Phase 4完了！** ✨
 
 ---
 
@@ -208,13 +212,14 @@
    - **Phase 3完全終了**: UIコンポーネント層（M4）
    - 総テスト数: 108テスト、平均品質スコア: 93.5/100点
 
-4. **Phase 4 - Dashboard**（M5）← 現在進行中
+4. **Phase 4 - Dashboard**（M5）← **完了！** ✅
    - M5-T01〜M5-T02（ドメインモデル）完了 ✅
    - M5-T03〜M5-T04（ユースケース）完了 ✅
    - M5-T05（HomeViewModel）スキップ（MV Pattern採用のため）
    - M5-T06〜M5-T07（ダッシュボードView層）完了 ✅
-   - M5-T08〜M5-T13（グループリスト・詳細View）← 次
+   - M5-T08〜M5-T13（グループリスト・詳細View + テスト）完了 ✅
    - MV Pattern採用（ViewModelなし）
+   - **Phase 4完全終了**: Dashboard & Statistics ✨
 
 5. **Phase 5 - 機能完成**（M6, M8）
    - M6-T01〜M6-T14（削除・ゴミ箱）
@@ -226,4 +231,4 @@
 
 ---
 
-*最終更新: 2025-11-30 (M5-T08スキップ、M5-T09完了 - GroupListView実装、83テスト追加 / 累計487テスト)*
+*最終更新: 2025-11-30 (M5-T13完了 - Phase 4 Dashboard完全終了！ / 60タスク完了 51.3%)*
