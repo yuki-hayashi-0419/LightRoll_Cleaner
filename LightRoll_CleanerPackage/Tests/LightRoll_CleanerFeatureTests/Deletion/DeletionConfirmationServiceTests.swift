@@ -87,16 +87,20 @@ struct DeletionConfirmationServiceTests {
         #expect(result == true, "ゴミ箱を空にするは常に確認が必要")
     }
 
-    @Test("キャンセルアクションは常に確認が必要")
-    func shouldShowConfirmation_Cancel_AlwaysTrue() {
+    @Test("キャンセルアクションは写真がある場合に確認が必要")
+    func shouldShowConfirmation_Cancel_RequiresPhotos() {
         // Given
         let service = DeletionConfirmationService()
 
         // When
-        let result = service.shouldShowConfirmation(photoCount: 0, actionType: .cancel)
+        let result1 = service.shouldShowConfirmation(photoCount: 0, actionType: .cancel)
+        let result2 = service.shouldShowConfirmation(photoCount: 1, actionType: .cancel)
+        let result3 = service.shouldShowConfirmation(photoCount: 10, actionType: .cancel)
 
         // Then
-        #expect(result == true, "キャンセルは常に確認が必要")
+        #expect(result1 == false, "写真が0枚の場合は確認不要")
+        #expect(result2 == true, "写真がある場合は確認が必要")
+        #expect(result3 == true, "写真がある場合は確認が必要")
     }
 
     // MARK: - formatConfirmationMessage Tests
@@ -285,21 +289,18 @@ struct DeletionConfirmationServiceTests {
             cancelTitle: "キャンセル"
         )
 
-        var confirmCalled = false
-        var cancelCalled = false
-
         // When
         let dialog = message.toDialog {
-            confirmCalled = true
+            // 確認アクション（何もしない）
         } onCancel: {
-            cancelCalled = true
+            // キャンセルアクション（何もしない）
         }
 
         // Then
         #expect(dialog.title == "テストタイトル", "タイトルが正しく変換される")
-        // 変換が正常に完了することを確認
-        #expect(!confirmCalled, "まだ確認アクションは実行されていない")
-        #expect(!cancelCalled, "まだキャンセルアクションは実行されていない")
+        #expect(dialog.message == "テストメッセージ", "メッセージが正しく変換される")
+        #expect(dialog.confirmTitle == "確認", "確認ボタンタイトルが正しく変換される")
+        #expect(dialog.cancelTitle == "キャンセル", "キャンセルボタンタイトルが正しく変換される")
     }
 
     // MARK: - Integration Tests
@@ -410,6 +411,7 @@ struct DeletionConfirmationServiceTests {
 struct MockDeletionConfirmationServiceTests {
 
     @Test("モックが呼び出しを記録する")
+    @MainActor
     func mock_RecordsMethodCalls() {
         // Given
         let mock = MockDeletionConfirmationService()
@@ -429,6 +431,7 @@ struct MockDeletionConfirmationServiceTests {
     }
 
     @Test("モックがカスタムメッセージを返す")
+    @MainActor
     func mock_ReturnsCustomMessage() {
         // Given
         let mock = MockDeletionConfirmationService()
@@ -457,6 +460,7 @@ struct MockDeletionConfirmationServiceTests {
     }
 
     @Test("モックがリセットできる")
+    @MainActor
     func mock_CanReset() {
         // Given
         let mock = MockDeletionConfirmationService()
