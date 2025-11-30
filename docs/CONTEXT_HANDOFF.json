@@ -1,14 +1,14 @@
 {
-  "version": "3.4",
+  "version": "3.5",
   "lastUpdated": "2025-11-30",
-  "sessionId": "impl-034",
+  "sessionId": "impl-035",
 
   "projectStatus": {
-    "phase": "Phase 5進行中（M6-T09完了）",
-    "currentPhase": "Phase 5（Deletion & Safety）- M6モジュール64.3%完了",
-    "overallProgress": "58.1%",
-    "nextMilestone": "M6-T10〜T14完了でM6モジュール終了",
-    "majorAchievement": "DeletionConfirmationService実装完了（95/100点）"
+    "phase": "Phase 5進行中（M6-T11完了）",
+    "currentPhase": "Phase 5（Deletion & Safety）- M6モジュール78.6%完了",
+    "overallProgress": "59.0%",
+    "nextMilestone": "M6-T12〜T14完了でM6モジュール終了",
+    "majorAchievement": "TrashView実装完了（98/100点）"
   },
 
   "designStatus": {
@@ -22,19 +22,18 @@
 
   "taskStatus": {
     "total": 117,
-    "completed": 68,
-    "skipped": 3,
+    "completed": 69,
+    "skipped": 4,
     "inProgress": 0,
-    "pending": 46,
-    "completedHours": 103.5,
-    "remainingHours": 77.5,
-    "lastCompletedTaskId": "M6-T09",
-    "skippedTasks": ["M5-T05", "M5-T08", "M5-T10"],
+    "pending": 44,
+    "completedHours": 106,
+    "remainingHours": 72,
+    "lastCompletedTaskId": "M6-T11",
+    "skippedTasks": ["M5-T05", "M5-T08", "M5-T10", "M6-T10"],
     "nextTaskCandidates": [
-      "M6-T10: TrashViewModel実装（高優先度、2h、MV Patternならスキップ可）",
-      "M6-T11: TrashView実装（高優先度、2.5h）",
       "M6-T12: DeletionConfirmationSheet（高優先度、1.5h）",
-      "M6-T13: PHAsset削除連携（高優先度、2h）"
+      "M6-T13: PHAsset削除連携（高優先度、2h）",
+      "M6-T14: 単体テスト作成（中優先度、2h）"
     ]
   },
 
@@ -44,7 +43,7 @@
     "M3": ["M3-T01", "M3-T02", "M3-T03", "M3-T04", "M3-T05", "M3-T06", "M3-T07", "M3-T08", "M3-T09", "M3-T10", "M3-T11", "M3-T12", "M3-T13"],
     "M4": ["M4-T01", "M4-T02", "M4-T03", "M4-T04", "M4-T05", "M4-T06", "M4-T07", "M4-T08", "M4-T09", "M4-T10", "M4-T11", "M4-T12", "M4-T13", "M4-T14"],
     "M5": ["M5-T01", "M5-T02", "M5-T03", "M5-T04", "M5-T06", "M5-T07", "M5-T09", "M5-T11", "M5-T12", "M5-T13"],
-    "M6": ["M6-T01", "M6-T02", "M6-T03", "M6-T04", "M6-T05", "M6-T06", "M6-T07", "M6-T08", "M6-T09"]
+    "M6": ["M6-T01", "M6-T02", "M6-T03", "M6-T04", "M6-T05", "M6-T06", "M6-T07", "M6-T08", "M6-T09", "M6-T11"]
   },
 
   "moduleProgress": {
@@ -90,11 +89,12 @@
       "status": "完了"
     },
     "M6_DeletionSafety": {
-      "completed": 9,
-      "remaining": 5,
-      "completedHours": 9.5,
-      "remainingHours": 10,
-      "percentage": 64.3,
+      "completed": 10,
+      "skipped": 1,
+      "remaining": 3,
+      "completedHours": 12,
+      "remainingHours": 5.5,
+      "percentage": 78.6,
       "status": "進行中"
     },
     "M7_Notifications": {
@@ -124,29 +124,29 @@
   },
 
   "qualityMetrics": {
-    "averageScore": 96.5,
-    "averagePercentage": 96.5,
-    "totalTests": 650,
-    "testsPassed": 646,
+    "averageScore": 96.7,
+    "averagePercentage": 96.7,
+    "totalTests": 676,
+    "testsPassed": 672,
     "testsFailed": 4,
     "failedTestNote": "境界値アサーション調整必要（軽微）",
     "latestScores": {
+      "M6-T11": 98,
       "M6-T09": 95,
       "M6-T08": 100,
       "M6-T07": 98,
-      "M6-T03": 100,
-      "M6-T02": 100
+      "M6-T03": 100
     }
   },
 
   "contextOptimization": {
-    "progressEntries": 15,
+    "progressEntries": 16,
     "maxProgressEntries": 10,
     "archivedTasks": 54,
     "lastOptimization": "2025-11-30",
-    "optimizationSession": "impl-031",
-    "nextOptimizationTrigger": "次回セッション開始時にアーカイブ必須（5件超過）",
-    "contextHealth": "要最適化（PROGRESS.md 15エントリ）"
+    "optimizationSession": "impl-035",
+    "nextOptimizationTrigger": "次回セッション開始時にアーカイブ必須（6件超過）",
+    "contextHealth": "要最適化（PROGRESS.md 16エントリ）"
   },
 
   "archivedModules": ["M1", "M2", "M3", "M4", "M5"],
@@ -213,8 +213,8 @@
       "modules": ["M6", "M8"],
       "tasks": "M6-T01〜M6-T14, M8-T01〜M8-14",
       "status": "進行中",
-      "progress": "9/28タスク完了（32.1%）",
-      "note": "M6-T09 DeletionConfirmationService完了（95/100点）"
+      "progress": "10/28タスク完了 + 1スキップ（39.3%）",
+      "note": "M6-T11 TrashView完了（98/100点）、M6-T10スキップ（MV Pattern）"
     },
     {
       "phase": 6,
@@ -247,17 +247,33 @@
   },
 
   "nextSessionRecommendations": [
-    "M6-T10: TrashViewModel実装（MV Patternならスキップ可）",
-    "M6-T11: TrashView実装（ゴミ箱UI）",
     "M6-T12: DeletionConfirmationSheet（削除確認シート）",
-    "M6-T13: PHAsset削除連携"
+    "M6-T13: PHAsset削除連携",
+    "M6-T14: 単体テスト作成"
   ],
 
   "resumeInstructions": {
-    "step1": "M6-T10 TrashViewModel実装から再開（MV Patternならスキップ可）",
-    "step2": "スキップの場合はM6-T11 TrashView実装に直接進む",
-    "step3": "M6-T12 DeletionConfirmationSheet実装",
-    "context": "M6-T09完了。68/117タスク（58.1%）完了。DeletionConfirmationService実装済み（95点）。"
+    "step1": "M6-T12 DeletionConfirmationSheet実装から再開",
+    "step2": "M6-T13 PHAsset削除連携実装",
+    "step3": "M6-T14 単体テスト作成でM6モジュール完了",
+    "context": "M6-T11完了。69/117タスク（59.0%）完了。TrashView実装済み（98点）。"
+  },
+
+  "impl035SessionSummary": {
+    "completedTasks": ["M6-T11"],
+    "skippedTasks": ["M6-T10"],
+    "addedTests": 26,
+    "totalTestsNow": 676,
+    "keyDeliverables": [
+      "M6-T11 TrashView: ゴミ箱ビュー（797行、26テスト）"
+    ],
+    "qualityHighlights": [
+      "M6-T11 TrashView 98/100点",
+      "全26テスト成功（100%）",
+      "MV Pattern採用（ViewModelなし）",
+      "復元・完全削除機能実装"
+    ],
+    "milestoneAchieved": "M6モジュール78.6%達成（10/14タスク完了 + 1スキップ）"
   },
 
   "impl034SessionSummary": {
@@ -318,16 +334,15 @@
   },
 
   "nextSession": {
-    "recommended_action": "M6-T10 TrashViewModel実装から継続（MV Patternならスキップしてm6-T11へ）",
+    "recommended_action": "M6-T12 DeletionConfirmationSheet実装から継続",
     "priority_tasks": [
-      "M6-T10: TrashViewModel実装（2h、MV Patternならスキップ可）",
-      "M6-T11: TrashView実装（2.5h）",
       "M6-T12: DeletionConfirmationSheet（1.5h）",
-      "M6-T13: PHAsset削除連携（2h）"
+      "M6-T13: PHAsset削除連携（2h）",
+      "M6-T14: 単体テスト作成（2h）"
     ],
     "alternativePath": "M8 Settings & Preferences に切り替えも可能",
-    "warnings": ["PROGRESS.mdが15エントリ（5件超過）→次回セッション前にアーカイブ必須"]
+    "warnings": ["PROGRESS.mdが16エントリ（6件超過）→次回セッション前にアーカイブ必須"]
   },
 
-  "notes": "impl-034セッション完了。M6-T09 DeletionConfirmationService実装完了（95/100点）。累計68タスク完了（58.1%）、650テスト（646成功/4失敗）。M6モジュール64.3%達成（9/14タスク）。削除確認サービス（閾値判定、メッセージ生成、ConfirmationDialog統合）完成。次回はM6-T10 TrashViewModel（MV Patternならスキップ）またはM6-T11 TrashViewから着手推奨。"
+  "notes": "impl-035セッション完了。M6-T11 TrashView実装完了（98/100点）、M6-T10スキップ（MV Pattern採用）。累計69タスク完了（59.0%）、676テスト。M6モジュール78.6%達成（10/14タスク + 1スキップ）。ゴミ箱ビュー（復元・完全削除機能）完成。次回はM6-T12 DeletionConfirmationSheetから着手でM6モジュール完了へ。"
 }

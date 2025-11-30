@@ -98,13 +98,13 @@
 | M6-T07 | DeletePhotosUseCase実装 | **完了** | 高 | 2h | M6-T03 |
 | M6-T08 | RestorePhotosUseCase実装 | **完了** | 高 | 1.5h | M6-T03 |
 | M6-T09 | DeletionConfirmationService | **完了** | 高 | 1h | M4-T11 |
-| M6-T10 | TrashViewModel実装 | 未着手 | 高 | 2h | M6-T07,M6-T08 |
-| M6-T11 | TrashView実装 | 未着手 | 高 | 2.5h | M6-T10,M4-T06 |
+| M6-T10 | TrashViewModel実装 | **スキップ** | - | - | MV Pattern採用のためスキップ |
+| M6-T11 | TrashView実装 | **完了** | 高 | 2.5h | M6-T09,M4-T06 |
 | M6-T12 | DeletionConfirmationSheet | 未着手 | 高 | 1.5h | M6-T09 |
 | M6-T13 | PHAsset削除連携 | 未着手 | 高 | 2h | M2-T05 |
 | M6-T14 | 単体テスト作成 | 未着手 | 中 | 2h | M6-T13 |
 
-**M6合計: 14タスク / 25時間（完了: 9タスク / 9.5h、残: 5タスク / 10h）**
+**M6合計: 14タスク / 25時間（完了: 10タスク / 12h + 1スキップ、残: 3タスク / 5.5h）**
 
 - M6-T01 TrashPhoto: 672行、44テスト、100/100点
 - M6-T02 TrashDataStore: 421行、22テスト、100/100点
@@ -113,6 +113,8 @@
 - M6-T07 DeletePhotosUseCase: 395行、14テスト、98/100点
 - M6-T08 RestorePhotosUseCase: 357行、12テスト、100/100点
 - M6-T09 DeletionConfirmationService: 593行、21テスト、95/100点
+- M6-T10 TrashViewModel: スキップ（MV Pattern採用のためViewModelは使用しない）
+- M6-T11 TrashView: 797行、26テスト、98/100点
 
 ---
 
@@ -194,13 +196,13 @@
 | M3: Image Analysis | 0 | 0h | 13 (26h) ✅ |
 | M4: UI Components | 0 | 0h | 14 (17h) ✅ |
 | M5: Dashboard | 0 | 0h | 11 (18h) + 3スキップ ✅ |
-| M6: Deletion & Safety | 5 | 10h | 9 (9.5h) ← **進行中** |
+| M6: Deletion & Safety | 3 | 5.5h | 10 (12h) + 1スキップ ← **進行中** |
 | M7: Notifications | 13 | 17.5h | 0 |
 | M8: Settings | 14 | 21h | 0 |
 | M9: Monetization | 15 | 25.5h | 0 |
-| **残合計** | **49** | **77.5h** | **68 (103.5h)** |
+| **残合計** | **47** | **72h** | **69 (106h)** |
 
-*進捗: 68/117タスク完了 (58.1%) / 103.5h/181h (57.2%)* - **Phase 5進行中！** ✨
+*進捗: 69/117タスク完了 (59.0%) / 106h/181h (58.6%) + 4スキップ* - **Phase 5進行中！** ✨
 
 ---
 
@@ -239,4 +241,4 @@
 
 ---
 
-*最終更新: 2025-11-30 (M6-T09完了 - DeletionConfirmationService実装 / 68タスク完了 58.1%)*
+*最終更新: 2025-11-30 (M6-T11完了 - TrashView実装 / 69タスク完了 59.0%)*
