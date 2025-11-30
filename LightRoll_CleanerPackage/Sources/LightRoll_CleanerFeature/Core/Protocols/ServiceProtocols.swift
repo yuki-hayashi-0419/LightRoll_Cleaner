@@ -13,62 +13,7 @@ import UIKit
 #endif
 
 // MARK: - Trash Manager Protocol
-
-/// ゴミ箱データモデル
-public struct TrashPhoto: Identifiable, Equatable, Hashable, Sendable {
-    /// 元の写真
-    public let photo: PhotoAsset
-
-    /// ゴミ箱に移動した日時
-    public let trashedDate: Date
-
-    /// 元の場所情報（復元用）
-    public let originalContext: TrashContext?
-
-    public var id: String { photo.id }
-
-    public init(
-        photo: PhotoAsset,
-        trashedDate: Date = Date(),
-        originalContext: TrashContext? = nil
-    ) {
-        self.photo = photo
-        self.trashedDate = trashedDate
-        self.originalContext = originalContext
-    }
-
-    /// 削除予定日を計算
-    /// - Parameter retentionDays: 保持日数
-    /// - Returns: 削除予定日
-    public func deletionDate(retentionDays: Int) -> Date {
-        Calendar.current.date(byAdding: .day, value: retentionDays, to: trashedDate) ?? trashedDate
-    }
-
-    /// 残り日数を計算
-    /// - Parameter retentionDays: 保持日数
-    /// - Returns: 残り日数（0未満の場合は期限切れ）
-    public func daysUntilDeletion(retentionDays: Int) -> Int {
-        let deletion = deletionDate(retentionDays: retentionDays)
-        return Calendar.current.dateComponents([.day], from: Date(), to: deletion).day ?? 0
-    }
-}
-
-/// ゴミ箱コンテキスト（復元時に使用）
-public struct TrashContext: Equatable, Hashable, Sendable {
-    /// 元のグループタイプ
-    public let groupType: GroupType?
-
-    /// 追加情報
-    public let metadata: [String: String]
-
-    public init(
-        groupType: GroupType? = nil,
-        metadata: [String: String] = [:]
-    ) {
-        self.groupType = groupType
-        self.metadata = metadata
-    }
-}
+// TrashPhoto モデルは Deletion/Models/TrashPhoto.swift で定義されています
 
 /// ゴミ箱マネージャープロトコル
 /// アプリ内ゴミ箱機能を管理
@@ -81,8 +26,8 @@ public protocol TrashManagerProtocol: AnyObject, Sendable {
     /// 写真をゴミ箱に移動
     /// - Parameters:
     ///   - photos: 移動する写真
-    ///   - context: コンテキスト情報（復元用）
-    func moveToTrash(_ photos: [PhotoAsset], context: TrashContext?) async throws
+    ///   - reason: 削除理由（オプション）
+    func moveToTrash(_ photos: [Photo], reason: TrashPhoto.DeletionReason?) async throws
 
     /// ゴミ箱から復元
     /// - Parameter photos: 復元する写真

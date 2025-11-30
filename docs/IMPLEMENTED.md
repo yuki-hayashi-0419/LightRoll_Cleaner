@@ -5,12 +5,13 @@
 
 ---
 
-## 現在のバージョン: v0.9.19（M5完了・Phase 4完全終了）
+## 現在のバージョン: v0.9.20（M6開始・Phase 5進行中）
 
 ### 進捗状況
-- **完了モジュール**: M1 Core Infrastructure, M2 Photo Access, M3 Image Analysis, M4 UI Components, **M5 Dashboard & Statistics** ✨
-- **Phase 4完全終了**: Dashboard & Statistics（11/11タスク完了 + 3スキップ = 100%）
-- **全体進捗**: 60/117タスク (51.3%) - **半分突破！**
+- **完了モジュール**: M1 Core Infrastructure, M2 Photo Access, M3 Image Analysis, M4 UI Components, M5 Dashboard & Statistics
+- **進行中モジュール**: **M6 Deletion & Trash（Phase 5開始）** ✨
+- **Phase 5進行中**: Deletion & Trash（1/14タスク完了）
+- **全体進捗**: 61/117タスク (52.1%)
 
 ---
 
@@ -288,10 +289,36 @@
 
 ---
 
+## M6: Deletion & Trash（進行中）✨
+
+ユーザーから見て出来るようになったこと：
+- **ゴミ箱機能の基盤完成**: 削除した写真を30日間ゴミ箱で保持し、復元可能にする仕組みが整備された
+
+### M6-T01: TrashPhotoモデル実装
+
+**実装内容:**
+- **TrashPhoto.swift**
+  - ゴミ箱に移動した写真を30日間保持するモデル
+  - 期限切れ自動判定（isExpired, isRestorable, daysUntilExpiration）
+  - 削除理由の記録（DeletionReason: 手動選択、類似写真、ブレ写真、スクリーンショット、一括削除）
+  - 元写真のメタデータ保持（解像度、作成日時、メディアタイプ）
+  - ゴミ箱統計情報（TrashStatistics: 総数、総サイズ、期限切れ間近、削除理由別内訳）
+
+**技術的特徴:**
+- Identifiable/Hashable/Sendable準拠
+- DeletionReason列挙型で削除理由を型安全に管理
+- 30日間の保持期間を設定ベースで管理
+- 期限切れ判定・復元可能判定の計算プロパティ
+- TrashStatisticsで統計情報を集計
+
+**セッション:** impl-030
+
+---
+
 ## 今後追加予定の機能
 
-### Phase 5（削除・設定）← 次のフェーズ
-- 削除・ゴミ箱機能（M6）
+### Phase 5（削除・設定）← **現在進行中**
+- 削除・ゴミ箱機能（M6）← **進行中**
 - 設定画面（M8）
 - 通知機能（M7）
 
@@ -300,4 +327,4 @@
 
 ---
 
-*最終更新: 2025-11-30 (M5-T13完了、**Phase 4 Dashboard完全終了！** - 60タスク完了 51.3%)*
+*最終更新: 2025-11-30 (M6-T01完了、**Phase 5開始！** - 61タスク完了 52.1%)*

@@ -5,6 +5,50 @@
 
 ---
 
+## 2025-11-30 | セッション: impl-030（M6-T01完了 - Phase 5 Deletion開始）
+
+### 完了項目（61タスク - 本セッション1タスク追加）
+- [x] M6-T01: TrashPhotoモデル（100/100点）
+  - TrashPhoto.swift: ゴミ箱写真モデル（672行）
+  - TrashPhotoMetadata: 元写真のメタデータ保持
+  - TrashPhotoError: LocalizedError準拠エラー型（6種類）
+  - TrashPhotoStatistics: 統計情報（期限切れ・復元可能数など）
+  - DeletionReason: 削除理由（5種類）
+  - Array<TrashPhoto>拡張: フィルタ、ソート、グルーピング、統計
+  - 30日保持期間、自動有効期限計算
+  - Sendable, Codable, Hashable, Identifiable準拠
+  - Photo型との連携（from staticファクトリメソッド）
+  - ServiceProtocols.swift TrashManagerProtocol統合
+
+### テスト結果
+- TrashPhotoTests: 44テスト / 12スイート
+  - 正常系: 初期化、computed properties、メタデータ
+  - 異常系: エラーハンドリング、LocalizedError
+  - 境界値: 0/負のファイルサイズ、期限切れ直前/直後
+  - Array拡張: フィルタリング、ソート、統計
+- **合計: 44テスト追加** (累計: 531テスト)
+
+### 品質評価
+- M6-T01: 100/100点 (合格)
+  - 正常系テストカバレッジ: 25/25点
+  - 異常系テストカバレッジ: 20/20点
+  - 境界値テストカバレッジ: 15/15点
+  - コードスタイル準拠: 15/15点
+  - アーキテクチャ整合性: 15/15点
+  - テスト品質: 10/10点
+
+### Phase 5開始 🚀
+- **M6: Deletion & Safety - 開始**
+  - 完了タスク: 1/14件（7.1%）
+  - **全体進捗**: 61/117タスク（52.1%）
+
+### 次のステップ
+- M6-T02: TrashDataStore実装
+- M6-T03: TrashManager基盤
+- M6-T04: moveToTrash実装
+
+---
+
 ## 2025-11-30 | セッション: impl-029（M5-T13完了 - Phase 4 Dashboard完全終了！）
 
 ### 完了項目（60タスク - 本セッション1タスク追加）

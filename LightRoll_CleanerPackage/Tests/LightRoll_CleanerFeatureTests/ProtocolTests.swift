@@ -261,26 +261,51 @@ struct ViewModelStateTests {
 struct ServiceProtocolTypesTests {
 
     // MARK: - TrashPhoto Tests
+    // 注: 詳細なTrashPhotoテストはTrashPhotoTests.swiftにあります
 
-    @Test("TrashPhotoの削除日計算が正しい")
-    func trashPhotoDeletionDate() {
-        let photo = PhotoAsset(id: "test")
-        let trashedDate = Date()
-        let trashPhoto = TrashPhoto(photo: photo, trashedDate: trashedDate)
+    @Test("TrashPhotoの有効期限計算が正しい")
+    func trashPhotoExpiresAt() {
+        let deletedAt = Date()
+        let metadata = TrashPhotoMetadata(
+            creationDate: Date(),
+            pixelWidth: 100,
+            pixelHeight: 100
+        )
+        let trashPhoto = TrashPhoto(
+            originalPhotoId: "test-123",
+            originalAssetIdentifier: "asset-456",
+            thumbnailData: nil,
+            deletedAt: deletedAt,
+            expiresAt: nil,  // 自動計算
+            fileSize: 1024,
+            metadata: metadata
+        )
 
-        let deletionDate = trashPhoto.deletionDate(retentionDays: 30)
-        let expectedDate = Calendar.current.date(byAdding: .day, value: 30, to: trashedDate)!
+        // デフォルトで30日後に期限切れ
+        let expectedExpires = Calendar.current.date(byAdding: .day, value: 30, to: deletedAt)!
 
-        #expect(Calendar.current.isDate(deletionDate, inSameDayAs: expectedDate))
+        #expect(Calendar.current.isDate(trashPhoto.expiresAt, inSameDayAs: expectedExpires))
     }
 
     @Test("TrashPhotoの残り日数計算が正しい")
-    func trashPhotoDaysUntilDeletion() {
-        let photo = PhotoAsset(id: "test")
-        let trashedDate = Date()
-        let trashPhoto = TrashPhoto(photo: photo, trashedDate: trashedDate)
+    func trashPhotoDaysUntilExpiration() {
+        let deletedAt = Date()
+        let metadata = TrashPhotoMetadata(
+            creationDate: Date(),
+            pixelWidth: 100,
+            pixelHeight: 100
+        )
+        let trashPhoto = TrashPhoto(
+            originalPhotoId: "test-123",
+            originalAssetIdentifier: "asset-456",
+            thumbnailData: nil,
+            deletedAt: deletedAt,
+            expiresAt: nil,  // 自動計算（30日後）
+            fileSize: 1024,
+            metadata: metadata
+        )
 
-        let daysRemaining = trashPhoto.daysUntilDeletion(retentionDays: 30)
+        let daysRemaining = trashPhoto.daysUntilExpiration
 
         // 今日ゴミ箱に入れたので、約30日残っているはず
         #expect(daysRemaining >= 29 && daysRemaining <= 30)
@@ -453,8 +478,18 @@ struct SendableConformanceTests {
 
     @Test("TrashPhotoがSendable")
     func trashPhotoSendable() async {
-        let photo = PhotoAsset(id: "test")
-        let trashPhoto = TrashPhoto(photo: photo)
+        let metadata = TrashPhotoMetadata(
+            creationDate: Date(),
+            pixelWidth: 100,
+            pixelHeight: 100
+        )
+        let trashPhoto = TrashPhoto(
+            originalPhotoId: "test-123",
+            originalAssetIdentifier: "asset-456",
+            thumbnailData: nil,
+            fileSize: 1024,
+            metadata: metadata
+        )
 
         await Task {
             _ = trashPhoto.id
