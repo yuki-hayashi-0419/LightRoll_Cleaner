@@ -95,8 +95,8 @@
 | M6-T04 | moveToTrash実装 | **完了** | 高 | - | M6-T03に含む |
 | M6-T05 | restoreFromTrash実装 | **完了** | 高 | - | M6-T03に含む |
 | M6-T06 | 自動クリーンアップ | **完了** | 中 | - | M6-T03に含む |
-| M6-T07 | DeletePhotosUseCase実装 | 未着手 | 高 | 2h | M6-T03 |
-| M6-T08 | RestorePhotosUseCase実装 | 未着手 | 高 | 1.5h | M6-T03 |
+| M6-T07 | DeletePhotosUseCase実装 | **完了** | 高 | 2h | M6-T03 |
+| M6-T08 | RestorePhotosUseCase実装 | **完了** | 高 | 1.5h | M6-T03 |
 | M6-T09 | DeletionConfirmationService | 未着手 | 高 | 1h | M4-T11 |
 | M6-T10 | TrashViewModel実装 | 未着手 | 高 | 2h | M6-T07,M6-T08 |
 | M6-T11 | TrashView実装 | 未着手 | 高 | 2.5h | M6-T10,M4-T06 |
@@ -104,12 +104,14 @@
 | M6-T13 | PHAsset削除連携 | 未着手 | 高 | 2h | M2-T05 |
 | M6-T14 | 単体テスト作成 | 未着手 | 中 | 2h | M6-T13 |
 
-**M6合計: 14タスク / 25時間（完了: 6タスク / 5h、残: 8タスク / 14.5h）**
+**M6合計: 14タスク / 25時間（完了: 8タスク / 8.5h、残: 6タスク / 11h）**
 
 - M6-T01 TrashPhoto: 672行、44テスト、100/100点
 - M6-T02 TrashDataStore: 421行、22テスト、100/100点
 - M6-T03 TrashManager: 417行、28テスト、100/100点
 - M6-T04/T05/T06: M6-T03に統合実装
+- M6-T07 DeletePhotosUseCase: 395行、14テスト、98/100点
+- M6-T08 RestorePhotosUseCase: 357行、12テスト、100/100点
 
 ---
 
