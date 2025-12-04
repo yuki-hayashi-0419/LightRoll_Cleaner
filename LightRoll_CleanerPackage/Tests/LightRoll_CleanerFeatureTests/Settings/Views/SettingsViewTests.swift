@@ -360,6 +360,236 @@ struct SettingsViewTests {
         // Then: 設定が保持されている
         #expect(service2.settings.scanSettings.autoScanEnabled == true)
     }
+
+    // MARK: - Edge Case Tests
+
+    @Test("類似度しきい値の最小値（0.0）を設定できる")
+    func similarityThresholdMinimumValue() throws {
+        // Given
+        let service = SettingsService()
+        var analysisSettings = service.settings.analysisSettings
+
+        // When: 最小値を設定
+        analysisSettings.similarityThreshold = 0.0
+        try service.updateAnalysisSettings(analysisSettings)
+
+        // Then: 正しく設定される
+        #expect(service.settings.analysisSettings.similarityThreshold == 0.0)
+    }
+
+    @Test("類似度しきい値の最大値（1.0）を設定できる")
+    func similarityThresholdMaximumValue() throws {
+        // Given
+        let service = SettingsService()
+        var analysisSettings = service.settings.analysisSettings
+
+        // When: 最大値を設定
+        analysisSettings.similarityThreshold = 1.0
+        try service.updateAnalysisSettings(analysisSettings)
+
+        // Then: 正しく設定される
+        #expect(service.settings.analysisSettings.similarityThreshold == 1.0)
+    }
+
+    @Test("グリッド列数の最小値（1）を設定できる")
+    func gridColumnsMinimumValue() throws {
+        // Given
+        let service = SettingsService()
+        var displaySettings = service.settings.displaySettings
+
+        // When: 最小値を設定
+        displaySettings.gridColumns = 1
+        try service.updateDisplaySettings(displaySettings)
+
+        // Then: 正しく設定される
+        #expect(service.settings.displaySettings.gridColumns == 1)
+    }
+
+    @Test("グリッド列数の最大値（6）を設定できる")
+    func gridColumnsMaximumValue() throws {
+        // Given
+        let service = SettingsService()
+        var displaySettings = service.settings.displaySettings
+
+        // When: 最大値を設定
+        displaySettings.gridColumns = 6
+        try service.updateDisplaySettings(displaySettings)
+
+        // Then: 正しく設定される
+        #expect(service.settings.displaySettings.gridColumns == 6)
+    }
+
+    @Test("静寂時間の開始と終了が同じ時刻の場合も有効")
+    func quietHoursSameStartAndEnd() throws {
+        // Given
+        let service = SettingsService()
+        var notificationSettings = service.settings.notificationSettings
+
+        // When: 同じ時刻を設定
+        notificationSettings.quietHoursStart = 12
+        notificationSettings.quietHoursEnd = 12
+        try service.updateNotificationSettings(notificationSettings)
+
+        // Then: 正しく設定される
+        #expect(service.settings.notificationSettings.quietHoursStart == 12)
+        #expect(service.settings.notificationSettings.quietHoursEnd == 12)
+    }
+
+    @Test("極端な組み合わせ: 最小類似度と最大グループサイズ")
+    func extremeCombinationMinSimilarityMaxGroupSize() throws {
+        // Given
+        let service = SettingsService()
+        var analysisSettings = service.settings.analysisSettings
+
+        // When: 極端な組み合わせを設定
+        analysisSettings.similarityThreshold = 0.0
+        analysisSettings.minGroupSize = 100
+        try service.updateAnalysisSettings(analysisSettings)
+
+        // Then: 両方が正しく設定される
+        #expect(service.settings.analysisSettings.similarityThreshold == 0.0)
+        #expect(service.settings.analysisSettings.minGroupSize == 100)
+    }
+
+    // MARK: - Error Handling & Recovery Tests
+
+    @Test("複数の設定を同時に変更してエラーが発生した場合、ロールバックされる")
+    func errorDuringMultipleUpdatesRollsBack() throws {
+        // Given
+        let service = SettingsService()
+
+        // When: 有効な変更を行う
+        var scanSettings = service.settings.scanSettings
+        scanSettings.autoScanEnabled = true
+        try service.updateScanSettings(scanSettings)
+
+        // And: 無効な変更を試みる
+        var analysisSettings = service.settings.analysisSettings
+        analysisSettings.minGroupSize = 1  // 無効（2未満）
+
+        // Then: エラーがthrowされる
+        #expect(throws: SettingsError.self) {
+            try service.updateAnalysisSettings(analysisSettings)
+        }
+
+        // And: 有効だった変更は保持され、無効な変更は適用されない
+        #expect(service.settings.scanSettings.autoScanEnabled == true)
+        #expect(service.settings.analysisSettings.minGroupSize != 1)
+    }
+
+    @Test("リセット後にすべての設定がデフォルト値に戻る")
+    func resetRestoresAllDefaults() throws {
+        // Given
+        let service = SettingsService()
+
+        // When: すべての設定を変更
+        var scanSettings = service.settings.scanSettings
+        scanSettings.autoScanEnabled = true
+        scanSettings.autoScanInterval = .daily
+        try service.updateScanSettings(scanSettings)
+
+        var analysisSettings = service.settings.analysisSettings
+        analysisSettings.similarityThreshold = 0.5
+        analysisSettings.minGroupSize = 5
+        try service.updateAnalysisSettings(analysisSettings)
+
+        var notificationSettings = service.settings.notificationSettings
+        notificationSettings.enabled = true
+        try service.updateNotificationSettings(notificationSettings)
+
+        var displaySettings = service.settings.displaySettings
+        displaySettings.gridColumns = 5
+        try service.updateDisplaySettings(displaySettings)
+
+        // And: リセット
+        service.resetToDefaults()
+
+        // Then: すべての設定がデフォルト値に戻る
+        let defaults = UserSettings.default
+        #expect(service.settings.scanSettings.autoScanEnabled == defaults.scanSettings.autoScanEnabled)
+        #expect(service.settings.scanSettings.autoScanInterval == defaults.scanSettings.autoScanInterval)
+        #expect(service.settings.analysisSettings.similarityThreshold == defaults.analysisSettings.similarityThreshold)
+        #expect(service.settings.analysisSettings.minGroupSize == defaults.analysisSettings.minGroupSize)
+        #expect(service.settings.notificationSettings.enabled == defaults.notificationSettings.enabled)
+        #expect(service.settings.displaySettings.gridColumns == defaults.displaySettings.gridColumns)
+    }
+
+
+    // MARK: - Comprehensive Integration Tests
+
+    @Test("完全なユーザーワークフロー: 初期化→変更→保存→読み込み→リセット")
+    func completeUserWorkflow() throws {
+        // Given: 新しいサービスインスタンス
+        let repository = SettingsRepository()
+        let service1 = SettingsService(repository: repository)
+
+        // When: ステップ1 - すべての設定を変更
+        var scanSettings = service1.settings.scanSettings
+        scanSettings.autoScanEnabled = true
+        scanSettings.includeVideos = false
+        try service1.updateScanSettings(scanSettings)
+
+        var analysisSettings = service1.settings.analysisSettings
+        analysisSettings.similarityThreshold = 0.75
+        analysisSettings.minGroupSize = 4
+        try service1.updateAnalysisSettings(analysisSettings)
+
+        var notificationSettings = service1.settings.notificationSettings
+        notificationSettings.enabled = true
+        notificationSettings.reminderEnabled = true
+        try service1.updateNotificationSettings(notificationSettings)
+
+        var displaySettings = service1.settings.displaySettings
+        displaySettings.gridColumns = 5
+        displaySettings.sortOrder = .sizeDescending
+        try service1.updateDisplaySettings(displaySettings)
+
+        // Then: ステップ2 - 新しいインスタンスで読み込み
+        let service2 = SettingsService(repository: repository)
+        #expect(service2.settings.scanSettings.autoScanEnabled == true)
+        #expect(service2.settings.scanSettings.includeVideos == false)
+        #expect(service2.settings.analysisSettings.similarityThreshold == 0.75)
+        #expect(service2.settings.analysisSettings.minGroupSize == 4)
+        #expect(service2.settings.notificationSettings.enabled == true)
+        #expect(service2.settings.notificationSettings.reminderEnabled == true)
+        #expect(service2.settings.displaySettings.gridColumns == 5)
+        #expect(service2.settings.displaySettings.sortOrder == .sizeDescending)
+
+        // When: ステップ3 - リセット
+        service2.resetToDefaults()
+
+        // Then: すべての設定がデフォルトに戻る
+        let defaults = UserSettings.default
+        #expect(service2.settings.scanSettings.autoScanEnabled == defaults.scanSettings.autoScanEnabled)
+        #expect(service2.settings.scanSettings.includeVideos == defaults.scanSettings.includeVideos)
+        #expect(service2.settings.analysisSettings.similarityThreshold == defaults.analysisSettings.similarityThreshold)
+        #expect(service2.settings.analysisSettings.minGroupSize == defaults.analysisSettings.minGroupSize)
+
+        // And: ステップ4 - リセット後も永続化されている
+        let service3 = SettingsService(repository: repository)
+        #expect(service3.settings.scanSettings.autoScanEnabled == defaults.scanSettings.autoScanEnabled)
+    }
+
+    @Test("すべての並び順オプションが正しく機能する")
+    func allSortOrderOptionsWork() throws {
+        // Given
+        let service = SettingsService()
+        let allSortOrders: [LightRoll_CleanerFeature.SortOrder] = [
+            .dateDescending,
+            .dateAscending,
+            .sizeDescending,
+            .sizeAscending
+        ]
+
+        // When & Then: すべての並び順を試す
+        for sortOrder in allSortOrders {
+            var displaySettings = service.settings.displaySettings
+            displaySettings.sortOrder = sortOrder
+            try service.updateDisplaySettings(displaySettings)
+
+            #expect(service.settings.displaySettings.sortOrder == sortOrder)
+        }
+    }
 }
 
 // MARK: - Test Tags
