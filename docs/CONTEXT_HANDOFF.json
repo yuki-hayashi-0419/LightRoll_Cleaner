@@ -192,6 +192,11 @@
   "gitHistory": {
     "commits": [
       {
+        "hash": "c719112",
+        "message": "feat: impl-043完了 - M8-T09 AnalysisSettingsView実装（1,124行、39テスト、97点）",
+        "date": "2025-12-05"
+      },
+      {
         "hash": "ed6305e",
         "message": "feat: impl-042完了 - M8-T08 ScanSettingsView実装（938行、30テスト、93点）",
         "date": "2025-12-05"
