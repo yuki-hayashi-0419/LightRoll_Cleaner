@@ -85,36 +85,14 @@
 
 ---
 
-## M6: Deletion & Safety
+## M6: Deletion & Safety - 完了 ✅
 
-| タスクID | タスク名 | ステータス | 優先度 | 見積 | 依存 |
-|----------|----------|------------|--------|------|------|
-| M6-T01 | TrashPhotoモデル | **完了** | 高 | 1h | M1-T08 |
-| M6-T02 | TrashDataStore実装 | **完了** | 高 | 2h | M6-T01 |
-| M6-T03 | TrashManager基盤 | **完了** | 高 | 2h | M6-T02 |
-| M6-T04 | moveToTrash実装 | **完了** | 高 | - | M6-T03に含む |
-| M6-T05 | restoreFromTrash実装 | **完了** | 高 | - | M6-T03に含む |
-| M6-T06 | 自動クリーンアップ | **完了** | 中 | - | M6-T03に含む |
-| M6-T07 | DeletePhotosUseCase実装 | **完了** | 高 | 2h | M6-T03 |
-| M6-T08 | RestorePhotosUseCase実装 | **完了** | 高 | 1.5h | M6-T03 |
-| M6-T09 | DeletionConfirmationService | **完了** | 高 | 1h | M4-T11 |
-| M6-T10 | TrashViewModel実装 | **スキップ** | - | - | MV Pattern採用のためスキップ |
-| M6-T11 | TrashView実装 | **完了** | 高 | 2.5h | M6-T09,M4-T06 |
-| M6-T12 | DeletionConfirmationSheet | 未着手 | 高 | 1.5h | M6-T09 |
-| M6-T13 | PHAsset削除連携 | 未着手 | 高 | 2h | M2-T05 |
-| M6-T14 | 単体テスト作成 | 未着手 | 中 | 2h | M6-T13 |
+**全14タスク完了（13タスク完了 + 1スキップ）** (17.5h) -> 詳細は `docs/archive/TASKS_COMPLETED.md` 参照
 
-**M6合計: 14タスク / 25時間（完了: 10タスク / 12h + 1スキップ、残: 3タスク / 5.5h）**
-
-- M6-T01 TrashPhoto: 672行、44テスト、100/100点
-- M6-T02 TrashDataStore: 421行、22テスト、100/100点
-- M6-T03 TrashManager: 417行、28テスト、100/100点
-- M6-T04/T05/T06: M6-T03に統合実装
-- M6-T07 DeletePhotosUseCase: 395行、14テスト、98/100点
-- M6-T08 RestorePhotosUseCase: 357行、12テスト、100/100点
-- M6-T09 DeletionConfirmationService: 593行、21テスト、95/100点
-- M6-T10 TrashViewModel: スキップ（MV Pattern採用のためViewModelは使用しない）
-- M6-T11 TrashView: 797行、26テスト、98/100点
+- 平均品質スコア: 97.5/100点
+- 主要成果物: TrashPhoto, TrashDataStore, TrashManager, DeletePhotosUseCase, RestorePhotosUseCase, DeletionConfirmationService, TrashView, DeletionConfirmationSheet
+- 総テスト数: 176テスト
+- **Phase 5完了**: M1（基盤） + M2（写真アクセス） + M3（画像分析） + M4（UI） + M5（Dashboard） + **M6（Deletion & Trash）** ✨
 
 ---
 
@@ -196,13 +174,13 @@
 | M3: Image Analysis | 0 | 0h | 13 (26h) ✅ |
 | M4: UI Components | 0 | 0h | 14 (17h) ✅ |
 | M5: Dashboard | 0 | 0h | 11 (18h) + 3スキップ ✅ |
-| M6: Deletion & Safety | 3 | 5.5h | 10 (12h) + 1スキップ ← **進行中** |
+| M6: Deletion & Safety | 0 | 0h | 13 (17.5h) + 1スキップ ✅ |
 | M7: Notifications | 13 | 17.5h | 0 |
 | M8: Settings | 14 | 21h | 0 |
 | M9: Monetization | 15 | 25.5h | 0 |
-| **残合計** | **47** | **72h** | **69 (106h)** |
+| **残合計** | **42** | **64h** | **73 (115h)** |
 
-*進捗: 69/117タスク完了 (59.0%) / 106h/181h (58.6%) + 4スキップ* - **Phase 5進行中！** ✨
+*進捗: 73/117タスク完了 (62.4%) / 115h/181h (63.5%) + 4スキップ* - **Phase 5: M6完了！** ✨
 
 ---
 
@@ -241,4 +219,4 @@
 
 ---
 
-*最終更新: 2025-11-30 (M6-T11完了 - TrashView実装 / 69タスク完了 59.0%)*
+*最終更新: 2025-12-04 (M6完了・アーカイブ済 / 73タスク完了 62.4%)*

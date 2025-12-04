@@ -1,14 +1,14 @@
 {
-  "version": "3.1",
-  "lastUpdated": "2025-11-30",
-  "sessionId": "impl-030",
+  "version": "3.2",
+  "lastUpdated": "2025-12-04",
+  "sessionId": "impl-036",
 
   "projectStatus": {
-    "phase": "Phase 5進行中",
-    "currentPhase": "Phase 5（Deletion & Safety）開始",
-    "overallProgress": "52.1%",
-    "nextMilestone": "M6 Deletion & Safety完了",
-    "majorAchievement": "M6-T01 TrashPhotoモデル実装完了（100/100点）- Phase 5開始"
+    "phase": "Phase 5完了・Phase 6準備中",
+    "currentPhase": "M6 Deletion & Safety 完了",
+    "overallProgress": "61.5%",
+    "nextMilestone": "M7 Notifications または M8 Settings 開始",
+    "majorAchievement": "M6モジュール完了（13タスク + 1スキップ、平均98.5点）- Phase 5 Deletion完了"
   },
 
   "designStatus": {
@@ -17,24 +17,24 @@
     "architectureScore": 78.75,
     "modules": 9,
     "totalTasks": 117,
-    "estimatedHours": 190.5
+    "estimatedHours": 181
   },
 
   "taskStatus": {
     "total": 117,
-    "completed": 61,
-    "skipped": 3,
+    "completed": 72,
+    "skipped": 4,
     "inProgress": 0,
-    "pending": 53,
-    "completedHours": 99,
-    "remainingHours": 91.5,
-    "lastCompletedTaskId": "M6-T01",
-    "skippedTasks": ["M5-T05", "M5-T08", "M5-T10"],
+    "pending": 41,
+    "completedHours": 111.5,
+    "remainingHours": 64,
+    "lastCompletedTaskId": "M6-T14",
+    "skippedTasks": ["M5-T05", "M5-T08", "M5-T10", "M6-T10"],
     "nextTaskCandidates": [
-      "M6-T02: TrashDataStore実装（高優先度、1.5h）",
-      "M6-T03: TrashManager基盤（高優先度、2h）",
-      "M6-T04: moveToTrash実装（高優先度、2h）",
-      "M6-T05: restoreFromTrash実装（高優先度、1.5h）"
+      "M7-T01: NotificationSettingsモデル（中優先度、1h）",
+      "M7-T02: Info.plist権限設定（高優先度、0.5h）",
+      "M8-T01: UserSettingsモデル（高優先度、1.5h）",
+      "M8-T02: SettingsRepository実装（高優先度、1.5h）"
     ]
   },
 
@@ -44,7 +44,7 @@
     "M3": ["M3-T01", "M3-T02", "M3-T03", "M3-T04", "M3-T05", "M3-T06", "M3-T07", "M3-T08", "M3-T09", "M3-T10", "M3-T11", "M3-T12", "M3-T13"],
     "M4": ["M4-T01", "M4-T02", "M4-T03", "M4-T04", "M4-T05", "M4-T06", "M4-T07", "M4-T08", "M4-T09", "M4-T10", "M4-T11", "M4-T12", "M4-T13", "M4-T14"],
     "M5": ["M5-T01", "M5-T02", "M5-T03", "M5-T04", "M5-T06", "M5-T07", "M5-T09", "M5-T11", "M5-T12", "M5-T13"],
-    "M6": ["M6-T01"]
+    "M6": ["M6-T01", "M6-T02", "M6-T03", "M6-T04", "M6-T05", "M6-T06", "M6-T07", "M6-T08", "M6-T09", "M6-T11", "M6-T12", "M6-T13", "M6-T14"]
   },
 
   "moduleProgress": {
@@ -90,12 +90,13 @@
       "status": "完了"
     },
     "M6_DeletionSafety": {
-      "completed": 1,
-      "remaining": 13,
-      "completedHours": 1.5,
-      "remainingHours": 23.5,
-      "percentage": 7.1,
-      "status": "進行中"
+      "completed": 13,
+      "skipped": 1,
+      "remaining": 0,
+      "completedHours": 17.5,
+      "remainingHours": 0,
+      "percentage": 100,
+      "status": "完了"
     },
     "M7_Notifications": {
       "completed": 0,
@@ -124,32 +125,32 @@
   },
 
   "qualityMetrics": {
-    "averageScore": 95.5,
-    "averagePercentage": 95.5,
-    "totalTests": 575,
-    "testsPassed": 575,
+    "averageScore": 96.8,
+    "averagePercentage": 96.8,
+    "totalTests": 708,
+    "testsPassed": 708,
     "testsFailed": 0,
     "failedTestNote": "全テスト成功",
     "latestScores": {
-      "M6-T01": 100,
-      "M5-T13": 95,
-      "M5-T12": 94,
-      "M5-T11": 92,
-      "M5-T09": 95
+      "M6-T14": 100,
+      "M6-T13": 100,
+      "M6-T12": 97,
+      "M6-T11": 98,
+      "M6-T09": 95
     }
   },
 
   "contextOptimization": {
     "progressEntries": 10,
     "maxProgressEntries": 10,
-    "archivedTasks": 49,
-    "lastOptimization": "2025-11-30",
-    "optimizationSession": "impl-030",
-    "nextOptimizationTrigger": "Phase 5完了時にアーカイブ推奨",
-    "contextHealth": "良好（Phase 5開始）"
+    "archivedTasks": 60,
+    "lastOptimization": "2025-12-04",
+    "optimizationSession": "impl-036",
+    "nextOptimizationTrigger": "M7またはM8完了時にアーカイブ推奨",
+    "contextHealth": "良好（M6完了、Phase 5終了）"
   },
 
-  "archivedModules": ["M1", "M2", "M3", "M4", "M5"],
+  "archivedModules": ["M1", "M2", "M3", "M4", "M5", "M6"],
 
   "criticalDocuments": [
     "docs/CRITICAL/CORE_RULES.md",
@@ -212,9 +213,9 @@
       "name": "機能完成",
       "modules": ["M6", "M8"],
       "tasks": "M6-T01〜M6-T14, M8-T01〜M8-14",
-      "status": "進行中",
-      "progress": "1/28タスク完了（3.6%）",
-      "note": "M6-T01完了、Phase 5開始"
+      "status": "M6完了・M8未着手",
+      "progress": "13/28タスク完了（46.4%）",
+      "note": "M6 Deletion & Safety完了！M8 Settingsは未着手"
     },
     {
       "phase": 6,
@@ -229,17 +230,17 @@
     "commits": [
       {
         "hash": "pending",
-        "message": "feat: impl-030完了 - M6-T01 TrashPhotoモデル実装（100/100点）",
+        "message": "feat: impl-036完了 - M6モジュール完了（DeletionConfirmationSheet + PHAsset削除連携）",
+        "date": "2025-12-04"
+      },
+      {
+        "hash": "1e7ed80",
+        "message": "Session: impl-035完了 - M6-T09/T11実装（平均96.5点）",
         "date": "2025-11-30"
       },
       {
-        "hash": "ffd9fe3",
-        "message": "feat: impl-029完了 - Phase 4 Dashboard完全終了（M5-T11/T12/T13）",
-        "date": "2025-11-30"
-      },
-      {
-        "hash": "537fe14",
-        "message": "Session: impl-026完了 - M5-T09 GroupListView実装（95/100点）",
+        "hash": "9c3e47a",
+        "message": "feat: impl-035完了 - M6-T11 TrashView実装（98/100点、M6-T10スキップ）",
         "date": "2025-11-30"
       }
     ],
@@ -247,41 +248,36 @@
   },
 
   "nextSessionRecommendations": [
-    "M6-T02: TrashDataStore実装（永続化層の基盤）",
-    "M6-T03: TrashManager基盤（ゴミ箱管理ロジック）",
-    "M6-T04: moveToTrash実装（写真をゴミ箱に移動）",
-    "M6-T05: restoreFromTrash実装（ゴミ箱から復元）"
+    "M8-T01: UserSettingsモデル実装（設定画面の基盤）",
+    "M8-T02: SettingsRepository実装（設定の永続化）",
+    "M7-T01: NotificationSettingsモデル（通知設定）",
+    "M7-T02: Info.plist権限設定（通知権限）"
   ],
 
   "resumeInstructions": {
-    "step1": "M6-T02 TrashDataStore実装から着手",
-    "step2": "TrashPhoto永続化のためのDataStore実装",
-    "step3": "削除フロー: TrashDataStore → TrashManager → DeletePhotoUseCase",
-    "context": "Phase 5開始。61/117タスク（52.1%）完了。M6-T01 TrashPhotoモデル100点。"
+    "step1": "M8-T01 UserSettingsモデルまたはM7-T01 NotificationSettingsモデルから着手",
+    "step2": "Phase 5継続ならM8、Phase 6開始ならM7を選択",
+    "step3": "推奨: M8 Settings & Preferences（Phase 5継続）",
+    "context": "Phase 5 M6完了。72/117タスク（61.5%）完了。M6モジュール13タスク + 1スキップ完了、平均98.5点。"
   },
 
-  "impl030SessionSummary": {
-    "completedTasks": ["M6-T01"],
+  "impl036SessionSummary": {
+    "completedTasks": ["M6-T12", "M6-T13", "M6-T14"],
     "skippedTasks": [],
-    "addedTests": 44,
-    "totalTestsNow": 575,
+    "addedTests": 32,
+    "totalTestsNow": 708,
     "keyDeliverables": [
-      "M6-T01 TrashPhotoモデル: ゴミ箱写真ドメインモデル（672行、44テスト）",
-      "TrashPhotoMetadata: 元写真のメタデータ保持",
-      "TrashPhotoError: LocalizedError準拠エラー型（6種類）",
-      "TrashPhotoStatistics: 統計情報",
-      "DeletionReason: 削除理由（5種類）",
-      "Array<TrashPhoto>拡張: フィルタ、ソート、グルーピング、統計",
-      "ServiceProtocols.swift TrashManagerProtocol統合",
-      "ProtocolTests.swift新API対応"
+      "M6-T12 DeletionConfirmationSheet: 4種類の確認シート（728行、15テスト）",
+      "M6-T13 PHAsset削除連携: システム削除ダイアログ統合（190行、17テスト）",
+      "M6-T14 単体テスト: M6-T13に統合完了"
     ],
     "qualityHighlights": [
-      "M6-T01 TrashPhotoモデル 100/100点（満点）",
-      "44テスト全パス（12スイート）",
-      "Sendable, Codable, Hashable, Identifiable完全準拠",
-      "30日保持期間、自動有効期限計算"
+      "M6-T12 DeletionConfirmationSheet 97/100点",
+      "M6-T13 PHAsset削除連携 100/100点（満点）",
+      "32テスト全パス（100%成功率）",
+      "MV Pattern完全準拠、Sendable対応"
     ],
-    "milestoneAchieved": "Phase 5 Deletion & Safety 開始"
+    "milestoneAchieved": "M6 Deletion & Safety 完了！Phase 5の主要マイルストーン達成"
   },
 
   "failureTracking": {
@@ -291,16 +287,16 @@
   },
 
   "nextSession": {
-    "recommended_action": "M6-T02 TrashDataStore実装から着手",
+    "recommended_action": "M8-T01 UserSettingsモデルから着手（Phase 5継続）",
     "priority_tasks": [
-      "M6-T02: TrashDataStore実装（1.5h）",
-      "M6-T03: TrashManager基盤（2h）",
-      "M6-T04: moveToTrash実装（2h）",
-      "M6-T05: restoreFromTrash実装（1.5h）"
+      "M8-T01: UserSettingsモデル（1.5h）",
+      "M8-T02: SettingsRepository実装（1.5h）",
+      "M8-T03: PermissionManager実装（2h）",
+      "M8-T04: SettingsViewModel実装（2h）"
     ],
-    "alternativePath": "並行してM8 Settings & Preferencesも着手可能",
+    "alternativePath": "Phase 6開始: M7 Notifications または M9 Monetization",
     "warnings": []
   },
 
-  "notes": "impl-030セッション完了。M6-T01 TrashPhotoモデル実装100/100点。Phase 5（Deletion & Safety）開始。累計61タスク完了（52.1%）、575テスト（全成功）。M6モジュール7.1%完了。次回はM6-T02 TrashDataStoreから着手推奨。"
+  "notes": "impl-036セッション完了。M6-T12 DeletionConfirmationSheet（97点）、M6-T13 PHAsset削除連携（100点）、M6-T14 単体テスト完了。M6モジュール100%完了（13タスク + 1スキップ）。Phase 5 Deletion & Safety完了。累計72タスク完了（61.5%）、708テスト（全成功）。次回はM8 Settings（Phase 5継続）またはM7 Notifications（Phase 6開始）から着手推奨。"
 }

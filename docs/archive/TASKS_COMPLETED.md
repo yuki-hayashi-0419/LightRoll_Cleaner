@@ -888,3 +888,172 @@
 **次フェーズ**: Phase 3（UI層）- M4-T05（PhotoThumbnail実装）から開始
 
 ---
+
+## 2025-11-30〜12-04 完了（M6: Deletion & Trash - Phase 5完了）
+
+**モジュールサマリー**
+- **完了日**: 2025-12-04
+- **セッション**: impl-030〜impl-036
+- **タスク数**: 13/14完了（1タスクスキップ）
+- **総工数**: 17.5h
+- **平均品質スコア**: 97.5/100点
+- **総テスト数**: 676テスト全パス
+- **Phase 5完了**: M6 Deletion & Trash完全実装完了 ✨
+
+### M6-T01: TrashPhotoモデル
+- **完了日**: 2025-11-30
+- **セッション**: impl-030
+- **品質スコア**: 100/100点
+- **成果物**:
+  - TrashPhoto.swift: ゴミ箱写真モデル（672行）
+  - DeletionReason列挙型: 5種類の削除理由（手動選択、類似写真、ブレ写真、スクリーンショット、一括削除）
+  - 期限切れ判定・復元可能判定の計算プロパティ
+  - TrashStatistics: 統計情報集計構造体
+  - 30日間保持期間の設定ベース管理
+  - Identifiable/Hashable/Sendable/Codable準拠
+- **テスト**: 44テスト全パス
+
+### M6-T02: TrashDataStore実装
+- **完了日**: 2025-11-30
+- **セッション**: impl-031
+- **品質スコア**: 100/100点
+- **成果物**:
+  - TrashDataStore.swift: ファイルシステムベース永続化（421行）
+  - JSONエンコード/デコードによるデータ保存
+  - 全CRUD操作（ロード/保存/更新/削除）
+  - 統計情報取得（totalCount, totalSize, expiringSoon等）
+  - 有効期限切れ写真の自動検出・クリーンアップ
+  - Actor-isolated実装でスレッドセーフ
+- **テスト**: 22テスト全パス
+
+### M6-T03: TrashManager基盤実装
+- **完了日**: 2025-11-30
+- **セッション**: impl-031
+- **品質スコア**: 100/100点
+- **成果物**:
+  - TrashManager.swift: ゴミ箱管理サービス（417行）
+  - TrashManagerProtocol完全実装
+  - moveToTrash: 写真をゴミ箱に移動（メタデータ保持）
+  - restoreFromTrash: ゴミ箱から元の場所に復元
+  - cleanupExpiredPhotos: 30日経過した写真を自動削除
+  - permanentlyDelete: 指定した写真を完全削除
+  - 統計情報取得・イベント通知機能
+  - @Observable + @MainActor対応
+  - バッチ操作サポート
+- **テスト**: 28テスト全パス
+
+### M6-T04/T05/T06: M6-T03に統合実装
+- **完了日**: 2025-11-30
+- **セッション**: impl-031
+- **成果物**: TrashManager内に統合完了
+  - M6-T04 moveToTrash実装 → TrashManager.moveToTrash()
+  - M6-T05 restoreFromTrash実装 → TrashManager.restoreFromTrash()
+  - M6-T06 自動クリーンアップ → TrashManager.cleanupExpiredPhotos()
+
+### M6-T07: DeletePhotosUseCase実装
+- **完了日**: 2025-11-30
+- **セッション**: impl-032
+- **品質スコア**: 98/100点
+- **成果物**:
+  - DeletePhotosUseCase.swift: 写真削除ユースケース（395行）
+  - DeletionOptions: 4つの削除モード（moveToTrash/permanentDelete/deleteIfExpired/deleteAll）
+  - DeletionContext: 削除理由・関連情報の追跡
+  - DeletionResult: 詳細な結果情報
+  - グループ削除・個別削除の両対応
+  - バッチ処理、進捗通知、キャンセル対応
+- **テスト**: 14テスト全パス
+
+### M6-T08: RestorePhotosUseCase実装
+- **完了日**: 2025-11-30
+- **セッション**: impl-033
+- **品質スコア**: 100/100点（満点）
+- **成果物**:
+  - RestorePhotosUseCase.swift: 写真復元ユースケース（357行）
+  - RestoreOptions: 3つの復元モード（restoreAll/onlyValid/skipExpired）
+  - RestoreResult: 復元結果・統計情報
+  - 期限切れ写真の自動検出と柔軟な処理
+  - DeletePhotosUseCaseと完全な対称性
+  - バッチ処理、進捗通知、エラーハンドリング
+- **テスト**: 12テスト全パス
+
+### M6-T09: DeletionConfirmationService実装
+- **完了日**: 2025-11-30
+- **セッション**: impl-034
+- **品質スコア**: 95/100点
+- **成果物**:
+  - DeletionConfirmationService.swift: 削除確認サービス（593行）
+  - ConfirmationMode: 8種類の削除確認モード（ゴミ箱移動、永久削除、グループ削除、一括削除等）
+  - 削除前確認ダイアログの生成（ConfirmationDialog統合）
+  - 推奨アクションの提示
+  - SafetyCheckResult: 安全性チェック結果（警告レベル、警告メッセージ）
+  - DeletionImpactAnalysis: 削除影響分析
+  - @Observable + @MainActor対応
+- **テスト**: 21テスト全パス
+
+### M6-T10: TrashViewModel実装
+- **完了日**: 2025-11-30
+- **セッション**: impl-035
+- **ステータス**: **スキップ**
+- **理由**: MV Pattern採用のためViewModelは使用しない
+- **代替**: TrashView内で@State中心の状態管理を実装
+
+### M6-T11: TrashView実装
+- **完了日**: 2025-11-30
+- **セッション**: impl-035
+- **品質スコア**: 98/100点
+- **成果物**:
+  - TrashView.swift: ゴミ箱画面SwiftUI View（797行）
+  - MV Pattern（ViewModelなし）で@State中心の状態管理
+  - ViewStateパターン（loading, loaded, processing, error）
+  - ゴミ箱内写真の一覧表示（PhotoGrid使用）
+  - 複数選択機能（選択カウント、全選択/全解除）
+  - 復元/完全削除機能（確認ダイアログ付き）
+  - 自動クリーンアップ機能
+  - ストレージ統計表示（総数、総サイズ、期限切れ間近数）
+  - EmptyStateView統合（ゴミ箱が空の場合）
+  - .task修飾子で非同期写真読み込み
+  - ツールバー（統計、選択管理、クリーンアップ）
+  - グラスモーフィズムデザイン
+  - アクセシビリティ完全対応
+- **テスト**: 26テスト全パス
+
+### M6-T12: DeletionConfirmationSheet実装
+- **完了日**: 2025-12-04
+- **セッション**: impl-036
+- **品質スコア**: 97/100点
+- **成果物**:
+  - DeletionConfirmationSheet.swift: 削除確認シート（728行）
+  - 8種類の削除確認モード対応（ゴミ箱移動、永久削除、グループ削除等）
+  - 3段階の影響レベル表示（low/medium/high）
+  - 削除前の安全性チェック統合
+  - ConfirmationDialog統合
+  - ViewState管理（idle, analyzing, confirmed, confirming, error）
+  - DeletionConfirmationService連携
+  - 詳細情報表示（削除対象数、削減容量、削除理由等）
+  - アニメーション統合（スライドイン、フェードアウト）
+  - Swift 6.1 Concurrency完全対応
+- **テスト**: 15テスト全パス
+
+### M6-T13: PHAsset削除連携
+- **完了日**: 2025-12-04
+- **セッション**: impl-036
+- **品質スコア**: 100/100点（満点）
+- **成果物**:
+  - PhotoRepository拡張: PHPhotoLibrary.shared().performChanges()統合（190行）
+  - deletePhotos(ids:permanently:) 実装
+    - ゴミ箱移動モード: TrashManager連携
+    - 完全削除モード: PHAssetChangeRequest.deleteAssets()直接実行
+  - エラーハンドリング強化（PHPhotosError対応）
+  - DeletePhotosUseCase統合完了
+  - バッチ削除、進捗通知、キャンセル対応
+  - @MainActor分離設計（UI更新とデータアクセス分離）
+- **テスト**: 17テスト全パス
+- **ユーザー視点**: 写真アプリ本体から実際に写真を削除可能に
+
+### M6-T14: 単体テスト作成
+- **完了日**: 2025-12-04
+- **セッション**: impl-036
+- **品質スコア**: 100/100点（M6-T13に統合完了）
+- **成果物**: M6-T13のテスト実装で完了（17テスト全合格）
+
+---

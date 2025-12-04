@@ -269,17 +269,70 @@ public final class PhotoRepository: PhotoRepositoryProtocol, @unchecked Sendable
         )
     }
 
-    /// 写真を削除
+    /// 写真を削除（PHAsset完全削除）
+    /// - Parameter photos: 削除する写真の配列
+    /// - Throws: PhotoRepositoryError
+    ///
+    /// ## 注意事項
+    /// - この操作は取り消し不可能です
+    /// - PHPhotoLibrary.performChanges経由でシステム削除確認ダイアログが表示されます
+    /// - ユーザーがキャンセルした場合はエラーがスローされます
     public func deletePhotos(_ photos: [PhotoAsset]) async throws {
+        // 権限チェック
+        guard permissionManager.currentStatus.isAuthorized else {
+            let error = PhotoRepositoryError.photoAccessDenied
+            self.lastError = error
+            throw error
+        }
+
+        // 空の配列チェック
+        guard !photos.isEmpty else {
+            return
+        }
+
+        // PhotoAssetのIDからPHAssetを取得
         let ids = photos.map { $0.id }
         let assets = fetchPHAssets(by: ids)
 
+        // アセットが見つからない場合
         guard !assets.isEmpty else {
-            throw PhotoRepositoryError.assetNotFound
+            let error = PhotoRepositoryError.assetNotFound
+            self.lastError = error
+            throw error
         }
 
-        try await PHPhotoLibrary.shared().performChanges {
-            PHAssetChangeRequest.deleteAssets(assets as NSFastEnumeration)
+        // PHPhotoLibraryで削除を実行
+        // システム削除確認ダイアログが表示される
+        do {
+            try await PHPhotoLibrary.shared().performChanges {
+                PHAssetChangeRequest.deleteAssets(assets as NSFastEnumeration)
+            }
+
+            // キャッシュをクリア
+            #if canImport(UIKit)
+            self.clearThumbnailCache()
+            #endif
+            self.clearStorageInfoCache()
+
+        } catch let error as NSError {
+            // ユーザーキャンセルまたは削除失敗
+            let repositoryError: PhotoRepositoryError
+            if error.domain == PHPhotosErrorDomain {
+                switch error.code {
+                case PHPhotosError.userCancelled.rawValue:
+                    repositoryError = .fetchCancelled
+                case PHPhotosError.accessUserDenied.rawValue,
+                     PHPhotosError.accessRestricted.rawValue:
+                    repositoryError = .photoAccessDenied
+                default:
+                    repositoryError = .unknown("削除に失敗しました: \(error.localizedDescription)")
+                }
+            } else {
+                repositoryError = .unknown(error.localizedDescription)
+            }
+
+            self.lastError = repositoryError
+            throw repositoryError
         }
     }
 

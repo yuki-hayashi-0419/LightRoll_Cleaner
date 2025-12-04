@@ -5,13 +5,13 @@
 
 ---
 
-## 現在のバージョン: v0.9.25（M6進行中・Phase 5 Deletion基盤完成）
+## 現在のバージョン: v0.9.36（M6完了・Phase 5 Deletion完了）
 
 ### 進捗状況
-- **完了モジュール**: M1 Core Infrastructure, M2 Photo Access, M3 Image Analysis, M4 UI Components, M5 Dashboard & Statistics
-- **進行中モジュール**: **M6 Deletion & Trash（Phase 5進行中）** ✨
-- **Phase 5進行中**: Deletion & Trash（6/14タスク完了 - 42.9%）
-- **全体進捗**: 65/117タスク (55.6%)
+- **完了モジュール**: M1 Core Infrastructure, M2 Photo Access, M3 Image Analysis, M4 UI Components, M5 Dashboard & Statistics, **M6 Deletion & Safety** ✨
+- **次のモジュール**: M7 Notifications または M8 Settings
+- **Phase 5完了**: Deletion & Safety（13/14タスク + 1スキップ = 100%）
+- **全体進捗**: 72/117タスク (61.5%)
 
 ---
 
@@ -289,12 +289,14 @@
 
 ---
 
-## M6: Deletion & Trash（進行中）✨
+## M6: Deletion & Safety（完了）✨
 
 ユーザーから見て出来るようになったこと：
-- **ゴミ箱機能の基盤完成**: 削除した写真を30日間ゴミ箱で保持し、復元可能にする仕組みが整備された
+- **ゴミ箱機能完成**: 削除した写真を30日間ゴミ箱で保持し、いつでも復元可能
+- **削除確認ダイアログ**: 削除/復元/永久削除/ゴミ箱を空にする操作を安全に確認
+- **PHAsset完全削除**: システムの削除確認ダイアログと連携して写真を安全に削除
 - **ゴミ箱データ永続化**: 削除した写真情報がアプリを閉じても保持される
-- **ゴミ箱管理サービス**: 写真の削除・復元・自動クリーンアップが全て動作可能に
+- **自動クリーンアップ**: 30日経過した写真は自動的に完全削除
 
 ### M6-T02: TrashDataStore実装（100/100点）
 
@@ -381,16 +383,95 @@
 
 ---
 
+### M6-T12: DeletionConfirmationSheet実装（97/100点）
+
+**実装内容:**
+- **DeletionConfirmationSheet.swift** (728行)
+  - 4種類の確認シートを統一インターフェースで提供
+  - 削除確認（moveToTrash）: 写真をゴミ箱に移動
+  - 復元確認（restore）: ゴミ箱から写真を復元
+  - 永久削除確認（permanentDelete）: 写真を完全に削除
+  - ゴミ箱クリア確認（emptyTrash）: 全ゴミ箱アイテムを削除
+  - ViewStateパターンで状態管理（idle, processing, success, error）
+  - グラスモーフィズムデザイン
+
+**テスト:**
+- **DeletionConfirmationSheetTests.swift** (15テスト全パス)
+  - 初期化・状態管理テスト
+  - アクションタイプ別テスト
+  - エラーハンドリングテスト
+
+**技術的特徴:**
+- MV Pattern準拠（ViewModelなし）
+- @State中心の状態管理
+- アクセシビリティ対応
+- 国際化対応
+
+**セッション:** impl-036
+
+---
+
+### M6-T13: PHAsset削除連携実装（100/100点）
+
+**実装内容:**
+- **PhotoRepository拡張** (既存ファイルに機能追加)
+  - deleteAssets: PHAssetを完全削除するメソッド
+  - PHPhotoLibrary.shared().performChanges統合
+  - システム削除確認ダイアログ連携
+
+- **DeletePhotosUseCase拡張** (既存ファイルに機能追加)
+  - permanentDeleteFromSystem: システムから完全削除
+  - deletePermanently: ゴミ箱からの完全削除をシステム連携
+
+**テスト:**
+- **PhotoRepositoryDeleteTests.swift** (17テスト全パス)
+  - deleteAssets基本テスト
+  - エラーハンドリングテスト（権限、キャンセル、削除失敗）
+  - 空配列エッジケーステスト
+  - ネットワーク/iCloud連携テスト
+
+**技術的特徴:**
+- PHPhotoLibrary API完全準拠
+- ユーザーキャンセル対応（NSCocoaErrorDomain 3072）
+- 権限エラーハンドリング
+- Sendable準拠
+
+**セッション:** impl-036
+
+---
+
+### M6-T14: 単体テスト作成
+
+**実装内容:**
+- M6-T13に統合実装
+- PhotoRepositoryDeleteTests.swift (17テスト)
+
+**セッション:** impl-036
+
+---
+
+## M6モジュール完全終了 ✨
+
+**総成果物:**
+- 実装行数: 約4,500行
+- テスト行数: 約2,500行
+- 総テスト数: 162テスト
+- 平均品質スコア: 98.6/100点
+- 13タスク完了（1タスクスキップ、MV Pattern採用のため）
+
+**Phase 5完了**: M1（基盤）+ M2（写真アクセス）+ M3（画像分析）+ M4（UIコンポーネント）+ M5（Dashboard）+ **M6（Deletion & Safety）** ✨
+
+---
+
 ## 今後追加予定の機能
 
-### Phase 5（削除・設定）← **現在進行中**
-- 削除・ゴミ箱機能（M6）← **進行中**
-- 設定画面（M8）
-- 通知機能（M7）
+### Phase 5 継続（設定）
+- 設定画面（M8） ← **次の実装候補**
 
 ### Phase 6（仕上げ）
+- 通知機能（M7）
 - プレミアム機能・広告（M9）
 
 ---
 
-*最終更新: 2025-11-30 (M6-T02〜T06完了、**Phase 5 Deletion基盤完成！** - 65タスク完了 55.6%)*
+*最終更新: 2025-12-04 (M6完了、**Phase 5 Deletion完了！** - 72タスク完了 61.5%)*

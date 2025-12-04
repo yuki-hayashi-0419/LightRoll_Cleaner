@@ -122,11 +122,14 @@ struct DeletePhotosUseCaseTests {
         // Note: MockTrashManagerに削除理由を記録する機能を追加する必要がある
     }
 
-    @Test("完全削除モードでは未実装エラーが発生する")
-    func testPermanentDeletionNotImplemented() async throws {
+    @Test("完全削除モードでPhotoRepositoryが未設定の場合エラーが発生する")
+    func testPermanentDeletionWithoutRepository() async throws {
         // Given
         let mockTrashManager = MockTrashManager()
-        let sut = DeletePhotosUseCase(trashManager: mockTrashManager)
+        let sut = DeletePhotosUseCase(
+            trashManager: mockTrashManager,
+            photoRepository: nil  // PhotoRepositoryを設定しない
+        )
 
         let photos = [PhotoAsset(id: "photo1", creationDate: Date(), fileSize: 1000)]
         let input = DeletePhotosInput(photos: photos, permanently: true)
@@ -135,6 +138,81 @@ struct DeletePhotosUseCaseTests {
         await #expect(throws: DeletePhotosUseCaseError.self) {
             try await sut.execute(input)
         }
+    }
+
+    @Test("完全削除モードでPhotoRepositoryが設定されている場合削除が実行される")
+    func testPermanentDeletionWithRepository() async throws {
+        // Given
+        let mockTrashManager = MockTrashManager()
+        let mockRepository = MockPhotoRepository()
+
+        let sut = DeletePhotosUseCase(
+            trashManager: mockTrashManager,
+            photoRepository: mockRepository
+        )
+
+        let photos = [
+            PhotoAsset(id: "photo1", creationDate: Date(), fileSize: 1000),
+            PhotoAsset(id: "photo2", creationDate: Date(), fileSize: 2000)
+        ]
+        let input = DeletePhotosInput(photos: photos, permanently: true)
+
+        // When
+        let result = try await sut.execute(input)
+
+        // Then
+        #expect(mockRepository.deletePhotosCalled)
+        #expect(mockRepository.lastDeletedPhotos?.count == 2)
+        #expect(result.deletedCount == 2)
+        #expect(result.freedBytes == 3000)
+        #expect(result.isFullySuccessful)
+        #expect(!mockTrashManager.moveToTrashCalled) // ゴミ箱には移動しない
+    }
+
+    @Test("完全削除でPhotoRepositoryがエラーを返す場合エラーが発生する")
+    func testPermanentDeletionRepositoryError() async throws {
+        // Given
+        let mockTrashManager = MockTrashManager()
+        let mockRepository = MockPhotoRepository()
+        mockRepository.shouldThrowError = true
+        mockRepository.errorToThrow = PhotoRepositoryError.photoAccessDenied
+
+        let sut = DeletePhotosUseCase(
+            trashManager: mockTrashManager,
+            photoRepository: mockRepository
+        )
+
+        let photos = [PhotoAsset(id: "photo1", creationDate: Date(), fileSize: 1000)]
+        let input = DeletePhotosInput(photos: photos, permanently: true)
+
+        // When & Then
+        await #expect(throws: DeletePhotosUseCaseError.self) {
+            try await sut.execute(input)
+        }
+        #expect(mockRepository.deletePhotosCalled)
+    }
+
+    @Test("完全削除でユーザーがキャンセルした場合エラーが発生する")
+    func testPermanentDeletionUserCancelled() async throws {
+        // Given
+        let mockTrashManager = MockTrashManager()
+        let mockRepository = MockPhotoRepository()
+        mockRepository.shouldThrowError = true
+        mockRepository.errorToThrow = PhotoRepositoryError.fetchCancelled
+
+        let sut = DeletePhotosUseCase(
+            trashManager: mockTrashManager,
+            photoRepository: mockRepository
+        )
+
+        let photos = [PhotoAsset(id: "photo1", creationDate: Date(), fileSize: 1000)]
+        let input = DeletePhotosInput(photos: photos, permanently: true)
+
+        // When & Then
+        await #expect(throws: DeletePhotosUseCaseError.self) {
+            try await sut.execute(input)
+        }
+        #expect(mockRepository.deletePhotosCalled)
     }
 
     @Test("フォーマット済み容量が正しく表示される")

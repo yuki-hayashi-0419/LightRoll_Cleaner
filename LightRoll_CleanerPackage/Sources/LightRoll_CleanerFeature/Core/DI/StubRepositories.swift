@@ -174,11 +174,19 @@ public final class MockPhotoRepository: PhotoRepositoryProtocol, @unchecked Send
     public var fetchAllPhotosCalled = false
     public var deletePhotosCalled = false
     public var deletedPhotos: [PhotoAsset] = []
+    public var lastDeletedPhotos: [PhotoAsset]?
+
+    // エラー制御用
+    public var shouldThrowError = false
+    public var errorToThrow: PhotoRepositoryError?
 
     public init() {}
 
     public func fetchAllPhotos() async throws -> [PhotoAsset] {
         fetchAllPhotosCalled = true
+        if shouldThrowError {
+            throw errorToThrow ?? PhotoRepositoryError.photoAccessDenied
+        }
         return mockPhotos
     }
 
@@ -189,6 +197,11 @@ public final class MockPhotoRepository: PhotoRepositoryProtocol, @unchecked Send
     public func deletePhotos(_ photos: [PhotoAsset]) async throws {
         deletePhotosCalled = true
         deletedPhotos = photos
+        lastDeletedPhotos = photos
+
+        if shouldThrowError {
+            throw errorToThrow ?? PhotoRepositoryError.photoAccessDenied
+        }
     }
 
     public func moveToTrash(_ photos: [PhotoAsset]) async throws {

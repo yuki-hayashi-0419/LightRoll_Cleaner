@@ -227,7 +227,7 @@ public final class DeletePhotosUseCase: DeletePhotosUseCaseProtocol {
         }
     }
 
-    /// 完全削除を実行（将来実装）
+    /// 完全削除を実行
     /// - Parameters:
     ///   - photos: 削除する写真
     ///   - totalSize: 合計サイズ
@@ -237,21 +237,47 @@ public final class DeletePhotosUseCase: DeletePhotosUseCaseProtocol {
         photos: [Photo],
         totalSize: Int64
     ) async throws -> DeletePhotosOutput {
-        // 現時点では未実装
-        // M6-T13（PHAsset削除連携）で実装予定
-        throw DeletePhotosUseCaseError.permanentDeletionFailed(
-            underlying: NSError(
-                domain: "DeletePhotosUseCase",
-                code: -1,
-                userInfo: [
-                    NSLocalizedDescriptionKey: NSLocalizedString(
-                        "deletePhotosUseCase.error.notImplemented",
-                        value: "完全削除機能は未実装です",
-                        comment: "Not implemented"
-                    )
-                ]
+        // PhotoRepositoryが必要
+        guard let repository = photoRepository else {
+            throw DeletePhotosUseCaseError.permanentDeletionFailed(
+                underlying: NSError(
+                    domain: "DeletePhotosUseCase",
+                    code: -1,
+                    userInfo: [
+                        NSLocalizedDescriptionKey: NSLocalizedString(
+                            "deletePhotosUseCase.error.repositoryNotProvided",
+                            value: "写真リポジトリが設定されていません",
+                            comment: "Repository not provided"
+                        )
+                    ]
+                )
             )
-        )
+        }
+
+        do {
+            // PhotoをPhotoAssetに変換
+            let photoAssets = photos.map { photo in
+                PhotoAsset(
+                    id: photo.localIdentifier,
+                    creationDate: photo.creationDate,
+                    fileSize: photo.fileSize
+                )
+            }
+
+            // PhotoRepositoryで完全削除を実行
+            // PHPhotoLibrary.performChanges経由でシステム削除確認ダイアログが表示される
+            try await repository.deletePhotos(photoAssets)
+
+            // 成功結果を返す
+            return DeletePhotosOutput(
+                deletedCount: photos.count,
+                freedBytes: totalSize,
+                failedIds: []
+            )
+        } catch {
+            // エラーをラップして再スロー
+            throw DeletePhotosUseCaseError.permanentDeletionFailed(underlying: error)
+        }
     }
 
     /// PhotoAssetからPhotoへの変換
