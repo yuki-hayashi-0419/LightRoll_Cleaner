@@ -1,15 +1,15 @@
 {
-  "version": "3.7",
+  "version": "3.8",
   "lastUpdated": "2025-12-05",
-  "sessionId": "impl-038",
+  "sessionId": "impl-040",
   "sessionEndStatus": "completed",
 
   "projectStatus": {
-    "phase": "Phase 5継続中（M8-T05完了）",
+    "phase": "Phase 5継続中（M8-T06完了）",
     "currentPhase": "Phase 5（Settings）- M8モジュール42.9%完了",
-    "overallProgress": "66.7%",
-    "nextMilestone": "M8-T06〜T14完了でM8モジュール終了",
-    "majorAchievement": "Settings基盤 + UI完成（5タスク完了：UserSettings, Repository, PermissionManager, SettingsService, PermissionsView）"
+    "overallProgress": "67.5%",
+    "nextMilestone": "M8-T07〜T14完了でM8モジュール終了",
+    "majorAchievement": "Settings基盤 + UIコンポーネント完成（6タスク完了：UserSettings, Repository, PermissionManager, SettingsService, PermissionsView, SettingsRow/Toggle）"
   },
 
   "designStatus": {
@@ -23,20 +23,20 @@
 
   "taskStatus": {
     "total": 117,
-    "completed": 78,
+    "completed": 79,
     "skipped": 4,
     "merged": 1,
     "inProgress": 0,
-    "pending": 34,
-    "completedHours": 123,
-    "remainingHours": 56,
-    "lastCompletedTaskId": "M8-T05",
+    "pending": 33,
+    "completedHours": 124.5,
+    "remainingHours": 54.5,
+    "lastCompletedTaskId": "M8-T06",
     "skippedTasks": ["M5-T05", "M5-T08", "M5-T10", "M6-T10"],
     "mergedTasks": ["M8-T12 (merged into M8-T05)"],
     "nextTaskCandidates": [
-      "M8-T06: SettingsRow/Toggle実装（高優先度、1.5h）",
       "M8-T07: SettingsView実装（高優先度、2.5h）",
-      "M8-T08: ScanSettingsView実装（中優先度、1.5h）"
+      "M8-T08: ScanSettingsView実装（中優先度、1.5h）",
+      "M8-T09: AnalysisSettingsView実装（中優先度、1h）"
     ]
   },
 
@@ -47,7 +47,7 @@
     "M4": ["M4-T01", "M4-T02", "M4-T03", "M4-T04", "M4-T05", "M4-T06", "M4-T07", "M4-T08", "M4-T09", "M4-T10", "M4-T11", "M4-T12", "M4-T13", "M4-T14"],
     "M5": ["M5-T01", "M5-T02", "M5-T03", "M5-T04", "M5-T06", "M5-T07", "M5-T09", "M5-T11", "M5-T12", "M5-T13"],
     "M6": ["M6-T01", "M6-T02", "M6-T03", "M6-T04", "M6-T05", "M6-T06", "M6-T07", "M6-T08", "M6-T09", "M6-T11", "M6-T12", "M6-T13"],
-    "M8": ["M8-T01", "M8-T02", "M8-T03", "M8-T04", "M8-T05"]
+    "M8": ["M8-T01", "M8-T02", "M8-T03", "M8-T04", "M8-T05", "M8-T06"]
   },
 
   "moduleProgress": {
@@ -97,11 +97,11 @@
       "status": "未着手"
     },
     "M8_Settings": {
-      "completed": 5,
+      "completed": 6,
       "merged": 1,
-      "remaining": 8,
-      "remainingHours": 13,
-      "percentage": 42.9,
+      "remaining": 7,
+      "remainingHours": 11.5,
+      "percentage": 50.0,
       "status": "進行中"
     },
     "M9_Monetization": {
@@ -113,26 +113,26 @@
   },
 
   "qualityMetrics": {
-    "averageScore": 97.4,
-    "totalTests": 852,
-    "testsPassed": 852,
+    "averageScore": 97.6,
+    "totalTests": 909,
+    "testsPassed": 909,
     "testsFailed": 0,
     "failedTestNote": "なし（全テスト成功）",
     "latestScores": {
+      "M8-T06": 99,
       "M8-T05": 97,
       "M8-T04": 98,
       "M8-T03": 100,
-      "M6-T13": 100,
-      "M6-T12": 97
+      "M6-T13": 100
     }
   },
 
   "contextOptimization": {
-    "progressEntries": 10,
+    "progressEntries": 12,
     "maxProgressEntries": 10,
     "lastOptimization": "2025-12-05",
     "optimizationSession": "impl-038",
-    "contextHealth": "上限到達（10エントリ、次回アーカイブ推奨）"
+    "contextHealth": "超過（12エントリ、アーカイブ推奨）"
   },
 
   "archivedModules": ["M1", "M2", "M3", "M4", "M5", "M6"],
@@ -178,8 +178,8 @@
       "name": "機能完成",
       "modules": ["M6", "M8"],
       "status": "進行中",
-      "progress": "18/28タスク完了 + 1スキップ + 1統合（67.9%）",
-      "note": "M6完了（100%）+ M8進行中（5/13完了 - 42.9%）"
+      "progress": "19/28タスク完了 + 1スキップ + 1統合（71.4%）",
+      "note": "M6完了（100%）+ M8進行中（6/13完了 - 50.0%）"
     },
     {
       "phase": 6,
@@ -192,30 +192,40 @@
   "gitHistory": {
     "commits": [
       {
-        "hash": "bbd3007",
-        "message": "feat: impl-031完了 - M6-T02〜T06実装（100/100点）",
-        "date": "2025-11-30"
+        "hash": "pending",
+        "message": "feat: impl-040完了 - M8-T06 SettingsRow/Toggle実装（1,369行、57テスト、99点）",
+        "date": "2025-12-05"
       },
       {
-        "hash": "2a861cd",
-        "message": "feat: impl-030完了 - M6-T01 TrashPhotoモデル実装（100/100点）",
-        "date": "2025-11-30"
+        "hash": "a68b209",
+        "message": "feat: impl-039完了 - M8-T05 PermissionsView実装（419行、13テスト、97点）",
+        "date": "2025-12-05"
+      },
+      {
+        "hash": "90f869a",
+        "message": "feat: impl-038完了 - M8-T04 SettingsService実装（186行、17テスト、98/100点）",
+        "date": "2025-12-05"
+      },
+      {
+        "hash": "777b8ce",
+        "message": "feat: impl-037完了 - M8-T03 PermissionManager実装（273行、52テスト、100点）",
+        "date": "2025-12-04"
       }
     ],
     "branch": "main"
   },
 
   "nextSessionRecommendations": [
-    "M6-T12: DeletionConfirmationSheet（削除確認シート）",
-    "M6-T13: PHAsset削除連携",
-    "M6-T14: 単体テスト作成"
+    "M8-T07: SettingsView実装（メイン設定画面）",
+    "M8-T08: ScanSettingsView実装（スキャン設定）",
+    "M8-T09: AnalysisSettingsView実装（分析設定）"
   ],
 
   "resumeInstructions": {
-    "step1": "M6-T12 DeletionConfirmationSheet実装から再開",
-    "step2": "M6-T13 PHAsset削除連携実装",
-    "step3": "M6-T14 単体テスト作成でM6モジュール完了",
-    "context": "M6-T11完了。69/117タスク（59.0%）完了。ゴミ箱ビュー実装済み（98点）。"
+    "step1": "M8-T07 SettingsView実装から再開",
+    "step2": "M8-T08〜T09で各設定画面を実装",
+    "step3": "M8-T10〜T14でM8モジュール完了",
+    "context": "M8-T06完了。79/117タスク（67.5%）完了。Settings基盤 + UIコンポーネント実装済み（99点）。M8モジュール50%達成。"
   },
 
   "sessionSummary_impl035": {
@@ -248,16 +258,45 @@
     "recoveryActions": []
   },
 
-  "nextSession": {
-    "recommended_action": "M6-T12 DeletionConfirmationSheet実装から継続",
-    "priority_tasks": [
-      "M6-T12: DeletionConfirmationSheet（1.5h）",
-      "M6-T13: PHAsset削除連携（2h）",
-      "M6-T14: 単体テスト作成（2h）"
+  "sessionSummary_impl038": {
+    "completedTasks": ["M8-T04", "M8-T05", "M6-T12", "M6-T13"],
+    "mergedTasks": ["M8-T12 (merged into M8-T05)"],
+    "addedTests": 176,
+    "totalTestsNow": 852,
+    "totalCodeLines": 1512,
+    "qualityAverage": 98.0,
+    "keyDeliverables": [
+      "M8-T04 SettingsService: 統合設定管理（186行、17テスト、98点）",
+      "M8-T05 PermissionsView: 権限管理UI（419行、13テスト、97点）",
+      "M6-T12 DeletionConfirmationSheet: 削除確認シート（728行、15テスト、97点）",
+      "M6-T13 PHAsset削除連携: 完全削除機能（190行、17テスト、100点）"
     ],
-    "alternativePath": "M8 Settings & Preferences に切り替えも可能",
-    "contextHealthy": true
+    "milestoneAchieved": "M6モジュール100%完了 + M8モジュール42.9%達成（5/13タスク完了 + 1統合）"
   },
 
-  "notes": "impl-035セッション完了。M6-T09 DeletionConfirmationService（95点）+ M6-T11 TrashView（98点）実装完了、M6-T10スキップ（MV Pattern採用）。累計69タスク完了（59.0%）、676テスト。M6モジュール85.7%達成。ゴミ箱ビュー（復元・完全削除機能）完成。次回はM6-T12 DeletionConfirmationSheetから着手でM6モジュール完了へ。コンテキスト最適化実施済み（PROGRESS.md 16→8エントリ）。"
+  "sessionSummary_impl040": {
+    "completedTasks": ["M8-T06"],
+    "addedTests": 57,
+    "totalTestsNow": 909,
+    "totalCodeLines": 1369,
+    "qualityAverage": 99.0,
+    "keyDeliverables": [
+      "M8-T06 SettingsRow/Toggle: UIコンポーネント（593行、57テスト、99点）"
+    ],
+    "milestoneAchieved": "M8モジュール50%達成（6/14タスク完了 + 1統合）"
+  },
+
+  "nextSession": {
+    "recommended_action": "M8-T07 SettingsView実装から継続",
+    "priority_tasks": [
+      "M8-T07: SettingsView実装（2.5h）",
+      "M8-T08: ScanSettingsView実装（1.5h）",
+      "M8-T09: AnalysisSettingsView実装（1h）"
+    ],
+    "alternativePath": "M7 Notifications に切り替えも可能",
+    "contextHealthy": false,
+    "archiveRecommended": "PROGRESS.md が12エントリ（上限+2）のため、次回セッション開始時にアーカイブ実施推奨"
+  },
+
+  "notes": "impl-040セッション完了。M8-T06 SettingsRow/Toggle実装（99点、1,369行、57テスト全合格）。累計79タスク完了（67.5%）、909テスト全合格。M8モジュール50%達成（6/14完了）。Settings UIコンポーネント基盤完成。次回はM8-T07 SettingsViewから着手。PROGRESS.md 12エントリ（上限超過、アーカイブ推奨）。"
 }
