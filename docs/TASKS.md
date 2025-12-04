@@ -146,7 +146,7 @@
 - M8-T05 PermissionsView: 419行、13テスト、97/100点
 - M8-T06 SettingsRow/Toggle: 593行、57テスト、99/100点
 - M8-T07 SettingsView: 938行、21テスト、95/100点
-- M8-T08 ScanSettingsView: 698行、19テスト、96/100点
+- M8-T08 ScanSettingsView: 938行、30テスト、93/100点
 - M8-T12: M8-T05と統合
 
 ---
