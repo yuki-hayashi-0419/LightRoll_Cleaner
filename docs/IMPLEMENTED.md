@@ -5,12 +5,13 @@
 
 ---
 
-## 現在のバージョン: v1.0.0-beta（M6完了・Phase 5終了）
+## 現在のバージョン: v1.0.0-beta（M8進行中・Phase 5継続）
 
 ### 進捗状況
-- **完了モジュール**: M1 Core Infrastructure, M2 Photo Access, M3 Image Analysis, M4 UI Components, M5 Dashboard & Statistics, **M6 Deletion & Trash** ✨
-- **Phase 5完了**: M1〜M6完全実装完了（73/117タスク - 62.4%）
-- **全体進捗**: 73/117タスク (62.4%) / 115h/181h (63.5%)
+- **完了モジュール**: M1 Core Infrastructure, M2 Photo Access, M3 Image Analysis, M4 UI Components, M5 Dashboard & Statistics, M6 Deletion & Trash
+- **進行中モジュール**: **M8 Settings & Preferences** (3/14タスク完了 - 21.4%) ✨
+- **Phase 5継続中**: M1〜M6完全実装 + M8部分実装（76/117タスク - 65.0%）
+- **全体進捗**: 76/117タスク (65.0%) / 117h/181h (64.6%)
 
 ---
 
@@ -187,7 +188,48 @@ Phase 5の継続として設定機能を実装中：
 **成果物**: SettingsRepository.swift (107行)、SettingsRepositoryTests.swift (11テスト、100%成功)
 **品質スコア**: 97/100点 ⭐
 
-**M8モジュール進捗**: 2/14タスク完了（14.3%）
+### M8-T03 PermissionManager詳細
+
+統合的な権限管理機能：
+
+| 機能 | 説明 |
+|------|------|
+| **写真権限管理** | PHPhotoLibrary経由で写真ライブラリへのアクセス権限を管理 |
+| **通知権限管理** | UNUserNotificationCenter経由で通知権限を管理 |
+| **権限状態取得** | 写真・通知それぞれの権限状態を統一的なPermissionStatusで返す |
+| **権限リクエスト** | 写真・通知それぞれの権限をリクエスト |
+| **設定アプリ誘導** | 権限拒否時にシステム設定アプリを開く |
+| **全権限一括取得** | 全権限種別の状態を辞書形式で一括取得 |
+
+#### 技術的特徴
+- **@MainActor分離**: UIとの連携を考慮したMainActor実装
+- **PermissionManagerProtocol準拠**: DIContainer対応
+- **SettingsOpener抽象化**: テスト可能なシステム設定誘導
+- **PHAuthorizationStatus拡張**: .limited（iOS 14+）対応
+- **UNAuthorizationStatus拡張**: .provisional/.ephemeral対応
+- **Swift 6 Strict Concurrency**: 完全なSendable準拠
+- **Actor-based Mocking**: MockNotificationCenterをactorで実装し、スレッドセーフなテストを実現
+
+#### サポートする権限状態
+- **notDetermined**: 未確定（初回）
+- **restricted**: 制限あり（ペアレンタルコントロール等）
+- **denied**: 拒否
+- **authorized**: 許可
+- **limited**: 限定許可（写真のみ、選択した写真）
+
+#### テストカバレッジ
+- **正常系テスト（3件）**: TC01 写真権限取得、TC02 通知権限取得、TC03 写真権限リクエスト
+- **異常系テスト（2件）**: TC04 権限拒否、TC05 設定誘導
+- **境界値テスト（3件）**: notDetermined状態、authorized状態、limited状態
+- **追加テスト（5件）**: 複数回呼び出し、初期化、プロトコル準拠、汎用インターフェース
+- **Extension Tests（12件）**: UNAuthorizationStatus拡張メソッドの検証
+- **Mock Tests（3件）**: モッククラスの動作検証
+
+**成果物**: PermissionManager.swift (273行)、PermissionManagerTests.swift (550行、52テスト）
+**品質スコア**: 100/100点 ⭐⭐
+**テスト成功率**: 52/52 (100%)
+
+**M8モジュール進捗**: 3/14タスク完了（21.4%）
 
 ---
 
@@ -202,4 +244,4 @@ Phase 5の継続として設定機能を実装中：
 
 ---
 
-*最終更新: 2025-12-04 (M8-T02完了 - 75タスク完了 64.1%)*
+*最終更新: 2025-12-04 (M8-T03完了 - 76タスク完了 65.0%)*
