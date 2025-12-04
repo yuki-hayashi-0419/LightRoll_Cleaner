@@ -126,18 +126,25 @@
 | M8-T02 | SettingsRepository実装 | 完了 | 高 | 1.5h | M8-T01 |
 | M8-T03 | PermissionManager実装 | 完了 | 高 | 2h | M2-T02,M7-T04 |
 | M8-T04 | SettingsService実装 | **完了** | 高 | 2h | M8-T02 |
-| M8-T05 | PermissionsViewModel | 未着手 | 中 | 1h | M8-T03 |
+| M8-T05 | PermissionsView | **完了** | 中 | 1h | M8-T03 |
 | M8-T06 | SettingsRow/Toggle実装 | 未着手 | 高 | 1.5h | M4-T03 |
 | M8-T07 | SettingsView実装 | 未着手 | 高 | 2.5h | M8-T04,M8-T06 |
 | M8-T08 | ScanSettingsView実装 | 未着手 | 中 | 1.5h | M8-T07 |
 | M8-T09 | AnalysisSettingsView実装 | 未着手 | 低 | 1h | M8-T07 |
 | M8-T10 | NotificationSettingsView | 未着手 | 中 | 1.5h | M8-T07,M7-T01 |
 | M8-T11 | DisplaySettingsView実装 | 未着手 | 低 | 1h | M8-T07 |
-| M8-T12 | PermissionsView実装 | 未着手 | 中 | 1.5h | M8-T05 |
+| M8-T12 | PermissionsView実装 | **M8-T05と統合** | - | - | - |
 | M8-T13 | AboutView実装 | 未着手 | 低 | 1h | M4-T03 |
 | M8-T14 | 単体テスト作成 | 未着手 | 中 | 1.5h | M8-T13 |
 
-**M8合計: 14タスク / 21時間**
+**M8合計: 14タスク / 21時間（5タスク完了：8h + 1統合、8タスク残：13h）**
+
+- M8-T01 UserSettings: 348行、43テスト、97/100点
+- M8-T02 SettingsRepository: 107行、11テスト、97/100点
+- M8-T03 PermissionManager: 273行、52テスト、100/100点
+- M8-T04 SettingsService: 186行、17テスト、98/100点
+- M8-T05 PermissionsView: 419行、13テスト、97/100点
+- M8-T12: M8-T05と統合
 
 ---
 
@@ -176,11 +183,11 @@
 | M5: Dashboard | 0 | 0h | 11 (18h) + 3スキップ ✅ |
 | M6: Deletion & Safety | 0 | 0h | 13 (17.5h) + 1スキップ ✅ |
 | M7: Notifications | 13 | 17.5h | 0 |
-| M8: Settings | 11 | 16h | 3 (5h) |
+| M8: Settings | 8 | 13h | 5 (8h) + 1統合 |
 | M9: Monetization | 15 | 25.5h | 0 |
-| **残合計** | **39** | **59h** | **76 (120h)** |
+| **残合計** | **36** | **56h** | **78 (123h)** |
 
-*進捗: 76/117タスク完了 (65.0%) / 120h/181h (66.3%) + 4スキップ* - **Phase 5: M6完了 + M8進行中（3/14完了）** ✨
+*進捗: 78/117タスク完了 (66.7%) / 123h/181h (67.9%) + 4スキップ + 1統合* - **Phase 5: M6完了 + M8進行中（5/14完了）** ✨
 
 ---
 
@@ -219,4 +226,4 @@
 
 ---
 
-*最終更新: 2025-12-04 (M8-T03完了 / 76タスク完了 65.0%)*
+*最終更新: 2025-12-05 (M8-T05完了 / 78タスク完了 66.7%)*

@@ -5,6 +5,41 @@
 
 ---
 
+## 2025-12-05 | セッション: impl-039（M8-T05完了 - PermissionsView実装）
+
+### 完了タスク
+- M8-T05: PermissionsView実装（419行、13テスト、97/100点）
+
+### 成果
+- **PermissionsView完成**: 権限管理画面のUI実装
+- 写真ライブラリ・通知の権限状態を視覚的に表示
+- 権限リクエスト・システム設定誘導機能
+- MV Pattern準拠、@Observableによる自動UI更新
+
+### 品質スコア
+- M8-T05: 97/100点
+
+### 累計成果（impl-037〜impl-039）
+- M8-T01: UserSettingsモデル（348行、43テスト、97/100点）
+- M8-T02: SettingsRepository（107行、11テスト、97/100点）
+- M8-T03: PermissionManager（273行、52テスト、100/100点）
+- M8-T04: SettingsService（186行、17テスト、98/100点）
+- M8-T05: PermissionsView（419行、13テスト、97/100点）
+- **M8進捗**: 5/14タスク完了（35.7%）
+- **平均品質スコア**: 97.8/100点
+
+### 統計情報
+- **M8進捗**: 5/14タスク完了（35.7%）
+- **全体進捗**: 78/117タスク完了（66.7%）
+- **Phase 5**: M6完了 + M8進行中
+
+### 次のステップ
+- M8-T06: SettingsRow/Toggle実装（1.5h）
+- M8-T07: SettingsView実装（2.5h）
+- M8-T08: ScanSettingsView実装（1.5h）
+
+---
+
 ## 2025-12-05 | セッション: impl-038（M8-T04完了 - SettingsService実装）
 
 ### 完了タスク

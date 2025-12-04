@@ -1,15 +1,15 @@
 {
-  "version": "3.6",
-  "lastUpdated": "2025-11-30",
-  "sessionId": "impl-035",
+  "version": "3.7",
+  "lastUpdated": "2025-12-05",
+  "sessionId": "impl-038",
   "sessionEndStatus": "completed",
 
   "projectStatus": {
-    "phase": "Phase 5進行中（M6-T11完了）",
-    "currentPhase": "Phase 5（Deletion & Safety）- M6モジュール85.7%完了",
-    "overallProgress": "59.0%",
-    "nextMilestone": "M6-T12〜T14完了でM6モジュール終了",
-    "majorAchievement": "ゴミ箱機能実装完了（TrashView + DeletionConfirmationService）"
+    "phase": "Phase 5継続中（M8-T05完了）",
+    "currentPhase": "Phase 5（Settings）- M8モジュール42.9%完了",
+    "overallProgress": "66.7%",
+    "nextMilestone": "M8-T06〜T14完了でM8モジュール終了",
+    "majorAchievement": "Settings基盤 + UI完成（5タスク完了：UserSettings, Repository, PermissionManager, SettingsService, PermissionsView）"
   },
 
   "designStatus": {
@@ -23,18 +23,20 @@
 
   "taskStatus": {
     "total": 117,
-    "completed": 69,
-    "skipped": 5,
+    "completed": 78,
+    "skipped": 4,
+    "merged": 1,
     "inProgress": 0,
-    "pending": 43,
-    "completedHours": 106,
-    "remainingHours": 72,
-    "lastCompletedTaskId": "M6-T11",
+    "pending": 34,
+    "completedHours": 123,
+    "remainingHours": 56,
+    "lastCompletedTaskId": "M8-T05",
     "skippedTasks": ["M5-T05", "M5-T08", "M5-T10", "M6-T10"],
+    "mergedTasks": ["M8-T12 (merged into M8-T05)"],
     "nextTaskCandidates": [
-      "M6-T12: DeletionConfirmationSheet（高優先度、1.5h）",
-      "M6-T13: PHAsset削除連携（高優先度、2h）",
-      "M6-T14: 単体テスト作成（中優先度、2h）"
+      "M8-T06: SettingsRow/Toggle実装（高優先度、1.5h）",
+      "M8-T07: SettingsView実装（高優先度、2.5h）",
+      "M8-T08: ScanSettingsView実装（中優先度、1.5h）"
     ]
   },
 
@@ -44,7 +46,8 @@
     "M3": ["M3-T01", "M3-T02", "M3-T03", "M3-T04", "M3-T05", "M3-T06", "M3-T07", "M3-T08", "M3-T09", "M3-T10", "M3-T11", "M3-T12", "M3-T13"],
     "M4": ["M4-T01", "M4-T02", "M4-T03", "M4-T04", "M4-T05", "M4-T06", "M4-T07", "M4-T08", "M4-T09", "M4-T10", "M4-T11", "M4-T12", "M4-T13", "M4-T14"],
     "M5": ["M5-T01", "M5-T02", "M5-T03", "M5-T04", "M5-T06", "M5-T07", "M5-T09", "M5-T11", "M5-T12", "M5-T13"],
-    "M6": ["M6-T01", "M6-T02", "M6-T03", "M6-T04", "M6-T05", "M6-T06", "M6-T07", "M6-T08", "M6-T09", "M6-T11"]
+    "M6": ["M6-T01", "M6-T02", "M6-T03", "M6-T04", "M6-T05", "M6-T06", "M6-T07", "M6-T08", "M6-T09", "M6-T11", "M6-T12", "M6-T13"],
+    "M8": ["M8-T01", "M8-T02", "M8-T03", "M8-T04", "M8-T05"]
   },
 
   "moduleProgress": {
@@ -80,12 +83,12 @@
       "status": "完了"
     },
     "M6_DeletionSafety": {
-      "completed": 10,
+      "completed": 13,
       "skipped": 1,
-      "remaining": 3,
-      "remainingHours": 5.5,
-      "percentage": 78.6,
-      "status": "進行中"
+      "remaining": 0,
+      "remainingHours": 0,
+      "percentage": 100,
+      "status": "完了"
     },
     "M7_Notifications": {
       "completed": 0,
@@ -94,10 +97,12 @@
       "status": "未着手"
     },
     "M8_Settings": {
-      "completed": 0,
-      "remaining": 14,
-      "percentage": 0,
-      "status": "未着手"
+      "completed": 5,
+      "merged": 1,
+      "remaining": 8,
+      "remainingHours": 13,
+      "percentage": 42.9,
+      "status": "進行中"
     },
     "M9_Monetization": {
       "completed": 0,
@@ -108,29 +113,29 @@
   },
 
   "qualityMetrics": {
-    "averageScore": 96.7,
-    "totalTests": 676,
-    "testsPassed": 672,
-    "testsFailed": 4,
-    "failedTestNote": "境界値アサーション調整必要（軽微）",
+    "averageScore": 97.4,
+    "totalTests": 852,
+    "testsPassed": 852,
+    "testsFailed": 0,
+    "failedTestNote": "なし（全テスト成功）",
     "latestScores": {
-      "M6-T11": 98,
-      "M6-T09": 95,
-      "M6-T08": 100,
-      "M6-T07": 98,
-      "M6-T03": 100
+      "M8-T05": 97,
+      "M8-T04": 98,
+      "M8-T03": 100,
+      "M6-T13": 100,
+      "M6-T12": 97
     }
   },
 
   "contextOptimization": {
-    "progressEntries": 8,
+    "progressEntries": 10,
     "maxProgressEntries": 10,
-    "lastOptimization": "2025-11-30",
-    "optimizationSession": "impl-035",
-    "contextHealth": "良好（8エントリ、上限10）"
+    "lastOptimization": "2025-12-05",
+    "optimizationSession": "impl-038",
+    "contextHealth": "上限到達（10エントリ、次回アーカイブ推奨）"
   },
 
-  "archivedModules": ["M1", "M2", "M3", "M4", "M5"],
+  "archivedModules": ["M1", "M2", "M3", "M4", "M5", "M6"],
 
   "criticalDocuments": [
     "docs/CRITICAL/CORE_RULES.md",
@@ -173,8 +178,8 @@
       "name": "機能完成",
       "modules": ["M6", "M8"],
       "status": "進行中",
-      "progress": "10/28タスク完了 + 1スキップ（39.3%）",
-      "note": "M6-T11 TrashView完了（98/100点）"
+      "progress": "18/28タスク完了 + 1スキップ + 1統合（67.9%）",
+      "note": "M6完了（100%）+ M8進行中（5/13完了 - 42.9%）"
     },
     {
       "phase": 6,

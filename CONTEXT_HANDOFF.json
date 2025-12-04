@@ -1,14 +1,14 @@
 {
-  "version": "3.3",
-  "lastUpdated": "2025-12-04",
-  "sessionId": "impl-037",
+  "version": "3.4",
+  "lastUpdated": "2025-12-05",
+  "sessionId": "impl-039",
 
   "projectStatus": {
     "phase": "Phase 5継続中",
     "currentPhase": "M8 Settings & Preferences 進行中",
-    "overallProgress": "65.8%",
-    "nextMilestone": "M8-T05 PermissionsViewModel実装",
-    "majorAchievement": "M8-T04 SettingsService完了（186行、17テスト、98/100点）"
+    "overallProgress": "66.7%",
+    "nextMilestone": "M8-T06 SettingsRow/Toggle実装",
+    "majorAchievement": "M8-T05 PermissionsView完了（419行、13テスト、97/100点）"
   },
 
   "designStatus": {
@@ -22,18 +22,20 @@
 
   "taskStatus": {
     "total": 117,
-    "completed": 77,
+    "completed": 78,
     "skipped": 4,
+    "merged": 1,
     "inProgress": 0,
-    "pending": 36,
-    "completedHours": 120,
-    "remainingHours": 55.5,
-    "lastCompletedTaskId": "M8-T04",
+    "pending": 34,
+    "completedHours": 123,
+    "remainingHours": 56,
+    "lastCompletedTaskId": "M8-T05",
     "skippedTasks": ["M5-T05", "M5-T08", "M5-T10", "M6-T10"],
+    "mergedTasks": ["M8-T12 → M8-T05"],
     "nextTaskCandidates": [
-      "M8-T05: PermissionsViewModel実装（中優先度、1h）",
       "M8-T06: SettingsRow/Toggle実装（高優先度、1.5h）",
-      "M8-T07: SettingsView実装（高優先度、2h）",
+      "M8-T07: SettingsView実装（高優先度、2.5h）",
+      "M8-T08: ScanSettingsView実装（中優先度、1.5h）",
       "M7-T01: NotificationSettingsモデル（代替パス、1h）"
     ]
   },
@@ -45,7 +47,7 @@
     "M4": ["M4-T01", "M4-T02", "M4-T03", "M4-T04", "M4-T05", "M4-T06", "M4-T07", "M4-T08", "M4-T09", "M4-T10", "M4-T11", "M4-T12", "M4-T13", "M4-T14"],
     "M5": ["M5-T01", "M5-T02", "M5-T03", "M5-T04", "M5-T06", "M5-T07", "M5-T09", "M5-T11", "M5-T12", "M5-T13"],
     "M6": ["M6-T01", "M6-T02", "M6-T03", "M6-T04", "M6-T05", "M6-T06", "M6-T07", "M6-T08", "M6-T09", "M6-T11", "M6-T12", "M6-T13", "M6-T14"],
-    "M8": ["M8-T01", "M8-T02", "M8-T03", "M8-T04"]
+    "M8": ["M8-T01", "M8-T02", "M8-T03", "M8-T04", "M8-T05"]
   },
 
   "moduleProgress": {
@@ -108,11 +110,12 @@
       "status": "未着手"
     },
     "M8_Settings": {
-      "completed": 4,
-      "remaining": 10,
-      "completedHours": 7,
-      "remainingHours": 14,
-      "percentage": 28.6,
+      "completed": 5,
+      "merged": 1,
+      "remaining": 8,
+      "completedHours": 8,
+      "remainingHours": 13,
+      "percentage": 35.7,
       "status": "進行中"
     },
     "M9_Monetization": {
@@ -126,29 +129,29 @@
   },
 
   "qualityMetrics": {
-    "averageScore": 96.9,
-    "averagePercentage": 96.9,
-    "totalTests": 831,
-    "testsPassed": 831,
+    "averageScore": 97.0,
+    "averagePercentage": 97.0,
+    "totalTests": 844,
+    "testsPassed": 844,
     "testsFailed": 0,
     "failedTestNote": "全テスト成功",
     "latestScores": {
+      "M8-T05": 97,
       "M8-T04": 98,
       "M8-T03": 100,
       "M8-T02": 97,
-      "M8-T01": 97,
-      "M6-T14": 100
+      "M8-T01": 97
     }
   },
 
   "contextOptimization": {
-    "progressEntries": 10,
+    "progressEntries": 11,
     "maxProgressEntries": 10,
     "archivedTasks": 60,
     "lastOptimization": "2025-12-04",
     "optimizationSession": "impl-036",
-    "nextOptimizationTrigger": "M7またはM8完了時にアーカイブ推奨",
-    "contextHealth": "良好（M6完了、Phase 5終了）"
+    "nextOptimizationTrigger": "M8完了時にアーカイブ推奨（エントリ数超過）",
+    "contextHealth": "良好（M6完了、M8進行中）"
   },
 
   "archivedModules": ["M1", "M2", "M3", "M4", "M5", "M6"],
@@ -215,8 +218,8 @@
       "modules": ["M6", "M8"],
       "tasks": "M6-T01〜M6-T14, M8-T01〜M8-14",
       "status": "M6完了・M8進行中",
-      "progress": "17/28タスク完了（60.7%）",
-      "note": "M6 Deletion & Safety完了。M8 Settings進行中（M8-T01〜T04完了、平均97.5点）"
+      "progress": "18/28タスク完了（64.3%）",
+      "note": "M6 Deletion & Safety完了。M8 Settings進行中（M8-T01〜T05完了、平均97.8点）"
     },
     {
       "phase": 6,
@@ -230,108 +233,60 @@
   "gitHistory": {
     "commits": [
       {
-        "hash": "08d538a",
-        "message": "feat: impl-037完了 - M8-T02 SettingsRepository実装（107行、11テスト、97点）",
-        "date": "2025-12-04"
-      },
-      {
         "hash": "pending",
-        "message": "feat: impl-036完了 - M6モジュール完了（DeletionConfirmationSheet + PHAsset削除連携）",
-        "date": "2025-12-04"
+        "message": "feat: impl-039完了 - M8-T05 PermissionsView実装（419行、13テスト、97点）",
+        "date": "2025-12-05"
       },
       {
-        "hash": "1e7ed80",
-        "message": "Session: impl-035完了 - M6-T09/T11実装（平均96.5点）",
-        "date": "2025-11-30"
+        "hash": "40611af",
+        "message": "chore: セッションimpl-038完了（PROGRESS.md/TASKS.md更新）",
+        "date": "2025-12-05"
+      },
+      {
+        "hash": "90f869a",
+        "message": "feat: impl-038完了 - M8-T04 SettingsService実装（186行、17テスト、98/100点）",
+        "date": "2025-12-05"
       }
     ],
     "branch": "main"
   },
 
   "nextSessionRecommendations": [
-    "M8-T04: SettingsViewModel実装（設定画面ViewModel・高優先度・2h）",
-    "M8-T05: PermissionsViewModel実装（権限画面VM・中優先度・1h）",
-    "M8-T06: SettingsRow/Toggle実装（UIコンポーネント・1.5h）",
+    "M8-T06: SettingsRow/Toggle実装（UIコンポーネント・高優先度・1.5h）",
+    "M8-T07: SettingsView実装（メイン設定画面・高優先度・2.5h）",
+    "M8-T08: ScanSettingsView実装（スキャン設定画面・中優先度・1.5h）",
     "M7-T01: NotificationSettingsモデル（代替パス・Phase 6開始・1h）"
   ],
 
   "resumeInstructions": {
-    "step1": "M8-T05 PermissionsViewModel実装から着手",
-    "step2": "権限管理画面用ViewModel実装（PermissionManager統合）",
+    "step1": "M8-T06 SettingsRow/Toggle実装から着手",
+    "step2": "設定画面用の共通UIコンポーネント（行・トグル）を実装",
     "step3": "推奨: Phase 5継続 - M8 Settings & Preferences",
-    "context": "Phase 5 M6完了、M8進行中。77/117タスク（65.8%）完了。M8-T01 UserSettings（348行、43テスト、97点）、M8-T02 SettingsRepository（107行、11テスト、97点）、M8-T03 PermissionManager（273行、52テスト、100点）、M8-T04 SettingsService（186行、17テスト、98点）完了。"
+    "context": "Phase 5 M6完了、M8進行中。78/117タスク（66.7%）完了。M8-T01 UserSettings（348行、43テスト、97点）、M8-T02 SettingsRepository（107行、11テスト、97点）、M8-T03 PermissionManager（273行、52テスト、100点）、M8-T04 SettingsService（186行、17テスト、98点）、M8-T05 PermissionsView（419行、13テスト、97点）完了。"
   },
 
-  "impl036SessionSummary": {
-    "completedTasks": ["M6-T12", "M6-T13", "M6-T14"],
+  "impl039SessionSummary": {
+    "completedTasks": ["M8-T05"],
+    "mergedTasks": ["M8-T12 → M8-T05"],
     "skippedTasks": [],
-    "addedTests": 32,
-    "totalTestsNow": 708,
+    "addedTests": 13,
+    "totalTestsNow": 844,
     "keyDeliverables": [
-      "M6-T12 DeletionConfirmationSheet: 4種類の確認シート（728行、15テスト）",
-      "M6-T13 PHAsset削除連携: システム削除ダイアログ統合（190行、17テスト）",
-      "M6-T14 単体テスト: M6-T13に統合完了"
+      "M8-T05 PermissionsView: 権限管理画面の完全実装（419行、13テスト）",
+      "写真ライブラリ・通知の権限状態表示",
+      "権限リクエスト・システム設定誘導機能",
+      "MV Pattern準拠、@Observable対応",
+      "PermissionRow/PermissionStatusBadgeコンポーネント",
+      "M8-T12（PermissionsView実装）をM8-T05と統合"
     ],
     "qualityHighlights": [
-      "M6-T12 DeletionConfirmationSheet 97/100点",
-      "M6-T13 PHAsset削除連携 100/100点（満点）",
-      "32テスト全パス（100%成功率）",
-      "MV Pattern完全準拠、Sendable対応"
-    ],
-    "milestoneAchieved": "M6 Deletion & Safety 完了！Phase 5の主要マイルストーン達成"
-  },
-
-  "impl037SessionSummary": {
-    "completedTasks": ["M8-T01", "M8-T02", "M8-T03"],
-    "skippedTasks": [],
-    "addedTests": 106,
-    "totalTestsNow": 814,
-    "keyDeliverables": [
-      "M8-T01 UserSettingsモデル: 階層構造の設定モデル（348行、43テスト）",
-      "M8-T02 SettingsRepository: UserDefaults永続化層（107行、11テスト）",
-      "M8-T03 PermissionManager: 写真・通知の統合権限管理（273行、52テスト）",
-      "5つの設定カテゴリ実装（Scan, Analysis, Notification, Display, Premium）",
-      "完全なSendable/Codable準拠、Swift 6対応",
-      "グレースフルなエラーハンドリング（デコード失敗時のデフォルト値返却）",
-      "@MainActor分離とActor-based Mocking実装"
-    ],
-    "qualityHighlights": [
-      "M8-T01 UserSettings 97/100点",
-      "M8-T02 SettingsRepository 97/100点",
-      "M8-T03 PermissionManager 100/100点（満点）",
-      "106テスト全パス（100%成功率）",
-      "範囲バリデーション・日本語エラーメッセージ完備",
-      "MV Pattern準拠、DIContainer統合完了",
-      "Protocol抽象化によるテスタビリティ確保"
-    ],
-    "milestoneAchieved": "M8 Settings & Preferences 継続中！Phase 5進行（M6→M8、3/14タスク完了・21.4%）"
-  },
-
-  "impl038SessionSummary": {
-    "completedTasks": ["M8-T04"],
-    "skippedTasks": [],
-    "addedTests": 17,
-    "totalTestsNow": 831,
-    "keyDeliverables": [
-      "M8-T04 SettingsService: 統合的な設定管理サービス（186行、17テスト）",
-      "バリデーション付き設定更新（throws型安全エラー）",
-      "lastErrorプロパティでエラー状態記録",
-      "isSavingフラグで同時保存防止",
-      "updateSettings(closure)で一括更新対応",
-      "SettingsViewModel簡易版追加（95行、将来的ラッパー用）",
-      "UserSettings.swift拡張（SettingsError.saveFailed追加）",
-      "DIContainer統合（makeSettingsService追加）"
-    ],
-    "qualityHighlights": [
-      "M8-T04 SettingsService 98/100点（高品質）",
-      "17テスト全パス（100%成功率）",
-      "@Observable @MainActor でSwiftUI自動連携",
+      "M8-T05 PermissionsView 97/100点",
+      "13テスト全パス（100%成功率）",
       "MV Pattern準拠、ViewModelなしでサービス層状態管理",
-      "Protocol-based DI、テスタビリティ確保",
-      "Swift 6 Sendable完全準拠",
-      "エラーハンドリング・バリデーション完備"
+      "アクセシビリティ対応（VoiceOver）",
+      "SF Symbols活用による視覚的フィードバック"
     ],
-    "milestoneAchieved": "M8 Settings & Preferences 継続中！Phase 5進行（4/14タスク完了・28.6%）"
+    "milestoneAchieved": "M8 Settings & Preferences 継続中！Phase 5進行（5/14タスク完了・35.7%）"
   },
 
   "failureTracking": {
@@ -341,16 +296,16 @@
   },
 
   "nextSession": {
-    "recommended_action": "M8-T05 PermissionsViewModel実装から着手（Phase 5継続）",
+    "recommended_action": "M8-T06 SettingsRow/Toggle実装から着手（Phase 5継続）",
     "priority_tasks": [
-      "M8-T05: PermissionsViewModel実装（中優先度、1h）",
       "M8-T06: SettingsRow/Toggle実装（高優先度、1.5h）",
-      "M8-T07: SettingsView実装（高優先度、2h）",
-      "M8-T08: ScanSettingsView実装（中優先度、1.5h）"
+      "M8-T07: SettingsView実装（高優先度、2.5h）",
+      "M8-T08: ScanSettingsView実装（中優先度、1.5h）",
+      "M8-T09: AnalysisSettingsView実装（低優先度、1h）"
     ],
     "alternativePath": "Phase 6開始: M7 Notifications または M9 Monetization",
     "warnings": []
   },
 
-  "notes": "impl-038セッション完了。M8-T04 SettingsService（186行、17テスト、98点）実装完了。統合的な設定管理サービスをバリデーション・エラーハンドリング完備で実装。@Observable @MainActor でSwiftUI自動連携、MV Pattern準拠。lastErrorプロパティでエラー状態記録、isSavingフラグで同時保存防止、updateSettings(closure)で一括更新対応。SettingsViewModel簡易版追加（95行）。UserSettings.swift拡張（SettingsError.saveFailed追加）、DIContainer統合（makeSettingsService追加）。M8 Settings & Preferences進行中（4/14タスク完了、28.6%）。累計77タスク完了（65.8%）、831テスト（全成功）。次回はM8-T05 PermissionsViewModel実装から着手推奨。"
+  "notes": "impl-039セッション完了。M8-T05 PermissionsView（419行、13テスト、97点）実装完了。権限管理画面を写真・通知の両権限に対応して実装。MV Pattern準拠でPermissionManagerサービス層と直接連携。PermissionRow/PermissionStatusBadgeコンポーネントで権限状態を視覚的に表示。M8-T12（PermissionsView実装）はM8-T05と統合。M8 Settings & Preferences進行中（5/14タスク完了、35.7%）。累計78タスク完了（66.7%）、844テスト（全成功）。次回はM8-T06 SettingsRow/Toggle実装から着手推奨。"
 }
