@@ -177,27 +177,8 @@ public struct PhotoAsset: Identifiable, Hashable, Sendable {
 // 注意: StorageInfo は PhotoAccess/Models/StorageInfo.swift で正式に定義されています。
 // ここでの仮定義は削除されました。
 
-/// ユーザー設定（仮定義）
-public struct UserSettings: Sendable, Equatable {
-    public var similarityThreshold: Float
-    public var autoDeleteDays: Int
-    public var notificationsEnabled: Bool
-    public var scanOnLaunch: Bool
-
-    public init(
-        similarityThreshold: Float = 0.85,
-        autoDeleteDays: Int = 30,
-        notificationsEnabled: Bool = true,
-        scanOnLaunch: Bool = false
-    ) {
-        self.similarityThreshold = similarityThreshold
-        self.autoDeleteDays = autoDeleteDays
-        self.notificationsEnabled = notificationsEnabled
-        self.scanOnLaunch = scanOnLaunch
-    }
-
-    public static let `default` = UserSettings()
-}
+// 注意: UserSettings は Models/Settings/UserSettings.swift で正式に定義されています。
+// ここでの仮定義は削除されました。
 
 /// 商品情報（仮定義）
 public struct ProductInfo: Identifiable, Sendable {
@@ -225,9 +206,5 @@ public enum PurchaseResult: Sendable {
     }
 }
 
-/// プレミアムステータス（仮定義）
-public enum PremiumStatus: Sendable, Equatable {
-    case free
-    case premium
-    case expired
-}
+// 注意: PremiumStatus は Models/Settings/UserSettings.swift で正式に定義されています。
+// ここでの仮定義は削除されました。

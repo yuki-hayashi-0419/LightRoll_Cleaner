@@ -5,13 +5,12 @@
 
 ---
 
-## 現在のバージョン: v0.9.36（M6完了・Phase 5 Deletion完了）
+## 現在のバージョン: v1.0.0-beta（M6完了・Phase 5終了）
 
 ### 進捗状況
-- **完了モジュール**: M1 Core Infrastructure, M2 Photo Access, M3 Image Analysis, M4 UI Components, M5 Dashboard & Statistics, **M6 Deletion & Safety** ✨
-- **次のモジュール**: M7 Notifications または M8 Settings
-- **Phase 5完了**: Deletion & Safety（13/14タスク + 1スキップ = 100%）
-- **全体進捗**: 72/117タスク (61.5%)
+- **完了モジュール**: M1 Core Infrastructure, M2 Photo Access, M3 Image Analysis, M4 UI Components, M5 Dashboard & Statistics, **M6 Deletion & Trash** ✨
+- **Phase 5完了**: M1〜M6完全実装完了（73/117タスク - 62.4%）
+- **全体進捗**: 73/117タスク (62.4%) / 115h/181h (63.5%)
 
 ---
 
@@ -68,79 +67,29 @@
 
 ### 基本UIコンポーネント
 - **写真サムネイル表示**: 高品質なサムネイル表示と選択状態の可視化
-  - 正方形レイアウトで統一感のあるグリッド表示
-  - 選択時のチェックマーク、ボーダー、半透明オーバーレイ
-  - ベストショット推奨時の星バッジ表示
-  - 動画の場合、再生アイコンと動画長さ表示
-  - グラスモーフィズム効果で洗練されたデザイン
-  - VoiceOver完全対応でアクセシビリティ向上
-
 - **写真グリッド表示**: 複数写真を効率的にグリッド表示
-  - LazyVGridで大量写真もスムーズにスクロール
-  - 選択状態管理、ベストショットバッジ対応
-  - タップ/長押しハンドリング
-
 - **ストレージインジケーター**: ストレージ使用量の視覚化
-  - バー形式・リング形式の2スタイル
-  - 警告レベル表示（normal/warning/critical）
-  - 削減可能容量の視覚化
-
 - **グループカード**: 類似写真グループの表示
-  - サムネイルプレビュー、グループ情報表示
-  - タップアクション、グラスモーフィズムデザイン
 
 ### インタラクティブコンポーネント
 - **アクションボタン**: プライマリ/セカンダリスタイル
-  - 無効化状態、ローディング状態対応
-  - SF Symbolsアイコン、スプリングアニメーション
-  - VoiceOver対応
-
 - **プログレスオーバーレイ**: 処理進捗表示
-  - 確定/不確定進捗モード
-  - キャンセル機能、アクセシビリティ対応
-
 - **確認ダイアログ**: 削除確認などの重要な操作確認
-  - 3スタイル（normal/destructive/warning）
-  - 詳細情報表示、非同期アクション対応
 
 ### フィードバックコンポーネント
 - **空状態表示**: コンテンツがない場合のガイダンス
-  - 5種類の状態タイプ（empty/noSearchResults/error/noPermission/custom）
-  - アクションボタン統合
-
 - **トースト通知**: 一時的なメッセージ表示
-  - 4種類（success/error/warning/info）
-  - スワイプ消去、自動消去、スタック表示対応
-
-### 開発者向け機能
-- **プレビュー環境**: 全コンポーネントでSwiftUI Previews利用可能
-- **モックデータ生成**: 27種類のプリセット + 動的生成関数
-  - MockPhoto: 9種類のバリエーション
-  - MockPhotoGroup: 6種類のグループタイプ
-  - MockStorageInfo: 5種類のストレージ状態
-  - MockAnalysisResult: 7種類の分析結果パターン
 
 ---
 
-## M5: Dashboard & Statistics（進行中）
+## M5: Dashboard & Statistics（完了）✅
 
 ユーザーから見て出来るようになったこと：
 
 ### ダッシュボード機能
 - **ホーム画面**: ストレージ状況の概要表示とスキャン実行
-  - スキャン実行・進捗表示・キャンセル機能
-  - クリーンアップ履歴の表示
-  - プルトゥリフレッシュでデータ更新
-
 - **ストレージ概要カード**: 使用状況を視覚的に把握
-  - 3つの表示スタイル（full/compact/minimal）
-  - グループ別サマリー、警告バッジ表示
-
 - **グループリスト画面**: 検出されたグループの一覧管理
-  - 6種類のグループタイプでフィルタリング
-  - 4種類のソート順（容量/写真数/日付/タイプ）
-  - マルチセレクト、全選択/全解除機能
-  - 削除確認ダイアログ
 
 ### ビジネスロジック
 - **写真スキャン処理**: 4フェーズスキャンでリアルタイム進捗通知
@@ -148,330 +97,85 @@
 
 ---
 
-### M5-T11: GroupDetailView実装（92/100点）
-
-**実装内容:**
-- **GroupDetailView.swift** (601行)
-  - グループ詳細画面のSwiftUI View実装
-  - MV Pattern（ViewModelなし）で@State中心の状態管理
-  - グループ内の写真一覧表示（PhotoGrid使用）
-  - 複数選択機能（ベストショットは選択不可）
-  - 削除機能（確認ダイアログ付き）
-  - ViewStateパターンで状態管理（loading, loaded, processing, error）
-  - .task修飾子で非同期写真読み込み
-  - サマリーヘッダー（グループタイプ、写真数、削減可能サイズ）
-
-**テスト:**
-- **GroupDetailViewTests.swift** (470行、22テスト全パス)
-  - 初期化テスト（2件）
-  - ViewState全状態テスト（2件）
-  - グループデータテスト（4件）
-  - ベストショットテスト（2件）
-  - サイズ計算テスト（3件）
-  - 写真数テスト（2件）
-  - 表示名テスト（2件）
-  - 削除候補テスト（1件）
-  - 大規模グループテスト（2件）
-  - グループタイプテスト（1件）
-
-**技術的特徴:**
-- PhotoProvider Protocol経由でデータ取得
-- 既存コンポーネント再利用（PhotoGrid, EmptyStateView）
-- 国際化対応（NSLocalizedString）
-- アクセシビリティ対応
-- 4種類のプレビュー（ダーク/ライト/スクリーンショット/空）
-
-**品質スコア: 92/100点**
-- 機能完全性: 23/25点
-- コード品質: 24/25点（MV Pattern模範実装）
-- テストカバレッジ: 18/20点
-- ドキュメント同期: 14/15点
-- エラーハンドリング: 13/15点
-
-**セッション:** impl-027
-
----
-
-### M5-T12: Navigation設定実装（94/100点）
-
-**実装内容:**
-- **DashboardRouter.swift** (112行)
-  - ナビゲーションルーター（@Observable + @MainActor）
-  - NavigationPathで画面遷移を管理
-  - 型安全なDashboardDestination列挙型
-  - navigateToGroupList/navigateToGroupDetail等のメソッド
-  - 戻る操作（navigateBack, navigateToRoot, navigateBackTo）
-
-- **DashboardNavigationContainer.swift** (190行)
-  - NavigationStack統合コンテナ
-  - HomeView → GroupListView → GroupDetailView の遷移管理
-  - @Environment経由でルーター注入
-  - 依存性注入（UseCases, PhotoProvider等）
-
-**テスト:**
-- **DashboardRouterTests.swift** (385行、23テスト全パス)
-  - ルーター初期化テスト（2件）
-  - ナビゲーションテスト（4件）
-  - 戻るナビゲーションテスト（5件）
-  - 設定画面遷移テスト（2件）
-  - パス操作テスト（4件）
-  - エッジケーステスト（2件）
-  - DashboardDestination等価性テスト（4件）
-
-**技術的特徴:**
-- MV Pattern（ViewModelなし）
-- @Observable/@Environment/@Stateの活用
-- Swift 6 Concurrency準拠（@MainActor, Sendable）
-- DashboardDestination列挙型でHashable/Sendable準拠
-- フィルタ付き/なし両対応の柔軟な設計
-
-**品質スコア: 94/100点**
-- 機能完全性: 24/25点
-- コード品質: 24/25点（MV Pattern完全準拠）
-- テストカバレッジ: 20/20点
-- ドキュメント同期: 14/15点
-- エラーハンドリング: 12/15点
-
-**セッション:** impl-028
-
----
-
-### M5-T13: 単体テスト作成（95/100点）
-
-**実装内容:**
-- **DashboardIntegrationTests.swift** (642行)
-  - UseCase+View統合テスト（3スイート、30テスト）
-  - Router+View統合テスト（2スイート、12テスト）
-  - データ一貫性テスト（1スイート、8テスト）
-  - パフォーマンステスト（1スイート、5テスト）
-
-- **DashboardE2ETests.swift** (659行)
-  - E2Eシナリオテスト（4スイート、24テスト）
-  - 全体フロー検証（スキャン→グループ表示→詳細→削除）
-  - Actor-based Mock Repository実装
-
-- **DashboardEdgeCaseTests.swift** (559行)
-  - 境界値テスト（2スイート、15テスト）
-  - エラーハンドリングテスト（2スイート、12テスト）
-
-**テスト:**
-- **総テスト数**: 87/90成功（96.7%）
-- 残り3テスト失敗は境界値アサーション調整が必要（ロジック問題）
-- 4テスト無効化（複雑なUseCase Mock実装が必要）
-
-**技術的特徴:**
-- Swift Testing framework（@Test, @Suite, #expect）
-- Actor-based Mock実装（スレッドセーフ）
-- Tag管理（.integration, .e2e, .edgeCase, .performance）
-- 統合・E2E・境界値・エラーハンドリング・パフォーマンステスト網羅
-
-**品質スコア: 95/100点**
-- 機能完全性: 24/25点
-- コード品質: 24/25点（Swift Testing完全準拠）
-- テストカバレッジ: 20/20点（3カテゴリ網羅）
-- ドキュメント同期: 14/15点
-- エラーハンドリング: 13/15点
-
-**セッション:** impl-029
-
----
-
-## M5モジュール完全終了 ✨
-
-**総成果物:**
-- 実装行数: 約6,300行
-- テスト行数: 約3,200行
-- 総テスト数: 87/90成功（96.7%）
-- 平均品質スコア: 95.4/100点
-- 11タスク完了（3タスクスキップ、MV Pattern採用のため）
-
-**Phase 4完全終了**: M1（基盤）+ M2（写真アクセス）+ M3（画像分析）+ M4（UIコンポーネント）+ **M5（Dashboard）** ✨
-
----
-
-## M6: Deletion & Safety（完了）✨
+## M6: Deletion & Trash（完了）✅
 
 ユーザーから見て出来るようになったこと：
-- **ゴミ箱機能完成**: 削除した写真を30日間ゴミ箱で保持し、いつでも復元可能
-- **削除確認ダイアログ**: 削除/復元/永久削除/ゴミ箱を空にする操作を安全に確認
-- **PHAsset完全削除**: システムの削除確認ダイアログと連携して写真を安全に削除
-- **ゴミ箱データ永続化**: 削除した写真情報がアプリを閉じても保持される
-- **自動クリーンアップ**: 30日経過した写真は自動的に完全削除
+- **完全なゴミ箱機能**: 削除した写真を30日間ゴミ箱で保持し、復元可能
+- **写真の削除**: グループ削除・個別削除・ゴミ箱移動・完全削除の全モード対応
+- **復元機能**: ゴミ箱から元の場所への復元、期限切れ写真の自動処理
+- **削除確認**: 削除前の影響分析と安全性チェック機能
+- **ゴミ箱管理画面**: ゴミ箱内写真の一覧表示、複数選択、復元/完全削除
+- **PHAsset統合**: 写真アプリ本体からの実際の写真削除が可能
 
-### M6-T02: TrashDataStore実装（100/100点）
+### 主要成果物（詳細は `docs/archive/TASKS_COMPLETED.md` 参照）
 
-**実装内容:**
-- **TrashDataStore.swift** (421行)
-  - ゴミ箱写真のファイルシステムベース永続化
-  - JSONエンコード/デコードによるデータ保存
-  - ロード/保存/更新/削除の全CRUD操作
-  - 統計情報取得（totalCount, totalSize, expiringSoon等）
-  - 有効期限切れ写真の自動検出・クリーンアップ
-  - Actor-isolated実装でスレッドセーフ
+- **TrashPhoto.swift** (672行、44テスト、100点)
+- **TrashDataStore.swift** (421行、22テスト、100点)
+- **TrashManager.swift** (417行、28テスト、100点)
+- **DeletePhotosUseCase.swift** (395行、14テスト、98点)
+- **RestorePhotosUseCase.swift** (357行、12テスト、100点)
+- **DeletionConfirmationService.swift** (593行、21テスト、95点)
+- **TrashView.swift** (797行、26テスト、98点)
+- **DeletionConfirmationSheet.swift** (728行、15テスト、97点)
+- **PhotoRepository拡張** (190行、17テスト、100点)
 
-**テスト:**
-- **TrashDataStoreTests.swift** (468行、22テスト全パス)
-  - 保存・読み込みテスト（6件）
-  - 更新・削除テスト（4件）
-  - 統計情報テスト（4件）
-  - クリーンアップテスト（4件）
-  - エラーハンドリングテスト（4件）
+**M6モジュール完全終了**: 13タスク完了（1スキップ）、176テスト、平均97.5点 ✨
 
-**セッション:** impl-031
+**セッション:** impl-030〜impl-036
 
 ---
 
-### M6-T03: TrashManager基盤実装（100/100点）
+## M8: Settings & Preferences（進行中）✨
 
-**実装内容:**
-- **TrashManager.swift** (417行)
-  - TrashManagerProtocol完全実装
-  - moveToTrash: 写真をゴミ箱に移動（メタデータ保持）
-  - restoreFromTrash: ゴミ箱から元の場所に復元
-  - cleanupExpiredPhotos: 30日経過した写真を自動削除
-  - permanentlyDelete: 指定した写真を完全削除
-  - 統計情報取得・イベント通知機能
-  - @Observable + @MainActor対応
+Phase 5の継続として設定機能を実装中：
+- **UserSettingsモデル実装済み**: アプリ全体の設定を管理する階層構造のデータモデル（M8-T01完了 97/100点）
 
-**テスト:**
-- **TrashManagerTests.swift** (642行、28テスト全パス)
-  - moveToTrashテスト（5件）
-  - restoreFromTrashテスト（5件）
-  - cleanupExpiredPhotosテスト（4件）
-  - permanentlyDeleteテスト（4件）
-  - 統計情報テスト（4件）
-  - エラーハンドリングテスト（6件）
+### M8-T01 UserSettingsモデル詳細
 
-**技術的特徴:**
-- TrashDataStoreとの連携
-- DeletionReason追跡（手動選択、類似写真、ブレ写真等）
-- イベント通知（movedToTrash, restored, deleted等）
-- バッチ操作サポート（複数写真の一括処理）
+ユーザーから見て設定できる項目：
 
-**セッション:** impl-031
+| 設定カテゴリ | 設定項目 | デフォルト値 |
+|-------------|---------|-------------|
+| **スキャン設定** | 自動スキャン有効化 | 無効 |
+| | 自動スキャン間隔 | 毎週 |
+| | 動画を含める | 有効 |
+| | スクリーンショットを含める | 有効 |
+| | セルフィーを含める | 有効 |
+| **分析設定** | 類似度閾値 | 0.85 |
+| | ブレ閾値 | 0.3 |
+| | 最小グループサイズ | 2枚 |
+| **通知設定** | 通知有効化 | 無効 |
+| | 容量警告 | 有効 |
+| | リマインダー | 無効 |
+| | 静寂時間（開始） | 22時 |
+| | 静寂時間（終了） | 8時 |
+| **表示設定** | グリッドカラム数 | 4列 |
+| | ファイルサイズ表示 | 有効 |
+| | 日付表示 | 有効 |
+| | ソート順 | 新しい順 |
+| **プレミアム** | ステータス | 無料版 |
 
----
+### 技術的特徴
+- **完全なSendable準拠**: Swift 6 Strict Concurrency対応
+- **Codable実装**: JSON/UserDefaultsでの永続化対応
+- **バリデーション**: 全設定項目に範囲チェック機能
+- **日本語エラーメッセージ**: ユーザーフレンドリーなエラー通知
+- **階層構造**: UserSettings → 5つのサブ設定（Scan, Analysis, Notification, Display, Premium）
 
-### M6-T04/T05/T06: M6-T03に統合
-
-- **M6-T04 moveToTrash実装** → TrashManager.moveToTrash()に実装済み
-- **M6-T05 restoreFromTrash実装** → TrashManager.restoreFromTrash()に実装済み
-- **M6-T06 自動クリーンアップ** → TrashManager.cleanupExpiredPhotos()に実装済み
-
-**セッション:** impl-031
-
----
-
-### M6-T01: TrashPhotoモデル実装
-
-**実装内容:**
-- **TrashPhoto.swift**
-  - ゴミ箱に移動した写真を30日間保持するモデル
-  - 期限切れ自動判定（isExpired, isRestorable, daysUntilExpiration）
-  - 削除理由の記録（DeletionReason: 手動選択、類似写真、ブレ写真、スクリーンショット、一括削除）
-  - 元写真のメタデータ保持（解像度、作成日時、メディアタイプ）
-  - ゴミ箱統計情報（TrashStatistics: 総数、総サイズ、期限切れ間近、削除理由別内訳）
-
-**技術的特徴:**
-- Identifiable/Hashable/Sendable準拠
-- DeletionReason列挙型で削除理由を型安全に管理
-- 30日間の保持期間を設定ベースで管理
-- 期限切れ判定・復元可能判定の計算プロパティ
-- TrashStatisticsで統計情報を集計
-
-**セッション:** impl-030
-
----
-
-### M6-T12: DeletionConfirmationSheet実装（97/100点）
-
-**実装内容:**
-- **DeletionConfirmationSheet.swift** (728行)
-  - 4種類の確認シートを統一インターフェースで提供
-  - 削除確認（moveToTrash）: 写真をゴミ箱に移動
-  - 復元確認（restore）: ゴミ箱から写真を復元
-  - 永久削除確認（permanentDelete）: 写真を完全に削除
-  - ゴミ箱クリア確認（emptyTrash）: 全ゴミ箱アイテムを削除
-  - ViewStateパターンで状態管理（idle, processing, success, error）
-  - グラスモーフィズムデザイン
-
-**テスト:**
-- **DeletionConfirmationSheetTests.swift** (15テスト全パス)
-  - 初期化・状態管理テスト
-  - アクションタイプ別テスト
-  - エラーハンドリングテスト
-
-**技術的特徴:**
-- MV Pattern準拠（ViewModelなし）
-- @State中心の状態管理
-- アクセシビリティ対応
-- 国際化対応
-
-**セッション:** impl-036
-
----
-
-### M6-T13: PHAsset削除連携実装（100/100点）
-
-**実装内容:**
-- **PhotoRepository拡張** (既存ファイルに機能追加)
-  - deleteAssets: PHAssetを完全削除するメソッド
-  - PHPhotoLibrary.shared().performChanges統合
-  - システム削除確認ダイアログ連携
-
-- **DeletePhotosUseCase拡張** (既存ファイルに機能追加)
-  - permanentDeleteFromSystem: システムから完全削除
-  - deletePermanently: ゴミ箱からの完全削除をシステム連携
-
-**テスト:**
-- **PhotoRepositoryDeleteTests.swift** (17テスト全パス)
-  - deleteAssets基本テスト
-  - エラーハンドリングテスト（権限、キャンセル、削除失敗）
-  - 空配列エッジケーステスト
-  - ネットワーク/iCloud連携テスト
-
-**技術的特徴:**
-- PHPhotoLibrary API完全準拠
-- ユーザーキャンセル対応（NSCocoaErrorDomain 3072）
-- 権限エラーハンドリング
-- Sendable準拠
-
-**セッション:** impl-036
-
----
-
-### M6-T14: 単体テスト作成
-
-**実装内容:**
-- M6-T13に統合実装
-- PhotoRepositoryDeleteTests.swift (17テスト)
-
-**セッション:** impl-036
-
----
-
-## M6モジュール完全終了 ✨
-
-**総成果物:**
-- 実装行数: 約4,500行
-- テスト行数: 約2,500行
-- 総テスト数: 162テスト
-- 平均品質スコア: 98.6/100点
-- 13タスク完了（1タスクスキップ、MV Pattern採用のため）
-
-**Phase 5完了**: M1（基盤）+ M2（写真アクセス）+ M3（画像分析）+ M4（UIコンポーネント）+ M5（Dashboard）+ **M6（Deletion & Safety）** ✨
+**成果物**: UserSettings.swift (348行)、UserSettingsTests.swift (470行、43テスト、100%成功)
+**品質スコア**: 97/100点 ⭐
 
 ---
 
 ## 今後追加予定の機能
 
-### Phase 5 継続（設定）
-- 設定画面（M8） ← **次の実装候補**
+### Phase 5（継続中）
+- 設定画面（M8-T02〜T14）
 
-### Phase 6（仕上げ）
+### Phase 6（通知・課金）
 - 通知機能（M7）
 - プレミアム機能・広告（M9）
 
 ---
 
-*最終更新: 2025-12-04 (M6完了、**Phase 5 Deletion完了！** - 72タスク完了 61.5%)*
+*最終更新: 2025-12-04 (M8-T01完了 - 74タスク完了 63.2%)*

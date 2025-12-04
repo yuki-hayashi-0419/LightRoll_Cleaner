@@ -403,13 +403,14 @@ struct MockImplementationTests {
     @Test("MockSettingsRepositoryがプロトコルに準拠している")
     func mockSettingsRepositoryConformance() {
         let mock = MockSettingsRepository()
-        let newSettings = UserSettings(similarityThreshold: 0.9)
+        var newSettings = UserSettings.default
+        newSettings.analysisSettings.similarityThreshold = 0.9
 
         mock.save(newSettings)
         let loaded = mock.load()
 
         #expect(mock.saveCalled == true)
-        #expect(loaded.similarityThreshold == 0.9)
+        #expect(loaded.analysisSettings.similarityThreshold == 0.9)
     }
 
     @Test("MockPurchaseRepositoryがプロトコルに準拠している")

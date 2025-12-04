@@ -149,13 +149,13 @@ struct DIContainerTests {
     func testMockSettingsRepository() async throws {
         let mockRepo = MockSettingsRepository()
         var settings = UserSettings.default
-        settings.similarityThreshold = 0.9
+        settings.analysisSettings.similarityThreshold = 0.9
 
         mockRepo.save(settings)
         #expect(mockRepo.saveCalled == true)
 
         let loadedSettings = mockRepo.load()
-        #expect(loadedSettings.similarityThreshold == 0.9)
+        #expect(loadedSettings.analysisSettings.similarityThreshold == 0.9)
     }
 
     @MainActor
@@ -208,10 +208,10 @@ struct ModelTests {
     func testUserSettingsDefaults() {
         let settings = UserSettings.default
 
-        #expect(settings.similarityThreshold == 0.85)
-        #expect(settings.autoDeleteDays == 30)
-        #expect(settings.notificationsEnabled == true)
-        #expect(settings.scanOnLaunch == false)
+        #expect(settings.analysisSettings.similarityThreshold == 0.85)
+        #expect(settings.notificationSettings.enabled == false)
+        #expect(settings.scanSettings.autoScanEnabled == false)
+        #expect(settings.premiumStatus == .free)
     }
 
     @Test("PhotoGroupが正しく初期化される")
