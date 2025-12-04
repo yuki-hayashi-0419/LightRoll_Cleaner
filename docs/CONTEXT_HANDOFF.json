@@ -192,7 +192,7 @@
   "gitHistory": {
     "commits": [
       {
-        "hash": "pending",
+        "hash": "9654ce4",
         "message": "feat: impl-040完了 - M8-T06 SettingsRow/Toggle実装（1,369行、57テスト、99点）",
         "date": "2025-12-05"
       },
