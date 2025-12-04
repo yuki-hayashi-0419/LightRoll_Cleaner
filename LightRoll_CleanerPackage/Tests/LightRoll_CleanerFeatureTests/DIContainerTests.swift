@@ -95,11 +95,11 @@ struct DIContainerTests {
     }
 
     @MainActor
-    @Test("makeSettingsViewModelがViewModelを生成する")
-    func testMakeSettingsViewModel() async throws {
+    @Test("makeSettingsServiceがSettingsServiceを生成する")
+    func testMakeSettingsService() async throws {
         let container = DIContainer.shared
-        let viewModel = container.makeSettingsViewModel()
-        #expect(viewModel != nil)
+        let service = container.makeSettingsService()
+        #expect(service.settings == .default)
     }
 
     // MARK: - Mock Repository Tests
@@ -152,7 +152,7 @@ struct DIContainerTests {
         settings.analysisSettings.similarityThreshold = 0.9
 
         mockRepo.save(settings)
-        #expect(mockRepo.saveCalled == true)
+        #expect(mockRepo.saveCallCount == 1)
 
         let loadedSettings = mockRepo.load()
         #expect(loadedSettings.analysisSettings.similarityThreshold == 0.9)

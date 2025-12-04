@@ -321,13 +321,36 @@ extension PremiumStatus {
 // MARK: - SettingsError
 
 /// 設定関連のエラー
-public enum SettingsError: LocalizedError, Sendable {
+public enum SettingsError: LocalizedError, Sendable, Equatable {
     case invalidSimilarityThreshold
     case invalidBlurThreshold
     case invalidMinGroupSize
     case invalidGridColumns
     case invalidQuietHours
     case noContentTypeEnabled
+    case saveFailed(String)  // Errorを含むとEquatableに準拠できないため、String化
+
+    /// Errorからの変換用
+    public static func saveFailed(_ error: Error) -> SettingsError {
+        return .saveFailed(error.localizedDescription)
+    }
+
+    /// Equatable準拠
+    public static func == (lhs: SettingsError, rhs: SettingsError) -> Bool {
+        switch (lhs, rhs) {
+        case (.invalidSimilarityThreshold, .invalidSimilarityThreshold),
+             (.invalidBlurThreshold, .invalidBlurThreshold),
+             (.invalidMinGroupSize, .invalidMinGroupSize),
+             (.invalidGridColumns, .invalidGridColumns),
+             (.invalidQuietHours, .invalidQuietHours),
+             (.noContentTypeEnabled, .noContentTypeEnabled):
+            return true
+        case (.saveFailed(let lhsMessage), .saveFailed(let rhsMessage)):
+            return lhsMessage == rhsMessage
+        default:
+            return false
+        }
+    }
 
     public var errorDescription: String? {
         switch self {
@@ -343,6 +366,8 @@ public enum SettingsError: LocalizedError, Sendable {
             return "静寂時間は0〜23の範囲で指定してください。"
         case .noContentTypeEnabled:
             return "少なくとも1つのコンテンツタイプを有効にしてください。"
+        case .saveFailed(let message):
+            return "設定の保存に失敗しました: \(message)"
         }
     }
 }

@@ -9,9 +9,9 @@
 
 ### 進捗状況
 - **完了モジュール**: M1 Core Infrastructure, M2 Photo Access, M3 Image Analysis, M4 UI Components, M5 Dashboard & Statistics, M6 Deletion & Trash
-- **進行中モジュール**: **M8 Settings & Preferences** (3/14タスク完了 - 21.4%) ✨
-- **Phase 5継続中**: M1〜M6完全実装 + M8部分実装（76/117タスク - 65.0%）
-- **全体進捗**: 76/117タスク (65.0%) / 117h/181h (64.6%)
+- **進行中モジュール**: **M8 Settings & Preferences** (4/14タスク完了 - 28.6%) ✨
+- **Phase 5継続中**: M1〜M6完全実装 + M8部分実装（77/117タスク - 65.8%）
+- **全体進捗**: 77/117タスク (65.8%) / 121h/181h (66.9%)
 
 ---
 
@@ -131,6 +131,8 @@
 Phase 5の継続として設定機能を実装中：
 - **UserSettingsモデル実装済み**: アプリ全体の設定を管理する階層構造のデータモデル（M8-T01完了 97/100点）
 - **SettingsRepository実装済み**: UserDefaults永続化層（M8-T02完了 97/100点）
+- **PermissionManager実装済み**: 写真・通知の統合権限管理（M8-T03完了 100/100点）
+- **SettingsService実装済み**: 設定管理サービス・バリデーション・永続化統合（M8-T04完了 98/100点）✨
 
 ### M8-T01 UserSettingsモデル詳細
 
@@ -229,7 +231,65 @@ Phase 5の継続として設定機能を実装中：
 **品質スコア**: 100/100点 ⭐⭐
 **テスト成功率**: 52/52 (100%)
 
-**M8モジュール進捗**: 3/14タスク完了（21.4%）
+### M8-T04 SettingsService詳細
+
+統合的な設定管理サービス：
+
+| 機能 | 説明 |
+|------|------|
+| **設定管理** | UserSettingsの読み込み・保存・更新を統合管理 |
+| **バリデーション** | 各設定カテゴリのバリデーションを自動実行 |
+| **エラーハンドリング** | lastErrorプロパティでエラー状態を記録・通知 |
+| **同時保存防止** | isSavingフラグで保存処理の重複実行を防止 |
+| **個別更新** | スキャン・分析・通知・表示・プレミアムの各設定を個別更新 |
+| **一括更新** | updateSettings(closure)でクロージャベースの一括更新 |
+| **設定リセット** | 全設定をデフォルト値にリセット |
+| **再読み込み** | 外部変更を反映する設定の再読み込み |
+
+#### 技術的特徴
+- **@Observable @MainActor**: SwiftUIとの自動連携、UI更新の最適化
+- **MV Pattern準拠**: ViewModelを使わずサービス層で直接状態管理
+- **Protocol-based DI**: SettingsRepositoryProtocol経由でテスタビリティ確保
+- **Swift 6 Sendable**: 完全な型安全性とスレッドセーフ実装
+- **エラー記録**: lastErrorで最後のエラーを保持、clearError()でクリア
+- **バリデーションエラー**: 範囲外の値を設定前に検出してthrow
+- **同時実行制御**: isSavingフラグで保存処理の競合を防止
+- **日本語エラー**: SettingsError.saveFailed(Error)で詳細なエラー情報
+
+#### APIメソッド
+- `reload()` - 設定を再読み込み
+- `updateScanSettings(_:) throws` - スキャン設定更新（バリデーション付き）
+- `updateAnalysisSettings(_:) throws` - 分析設定更新（バリデーション付き）
+- `updateNotificationSettings(_:) throws` - 通知設定更新（バリデーション付き）
+- `updateDisplaySettings(_:) throws` - 表示設定更新（バリデーション付き）
+- `updatePremiumStatus(_:)` - プレミアムステータス更新
+- `resetToDefaults()` - デフォルトにリセット
+- `updateSettings(_:)` - クロージャベースの一括更新
+- `clearError()` - エラー状態をクリア
+
+#### テストカバレッジ
+- **初期化テスト（2件）**: デフォルト設定、既存設定の読み込み
+- **スキャン設定（2件）**: 正常更新、バリデーションエラー
+- **分析設定（4件）**: 正常更新、類似度・ブレ・グループサイズの各バリデーション
+- **通知設定（2件）**: 正常更新、静寂時間バリデーション
+- **表示設定（2件）**: 正常更新、グリッドカラム数バリデーション
+- **プレミアム（1件）**: ステータス更新
+- **リセット（1件）**: デフォルトリセット
+- **一括更新（1件）**: クロージャベース更新
+- **再読み込み（1件）**: 外部変更反映
+- **エラー処理（1件）**: エラークリア
+
+**成果物**:
+- SettingsService.swift (186行)
+- SettingsServiceTests.swift (407行、17テスト）
+- SettingsViewModel.swift (95行、簡易版）
+- UserSettings.swift 更新（SettingsError.saveFailed追加）
+- DIContainer.swift 更新（makeSettingsService追加）
+
+**品質スコア**: 98/100点 ⭐⭐
+**テスト成功率**: 17/17 (100%)
+
+**M8モジュール進捗**: 4/14タスク完了（28.6%）
 
 ---
 
@@ -244,4 +304,4 @@ Phase 5の継続として設定機能を実装中：
 
 ---
 
-*最終更新: 2025-12-04 (M8-T03完了 - 76タスク完了 65.0%)*
+*最終更新: 2025-12-04 (M8-T04完了 - 77タスク完了 65.8%)*

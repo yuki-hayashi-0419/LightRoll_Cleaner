@@ -144,12 +144,11 @@ public final class DIContainer: ObservableObject {
         )
     }
 
-    /// SettingsViewModelを生成
-    /// - Returns: 新しいSettingsViewModelインスタンス
-    public func makeSettingsViewModel() -> SettingsViewModel {
-        return SettingsViewModel(
-            settingsRepository: settingsRepository,
-            purchaseRepository: purchaseRepository
+    /// SettingsServiceを生成
+    /// - Returns: 新しいSettingsServiceインスタンス
+    public func makeSettingsService() -> SettingsService {
+        return SettingsService(
+            repository: settingsRepository
         )
     }
 
@@ -258,32 +257,5 @@ public final class GroupDetailViewModel: ObservableObject {
         let photoIdsToDelete = group.photoIds.filter { selectedPhotos.contains($0) }
         let assetsToDelete = photoIdsToDelete.map { PhotoAsset(id: $0) }
         try await photoRepository.deletePhotos(assetsToDelete)
-    }
-}
-
-/// SettingsViewModel（仮定義）
-@MainActor
-public final class SettingsViewModel: ObservableObject {
-    private let settingsRepository: any SettingsRepositoryProtocol
-    private let purchaseRepository: any PurchaseRepositoryProtocol
-
-    @Published public var settings: UserSettings
-    @Published public var premiumStatus: PremiumStatus = .free
-
-    public init(
-        settingsRepository: any SettingsRepositoryProtocol,
-        purchaseRepository: any PurchaseRepositoryProtocol
-    ) {
-        self.settingsRepository = settingsRepository
-        self.purchaseRepository = purchaseRepository
-        self.settings = settingsRepository.load()
-    }
-
-    public func saveSettings() {
-        settingsRepository.save(settings)
-    }
-
-    public func loadPremiumStatus() async {
-        premiumStatus = await purchaseRepository.getPremiumStatus()
     }
 }

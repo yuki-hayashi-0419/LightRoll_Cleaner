@@ -409,7 +409,7 @@ struct MockImplementationTests {
         mock.save(newSettings)
         let loaded = mock.load()
 
-        #expect(mock.saveCalled == true)
+        #expect(mock.saveCallCount == 1)
         #expect(loaded.analysisSettings.similarityThreshold == 0.9)
     }
 
