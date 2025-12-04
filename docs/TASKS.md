@@ -125,7 +125,7 @@
 | M8-T01 | UserSettingsモデル | 完了 | 高 | 1.5h | M1-T08 |
 | M8-T02 | SettingsRepository実装 | 完了 | 高 | 1.5h | M8-T01 |
 | M8-T03 | PermissionManager実装 | 完了 | 高 | 2h | M2-T02,M7-T04 |
-| M8-T04 | SettingsViewModel実装 | 未着手 | 高 | 2h | M8-T02 |
+| M8-T04 | SettingsService実装 | **完了** | 高 | 2h | M8-T02 |
 | M8-T05 | PermissionsViewModel | 未着手 | 中 | 1h | M8-T03 |
 | M8-T06 | SettingsRow/Toggle実装 | 未着手 | 高 | 1.5h | M4-T03 |
 | M8-T07 | SettingsView実装 | 未着手 | 高 | 2.5h | M8-T04,M8-T06 |
