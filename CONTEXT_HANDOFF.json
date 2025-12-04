@@ -230,6 +230,11 @@
   "gitHistory": {
     "commits": [
       {
+        "hash": "08d538a",
+        "message": "feat: impl-037完了 - M8-T02 SettingsRepository実装（107行、11テスト、97点）",
+        "date": "2025-12-04"
+      },
+      {
         "hash": "pending",
         "message": "feat: impl-036完了 - M6モジュール完了（DeletionConfirmationSheet + PHAsset削除連携）",
         "date": "2025-12-04"
@@ -237,11 +242,6 @@
       {
         "hash": "1e7ed80",
         "message": "Session: impl-035完了 - M6-T09/T11実装（平均96.5点）",
-        "date": "2025-11-30"
-      },
-      {
-        "hash": "9c3e47a",
-        "message": "feat: impl-035完了 - M6-T11 TrashView実装（98/100点、M6-T10スキップ）",
         "date": "2025-11-30"
       }
     ],
