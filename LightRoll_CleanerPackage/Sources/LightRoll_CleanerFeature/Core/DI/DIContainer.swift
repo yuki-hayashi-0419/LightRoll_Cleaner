@@ -109,8 +109,8 @@ public final class DIContainer: ObservableObject {
         if let factory = settingsRepositoryFactory {
             return factory()
         }
-        // デフォルト実装（StubRepository）
-        return StubSettingsRepository()
+        // デフォルト実装（本番用SettingsRepository）
+        return SettingsRepository()
     }
 
     private func createPurchaseRepository() -> any PurchaseRepositoryProtocol {

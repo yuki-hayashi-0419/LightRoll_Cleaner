@@ -6,9 +6,9 @@
   "projectStatus": {
     "phase": "Phase 5継続中",
     "currentPhase": "M8 Settings & Preferences 進行中",
-    "overallProgress": "63.2%",
-    "nextMilestone": "M8-T02 SettingsRepository実装",
-    "majorAchievement": "M8-T01 UserSettingsモデル完了（348行、43テスト、97/100点）"
+    "overallProgress": "64.1%",
+    "nextMilestone": "M8-T03 PermissionManager実装",
+    "majorAchievement": "M8-T02 SettingsRepository完了（107行、11テスト、97/100点）"
   },
 
   "designStatus": {
@@ -22,19 +22,19 @@
 
   "taskStatus": {
     "total": 117,
-    "completed": 74,
+    "completed": 75,
     "skipped": 4,
     "inProgress": 0,
-    "pending": 39,
-    "completedHours": 114.5,
-    "remainingHours": 61,
-    "lastCompletedTaskId": "M8-T01",
+    "pending": 38,
+    "completedHours": 116,
+    "remainingHours": 59.5,
+    "lastCompletedTaskId": "M8-T02",
     "skippedTasks": ["M5-T05", "M5-T08", "M5-T10", "M6-T10"],
     "nextTaskCandidates": [
-      "M8-T02: SettingsRepository実装（高優先度、1.5h）",
       "M8-T03: PermissionManager実装（高優先度、2h）",
       "M8-T04: SettingsViewModel実装（高優先度、2h）",
-      "M7-T01: NotificationSettingsモデル（中優先度、1h）"
+      "M8-T05: PermissionsViewModel実装（中優先度、1h）",
+      "M7-T01: NotificationSettingsモデル（代替パス、1h）"
     ]
   },
 
@@ -45,7 +45,7 @@
     "M4": ["M4-T01", "M4-T02", "M4-T03", "M4-T04", "M4-T05", "M4-T06", "M4-T07", "M4-T08", "M4-T09", "M4-T10", "M4-T11", "M4-T12", "M4-T13", "M4-T14"],
     "M5": ["M5-T01", "M5-T02", "M5-T03", "M5-T04", "M5-T06", "M5-T07", "M5-T09", "M5-T11", "M5-T12", "M5-T13"],
     "M6": ["M6-T01", "M6-T02", "M6-T03", "M6-T04", "M6-T05", "M6-T06", "M6-T07", "M6-T08", "M6-T09", "M6-T11", "M6-T12", "M6-T13", "M6-T14"],
-    "M8": ["M8-T01"]
+    "M8": ["M8-T01", "M8-T02"]
   },
 
   "moduleProgress": {
@@ -108,11 +108,11 @@
       "status": "未着手"
     },
     "M8_Settings": {
-      "completed": 1,
-      "remaining": 13,
-      "completedHours": 1.5,
-      "remainingHours": 19.5,
-      "percentage": 7.1,
+      "completed": 2,
+      "remaining": 12,
+      "completedHours": 3,
+      "remainingHours": 18,
+      "percentage": 14.3,
       "status": "進行中"
     },
     "M9_Monetization": {
@@ -128,16 +128,16 @@
   "qualityMetrics": {
     "averageScore": 96.8,
     "averagePercentage": 96.8,
-    "totalTests": 751,
-    "testsPassed": 751,
+    "totalTests": 762,
+    "testsPassed": 762,
     "testsFailed": 0,
     "failedTestNote": "全テスト成功",
     "latestScores": {
+      "M8-T02": 97,
       "M8-T01": 97,
       "M6-T14": 100,
       "M6-T13": 100,
-      "M6-T12": 97,
-      "M6-T11": 98
+      "M6-T12": 97
     }
   },
 
@@ -215,8 +215,8 @@
       "modules": ["M6", "M8"],
       "tasks": "M6-T01〜M6-T14, M8-T01〜M8-14",
       "status": "M6完了・M8進行中",
-      "progress": "14/28タスク完了（50.0%）",
-      "note": "M6 Deletion & Safety完了。M8 Settings開始（M8-T01完了 97/100点）"
+      "progress": "15/28タスク完了（53.6%）",
+      "note": "M6 Deletion & Safety完了。M8 Settings進行中（M8-T01/T02完了、各97点）"
     },
     {
       "phase": 6,
@@ -249,17 +249,17 @@
   },
 
   "nextSessionRecommendations": [
-    "M8-T02: SettingsRepository実装（設定の永続化・高優先度）",
-    "M8-T03: PermissionManager実装（権限管理・高優先度）",
-    "M8-T04: SettingsViewModel実装（設定画面ViewModel・高優先度）",
-    "M7-T01: NotificationSettingsモデル（代替パス・Phase 6開始）"
+    "M8-T03: PermissionManager実装（権限管理・高優先度・2h）",
+    "M8-T04: SettingsViewModel実装（設定画面ViewModel・高優先度・2h）",
+    "M8-T05: PermissionsViewModel実装（権限画面VM・中優先度・1h）",
+    "M7-T01: NotificationSettingsモデル（代替パス・Phase 6開始・1h）"
   ],
 
   "resumeInstructions": {
-    "step1": "M8-T02 SettingsRepository実装から着手",
-    "step2": "UserSettings永続化層を実装（UserDefaults/Codable使用）",
+    "step1": "M8-T03 PermissionManager実装から着手",
+    "step2": "PHPhotoLibrary/UNUserNotificationCenter権限管理を実装",
     "step3": "推奨: Phase 5継続 - M8 Settings & Preferences",
-    "context": "Phase 5 M6完了、M8開始。74/117タスク（63.2%）完了。M8-T01 UserSettingsモデル完了（348行、43テスト、97点）。"
+    "context": "Phase 5 M6完了、M8進行中。75/117タスク（64.1%）完了。M8-T01 UserSettings（348行、43テスト、97点）、M8-T02 SettingsRepository（107行、11テスト、97点）完了。"
   },
 
   "impl036SessionSummary": {
@@ -282,23 +282,25 @@
   },
 
   "impl037SessionSummary": {
-    "completedTasks": ["M8-T01"],
+    "completedTasks": ["M8-T01", "M8-T02"],
     "skippedTasks": [],
-    "addedTests": 43,
-    "totalTestsNow": 751,
+    "addedTests": 54,
+    "totalTestsNow": 762,
     "keyDeliverables": [
       "M8-T01 UserSettingsモデル: 階層構造の設定モデル（348行、43テスト）",
+      "M8-T02 SettingsRepository: UserDefaults永続化層（107行、11テスト）",
       "5つの設定カテゴリ実装（Scan, Analysis, Notification, Display, Premium）",
       "完全なSendable/Codable準拠、Swift 6対応",
-      "DIContainerTests/ProtocolTests修正（レガシーAPI移行）"
+      "グレースフルなエラーハンドリング（デコード失敗時のデフォルト値返却）"
     ],
     "qualityHighlights": [
       "M8-T01 UserSettings 97/100点",
-      "43テスト全パス（100%成功率）",
+      "M8-T02 SettingsRepository 97/100点",
+      "54テスト全パス（100%成功率）",
       "範囲バリデーション・日本語エラーメッセージ完備",
-      "MV Pattern準拠、階層構造の設定管理"
+      "MV Pattern準拠、DIContainer統合完了"
     ],
-    "milestoneAchieved": "M8 Settings & Preferences 開始！Phase 5継続（M6→M8）"
+    "milestoneAchieved": "M8 Settings & Preferences 開始！Phase 5継続（M6→M8、2/14タスク完了）"
   },
 
   "failureTracking": {
@@ -308,16 +310,16 @@
   },
 
   "nextSession": {
-    "recommended_action": "M8-T02 SettingsRepository実装から着手（Phase 5継続）",
+    "recommended_action": "M8-T03 PermissionManager実装から着手（Phase 5継続）",
     "priority_tasks": [
-      "M8-T02: SettingsRepository実装（1.5h）",
       "M8-T03: PermissionManager実装（2h）",
       "M8-T04: SettingsViewModel実装（2h）",
-      "M8-T05: SettingsView実装（2h）"
+      "M8-T05: PermissionsViewModel実装（1h）",
+      "M8-T06: SettingsRow/Toggle実装（1.5h）"
     ],
     "alternativePath": "Phase 6開始: M7 Notifications または M9 Monetization",
     "warnings": []
   },
 
-  "notes": "impl-037セッション完了。M8-T01 UserSettingsモデル実装（348行、43テスト、97/100点）。階層構造の設定モデル（Scan, Analysis, Notification, Display, Premium）を完全なSendable/Codable準拠で実装。DIContainerTests/ProtocolTests修正完了。M8 Settings & Preferences開始（Phase 5継続）。累計74タスク完了（63.2%）、751テスト（全成功）。次回はM8-T02 SettingsRepository実装から着手推奨。"
+  "notes": "impl-037セッション完了。M8-T01 UserSettingsモデル（348行、43テスト、97点）、M8-T02 SettingsRepository（107行、11テスト、97点）実装完了。階層構造の設定モデル（Scan, Analysis, Notification, Display, Premium）をSendable/Codable準拠で実装。UserDefaults永続化層とグレースフルなエラーハンドリング実装。DIContainer統合完了。M8 Settings & Preferences進行中（2/14タスク完了、14.3%）。累計75タスク完了（64.1%）、762テスト（全成功）。次回はM8-T03 PermissionManager実装から着手推奨。"
 }
