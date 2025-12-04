@@ -145,13 +145,14 @@
   },
 
   "contextOptimization": {
-    "progressEntries": 11,
+    "progressEntries": 10,
     "maxProgressEntries": 10,
-    "archivedTasks": 60,
-    "lastOptimization": "2025-12-04",
-    "optimizationSession": "impl-036",
-    "nextOptimizationTrigger": "M8完了時にアーカイブ推奨（エントリ数超過）",
-    "contextHealth": "良好（M6完了、M8進行中50%）"
+    "archivedTasks": 62,
+    "lastOptimization": "2025-12-05",
+    "optimizationSession": "impl-042-archive",
+    "archivedEntries": ["impl-030", "impl-031"],
+    "nextOptimizationTrigger": "10タスク完了後 または M8完了時",
+    "contextHealth": "最適化完了（上限10エントリ）"
   },
 
   "archivedModules": ["M1", "M2", "M3", "M4", "M5", "M6"],
