@@ -264,19 +264,18 @@ public struct SettingsView: View {
 
     /// 通知セクション
     private var notificationSection: some View {
-        Section {
-            @Bindable var service = settingsService
-
+        @Bindable var service = settingsService
+        return Section {
             SettingsToggle(
                 icon: "bell",
                 iconColor: .orange,
                 title: "通知を許可",
                 subtitle: "アプリからの通知を受け取る",
                 isOn: .init(
-                    get: { service.settings.notificationSettings.enabled },
+                    get: { service.settings.notificationSettings.isEnabled },
                     set: { newValue in
                         var newSettings = service.settings.notificationSettings
-                        newSettings.enabled = newValue
+                        newSettings.isEnabled = newValue
                         try? service.updateNotificationSettings(newSettings)
                     }
                 )
@@ -288,14 +287,14 @@ public struct SettingsView: View {
                 title: "容量警告",
                 subtitle: "ストレージ容量が不足したときに通知",
                 isOn: .init(
-                    get: { service.settings.notificationSettings.capacityWarning },
+                    get: { service.settings.notificationSettings.storageAlertEnabled },
                     set: { newValue in
                         var newSettings = service.settings.notificationSettings
-                        newSettings.capacityWarning = newValue
+                        newSettings.storageAlertEnabled = newValue
                         try? service.updateNotificationSettings(newSettings)
                     }
                 ),
-                disabled: !service.settings.notificationSettings.enabled
+                disabled: !service.settings.notificationSettings.isEnabled
             )
 
             SettingsToggle(
@@ -311,7 +310,7 @@ public struct SettingsView: View {
                         try? service.updateNotificationSettings(newSettings)
                     }
                 ),
-                disabled: !service.settings.notificationSettings.enabled
+                disabled: !service.settings.notificationSettings.isEnabled
             )
 
             HStack {
@@ -327,8 +326,8 @@ public struct SettingsView: View {
                     .foregroundColor(.secondary)
                     .font(.caption)
             }
-            .disabled(!service.settings.notificationSettings.enabled)
-            .opacity(service.settings.notificationSettings.enabled ? 1.0 : 0.5)
+            .disabled(!service.settings.notificationSettings.isEnabled)
+            .opacity(service.settings.notificationSettings.isEnabled ? 1.0 : 0.5)
         } header: {
             Text("通知")
         }
@@ -556,14 +555,17 @@ public struct SettingsView: View {
 }
 
 #Preview("自動スキャン有効") {
-    let service = SettingsService()
-    var settings = service.settings
-    settings.scanSettings.autoScanEnabled = true
-    settings.notificationSettings.enabled = true
-    try? service.updateScanSettings(settings.scanSettings)
-    try? service.updateNotificationSettings(settings.notificationSettings)
+    @Previewable @State var service: SettingsService = {
+        let s = SettingsService()
+        var settings = s.settings
+        settings.scanSettings.autoScanEnabled = true
+        settings.notificationSettings.isEnabled = true
+        try? s.updateScanSettings(settings.scanSettings)
+        try? s.updateNotificationSettings(settings.notificationSettings)
+        return s
+    }()
 
-    return SettingsView()
+    SettingsView()
         .environment(service)
         .environment(PermissionManager())
 }

@@ -47,8 +47,8 @@ struct SettingsRepositoryTests {
                 minGroupSize: 5
             ),
             notificationSettings: NotificationSettings(
-                enabled: true,
-                capacityWarning: false,
+                isEnabled: true,
+                storageAlertEnabled: false,
                 reminderEnabled: true,
                 quietHoursStart: 20,
                 quietHoursEnd: 6
@@ -112,8 +112,8 @@ struct SettingsRepositoryTests {
         #expect(loadedSettings.analysisSettings.blurThreshold == 0.5)
         #expect(loadedSettings.analysisSettings.minGroupSize == 5)
 
-        #expect(loadedSettings.notificationSettings.enabled == true)
-        #expect(loadedSettings.notificationSettings.capacityWarning == false)
+        #expect(loadedSettings.notificationSettings.isEnabled == true)
+        #expect(loadedSettings.notificationSettings.storageAlertEnabled == false)
         #expect(loadedSettings.notificationSettings.reminderEnabled == true)
         #expect(loadedSettings.notificationSettings.quietHoursStart == 20)
         #expect(loadedSettings.notificationSettings.quietHoursEnd == 6)
@@ -246,8 +246,8 @@ struct SettingsRepositoryTests {
                 minGroupSize: 10
             ),
             notificationSettings: NotificationSettings(
-                enabled: true,
-                capacityWarning: true,
+                isEnabled: true,
+                storageAlertEnabled: true,
                 reminderEnabled: true,
                 quietHoursStart: 23,
                 quietHoursEnd: 7
@@ -289,8 +289,8 @@ struct SettingsRepositoryTests {
                 minGroupSize: 2           // 最小値
             ),
             notificationSettings: NotificationSettings(
-                enabled: true,
-                capacityWarning: true,
+                isEnabled: true,
+                storageAlertEnabled: true,
                 reminderEnabled: true,
                 quietHoursStart: 0,  // 最小値
                 quietHoursEnd: 23    // 最大値

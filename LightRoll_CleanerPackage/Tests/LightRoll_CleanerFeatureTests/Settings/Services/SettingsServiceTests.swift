@@ -192,8 +192,8 @@ struct SettingsServiceTests {
         let sut = SettingsService(repository: mockRepo)
 
         let newNotificationSettings = NotificationSettings(
-            enabled: true,
-            capacityWarning: false,
+            isEnabled: true,
+            storageAlertEnabled: false,
             reminderEnabled: true,
             quietHoursStart: 21,
             quietHoursEnd: 7
@@ -214,8 +214,8 @@ struct SettingsServiceTests {
         let sut = SettingsService(repository: mockRepo)
 
         let invalidNotificationSettings = NotificationSettings(
-            enabled: true,
-            capacityWarning: true,
+            isEnabled: true,
+            storageAlertEnabled: true,
             reminderEnabled: false,
             quietHoursStart: 25,  // 24以上 → エラー
             quietHoursEnd: 8

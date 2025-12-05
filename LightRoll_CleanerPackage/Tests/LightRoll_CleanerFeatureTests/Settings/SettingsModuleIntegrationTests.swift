@@ -316,7 +316,7 @@ struct SettingsModuleIntegrationTests {
         try service.updateAnalysisSettings(analysisSettings)
 
         var notificationSettings = NotificationSettings.default
-        notificationSettings.enabled = false
+        notificationSettings.isEnabled = false
         notificationSettings.reminderEnabled = false
         try service.updateNotificationSettings(notificationSettings)
 
@@ -328,7 +328,7 @@ struct SettingsModuleIntegrationTests {
         let service2 = SettingsService(repository: repository)
         #expect(service2.settings.scanSettings.includeVideos == false)
         #expect(service2.settings.analysisSettings.similarityThreshold == 0.92)
-        #expect(service2.settings.notificationSettings.enabled == false)
+        #expect(service2.settings.notificationSettings.isEnabled == false)
         #expect(service2.settings.displaySettings.gridColumns == 4)
     }
 
@@ -513,14 +513,14 @@ struct SettingsModuleIntegrationTests {
         try service.updateScanSettings(scanSettings)
 
         var notificationSettings = NotificationSettings.default
-        notificationSettings.enabled = true
+        notificationSettings.isEnabled = true
         notificationSettings.reminderEnabled = true
         try service.updateNotificationSettings(notificationSettings)
 
         // 設定が保存されたことを確認
         let newService = SettingsService(repository: repository)
         #expect(newService.settings.scanSettings.autoScanEnabled == true)
-        #expect(newService.settings.notificationSettings.enabled == true)
+        #expect(newService.settings.notificationSettings.isEnabled == true)
     }
 
     @Test("設定カスタマイズフルフロー")
@@ -543,8 +543,8 @@ struct SettingsModuleIntegrationTests {
 
         // 通知設定をカスタマイズ
         var notificationSettings = NotificationSettings.default
-        notificationSettings.enabled = true
-        notificationSettings.capacityWarning = true
+        notificationSettings.isEnabled = true
+        notificationSettings.storageAlertEnabled = true
         notificationSettings.reminderEnabled = true
         try service.updateNotificationSettings(notificationSettings)
 
@@ -560,7 +560,7 @@ struct SettingsModuleIntegrationTests {
         #expect(newService.settings.scanSettings.autoScanInterval == .daily)
         #expect(newService.settings.analysisSettings.similarityThreshold == 0.88)
         #expect(newService.settings.analysisSettings.blurThreshold == 0.6)
-        #expect(newService.settings.notificationSettings.enabled == true)
+        #expect(newService.settings.notificationSettings.isEnabled == true)
         #expect(newService.settings.displaySettings.gridColumns == 4)
     }
 
@@ -604,7 +604,7 @@ struct SettingsModuleIntegrationTests {
         try service.updateAnalysisSettings(analysisSettings)
 
         var notificationSettings = NotificationSettings.default
-        notificationSettings.enabled = false
+        notificationSettings.isEnabled = false
         notificationSettings.reminderEnabled = false
         try service.updateNotificationSettings(notificationSettings)
 
@@ -619,7 +619,7 @@ struct SettingsModuleIntegrationTests {
         #expect(newService.settings.scanSettings.autoScanEnabled == true)
         #expect(newService.settings.scanSettings.includeVideos == false)
         #expect(newService.settings.analysisSettings.similarityThreshold == 0.95)
-        #expect(newService.settings.notificationSettings.enabled == false)
+        #expect(newService.settings.notificationSettings.isEnabled == false)
         #expect(newService.settings.displaySettings.sortOrder == .sizeDescending)
         #expect(newService.settings.displaySettings.gridColumns == 5)
     }

@@ -209,7 +209,7 @@ struct ModelTests {
         let settings = UserSettings.default
 
         #expect(settings.analysisSettings.similarityThreshold == 0.85)
-        #expect(settings.notificationSettings.enabled == false)
+        #expect(settings.notificationSettings.isEnabled == true)
         #expect(settings.scanSettings.autoScanEnabled == false)
         #expect(settings.premiumStatus == .free)
     }

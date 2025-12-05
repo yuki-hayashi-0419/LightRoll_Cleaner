@@ -175,14 +175,14 @@ struct SettingsViewTests {
         // Given
         let service = SettingsService()
         var notificationSettings = service.settings.notificationSettings
-        let initialState = notificationSettings.enabled
+        let initialState = notificationSettings.isEnabled
 
         // When
-        notificationSettings.enabled.toggle()
+        notificationSettings.isEnabled.toggle()
         try service.updateNotificationSettings(notificationSettings)
 
         // Then
-        #expect(service.settings.notificationSettings.enabled == !initialState)
+        #expect(service.settings.notificationSettings.isEnabled == !initialState)
     }
 
     @Test("容量警告トグルが正しく動作する")
@@ -192,11 +192,11 @@ struct SettingsViewTests {
         var notificationSettings = service.settings.notificationSettings
 
         // When
-        notificationSettings.capacityWarning = false
+        notificationSettings.storageAlertEnabled = false
         try service.updateNotificationSettings(notificationSettings)
 
         // Then
-        #expect(service.settings.notificationSettings.capacityWarning == false)
+        #expect(service.settings.notificationSettings.storageAlertEnabled == false)
     }
 
     @Test("リマインダートグルが正しく動作する")
@@ -334,13 +334,13 @@ struct SettingsViewTests {
 
         // And: 通知設定を更新
         var notificationSettings = service.settings.notificationSettings
-        notificationSettings.enabled = true
+        notificationSettings.isEnabled = true
         try service.updateNotificationSettings(notificationSettings)
 
         // Then: すべての設定が正しく更新される
         #expect(service.settings.scanSettings.autoScanEnabled == true)
         #expect(service.settings.analysisSettings.minGroupSize == 3)
-        #expect(service.settings.notificationSettings.enabled == true)
+        #expect(service.settings.notificationSettings.isEnabled == true)
     }
 
     @Test("設定の永続化と読み込みが動作する")
@@ -494,7 +494,7 @@ struct SettingsViewTests {
         try service.updateAnalysisSettings(analysisSettings)
 
         var notificationSettings = service.settings.notificationSettings
-        notificationSettings.enabled = true
+        notificationSettings.isEnabled = true
         try service.updateNotificationSettings(notificationSettings)
 
         var displaySettings = service.settings.displaySettings
@@ -510,7 +510,7 @@ struct SettingsViewTests {
         #expect(service.settings.scanSettings.autoScanInterval == defaults.scanSettings.autoScanInterval)
         #expect(service.settings.analysisSettings.similarityThreshold == defaults.analysisSettings.similarityThreshold)
         #expect(service.settings.analysisSettings.minGroupSize == defaults.analysisSettings.minGroupSize)
-        #expect(service.settings.notificationSettings.enabled == defaults.notificationSettings.enabled)
+        #expect(service.settings.notificationSettings.isEnabled == defaults.notificationSettings.isEnabled)
         #expect(service.settings.displaySettings.gridColumns == defaults.displaySettings.gridColumns)
     }
 
@@ -535,7 +535,7 @@ struct SettingsViewTests {
         try service1.updateAnalysisSettings(analysisSettings)
 
         var notificationSettings = service1.settings.notificationSettings
-        notificationSettings.enabled = true
+        notificationSettings.isEnabled = true
         notificationSettings.reminderEnabled = true
         try service1.updateNotificationSettings(notificationSettings)
 
@@ -550,7 +550,7 @@ struct SettingsViewTests {
         #expect(service2.settings.scanSettings.includeVideos == false)
         #expect(service2.settings.analysisSettings.similarityThreshold == 0.75)
         #expect(service2.settings.analysisSettings.minGroupSize == 4)
-        #expect(service2.settings.notificationSettings.enabled == true)
+        #expect(service2.settings.notificationSettings.isEnabled == true)
         #expect(service2.settings.notificationSettings.reminderEnabled == true)
         #expect(service2.settings.displaySettings.gridColumns == 5)
         #expect(service2.settings.displaySettings.sortOrder == .sizeDescending)

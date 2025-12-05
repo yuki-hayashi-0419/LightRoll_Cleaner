@@ -92,7 +92,9 @@ public final class SettingsService: Sendable {
     /// - Throws: SettingsError（バリデーション失敗時）
     public func updateNotificationSettings(_ notificationSettings: NotificationSettings) throws {
         // バリデーション
-        try notificationSettings.validate()
+        guard notificationSettings.isValid else {
+            throw SettingsError.invalidQuietHours
+        }
 
         // 設定を更新
         var newSettings = settings

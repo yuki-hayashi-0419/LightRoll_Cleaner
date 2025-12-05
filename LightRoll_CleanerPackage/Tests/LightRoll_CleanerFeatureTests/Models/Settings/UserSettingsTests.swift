@@ -21,7 +21,7 @@ func userSettingsDefaultValues() {
     #expect(settings.premiumStatus == .free)
     #expect(settings.scanSettings.autoScanEnabled == false)
     #expect(settings.analysisSettings.similarityThreshold == 0.85)
-    #expect(settings.notificationSettings.enabled == false)
+    #expect(settings.notificationSettings.isEnabled == false)
     #expect(settings.displaySettings.gridColumns == 4)
 }
 
@@ -201,71 +201,7 @@ func analysisSettingsCodable() throws {
 
 // MARK: - NotificationSettings Tests
 
-@Test("NotificationSettings: デフォルト値が正しい")
-func notificationSettingsDefaults() {
-    let settings = NotificationSettings.default
-
-    #expect(settings.enabled == false)
-    #expect(settings.capacityWarning == true)
-    #expect(settings.reminderEnabled == false)
-    #expect(settings.quietHoursStart == 22)
-    #expect(settings.quietHoursEnd == 8)
-}
-
-@Test("NotificationSettings: バリデーション - 正常系")
-func notificationSettingsValidation() throws {
-    let settings = NotificationSettings.default
-    try settings.validate()
-}
-
-@Test("NotificationSettings: バリデーション - 静寂時間の開始が範囲外",
-      arguments: [-1, 24, 25])
-func notificationSettingsInvalidQuietStart(hour: Int) {
-    var settings = NotificationSettings.default
-    settings.quietHoursStart = hour
-
-    #expect(throws: SettingsError.invalidQuietHours) {
-        try settings.validate()
-    }
-}
-
-@Test("NotificationSettings: バリデーション - 静寂時間の終了が範囲外",
-      arguments: [-1, 24, 25])
-func notificationSettingsInvalidQuietEnd(hour: Int) {
-    var settings = NotificationSettings.default
-    settings.quietHoursEnd = hour
-
-    #expect(throws: SettingsError.invalidQuietHours) {
-        try settings.validate()
-    }
-}
-
-@Test("NotificationSettings: isQuietHours - 静寂時間内（22-8時）")
-func notificationSettingsIsQuietHours() {
-    var settings = NotificationSettings.default
-    settings.quietHoursStart = 22
-    settings.quietHoursEnd = 8
-
-    // 現在時刻に依存するため、固定値でテスト
-    // 実際のアプリでは時刻をモックできる設計が推奨される
-
-    // 例: 23時は静寂時間内
-    let calendar = Calendar.current
-    let components = DateComponents(hour: 23, minute: 0)
-    if let date = calendar.date(from: components) {
-        let hour = calendar.component(.hour, from: date)
-        let isQuiet = (hour >= settings.quietHoursStart || hour < settings.quietHoursEnd)
-        #expect(isQuiet == true)
-    }
-}
-
-@Test("NotificationSettings: Codableが機能する")
-func notificationSettingsCodable() throws {
-    let original = NotificationSettings.default
-    let encoded = try JSONEncoder().encode(original)
-    let decoded = try JSONDecoder().decode(NotificationSettings.self, from: encoded)
-    #expect(original == decoded)
-}
+// NotificationSettingsのテストはNotificationSettingsTests.swiftに移動しました
 
 // MARK: - DisplaySettings Tests
 
@@ -439,7 +375,7 @@ func integrationUserSettingsFullCodable() throws {
     settings.scanSettings.autoScanEnabled = true
     settings.scanSettings.autoScanInterval = .daily
     settings.analysisSettings.similarityThreshold = 0.9
-    settings.notificationSettings.enabled = true
+    settings.notificationSettings.isEnabled = true
     settings.displaySettings.gridColumns = 3
     settings.displaySettings.sortOrder = .sizeDescending
     settings.premiumStatus = .premium
@@ -452,7 +388,7 @@ func integrationUserSettingsFullCodable() throws {
     #expect(decoded.scanSettings.autoScanEnabled == true)
     #expect(decoded.scanSettings.autoScanInterval == .daily)
     #expect(decoded.analysisSettings.similarityThreshold == 0.9)
-    #expect(decoded.notificationSettings.enabled == true)
+    #expect(decoded.notificationSettings.isEnabled == true)
     #expect(decoded.displaySettings.gridColumns == 3)
     #expect(decoded.displaySettings.sortOrder == .sizeDescending)
     #expect(decoded.premiumStatus == .premium)
@@ -465,6 +401,7 @@ func integrationAllValidations() throws {
     // すべてのバリデーションが成功することを確認
     try settings.scanSettings.validate()
     try settings.analysisSettings.validate()
-    try settings.notificationSettings.validate()
+    // NotificationSettings.isValidを使用してバリデーション
+    #expect(settings.notificationSettings.isValid == true)
     try settings.displaySettings.validate()
 }

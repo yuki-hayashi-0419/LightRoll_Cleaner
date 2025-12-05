@@ -139,66 +139,7 @@ extension AnalysisSettings {
 }
 
 // MARK: - NotificationSettings
-
-/// 通知に関する設定
-public struct NotificationSettings: Codable, Sendable, Equatable {
-    public var enabled: Bool
-    public var capacityWarning: Bool
-    public var reminderEnabled: Bool
-    public var quietHoursStart: Int
-    public var quietHoursEnd: Int
-
-    public init(
-        enabled: Bool = false,
-        capacityWarning: Bool = true,
-        reminderEnabled: Bool = false,
-        quietHoursStart: Int = 22,
-        quietHoursEnd: Int = 8
-    ) {
-        self.enabled = enabled
-        self.capacityWarning = capacityWarning
-        self.reminderEnabled = reminderEnabled
-        self.quietHoursStart = quietHoursStart
-        self.quietHoursEnd = quietHoursEnd
-    }
-}
-
-extension NotificationSettings {
-    /// デフォルト設定
-    public static let `default` = NotificationSettings(
-        enabled: false,
-        capacityWarning: true,
-        reminderEnabled: false,
-        quietHoursStart: 22,
-        quietHoursEnd: 8
-    )
-
-    /// 現在時刻が静寂時間内かどうか
-    public var isQuietHours: Bool {
-        let now = Calendar.current.component(.hour, from: Date())
-
-        if quietHoursStart < quietHoursEnd {
-            // 通常のケース（例: 22時〜8時 → 22-23, 0-7）
-            return now >= quietHoursStart || now < quietHoursEnd
-        } else {
-            // 日をまたがないケース（例: 8時〜22時）
-            return now >= quietHoursStart && now < quietHoursEnd
-        }
-    }
-
-    /// バリデーション
-    public func validate() throws {
-        // 静寂時間の開始時刻検証（0〜23）
-        guard quietHoursStart >= 0 && quietHoursStart < 24 else {
-            throw SettingsError.invalidQuietHours
-        }
-
-        // 静寂時間の終了時刻検証（0〜23）
-        guard quietHoursEnd >= 0 && quietHoursEnd < 24 else {
-            throw SettingsError.invalidQuietHours
-        }
-    }
-}
+// NotificationSettingsは Notifications/Models/NotificationSettings.swift で定義されています
 
 // MARK: - DisplaySettings
 
