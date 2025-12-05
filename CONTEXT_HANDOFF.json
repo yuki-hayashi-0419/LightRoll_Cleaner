@@ -233,6 +233,11 @@
   "gitHistory": {
     "commits": [
       {
+        "hash": "6f206f1",
+        "message": "feat: impl-044完了 - M8-T11, T13, T14実装（3タスク、1,311行、72テスト、平均98.3点）",
+        "date": "2025-12-06"
+      },
+      {
         "hash": "05ab1d9",
         "message": "chore: CONTEXT_HANDOFF.json更新（impl-043セッション完了、git hash記録）",
         "date": "2025-12-05"
@@ -241,21 +246,16 @@
         "hash": "c719112",
         "message": "feat: impl-043完了 - M8-T09 AnalysisSettingsView実装（1,124行、39テスト、97点）",
         "date": "2025-12-05"
-      },
-      {
-        "hash": "ed6305e",
-        "message": "feat: impl-042完了 - M8-T08 ScanSettingsView実装（938行、30テスト、93点）",
-        "date": "2025-12-05"
       }
     ],
     "branch": "main"
   },
 
   "nextSessionRecommendations": [
-    "M8-T10: NotificationSettingsView実装（通知設定画面・中優先度・1.5h）",
-    "M8-T11: DisplaySettingsView実装（表示設定画面・低優先度・1h）",
-    "M8-T13: AboutView実装（アプリ情報画面・低優先度・1h）",
-    "M8-T14: 単体テスト作成（M8モジュール統合テスト・中優先度・1.5h）"
+    "M7-T01: NotificationSettingsモデル実装（通知設定モデル・高優先度・1.5h・Phase 6開始）",
+    "M8-T10: NotificationSettingsView実装（通知設定画面・中優先度・1.5h・M7-T01依存）",
+    "M7-T02: Info.plist権限設定（通知権限設定・中優先度・0.5h）",
+    "M7-T03: NotificationManager基盤（通知管理サービス・高優先度・2h）"
   ],
 
   "resumeInstructions": {
