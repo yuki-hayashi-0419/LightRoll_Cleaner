@@ -236,7 +236,7 @@
   "gitHistory": {
     "commits": [
       {
-        "hash": "未記録",
+        "hash": "2489c91",
         "message": "feat: impl-045完了 - M7-T01 NotificationSettings実装（506行、28テスト、100点）",
         "date": "2025-12-06"
       },
