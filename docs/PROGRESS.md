@@ -5,6 +5,59 @@
 
 ---
 
+## 2025-12-06 | セッション: impl-044（M8-T11, T13, T14完了 - DisplaySettings, About, 統合テスト）
+
+### 完了タスク
+- M8-T11: DisplaySettingsView実装（321行、23テスト、100/100点）
+- M8-T13: AboutView実装（329行、24テスト、100/100点）
+- M8-T14: Settings Module Integration Tests（661行、25テスト、95/100点）
+
+### 成果
+- **DisplaySettingsView完成**: 表示設定画面の実装（321行）
+  - グリッド列数調整（Stepper: 2〜6列）
+  - ファイルサイズ表示トグル
+  - 撮影日表示トグル
+  - 並び順選択（Picker: 新しい順/古い順/容量大きい順/小さい順）
+  - バリデーション（2〜6列範囲チェック）
+  - 4種類のプレビュー（デフォルト、最小列数、最大列数、ダークモード）
+  - 全23テスト合格（100%成功率）
+
+- **AboutView完成**: アプリ情報画面の実装（329行）
+  - アプリアイコン、名前、バージョン情報（Bundle.main.infoDictionary）
+  - 開発者情報セクション（名前、ウェブサイト、サポートメール）
+  - 法的情報セクション（プライバシーポリシー、利用規約、ライセンス）
+  - 著作権フッター
+  - 全24テスト合格（100%成功率）
+
+- **SettingsModuleIntegrationTests完成**: M8モジュール統合テストスイート（661行）
+  - 統合シナリオテスト（7テスト）: 設定保存・読み込み、複数設定の同時変更、リセット、エラー回復、ViewModel統合
+  - データ永続化テスト（5テスト）: UserDefaults保存、再起動後復元、不正JSON処理、設定完全性検証
+  - 権限管理統合テスト（4テスト）: 写真ライブラリ・通知権限リクエスト、状態追跡、複数権限管理
+  - 設定変更伝播テスト（4テスト）: Service経由更新、@Observable自動更新、複数画面同期、バリデーションロールバック
+  - E2Eシナリオ（5テスト）: 初回起動、フルカスタマイズ、プレミアムアップグレード、一括更新、インポート/エクスポート
+  - 全25テスト合格（100%成功率）
+
+### 品質スコア
+- M8-T11: 100/100点（完璧な実装）
+- M8-T13: 100/100点（完璧な実装）
+- M8-T14: 95/100点（高品質統合テスト）
+- **平均: 98.3/100点**
+
+### 技術詳細
+- **MV Pattern**: @Environment(SettingsService.self) + @State、ViewModelなし
+- **Swift 6 Concurrency**: @MainActor準拠、strict mode対応
+- **コンポーネント再利用**: SettingsRow、SettingsToggle、GlassCard活用
+- **Bundle Info Dictionary**: CFBundleShortVersionString、CFBundleVersion取得
+- **Swift Testing framework**: @Test マクロ、#expect/#require アサーション
+- **モックオブジェクト活用**: MockSettingsRepository、MockPermissionManager
+- **包括的テスト**: 初期化、境界値、統合、UI状態、エラーハンドリング、E2E
+
+### モジュール進捗
+- M8: Settings（12/14タスク完了 - 85.7%）
+- 全体進捗: 85/117タスク完了 (72.6%)、132h/181h (72.9%)
+
+---
+
 ## 2025-12-05 | セッション: impl-043（M8-T09完了 - AnalysisSettingsView実装）
 
 ### 完了タスク
@@ -281,66 +334,4 @@
 
 ---
 
-## 2025-11-30 | セッションサマリー: impl-034〜035（M6-T09/T11完了 - ゴミ箱機能実装）
-
-### 今回セッションの成果
-- **完了タスク**: 2タスク + 1スキップ
-  - M6-T09: DeletionConfirmationService（95/100点、593行、21テスト）
-  - M6-T10: TrashViewModel → **スキップ**（MV Pattern採用のためViewModelは使用しない）
-  - M6-T11: TrashView（98/100点、797行、26テスト）
-- **品質スコア平均**: (95 + 98) / 2 = 96.5点
-- **実装合計**: 1,390行、47テスト（100%成功）
-
-### 発生したエラーと解決策
-- TrashView.swiftビルドエラー → Toolbar構造とカラー名を修正
-- テストのEquatableエラー → `(any Error).self`を使用
-
-### 統計情報
-- **M6進捗**: 11/14タスク完了 + 1スキップ（85.7%）
-- **全体進捗**: 69/117タスク完了（59.0%）
-- **総テスト数**: 676テスト
-
-### 次のステップ
-- M6-T12: DeletionConfirmationSheet（1.5h）
-- M6-T13: PHAsset削除連携（2h）
-- M6-T14: 単体テスト作成（2h）
-- → M6モジュール完了！
-
----
-
-## 2025-11-30 | セッション: impl-033（M6-T08完了 - RestorePhotosUseCase実装）
-
-### 完了項目（67タスク - 本セッション1タスク追加）
-- [x] M6-T08: RestorePhotosUseCase実装（100/100点）
-  - RestorePhotosUseCase.swift: 写真復元ユースケース（357行）
-  - 期限切れ写真の自動検出と柔軟な処理
-  - DeletePhotosUseCaseと完全な対称性
-  - 12テスト全パス（100%成功率）
-
-### 品質評価
-- M6-T08: 100/100点（満点）
-
----
-
-## 2025-11-30 | セッション: impl-032（M6-T07完了 - DeletePhotosUseCase実装）
-
-### 完了項目（66タスク - 本セッション1タスク追加）
-- [x] M6-T07: DeletePhotosUseCase実装（98/100点）
-  - DeletePhotosUseCase.swift: 写真削除ユースケース（395行）
-  - 14テスト全パス（100%成功率）
-
----
-
-## 2025-11-30 | セッション: impl-029（M5-T13完了 - Phase 4 Dashboard完全終了）
-
-### 完了項目（60タスク - 本セッション1タスク追加）
-- [x] M5-T13: 単体テスト作成（95/100点）
-  - 87/90テスト成功（96.7%）
-
-### マイルストーン達成
-- **Phase 4完全終了**: M5 Dashboard & Statistics完了
-- **全体進捗**: 60/117タスク（51.3%）- 半分突破！
-
----
-
-*古いエントリ（impl-028以前）は `docs/archive/PROGRESS_ARCHIVE.md` に移動済み*
+*古いエントリ（impl-035以前）は `docs/archive/PROGRESS_ARCHIVE.md` に移動済み*
