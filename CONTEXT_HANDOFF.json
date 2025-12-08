@@ -236,7 +236,7 @@
   "gitHistory": {
     "commits": [
       {
-        "hash": "pending",
+        "hash": "e90b96b",
         "message": "feat: impl-049/050完了 - M7-T06 StorageAlertScheduler, M7-T07 ReminderScheduler実装",
         "date": "2025-12-08"
       },
