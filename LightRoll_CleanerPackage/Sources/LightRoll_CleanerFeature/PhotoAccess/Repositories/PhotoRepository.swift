@@ -199,7 +199,7 @@ public final class PhotoRepository: PhotoRepositoryProtocol, @unchecked Sendable
     private let permissionManager: PhotoPermissionManagerProtocol
 
     /// ストレージサービス
-    private let storageService: StorageService
+    private let storageService: StorageServiceProtocol
 
     /// フェッチオプション
     public var fetchOptions: PhotoFetchOptions
@@ -232,7 +232,7 @@ public final class PhotoRepository: PhotoRepositoryProtocol, @unchecked Sendable
     public init(
         permissionManager: PhotoPermissionManagerProtocol,
         fetchOptions: PhotoFetchOptions = .default,
-        storageService: StorageService? = nil
+        storageService: StorageServiceProtocol? = nil
     ) {
         self.imageManager = PHCachingImageManager()
         self.permissionManager = permissionManager

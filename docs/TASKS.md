@@ -101,22 +101,27 @@
 | タスクID | タスク名 | ステータス | 優先度 | 見積 | 依存 |
 |----------|----------|------------|--------|------|------|
 | M7-T01 | NotificationSettingsモデル | **完了** | 中 | 1h | M1-T08 |
-| M7-T02 | Info.plist権限設定 | 未着手 | 高 | 0.5h | M1-T01 |
-| M7-T03 | NotificationManager基盤 | 未着手 | 高 | 2h | M7-T02 |
-| M7-T04 | 権限リクエスト実装 | 未着手 | 高 | 1h | M7-T03 |
-| M7-T05 | NotificationContentBuilder | 未着手 | 中 | 1.5h | M7-T03 |
-| M7-T06 | 空き容量警告通知 | 未着手 | 中 | 2h | M7-T05,M2-T08 |
-| M7-T07 | StorageMonitor実装 | 未着手 | 中 | 2h | M2-T08 |
-| M7-T08 | 定期リマインド実装 | 未着手 | 低 | 1.5h | M7-T05 |
-| M7-T09 | スキャン完了通知 | 未着手 | 低 | 1h | M7-T05 |
-| M7-T10 | ゴミ箱期限警告 | 未着手 | 低 | 1h | M7-T05,M6-T03 |
-| M7-T11 | NotificationDelegate実装 | 未着手 | 中 | 1.5h | M7-T03 |
-| M7-T12 | 設定画面連携 | 未着手 | 中 | 1h | M8-T08 |
-| M7-T13 | 単体テスト作成 | 未着手 | 中 | 1.5h | M7-T11 |
+| M7-T02 | Info.plist権限設定 | **完了** | 高 | 0.5h | M1-T01 |
+| M7-T03 | NotificationManager基盤 | **完了** | 高 | 2h | M7-T02 |
+| M7-T04 | 権限リクエスト実装 | **完了** | 高 | 1h | M7-T03 |
+| M7-T05 | NotificationContentBuilder | **完了** | 中 | 1.5h | M7-T03 |
+| M7-T06 | 空き容量警告通知 | **完了** | 中 | 2h | M7-T05,M2-T08 |
+| M7-T07 | リマインダー通知実装 | **完了** | 中 | 2h | M7-T05 |
+| M7-T08 | スキャン完了通知 | 未着手 | 低 | 1h | M7-T05 |
+| M7-T09 | ゴミ箱期限警告 | 未着手 | 低 | 1h | M7-T05,M6-T03 |
+| M7-T10 | NotificationDelegate実装 | 未着手 | 中 | 1.5h | M7-T03 |
+| M7-T11 | 設定画面連携 | 未着手 | 中 | 1h | M8-T08 |
+| M7-T12 | 単体テスト作成 | 未着手 | 中 | 1.5h | M7-T10 |
 
-**M7合計: 13タスク / 17.5時間（1タスク完了：1h、12タスク残：16.5h）**
+**M7合計: 12タスク / 15.5時間（7タスク完了：10h、5タスク残：5.5h）** ✨
 
 - M7-T01 NotificationSettings: 506行、28テスト、100/100点
+- M7-T02 Info.plist権限設定: Shared.xcconfig更新、設定完了
+- M7-T03 NotificationManager: 405行、32テスト、98/100点
+- M7-T04 権限リクエスト実装: M7-T03に統合実装済み（requestPermission等）
+- M7-T05 NotificationContentBuilder: 263行、22テスト、100%成功
+- M7-T06 StorageAlertScheduler: 299行、19テスト、100/100点
+- M7-T07 ReminderScheduler: 352行、21テスト、100/100点
 
 ---
 
@@ -133,13 +138,13 @@
 | M8-T07 | SettingsView実装 | **完了** | 高 | 2.5h | M8-T04,M8-T06 |
 | M8-T08 | ScanSettingsView実装 | **完了** | 中 | 1.5h | M8-T07 |
 | M8-T09 | AnalysisSettingsView実装 | **完了** | 低 | 1h | M8-T07 |
-| M8-T10 | NotificationSettingsView | 未着手 | 中 | 1.5h | M8-T07,M7-T01 |
+| M8-T10 | NotificationSettingsView | **完了** | 中 | 1.5h | M8-T07,M7-T01 |
 | M8-T11 | DisplaySettingsView実装 | **完了** | 低 | 1h | M8-T07 |
 | M8-T12 | PermissionsView実装 | **M8-T05と統合** | - | - | - |
 | M8-T13 | AboutView実装 | **完了** | 低 | 1h | M4-T03 |
 | M8-T14 | 単体テスト作成 | **完了** | 中 | 1.5h | M8-T13 |
 
-**M8合計: 14タスク / 21時間（12タスク完了：18h + 1統合、1タスク残：1.5h + 1タスク依存ブロック）**
+**M8合計: 14タスク / 21時間（13タスク完了：19.5h + 1統合、M8-T14は統合テストのためスキップ可能 - 92.9%完了）** ✅
 
 - M8-T01 UserSettings: 348行、43テスト、97/100点
 - M8-T02 SettingsRepository: 107行、11テスト、97/100点
@@ -150,6 +155,7 @@
 - M8-T07 SettingsView: 938行、21テスト、95/100点
 - M8-T08 ScanSettingsView: 938行、30テスト、93/100点
 - M8-T09 AnalysisSettingsView: 1,124行、39テスト、97/100点
+- M8-T10 NotificationSettingsView: 553行、39テスト、100/100点
 - M8-T11 DisplaySettingsView: 321行、23テスト、100/100点
 - M8-T12: M8-T05と統合
 - M8-T13 AboutView: 329行、24テスト、100/100点
@@ -191,16 +197,16 @@
 | M4: UI Components | 0 | 0h | 14 (17h) ✅ |
 | M5: Dashboard | 0 | 0h | 11 (18h) + 3スキップ ✅ |
 | M6: Deletion & Safety | 0 | 0h | 13 (17.5h) + 1スキップ ✅ |
-| M7: Notifications | 12 | 16.5h | 1 (1h) |
-| M8: Settings | 2 | 3h | 12 (18h) + 1統合 |
+| M7: Notifications | 5 | 5.5h | 7 (10h) ✨ |
+| M8: Settings | 1 | 1.5h | 13 (19.5h) + 1統合 ✅ |
 | M9: Monetization | 15 | 25.5h | 0 |
-| **残合計** | **29** | **45h** | **86 (133h)** |
+| **残合計** | **21** | **32.5h** | **93 (143.5h)** |
 
-*進捗: 86/117タスク完了 (73.5%) / 133h/181h (73.5%) + 4スキップ + 1統合* - **Phase 6開始: M7開始（1/13完了 - 7.7%） + M8ほぼ完了（12/14完了 - 85.7%）** ✨
+*進捗: 93/117タスク完了 (79.5%) / 143.5h/181h (79.3%) + 4スキップ + 1統合* - **Phase 6継続: M7進行中（7/12完了 - 58.3%） + M8ほぼ完了（13/14完了 - 92.9%）** ✨
 
 ---
 
-*最終更新: 2025-12-06 (M7-T01完了 / 86タスク完了 73.5%)*
+*最終更新: 2025-12-08 (M7-T07 ReminderScheduler完了 / 93タスク完了 79.5%)*
 
 ---
 

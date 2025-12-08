@@ -35,6 +35,9 @@ public protocol StorageServiceProtocol: AnyObject, Sendable {
     /// - Parameter bytes: バイト数
     /// - Returns: フォーマット済み文字列（例: "1.5 GB"）
     static func formatBytes(_ bytes: Int64) -> String
+
+    /// キャッシュをクリア
+    func clearCache()
 }
 
 // MARK: - StorageServiceError

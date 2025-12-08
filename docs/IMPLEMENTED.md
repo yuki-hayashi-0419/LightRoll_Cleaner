@@ -10,10 +10,10 @@
 ### 進捗状況
 - **完了モジュール**: M1 Core Infrastructure, M2 Photo Access, M3 Image Analysis, M4 UI Components, M5 Dashboard & Statistics, M6 Deletion & Trash
 - **進行中モジュール**:
-  - **M8 Settings & Preferences** (12/14タスク完了 - 85.7%)
-  - **M7 Notifications** (1/13タスク完了 - 7.7%) ✨ Phase 6開始
-- **Phase 5-6継続中**: M1〜M6完全実装 + M7・M8部分実装（86/117タスク - 73.5%）
-- **全体進捗**: 86/117タスク (73.5%)
+  - **M8 Settings & Preferences** (13/14タスク完了 - 92.9%) ✨ ほぼ完了
+  - **M7 Notifications** (5/13タスク完了 - 38.5%) ✨ Phase 6継続
+- **Phase 5-6継続中**: M1〜M6完全実装 + M7・M8部分実装（91/117タスク - 77.8%）
+- **全体進捗**: 91/117タスク (77.8%)
 
 ---
 
@@ -477,7 +477,263 @@ Phase 5の継続として設定機能を実装中：
 **品質スコア**: 100/100点 ⭐⭐⭐
 **テスト成功率**: 28/28 (100%)
 
-**M7モジュール進捗**: 1/13タスク完了（**7.7%達成**）
+### M7-T02 Info.plist権限設定詳細
+
+iOS通知機能を使用するための Info.plist 権限説明を追加：
+
+| 設定キー | 説明文 |
+|---------|--------|
+| **NSUserNotificationsUsageDescription** | 写真の整理タイミング、ストレージ空き容量の警告、定期リマインダーなどの重要な通知をお届けします。 |
+
+#### 技術的特徴
+- **GENERATE_INFOPLIST_FILE = YES**: Info.plistは自動生成、権限説明はShared.xcconfigに記載
+- **プライバシー配慮**: 通知の用途を具体的かつ明確に説明
+- **日本語説明**: ユーザーフレンドリーな説明文
+
+#### ユーザーへの効果
+- アプリが通知権限をリクエストする際、明確な理由が表示される
+- プライバシー保護の観点から安心して権限を許可できる
+- 権限の目的が具体的に理解できる
+
+**成果物**:
+- Config/Shared.xcconfig 更新（INFOPLIST_KEY_NSUserNotificationsUsageDescription追加）
+
+**品質スコア**: 設定完了（テスト不要）
+
+### M7-T03 NotificationManager基盤詳細
+
+通知管理サービスの完全実装。UNUserNotificationCenterを統合した通知システムの基盤を構築：
+
+| 機能 | 説明 |
+|------|------|
+| **権限管理** | 通知権限の状態管理（未確認/許可/拒否）とリクエスト処理 |
+| **通知スケジューリング** | 通知の登録・更新・削除機能 |
+| **設定統合** | NotificationSettingsとの統合、静寂時間帯の考慮 |
+| **識別子管理** | 型安全なNotificationIdentifier列挙型で通知を管理 |
+| **エラーハンドリング** | 包括的なエラー型定義と処理 |
+
+#### 技術的特徴
+- **プロトコル指向設計**: UserNotificationCenterProtocolで抽象化、依存性注入対応
+- **テスト容易性**: MockUserNotificationCenterをactorとして実装
+- **Swift 6 Concurrency**: @Observable + Sendable準拠、完全なactor isolation
+- **型安全性**: NotificationIdentifier列挙型で通知識別子を管理
+
+#### ユーザーへの効果
+- アプリからの通知を受け取れるようになる
+- ストレージ警告やリマインダーなどの各種通知の基盤が整う
+- 静寂時間帯設定に応じた通知制御が可能に
+- 通知権限のリクエストと状態確認ができる
+
+**成果物**:
+- NotificationManager.swift (405行)
+- NotificationManagerTests.swift (800行、32テスト）
+
+**品質スコア**: 98/100点 ⭐⭐⭐
+**テスト成功率**: 32/32 (100%)
+
+### M7-T04 権限リクエスト実装詳細
+
+M7-T04の権限リクエスト機能は、M7-T03 NotificationManagerに完全に統合実装されています：
+
+| 機能 | 説明 |
+|------|------|
+| **権限リクエスト** | `requestPermission()` メソッドで通知権限を要求 |
+| **状態更新** | `updateAuthorizationStatus()` で最新の権限状態を取得 |
+| **権限確認** | `isAuthorized` プロパティで許可状態を確認 |
+| **リクエスト可否** | `canRequestPermission` で再リクエストの可否を判定 |
+
+#### 実装メソッド
+- `requestPermission() async throws -> Bool` - 通知権限のリクエスト（alert, sound, badge）
+- `updateAuthorizationStatus() async` - 現在の権限状態を更新
+- `isAuthorized: Bool` - 権限が許可されているかを確認
+- `canRequestPermission: Bool` - 権限リクエストが可能かを確認
+
+#### 技術的特徴
+- **エラーハンドリング**: 拒否済みの場合は`NotificationError.permissionDenied`をthrow
+- **状態管理**: `authorizationStatus`プロパティで権限状態を保持
+- **Swift Concurrency**: async/awaitによる非同期処理
+- **テストカバレッジ**: 32テスト中6テストが権限管理をカバー
+
+#### ユーザーへの効果
+- アプリ初回起動時に通知権限をリクエストできる
+- 設定アプリへの誘導（権限が拒否された場合）
+- 現在の権限状態を確認できる
+- 既に許可/拒否されている場合の適切な処理
+
+**成果物**:
+- NotificationManager.swift（M7-T03に統合実装、405行）
+- NotificationManagerTests.swift（権限テスト6件含む、32テスト）
+
+**品質スコア**: 98/100点（M7-T03と同一） ⭐⭐⭐
+**テスト成功率**: 6/6権限テスト成功 (100%)
+
+### M7-T05 NotificationContentBuilder詳細
+
+通知コンテンツを生成するビルダーの完全実装。各通知タイプに対応したUNNotificationContentを生成：
+
+| 機能 | 説明 |
+|------|------|
+| **ストレージアラート通知** | 使用率と空き容量を表示する警告通知を生成 |
+| **リマインダー通知** | 定期的なクリーンアップを促すリマインダー通知を生成 |
+| **スキャン完了通知** | スキャン結果（アイテム数、合計サイズ）を通知 |
+| **ゴミ箱期限警告通知** | ゴミ箱内アイテムの期限切れ警告を通知 |
+| **コンテンツバリデーション** | 通知コンテンツの妥当性を検証 |
+
+#### 実装メソッド
+- `buildStorageAlertContent(usedPercentage:availableSpace:)` - ストレージアラート通知生成
+- `buildReminderContent(interval:)` - リマインダー通知生成（daily/weekly/biweekly/monthly対応）
+- `buildScanCompletionContent(itemCount:totalSize:)` - スキャン完了通知生成
+- `buildTrashExpirationContent(itemCount:expirationDays:)` - ゴミ箱期限警告生成
+- `isValidContent(_:)` - 通知コンテンツの検証（タイトル、本文、カテゴリID、typeチェック）
+
+#### 技術的特徴
+- **Sendable準拠**: Swift 6 Concurrency完全対応、structで実装
+- **日本語通知文言**: すべての通知メッセージが日本語で提供
+- **ByteFormatter**: バイトサイズを自動フォーマット（B/KB/MB/GB）
+- **userInfo活用**: 通知タイプやパラメータを辞書で格納
+- **categoryIdentifier**: 通知タイプごとに異なるカテゴリIDを設定
+
+#### ユーザーへの効果
+- **ストレージアラート**: 「使用率: 91% - 残り容量: 15.42GB」のように具体的な情報を表示
+- **リマインダー**: 「定期的なクリーンアップの時間です。ストレージを整理してデバイスを快適に保ちましょう。」
+- **スキャン完了**: 「5個の不要ファイルが見つかりました。合計サイズ: 142.35 MB」
+- **ゴミ箱警告**: 「ゴミ箱内の12個のアイテムが3日後に削除されます。復元したいファイルがないか確認しましょう。」
+
+**成果物**:
+- NotificationContentBuilder.swift (263行)
+- NotificationContentBuilderTests.swift (436行、22テスト）
+
+**品質スコア**: 100%テスト成功 ⭐⭐⭐
+**テスト成功率**: 22/22 (100%)
+
+### M7-T06 StorageAlertScheduler詳細
+
+空き容量警告通知のスケジューラー実装。ストレージ容量を監視し、閾値を超えた場合に自動的に通知をスケジュール：
+
+| 機能 | 説明 |
+|------|------|
+| **ストレージ監視** | PhotoRepositoryを通じてストレージ情報を取得 |
+| **閾値チェック** | カスタマイズ可能な使用率閾値で警告判定 |
+| **通知スケジューリング** | 閾値超過時に60秒後のトリガーで通知をスケジュール |
+| **静寂時間帯考慮** | NotificationManagerの静寂時間帯設定を尊重 |
+| **重複通知防止** | 既存通知の有無を確認してから新規スケジュール |
+| **エラーハンドリング** | 5種類のエラーケースに対応 |
+
+#### 実装メソッド
+- `checkAndScheduleIfNeeded()` - ストレージ状態チェックと自動スケジューリング
+- `scheduleStorageAlert(usagePercentage:availableSpace:)` - 通知のスケジューリング
+- `cancelStorageAlertNotification()` - 通知のキャンセル
+- `updateNotificationStatus()` - 通知スケジュール状態の更新
+- `clearError()` - エラー状態のクリア
+
+#### エラーハンドリング
+**StorageAlertSchedulerError列挙型**:
+- `storageInfoUnavailable` - ストレージ情報取得失敗
+- `schedulingFailed` - 通知スケジューリング失敗
+- `notificationsDisabled` - 通知設定が無効
+- `permissionDenied` - 通知権限が拒否されている
+- `quietHoursActive` - 静寂時間帯のためスキップ
+
+#### Observable状態管理
+- `lastUsagePercentage` - 最後にチェックしたストレージ使用率
+- `lastAvailableSpace` - 最後にチェックした空き容量
+- `lastCheckTime` - 最後のチェック時刻
+- `isNotificationScheduled` - 通知がスケジュールされているか
+- `lastError` - 最後に発生したエラー
+
+#### ユーザーへの効果
+- **自動監視**: アプリがストレージ容量を自動的に監視
+- **適切なタイミング**: 静寂時間帯を避けて通知を送信
+- **明確な情報**: 「使用率: 91% - 残り容量: 15.42GB」のような具体的な情報
+- **スマートな通知**: 既に通知済みの場合は重複通知を防止
+
+#### 技術的特徴
+- **@Observable + Sendable準拠**: Swift 6 Concurrency完全対応
+- **プロトコル指向設計**: StorageServiceProtocolでテスト容易性を確保
+- **依存性注入**: PhotoRepository、NotificationManager、NotificationContentBuilderを注入
+- **60秒遅延トリガー**: UNTimeIntervalNotificationTrigger使用
+
+**成果物**:
+- StorageAlertScheduler.swift (299行)
+- StorageAlertSchedulerTests.swift (19テスト、6テストスイート）
+- MockStorageService実装（35行）
+
+**品質スコア**: 100%テスト成功 ⭐⭐⭐
+**テスト成功率**: 19/19 (100%)、0.316秒
+
+### M7-T07 ReminderScheduler詳細
+
+リマインダー通知のスケジューラー実装。定期的なリマインダー通知を自動的にスケジュールし、ユーザーの清掃習慣をサポート：
+
+| 機能 | 説明 |
+|------|------|
+| **定期リマインダー** | daily/weekly/biweekly/monthly の4つの間隔から選択可能 |
+| **次回日時計算** | ユーザー設定の間隔に基づいて次回通知日時を自動計算 |
+| **カレンダートリガー** | UNCalendarNotificationTriggerで正確な日時指定 |
+| **静寂時間帯考慮** | 通知予定時刻が静寂時間帯の場合、自動調整 |
+| **重複通知防止** | 既存通知をキャンセルしてから新規スケジュール |
+| **エラーハンドリング** | 5種類のエラーケースに対応 |
+
+#### 実装メソッド
+- `scheduleReminder()` - リマインダー通知のスケジューリング
+- `rescheduleReminder()` - 設定変更時の再スケジューリング
+- `cancelReminder()` - リマインダー通知のキャンセル
+- `calculateNextReminderDate(from:interval:)` - 次回通知日時の計算
+- `updateNotificationStatus()` - 通知スケジュール状態の更新
+- `clearError()` - エラー状態のクリア
+
+#### エラーハンドリング
+**ReminderSchedulerError列挙型**:
+- `schedulingFailed` - 通知スケジューリング失敗
+- `notificationsDisabled` - 通知設定が無効
+- `permissionDenied` - 通知権限が拒否されている
+- `quietHoursActive` - 静寂時間帯のためスキップ
+- `invalidInterval` - 無効な間隔設定
+
+#### Observable状態管理
+- `nextReminderDate` - 次回リマインダー日時
+- `lastScheduledInterval` - 最後にスケジュールした間隔
+- `isReminderScheduled` - リマインダーがスケジュールされているか
+- `lastError` - 最後に発生したエラー
+- `timeUntilNextReminder` - 次回通知までの残り時間（秒）
+- `hasScheduledReminder` - 次回通知が予定されているか
+
+#### 日時計算ロジック
+- **デフォルト通知時刻**: 午前10時（`defaultReminderHour: 10`）
+- **過去時刻の自動調整**: 計算結果が過去の場合、翌日以降に自動調整
+- **間隔別の日付計算**:
+  - `daily`: 翌日（+1日）
+  - `weekly`: 1週間後（+7日）
+  - `biweekly`: 2週間後（+14日）
+  - `monthly`: 1ヶ月後（+1ヶ月）
+
+#### 静寂時間帯調整
+- 通知予定時刻の時刻（hour）を取得
+- `NotificationSettings.isInQuietHours(hour:)` でチェック
+- 静寂時間帯の場合、終了時刻+1時間に自動調整
+- 調整後の日時で再スケジュール
+
+#### ユーザーへの効果
+- **習慣化支援**: ユーザーが設定した間隔で定期的にリマインダーを受信
+- **適切なタイミング**: 午前10時というユーザーフレンドリーな時刻に通知
+- **静寂時間帯対応**: 就寝時間などを避けて通知を送信
+- **柔軟な間隔設定**: 毎日、毎週、隔週、毎月の4つのオプション
+
+#### 技術的特徴
+- **@Observable + Sendable準拠**: Swift 6 Concurrency完全対応
+- **プロトコル指向設計**: UserNotificationCenterProtocolでテスト容易性を確保
+- **依存性注入**: NotificationManager、NotificationContentBuilder、Calendarを注入
+- **カレンダーベーストリガー**: UNCalendarNotificationTrigger使用（正確な日時指定）
+- **型安全な間隔**: ReminderInterval enumで間隔を管理
+
+**成果物**:
+- ReminderScheduler.swift (352行)
+- ReminderSchedulerTests.swift (665行、21テスト、6テストスイート）
+
+**品質スコア**: 100%テスト成功 ⭐⭐⭐
+**テスト成功率**: 21/21 (100%)、0.006秒
+
+**M7モジュール進捗**: 7/13タスク完了（**53.8%達成** 🎉）
 
 ---
 
@@ -492,4 +748,103 @@ Phase 5の継続として設定機能を実装中：
 
 ---
 
-*最終更新: 2025-12-06 (M7-T01完了 - 86タスク完了 73.5%)*
+*最終更新: 2025-12-08 (M7-T07 ReminderScheduler完了 - 93タスク完了 79.5%)*
+
+---
+
+## M8-T10: NotificationSettingsView実装 (2025-12-08)
+
+### 概要
+通知設定を管理するSwiftUIビューを実装。NotificationSettingsモデルの全プロパティをUIで操作可能にし、MV Patternに完全準拠。
+
+### 実装機能
+
+#### 1. 通知マスタースイッチ
+- 通知機能全体のオン/オフ
+- 無効時は他のセクション（ストレージアラート、リマインダー、静寂時間帯）を非表示
+- SettingsToggle使用
+
+#### 2. ストレージアラート設定
+- アラート有効/無効トグル
+- しきい値スライダー（50%〜95%、5%刻み）
+- パーセント表示（例：「85%」）
+- フッターテキストで機能説明
+
+#### 3. リマインダー設定
+- リマインダー有効/無効トグル
+- 間隔選択ピッカー（毎日/毎週/2週間ごと/毎月）
+- ReminderInterval.displayNameを使用
+
+#### 4. 静寂時間帯設定
+- 静寂時間帯有効/無効トグル
+- 開始時刻ピッカー（0〜23時）
+- 終了時刻ピッカー（0〜23時）
+- 日跨ぎ対応（例：22時〜8時）
+- formatHour()ヘルパーで「22時」形式表示
+
+### 技術的実装
+
+#### アーキテクチャ
+- **MV Pattern**: ViewModelなし、@Environment(SettingsService.self) + @State
+- **.task**: 初回ロード時にloadSettings()で設定を反映
+- **.onChange**: 各設定変更時にsaveSettings()で自動保存
+
+#### UI/UX
+- **セクション構成**: 通知許可、ストレージアラート、リマインダー、静寂時間帯
+- **条件付き表示**: 通知無効時は子セクションを非表示
+- **既存コンポーネント活用**: SettingsToggle、SettingsRow
+- **フッターテキスト**: 各セクションに詳細説明
+
+#### バリデーション
+- しきい値範囲チェック（0.0〜1.0）
+- 時刻範囲チェック（0〜23）
+- NotificationSettings.isValidで妥当性確認
+- エラー時にloadSettings()で自動ロールバック
+
+#### アクセシビリティ
+- VoiceOverラベル設定
+- 適切な説明テキスト
+- キーボードナビゲーション対応
+
+### ユーザーへの効果
+- すべての通知設定を一画面で管理可能
+- 直感的なUI（トグル、スライダー、ピッカー）
+- 設定変更が即座に保存される
+- 静寂時間帯で就寝時や会議中の通知を自動抑制
+- ストレージ警告で容量不足を未然に防止
+- リマインダーで定期的なクリーンアップ習慣をサポート
+
+### 成果物
+- **NotificationSettingsView.swift** (553行)
+  - 4セクション構成（通知許可、ストレージアラート、リマインダー、静寂時間帯）
+  - @ViewBuilderで各セクションを分離
+  - 6種類のプレビュー
+
+- **NotificationSettingsViewTests.swift** (577行、39テスト）
+  - 初期化テスト（2）
+  - 通知マスタースイッチ（3）
+  - ストレージアラート（5）
+  - リマインダー（6）
+  - 静寂時間帯（5）
+  - バリデーション（6）
+  - 複合設定（3）
+  - エラーハンドリング（2）
+  - ReminderInterval表示（4）
+  - 静寂時間帯判定（3）
+
+### 品質スコア
+**100/100点** ⭐⭐⭐
+- 機能完全性: 25/25点
+- コード品質: 25/25点
+- テストカバレッジ: 20/20点
+- ドキュメント同期: 15/15点
+- エラーハンドリング: 15/15点
+
+**テスト成功率**: 39/39 (100%)
+
+### モジュール進捗
+**M8モジュール**: 13/14タスク完了（**92.9%達成** 🎉）← **M8ほぼ完了**
+
+---
+
+*最終更新: 2025-12-08 (M8-T10完了 - 88タスク完了 75.2%)*

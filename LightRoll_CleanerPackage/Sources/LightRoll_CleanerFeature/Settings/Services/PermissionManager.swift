@@ -34,7 +34,7 @@ public final class PermissionManager: PermissionManagerProtocol {
     private let settingsOpener: SettingsOpenerProtocol
 
     /// 通知センターの抽象化（テスト用）
-    private let notificationCenter: NotificationCenterProtocol
+    private let notificationCenter: PermissionNotificationCenterProtocol
 
     // MARK: - Initialization
 
@@ -44,7 +44,7 @@ public final class PermissionManager: PermissionManagerProtocol {
     ///   - notificationCenter: 通知センター（デフォルトは実際の実装）
     public init(
         settingsOpener: SettingsOpenerProtocol = DefaultSettingsOpener(),
-        notificationCenter: NotificationCenterProtocol = DefaultNotificationCenter()
+        notificationCenter: PermissionNotificationCenterProtocol = DefaultPermissionNotificationCenter()
     ) {
         self.currentPhotoStatus = PHPhotoLibrary.authorizationStatus(for: .readWrite)
         self.settingsOpener = settingsOpener
@@ -160,11 +160,11 @@ extension UNAuthorizationStatus {
     }
 }
 
-// MARK: - NotificationCenterProtocol
+// MARK: - PermissionNotificationCenterProtocol
 
-/// 通知センターのプロトコル
+/// 通知センターのプロトコル（権限管理用）
 /// テスト時にモックできるように抽象化
-public protocol NotificationCenterProtocol: Sendable {
+public protocol PermissionNotificationCenterProtocol: Sendable {
     /// 通知権限のステータスを取得
     /// - Returns: 現在の通知権限ステータス
     func getAuthorizationStatus() async -> UNAuthorizationStatus
@@ -175,11 +175,11 @@ public protocol NotificationCenterProtocol: Sendable {
     func requestAuthorization(options: UNAuthorizationOptions) async -> Bool
 }
 
-// MARK: - DefaultNotificationCenter
+// MARK: - DefaultPermissionNotificationCenter
 
-/// 通知センターのデフォルト実装
+/// 通知センターのデフォルト実装（権限管理用）
 /// UNUserNotificationCenter の実際の実装を使用
-public struct DefaultNotificationCenter: NotificationCenterProtocol {
+public struct DefaultPermissionNotificationCenter: PermissionNotificationCenterProtocol {
     public init() {}
 
     /// 通知権限のステータスを取得

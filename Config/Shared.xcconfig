@@ -36,6 +36,12 @@ INFOPLIST_KEY_NSPhotoLibraryUsageDescription = 重複・類似写真の検出と
 INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = 写真を保存するために写真ライブラリへの書き込みアクセスが必要です。
 
 // ==========================================
+// Privacy - User Notifications
+// ==========================================
+// 通知機能の説明
+INFOPLIST_KEY_NSUserNotificationsUsageDescription = 写真の整理タイミング、ストレージ空き容量の警告、定期リマインダーなどの重要な通知をお届けします。
+
+// ==========================================
 // Entitlements
 // ==========================================
 // AI agents can modify Config/LightRoll_Cleaner.entitlements to add capabilities

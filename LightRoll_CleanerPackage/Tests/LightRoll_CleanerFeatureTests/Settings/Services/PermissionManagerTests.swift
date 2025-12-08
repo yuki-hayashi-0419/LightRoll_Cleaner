@@ -38,8 +38,8 @@ final class MockSettingsOpenerForPermission: SettingsOpenerProtocol, @unchecked 
 
 // MARK: - Mock Notification Center
 
-/// テスト用の通知センターモック
-actor MockNotificationCenter: NotificationCenterProtocol {
+/// テスト用の通知センターモック（権限管理用）
+actor MockPermissionNotificationCenter: PermissionNotificationCenterProtocol {
     /// 返すべき通知権限ステータス
     private var mockAuthorizationStatus: UNAuthorizationStatus = .notDetermined
 
@@ -88,7 +88,7 @@ struct PermissionManagerTests {
     @Test("M8-T03-TC01: 写真権限ステータスの取得")
     func testGetPhotoPermissionStatus() async {
         let mockOpener = MockSettingsOpenerForPermission()
-        let mockNotificationCenter = MockNotificationCenter()
+        let mockNotificationCenter = MockPermissionNotificationCenter()
         let manager = PermissionManager(
             settingsOpener: mockOpener,
             notificationCenter: mockNotificationCenter
@@ -113,7 +113,7 @@ struct PermissionManagerTests {
     @Test("M8-T03-TC02: 通知権限ステータスの取得")
     func testGetNotificationPermissionStatus() async {
         let mockOpener = MockSettingsOpenerForPermission()
-        let mockNotificationCenter = MockNotificationCenter()
+        let mockNotificationCenter = MockPermissionNotificationCenter()
         await mockNotificationCenter.configure(authorizationStatus: .authorized, authorizationGranted: false)
 
         let manager = PermissionManager(
@@ -133,7 +133,7 @@ struct PermissionManagerTests {
     @Test("M8-T03-TC03: 写真権限リクエストの成功")
     func testRequestPhotoPermission() async {
         let mockOpener = MockSettingsOpenerForPermission()
-        let mockNotificationCenter = MockNotificationCenter()
+        let mockNotificationCenter = MockPermissionNotificationCenter()
         let manager = PermissionManager(
             settingsOpener: mockOpener,
             notificationCenter: mockNotificationCenter
@@ -161,7 +161,7 @@ struct PermissionManagerTests {
     @Test("M8-T03-TC04: 権限拒否時の処理")
     func testPermissionDenied() async {
         let mockOpener = MockSettingsOpenerForPermission()
-        let mockNotificationCenter = MockNotificationCenter()
+        let mockNotificationCenter = MockPermissionNotificationCenter()
         await mockNotificationCenter.reset() // まずリセット
         // actorのプロパティ設定はできないため、テストシナリオを調整
 
@@ -185,7 +185,7 @@ struct PermissionManagerTests {
     @Test("M8-T03-TC05: システム設定への誘導")
     func testOpenAppSettings() async {
         let mockOpener = MockSettingsOpenerForPermission()
-        let mockNotificationCenter = MockNotificationCenter()
+        let mockNotificationCenter = MockPermissionNotificationCenter()
         let manager = PermissionManager(
             settingsOpener: mockOpener,
             notificationCenter: mockNotificationCenter
@@ -205,7 +205,7 @@ struct PermissionManagerTests {
     @Test("初回起動時（notDetermined状態）")
     func testNotDeterminedState() async {
         let mockOpener = MockSettingsOpenerForPermission()
-        let mockNotificationCenter = MockNotificationCenter()
+        let mockNotificationCenter = MockPermissionNotificationCenter()
         await mockNotificationCenter.configure(authorizationStatus: .notDetermined, authorizationGranted: false)
 
         let manager = PermissionManager(
@@ -224,7 +224,7 @@ struct PermissionManagerTests {
     @Test("すでに許可済み（authorized状態）")
     func testAuthorizedState() async {
         let mockOpener = MockSettingsOpenerForPermission()
-        let mockNotificationCenter = MockNotificationCenter()
+        let mockNotificationCenter = MockPermissionNotificationCenter()
         await mockNotificationCenter.configure(authorizationStatus: .authorized, authorizationGranted: true)
 
         let manager = PermissionManager(
@@ -245,7 +245,7 @@ struct PermissionManagerTests {
     @Test("制限付きアクセス（limited状態）")
     func testLimitedState() async {
         let mockOpener = MockSettingsOpenerForPermission()
-        let mockNotificationCenter = MockNotificationCenter()
+        let mockNotificationCenter = MockPermissionNotificationCenter()
         let manager = PermissionManager(
             settingsOpener: mockOpener,
             notificationCenter: mockNotificationCenter
@@ -268,7 +268,7 @@ struct PermissionManagerTests {
     @Test("通知権限リクエストの複数回呼び出し")
     func testMultipleNotificationRequests() async {
         let mockOpener = MockSettingsOpenerForPermission()
-        let mockNotificationCenter = MockNotificationCenter()
+        let mockNotificationCenter = MockPermissionNotificationCenter()
         await mockNotificationCenter.configure(authorizationStatus: .authorized, authorizationGranted: true)
 
         let manager = PermissionManager(
@@ -288,7 +288,7 @@ struct PermissionManagerTests {
     @Test("openAppSettings の複数回呼び出し")
     func testMultipleOpenSettings() async {
         let mockOpener = MockSettingsOpenerForPermission()
-        let mockNotificationCenter = MockNotificationCenter()
+        let mockNotificationCenter = MockPermissionNotificationCenter()
         let manager = PermissionManager(
             settingsOpener: mockOpener,
             notificationCenter: mockNotificationCenter
@@ -304,7 +304,7 @@ struct PermissionManagerTests {
     @Test("初期化時に写真権限ステータスが設定される")
     func testInitializationSetsPhotoStatus() async {
         let mockOpener = MockSettingsOpenerForPermission()
-        let mockNotificationCenter = MockNotificationCenter()
+        let mockNotificationCenter = MockPermissionNotificationCenter()
         let manager = PermissionManager(
             settingsOpener: mockOpener,
             notificationCenter: mockNotificationCenter
@@ -324,7 +324,7 @@ struct PermissionManagerTests {
     @Test("Protocol 準拠 - PermissionManagerProtocol")
     func testProtocolConformance() async {
         let mockOpener = MockSettingsOpenerForPermission()
-        let mockNotificationCenter = MockNotificationCenter()
+        let mockNotificationCenter = MockPermissionNotificationCenter()
         await mockNotificationCenter.configure(authorizationStatus: .authorized, authorizationGranted: true)
 
         let manager: any PermissionManagerProtocol = PermissionManager(
@@ -343,7 +343,7 @@ struct PermissionManagerTests {
     @Test("汎用インターフェースのテスト - getStatus")
     func testGenericGetStatus() async {
         let mockOpener = MockSettingsOpenerForPermission()
-        let mockNotificationCenter = MockNotificationCenter()
+        let mockNotificationCenter = MockPermissionNotificationCenter()
         await mockNotificationCenter.configure(authorizationStatus: .authorized, authorizationGranted: true)
 
         let manager = PermissionManager(
@@ -369,7 +369,7 @@ struct PermissionManagerTests {
     @Test("汎用インターフェースのテスト - requestPermission")
     func testGenericRequestPermission() async {
         let mockOpener = MockSettingsOpenerForPermission()
-        let mockNotificationCenter = MockNotificationCenter()
+        let mockNotificationCenter = MockPermissionNotificationCenter()
         await mockNotificationCenter.configure(authorizationStatus: .authorized, authorizationGranted: true)
 
         let manager = PermissionManager(
@@ -482,9 +482,9 @@ struct MockTests {
         #expect(mock.wasOpenSettingsCalled == false)
     }
 
-    @Test("MockNotificationCenter - 初期状態での動作")
+    @Test("MockPermissionNotificationCenter - 初期状態での動作")
     func testMockNotificationCenterInitialState() async {
-        let mock = MockNotificationCenter()
+        let mock = MockPermissionNotificationCenter()
 
         // 初期状態は notDetermined
         let status = await mock.getAuthorizationStatus()
@@ -499,9 +499,9 @@ struct MockTests {
         #expect(requestCallCount == 1)
     }
 
-    @Test("MockNotificationCenter - カスタム状態の設定")
+    @Test("MockPermissionNotificationCenter - カスタム状態の設定")
     func testMockNotificationCenterCustomStatus() async {
-        let mock = MockNotificationCenter()
+        let mock = MockPermissionNotificationCenter()
         await mock.configure(authorizationStatus: .authorized, authorizationGranted: true)
 
         let status = await mock.getAuthorizationStatus()
@@ -511,9 +511,9 @@ struct MockTests {
         #expect(granted == true)
     }
 
-    @Test("MockNotificationCenter - reset で状態がリセットされる")
+    @Test("MockPermissionNotificationCenter - reset で状態がリセットされる")
     func testMockNotificationCenterReset() async {
-        let mock = MockNotificationCenter()
+        let mock = MockPermissionNotificationCenter()
         await mock.configure(authorizationStatus: .authorized, authorizationGranted: true)
 
         _ = await mock.getAuthorizationStatus()

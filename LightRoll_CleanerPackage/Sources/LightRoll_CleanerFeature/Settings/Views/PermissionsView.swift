@@ -406,7 +406,7 @@ private struct PreviewSettingsOpener: SettingsOpenerProtocol {
 }
 
 /// プレビュー用通知センター
-private struct PreviewNotificationCenter: NotificationCenterProtocol {
+private struct PreviewNotificationCenter: PermissionNotificationCenterProtocol {
     let status: UNAuthorizationStatus
 
     func getAuthorizationStatus() async -> UNAuthorizationStatus {
