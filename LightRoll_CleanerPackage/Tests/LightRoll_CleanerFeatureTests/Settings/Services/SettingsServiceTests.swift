@@ -41,7 +41,7 @@ struct SettingsServiceTests {
             analysisSettings: .default,
             notificationSettings: .default,
             displaySettings: .default,
-            premiumStatus: .premium
+            premiumStatus: .premium()
         )
         mockRepo.mockSettings = customSettings
 
@@ -51,7 +51,7 @@ struct SettingsServiceTests {
         // Then
         #expect(sut.settings == customSettings)
         #expect(sut.settings.scanSettings.autoScanEnabled == true)
-        #expect(sut.settings.premiumStatus == .premium)
+        #expect(sut.settings.premiumStatus == .premium())
     }
 
     // MARK: - スキャン設定更新
@@ -278,10 +278,10 @@ struct SettingsServiceTests {
         let sut = SettingsService(repository: mockRepo)
 
         // When
-        sut.updatePremiumStatus(.premium)
+        sut.updatePremiumStatus(.premium())
 
         // Then
-        #expect(sut.settings.premiumStatus == .premium)
+        #expect(sut.settings.premiumStatus == .premium())
         #expect(mockRepo.saveCallCount == 1)
     }
 
@@ -319,13 +319,13 @@ struct SettingsServiceTests {
         sut.updateSettings { settings in
             settings.scanSettings.autoScanEnabled = true
             settings.displaySettings.gridColumns = 5
-            settings.premiumStatus = .premium
+            settings.premiumStatus = .premium()
         }
 
         // Then
         #expect(sut.settings.scanSettings.autoScanEnabled == true)
         #expect(sut.settings.displaySettings.gridColumns == 5)
-        #expect(sut.settings.premiumStatus == .premium)
+        #expect(sut.settings.premiumStatus == .premium())
         #expect(mockRepo.saveCallCount == 1)
     }
 

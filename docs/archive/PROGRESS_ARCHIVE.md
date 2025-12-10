@@ -4,6 +4,245 @@
 
 ---
 
+## アーカイブ: 2025-12-11 コンテキスト最適化（impl-054終了時）
+
+以下のエントリは impl-054 セッション終了時の最適化でアーカイブされました（PROGRESS.md 11件 → 10件、最古1エントリを移動）。
+
+---
+
+## 2025-12-11 | セッション: impl-054（M9-T02/T03完了 - 2タスク連続実装成功！✨）
+
+### 完了タスク
+- M9-T02: ProductInfoモデル実装（304行、24テスト、95/100点）
+- M9-T03: StoreKit 2設定実装（444行、16テスト、92/100点）
+
+### 成果
+- **M9-T02完了**: ProductInfoモデル実装
+  - StoreKit 2製品情報モデル（id, displayName, description, price, priceFormatted）
+  - SubscriptionPeriod enum（monthly, yearly）
+  - OfferType enum（freeTrial, introPrice, payUpFront）
+  - IntroductoryOffer struct（初回割引オファー）
+  - プロトコル準拠: Codable, Sendable, Equatable, Identifiable
+  - 9つのヘルパーメソッド（isSubscription, hasIntroOffer, hasFreeTrial, fullDescription等）
+  - 3つのファクトリメソッド（monthlyPlan, yearlyPlan, monthlyWithTrial）
+
+- **M9-T03完了**: StoreKit 2設定実装
+  - Configuration.storekit（StoreKit Configuration File）
+  - ProductIdentifiers定数定義（CaseIterable, Sendable, Equatable, Hashable準拠）
+  - StoreKitManager実装（@Observable, @MainActor, async/await対応）
+  - 購入処理（loadProducts, purchase, restorePurchases, checkSubscriptionStatus）
+  - StoreKitError定義（8種類のエラーケース）
+  - トランザクション監視・検証機能
+  - 月額プラン（¥980/月、7日間無料トライアル）
+  - 年額プラン（¥9,800/年）
+
+### 品質スコア
+- M9-T02: **95/100点（合格）** ✨
+  - 機能完全性: 25/25点
+  - コード品質: 24/25点
+  - テストカバレッジ: 20/20点
+  - ドキュメント同期: 13/15点
+  - エラーハンドリング: 13/15点
+
+- M9-T03: **92/100点（合格）** ✨
+  - 機能完全性: 23/25点
+  - コード品質: 24/25点
+  - テストカバレッジ: 18/20点
+  - ドキュメント同期: 15/15点
+  - エラーハンドリング: 12/15点
+
+### 技術詳細
+- **M9-T02設計**: Swift 6.1 Strict Concurrency、Sendable完全準拠、MV Pattern
+- **M9-T02テスト**: 24テスト（SubscriptionPeriod 3、OfferType 3、IntroductoryOffer 6、ProductInfo 12）
+- **M9-T02実行時間**: 0.001秒
+- **M9-T02コード修正**: RepositoryProtocols.swift、StubRepositories.swiftの仮定義削除
+- **M9-T03設計**: StoreKit 2最新API、@Observable、@MainActor、async/await、Sendable準拠
+- **M9-T03テスト**: 16テスト（ProductIdentifiersTests全合格）
+- **M9-T03構成**: Configuration.storekit完備（月額¥980/7日トライアル、年額¥9,800）
+
+### マイルストーン
+- **M9 Monetization: 進行中**（3/15タスク完了、20.0%）
+- **累計進捗**: 103/117タスク完了（**88.0%**）
+- **総テスト数**: 1,371テスト（M9-T02で+24、M9-T03で+16）
+- **完了時間**: 156.5h/181h（86.5%）
+- **次のタスク**: M9-T04 PurchaseRepository実装（3h）
+
+---
+
+## アーカイブ: 2025-12-11 コンテキスト最適化（impl-052完了時）
+
+以下のエントリは impl-052 セッション完了時の最適化でアーカイブされました（PROGRESS.md 14件 → 10件、古い4エントリを移動）。
+
+---
+
+## 2025-12-06 | セッション: impl-044（M8-T11, T13, T14完了 - DisplaySettings, About, 統合テスト）
+
+### 完了タスク
+- M8-T11: DisplaySettingsView実装（321行、23テスト、100/100点）
+- M8-T13: AboutView実装（329行、24テスト、100/100点）
+- M8-T14: Settings Module Integration Tests（661行、25テスト、95/100点）
+
+### 成果
+- **DisplaySettingsView完成**: 表示設定画面の実装（321行）
+  - グリッド列数調整（Stepper: 2〜6列）
+  - ファイルサイズ表示トグル
+  - 撮影日表示トグル
+  - 並び順選択（Picker: 新しい順/古い順/容量大きい順/小さい順）
+  - バリデーション（2〜6列範囲チェック）
+  - 4種類のプレビュー（デフォルト、最小列数、最大列数、ダークモード）
+  - 全23テスト合格（100%成功率）
+
+- **AboutView完成**: アプリ情報画面の実装（329行）
+  - アプリアイコン、名前、バージョン情報（Bundle.main.infoDictionary）
+  - 開発者情報セクション（名前、ウェブサイト、サポートメール）
+  - 法的情報セクション（プライバシーポリシー、利用規約、ライセンス）
+  - 著作権フッター
+  - 全24テスト合格（100%成功率）
+
+- **SettingsModuleIntegrationTests完成**: M8モジュール統合テストスイート（661行）
+  - 統合シナリオテスト（7テスト）: 設定保存・読み込み、複数設定の同時変更、リセット、エラー回復、ViewModel統合
+  - データ永続化テスト（5テスト）: UserDefaults保存、再起動後復元、不正JSON処理、設定完全性検証
+  - 権限管理統合テスト（4テスト）: 写真ライブラリ・通知権限リクエスト、状態追跡、複数権限管理
+  - 設定変更伝播テスト（4テスト）: Service経由更新、@Observable自動更新、複数画面同期、バリデーションロールバック
+  - E2Eシナリオ（5テスト）: 初回起動、フルカスタマイズ、プレミアムアップグレード、一括更新、インポート/エクスポート
+  - 全25テスト合格（100%成功率）
+
+### 品質スコア
+- M8-T11: 100/100点（完璧な実装）
+- M8-T13: 100/100点（完璧な実装）
+- M8-T14: 95/100点（高品質統合テスト）
+- **平均: 98.3/100点**
+
+### 技術詳細
+- **MV Pattern**: @Environment(SettingsService.self) + @State、ViewModelなし
+- **Swift 6 Concurrency**: @MainActor準拠、strict mode対応
+- **コンポーネント再利用**: SettingsRow、SettingsToggle、GlassCard活用
+- **Bundle Info Dictionary**: CFBundleShortVersionString、CFBundleVersion取得
+- **Swift Testing framework**: @Test マクロ、#expect/#require アサーション
+- **モックオブジェクト活用**: MockSettingsRepository、MockPermissionManager
+- **包括的テスト**: 初期化、境界値、統合、UI状態、エラーハンドリング、E2E
+
+### モジュール進捗
+- M8: Settings（12/14タスク完了 - 85.7%）
+- 全体進捗: 85/117タスク完了 (72.6%)、132h/181h (72.9%)
+
+---
+
+## 2025-12-05 | セッション: impl-043（M8-T09完了 - AnalysisSettingsView実装）
+
+### 完了タスク
+- M8-T09: AnalysisSettingsView実装（1,124行、39テスト、97/100点）
+
+### 成果
+- **AnalysisSettingsView完成**: 分析設定画面の実装（365行）
+  - 類似度しきい値調整（Slider: 0%〜100%、step 0.01）
+  - ブレ判定感度選択（Picker: 低/標準/高）
+  - 最小グループサイズ設定（Stepper: 2〜10枚）
+  - BlurSensitivity enumで感度と閾値の相互変換
+  - バリデーション（類似度/ブレ: 0.0〜1.0、グループ: 2以上）
+  - トランザクション性（エラー時の自動ロールバック）
+  - 5種類のプレビュー（Default、高類似度、低ブレ感度、大グループ、ダークモード）
+- **AnalysisSettingsViewTests完成**: 包括的なテストスイート（759行、39テスト）
+  - 初期化テスト（2）
+  - 類似度しきい値テスト（5）
+  - ブレ判定感度テスト（8）
+  - グループサイズテスト（6）
+  - バリデーションテスト（5）
+  - 統合テスト（3）
+  - UI状態テスト（3）
+  - パフォーマンステスト（2）
+  - BlurSensitivity enumテスト（5）
+  - 全39テスト合格（100%成功率）
+
+### 品質スコア
+- M8-T09: 97/100点（高品質実装）
+- 機能完全性: 25/25点（完璧）
+- コード品質: 24/25点（マジックナンバー -1点）
+- テストカバレッジ: 20/20点（完璧）
+- ドキュメント同期: 13/15点
+- エラーハンドリング: 15/15点（完璧）
+
+### 技術詳細
+- **MV Pattern**: @Environment(SettingsService.self) + @State、ViewModelは不使用
+- **Swift 6 Concurrency**: @MainActor準拠、strict mode対応
+- **UIコンポーネント活用**: SettingsRow再利用（DRY原則）
+- **enum活用**: BlurSensitivityで感度（低/標準/高）と閾値（0.5/0.3/0.1）の相互変換
+- **トランザクション性**: エラー時のloadSettings()による自動ロールバック
+- **包括的テスト**: 境界値（0.0, 1.0, 0.19, 0.21, 0.39, 0.41）、統合、UI状態、パフォーマンス（100回連続操作）
+
+### モジュール進捗
+- M8: Settings（9/14タスク完了 - 64.3%）
+- 全体進捗: 82/117タスク完了 (70.1%)、129.5h/181h (71.5%)
+
+---
+
+## 2025-12-05 | セッション: impl-042（M8-T08完了 - ScanSettingsView実装）
+
+### 完了タスク
+- M8-T08: ScanSettingsView実装（938行、30テスト、93/100点）
+
+### 成果
+- **ScanSettingsView完成**: スキャン設定画面の実装（344行）
+  - 自動スキャン設定（オン/オフ、間隔選択）
+  - スキャン対象設定（動画、スクリーンショット、自撮り）
+  - SettingsService/@Environment連携
+  - 条件付き表示（自動スキャン有効時のみ間隔ピッカー表示）
+  - バリデーション（少なくとも1つのコンテンツタイプが有効）
+  - 5種類のプレビュー（デフォルト、自動スキャン有効、毎日スキャン、ダークモード、動画のみ）
+- **ScanSettingsViewTests完成**: 包括的なテストスイート（594行、30テスト）
+  - 初期化テスト（2）
+  - 自動スキャン設定テスト（7）
+  - スキャン対象設定テスト（3）
+  - バリデーションテスト（2）
+  - 複合テスト（3）
+  - エッジケーステスト（7）
+  - エラーハンドリングテスト（3）
+  - 統合テスト（3）
+  - 全30テスト合格（100%成功率）
+
+### 品質スコア
+- M8-T08: 93/100点（優良実装）
+- 機能完全性: 24/25点
+- コード品質: 24/25点
+- テストカバレッジ: 17/20点（30テスト全合格、1テスト修正後全合格）
+- ドキュメント同期: 13/15点
+- エラーハンドリング: 15/15点（完璧）
+
+### 技術詳細
+- **MV Pattern**: @Observable + @Environment、ViewModelは不使用
+- **Swift 6 Concurrency**: @MainActor準拠、strict mode対応
+- **既存コンポーネント活用**: SettingsRow、SettingsToggle再利用
+- **条件付きコンパイル**: #if os(iOS) で macOS対応
+- **SwiftUI State Management**: @State for local state, @Environment for service injection
+
+### モジュール進捗
+- M8: Settings（8/14タスク完了 - 57.1%）
+- 全体進捗: 81/117タスク完了 (69.2%)、128.5h/181h (71.0%)
+
+---
+
+## 2025-12-05 | セッション: impl-041（M8-T07完了 - SettingsView実装）
+
+### 完了タスク
+- M8-T07: SettingsView実装（938行、31テスト、95/100点）
+
+### 成果
+- **SettingsView完成**: メイン設定画面の実装（569行）
+  - 7セクション構成（プレミアム、スキャン、分析、通知、表示、その他、アプリ情報）
+  - SettingsService/@Environment連携
+  - SettingsRow/SettingsToggle活用
+  - 31テスト全合格（追加10個のエッジケース・統合テスト）
+
+### 品質スコア
+- M8-T07: 95/100点（優良実装）
+- 機能完全性: 24/25点
+- コード品質: 25/25点
+- テストカバレッジ: 19/20点（31テスト全合格 - 追加10個）
+- ドキュメント同期: 14/15点
+- エラーハンドリング: 13/15点
+
+---
+
 ## アーカイブ: 2025-12-09 コンテキスト最適化（impl-051開始時）
 
 以下のエントリは impl-051 セッション開始時の最適化でアーカイブされました（PROGRESS.md 11件 → 10件）。

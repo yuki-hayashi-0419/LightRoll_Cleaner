@@ -38,14 +38,14 @@ func userSettingsCustomCodable() throws {
     var settings = UserSettings.default
     settings.scanSettings.autoScanEnabled = true
     settings.analysisSettings.similarityThreshold = 0.9
-    settings.premiumStatus = .premium
+    settings.premiumStatus = .premium()
 
     let encoded = try JSONEncoder().encode(settings)
     let decoded = try JSONDecoder().decode(UserSettings.self, from: encoded)
 
     #expect(decoded.scanSettings.autoScanEnabled == true)
     #expect(decoded.analysisSettings.similarityThreshold == 0.9)
-    #expect(decoded.premiumStatus == .premium)
+    #expect(decoded.premiumStatus == .premium())
 }
 
 @Test("UserSettings: Equatable準拠の検証")
@@ -56,7 +56,7 @@ func userSettingsEquatable() {
     #expect(settings1 == settings2)
 
     var settings3 = UserSettings.default
-    settings3.premiumStatus = .premium
+    settings3.premiumStatus = .premium()
 
     #expect(settings1 != settings3)
 }
@@ -311,7 +311,7 @@ func autoScanIntervalDisplayName() {
 
 @Test("PremiumStatus: すべてのケースがCodableである")
 func premiumStatusCodable() throws {
-    for status in [PremiumStatus.free, PremiumStatus.premium] {
+    for status in [PremiumStatus.free, PremiumStatus.premium()] {
         let encoded = try JSONEncoder().encode(status)
         let decoded = try JSONDecoder().decode(PremiumStatus.self, from: encoded)
         #expect(decoded == status)
@@ -321,19 +321,19 @@ func premiumStatusCodable() throws {
 @Test("PremiumStatus: isFreeプロパティが正しい")
 func premiumStatusIsFree() {
     #expect(PremiumStatus.free.isFree == true)
-    #expect(PremiumStatus.premium.isFree == false)
+    #expect(PremiumStatus.premium().isFree == false)
 }
 
 @Test("PremiumStatus: isPremiumプロパティが正しい")
 func premiumStatusIsPremium() {
     #expect(PremiumStatus.free.isPremium == false)
-    #expect(PremiumStatus.premium.isPremium == true)
+    #expect(PremiumStatus.premium().isPremium == true)
 }
 
 @Test("PremiumStatus: displayNameプロパティが正しい")
 func premiumStatusDisplayName() {
-    #expect(PremiumStatus.free.displayName == "無料版")
-    #expect(PremiumStatus.premium.displayName == "プレミアム版")
+    #expect(PremiumStatus.free.statusText == "無料版")
+    #expect(PremiumStatus.premium().statusText.contains("月額プラン"))
 }
 
 // MARK: - SettingsError Tests
@@ -378,7 +378,7 @@ func integrationUserSettingsFullCodable() throws {
     settings.notificationSettings.isEnabled = true
     settings.displaySettings.gridColumns = 3
     settings.displaySettings.sortOrder = .sizeDescending
-    settings.premiumStatus = .premium
+    settings.premiumStatus = .premium()
 
     // エンコード/デコード
     let encoded = try JSONEncoder().encode(settings)
@@ -391,7 +391,7 @@ func integrationUserSettingsFullCodable() throws {
     #expect(decoded.notificationSettings.isEnabled == true)
     #expect(decoded.displaySettings.gridColumns == 3)
     #expect(decoded.displaySettings.sortOrder == .sizeDescending)
-    #expect(decoded.premiumStatus == .premium)
+    #expect(decoded.premiumStatus == .premium())
 }
 
 @Test("統合: すべてのサブ設定のバリデーション")

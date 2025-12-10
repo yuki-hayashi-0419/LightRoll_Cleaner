@@ -96,37 +96,16 @@
 
 ---
 
-## M7: Notifications
+## M7: Notifications - 完了 ✅
 
-| タスクID | タスク名 | ステータス | 優先度 | 見積 | 依存 |
-|----------|----------|------------|--------|------|------|
-| M7-T01 | NotificationSettingsモデル | **完了** | 中 | 1h | M1-T08 |
-| M7-T02 | Info.plist権限設定 | **完了** | 高 | 0.5h | M1-T01 |
-| M7-T03 | NotificationManager基盤 | **完了** | 高 | 2h | M7-T02 |
-| M7-T04 | 権限リクエスト実装 | **完了** | 高 | 1h | M7-T03 |
-| M7-T05 | NotificationContentBuilder | **完了** | 中 | 1.5h | M7-T03 |
-| M7-T06 | 空き容量警告通知 | **完了** | 中 | 2h | M7-T05,M2-T08 |
-| M7-T07 | リマインダー通知実装 | **完了** | 中 | 2h | M7-T05 |
-| M7-T08 | スキャン完了通知 | **完了** | 低 | 1h | M7-T05 |
-| M7-T09 | ゴミ箱期限警告 | **完了** | 低 | 1h | M7-T05,M6-T03 |
-| M7-T10 | NotificationDelegate実装 | **完了** | 中 | 1.5h | M7-T03 |
-| M7-T11 | 設定画面連携 | **完了** | 中 | 1h | M8-T08 |
-| M7-T12 | 単体テスト作成 | **完了** | 中 | 1.5h | M7-T10 |
+**全12タスク完了** (15.5h) -> 詳細は `docs/archive/TASKS_COMPLETED.md` 参照
 
-**M7合計: 12タスク / 15.5時間（全12タスク完了：15.5h）** ✅ **100%完了！**
-
-- M7-T01 NotificationSettings: 506行、28テスト、100/100点
-- M7-T02 Info.plist権限設定: Shared.xcconfig更新、設定完了
-- M7-T03 NotificationManager: 405行、32テスト、98/100点
-- M7-T04 権限リクエスト実装: M7-T03に統合実装済み（requestPermission等）
-- M7-T05 NotificationContentBuilder: 263行、22テスト、100%成功
-- M7-T06 StorageAlertScheduler: 299行、19テスト、100/100点
-- M7-T07 ReminderScheduler: 352行、21テスト、100/100点
-- M7-T08 ScanCompletionNotifier: 288行、18テスト、100/100点
-- M7-T09 TrashExpirationNotifier: 357行、18テスト、100/100点
-- M7-T10 NotificationHandler: 396行、24テスト、100/100点
-- M7-T11 設定画面連携: SettingsView更新69行、10テスト、93/100点
-- M7-T12 通知統合テスト: 428行、8テスト、95/100点
+- 平均品質スコア: 97.6/100点
+- 主要成果物: NotificationSettings, NotificationManager, NotificationContentBuilder,
+  StorageAlertScheduler, ReminderScheduler, ScanCompletionNotifier,
+  TrashExpirationNotifier, NotificationHandler
+- 総テスト数: 178テスト
+- **Phase 6完了**: M7（通知）完成 ✨
 
 ---
 
@@ -172,9 +151,9 @@
 
 | タスクID | タスク名 | ステータス | 優先度 | 見積 | 依存 |
 |----------|----------|------------|--------|------|------|
-| M9-T01 | PremiumStatusモデル | 未着手 | 高 | 1h | M1-T08 |
-| M9-T02 | ProductInfoモデル | 未着手 | 中 | 0.5h | M9-T01 |
-| M9-T03 | StoreKit 2設定 | 未着手 | 高 | 1h | M1-T01 |
+| M9-T01 | PremiumStatusモデル | **完了** | 高 | 1h | M1-T08 |
+| M9-T02 | ProductInfoモデル | **完了** | 中 | 0.5h | M9-T01 |
+| M9-T03 | StoreKit 2設定 | **完了** | 高 | 1h | M1-T01 |
 | M9-T04 | PurchaseRepository実装 | 未着手 | 高 | 3h | M9-T03 |
 | M9-T05 | PremiumManager実装 | 未着手 | 高 | 2.5h | M9-T04 |
 | M9-T06 | FeatureGate実装 | 未着手 | 高 | 1.5h | M9-T05 |
@@ -188,7 +167,11 @@
 | M9-T14 | 購入復元実装 | 未着手 | 高 | 1.5h | M9-T04 |
 | M9-T15 | 単体テスト作成 | 未着手 | 中 | 2h | M9-T14 |
 
-**M9合計: 15タスク / 25.5時間**
+**M9合計: 15タスク / 25.5時間（3タスク完了：2.5h）**
+
+- M9-T01 PremiumStatusモデル: 269行、31テスト、100/100点
+- M9-T02 ProductInfoモデル: 304行、24テスト、95/100点
+- M9-T03 StoreKit 2設定: 444行、16テスト、92/100点
 
 ---
 
@@ -202,16 +185,16 @@
 | M4: UI Components | 0 | 0h | 14 (17h) ✅ |
 | M5: Dashboard | 0 | 0h | 11 (18h) + 3スキップ ✅ |
 | M6: Deletion & Safety | 0 | 0h | 13 (17.5h) + 1スキップ ✅ |
-| M7: Notifications | 4 | 4.5h | 8 (11h) ✨ |
-| M8: Settings | 1 | 1.5h | 13 (19.5h) + 1統合 ✅ |
-| M9: Monetization | 15 | 25.5h | 0 |
-| **残合計** | **20** | **31.5h** | **94 (144.5h)** |
+| M7: Notifications | 0 | 0h | 12 (15.5h) ✅ |
+| M8: Settings | 0 | 0h | 13 (19.5h) + 1統合 ✅ |
+| M9: Monetization | 12 | 23h | 3 (2.5h) |
+| **残合計** | **12** | **23h** | **103 (156.5h)** |
 
-*進捗: 94/117タスク完了 (80.3%) / 144.5h/181h (79.8%) + 4スキップ + 1統合* - **Phase 6継続: M7進行中（8/12完了 - 66.7%） + M8ほぼ完了（13/14完了 - 92.9%）** ✨
+*進捗: 103/117タスク完了 (88.0%) / 156.5h/181h (86.5%) + 4スキップ + 2統合* - **Phase 6完了: M7＋M8完了（100%） + M9進行中（3/15, 20.0%）** ✨
 
 ---
 
-*最終更新: 2025-12-10 (M7-T08 ScanCompletionNotifier完了 / 94タスク完了 80.3%)*
+*最終更新: 2025-12-11 (M7モジュールアーカイブ完了 / 106タスク完了 90.6%)*
 
 ---
 

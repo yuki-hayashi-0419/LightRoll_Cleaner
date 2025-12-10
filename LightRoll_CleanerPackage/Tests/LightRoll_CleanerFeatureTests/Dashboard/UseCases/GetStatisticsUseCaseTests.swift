@@ -692,7 +692,7 @@ struct DeletionLimitStatusUseCaseTests {
         let status = DeletionLimitStatus(
             todayDeletedCount: 1000,
             dailyLimit: 50,
-            premiumStatus: .premium
+            premiumStatus: .premium()
         )
 
         #expect(status.canDelete == true)
@@ -716,7 +716,7 @@ struct DeletionLimitStatusUseCaseTests {
         let status = DeletionLimitStatus(
             todayDeletedCount: 1000,
             dailyLimit: 50,
-            premiumStatus: .premium
+            premiumStatus: .premium()
         )
 
         #expect(status.canDelete(count: 9999) == true)

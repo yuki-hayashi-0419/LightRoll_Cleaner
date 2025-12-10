@@ -394,12 +394,12 @@ public struct DeletionLimitStatus: Sendable, Equatable {
 
     /// 削除可能かどうか
     public var canDelete: Bool {
-        premiumStatus == .premium || remainingCount > 0
+        premiumStatus.isPremium || remainingCount > 0
     }
 
     /// 指定数を削除可能かどうか
     public func canDelete(count: Int) -> Bool {
-        premiumStatus == .premium || remainingCount >= count
+        premiumStatus.isPremium || remainingCount >= count
     }
 }
 

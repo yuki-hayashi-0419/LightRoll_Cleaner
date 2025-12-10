@@ -230,34 +230,7 @@ extension AutoScanInterval {
 }
 
 // MARK: - PremiumStatus
-
-/// プレミアムステータス
-public enum PremiumStatus: String, Codable, Sendable {
-    case free
-    case premium
-}
-
-extension PremiumStatus {
-    /// 無料版かどうか
-    public var isFree: Bool {
-        self == .free
-    }
-
-    /// プレミアム版かどうか
-    public var isPremium: Bool {
-        self == .premium
-    }
-
-    /// 表示用ラベル
-    public var displayName: String {
-        switch self {
-        case .free:
-            return "無料版"
-        case .premium:
-            return "プレミアム版"
-        }
-    }
-}
+// PremiumStatusは Monetization/Models/PremiumStatus.swift で定義されています
 
 // MARK: - SettingsError
 

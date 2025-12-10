@@ -162,10 +162,10 @@ struct DIContainerTests {
     @Test("MockPurchaseRepositoryがプレミアムステータスを返す")
     func testMockPurchaseRepository() async throws {
         let mockRepo = MockPurchaseRepository()
-        mockRepo.mockPremiumStatus = .premium
+        mockRepo.mockPremiumStatus = .premium()
 
         let status = await mockRepo.getPremiumStatus()
-        #expect(status == .premium)
+        #expect(status == .premium())
     }
 }
 

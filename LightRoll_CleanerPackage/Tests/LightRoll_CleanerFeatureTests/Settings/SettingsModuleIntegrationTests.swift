@@ -578,11 +578,11 @@ struct SettingsModuleIntegrationTests {
         try service.updateScanSettings(scanSettings)
 
         // プレミアムステータスを更新
-        service.updatePremiumStatus(.premium)
+        service.updatePremiumStatus(.premium())
 
         // プレミアムステータスが保存されたことを確認
         let newService = SettingsService(repository: repository)
-        #expect(newService.settings.premiumStatus == .premium)
+        #expect(newService.settings.premiumStatus == .premium())
     }
 
     @Test("全設定項目の一括変更・保存")

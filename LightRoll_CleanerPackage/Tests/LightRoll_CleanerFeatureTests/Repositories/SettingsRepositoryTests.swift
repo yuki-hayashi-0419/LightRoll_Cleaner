@@ -59,7 +59,7 @@ struct SettingsRepositoryTests {
                 showDate: false,
                 sortOrder: .sizeAscending
             ),
-            premiumStatus: .premium
+            premiumStatus: .premium()
         )
     }
 
@@ -123,7 +123,7 @@ struct SettingsRepositoryTests {
         #expect(loadedSettings.displaySettings.showDate == false)
         #expect(loadedSettings.displaySettings.sortOrder == .sizeAscending)
 
-        #expect(loadedSettings.premiumStatus == .premium)
+        #expect(loadedSettings.premiumStatus == .premium())
     }
 
     /// M8-T02-TC03: リセット機能
@@ -211,7 +211,7 @@ struct SettingsRepositoryTests {
                     showDate: true,
                     sortOrder: .dateDescending
                 ),
-                premiumStatus: iteration > 3 ? .premium : .free
+                premiumStatus: iteration > 3 ? .premium() : .free
             )
 
             repository.save(settings)
@@ -258,7 +258,7 @@ struct SettingsRepositoryTests {
                 showDate: false,
                 sortOrder: .dateAscending
             ),
-            premiumStatus: .premium
+            premiumStatus: .premium()
         )
 
         // When: 保存して読み込み
@@ -332,7 +332,7 @@ struct SettingsRepositoryTests {
 
         let settings1 = makeCustomSettings()
         var settings2 = UserSettings.default
-        settings2.premiumStatus = .premium
+        settings2.premiumStatus = .premium()
 
         // When: 異なる設定を保存
         repository1.save(settings1)
@@ -363,7 +363,7 @@ struct SettingsRepositoryTests {
         repository.reset()
 
         var settings2 = UserSettings.default
-        settings2.premiumStatus = .premium
+        settings2.premiumStatus = .premium()
         repository.save(settings2)
 
         // Then: 最後に保存した設定が読み込まれる

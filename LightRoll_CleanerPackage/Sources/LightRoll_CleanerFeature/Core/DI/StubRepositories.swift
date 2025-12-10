@@ -142,11 +142,8 @@ public final class StubPurchaseRepository: PurchaseRepositoryProtocol, @unchecke
 
     public func fetchProducts() async throws -> [ProductInfo] {
         return [
-            ProductInfo(
-                id: "com.lightroll.premium",
-                displayName: "プレミアム",
-                displayPrice: "¥980"
-            )
+            ProductInfo.monthlyPlan(),
+            ProductInfo.yearlyPlan()
         ]
     }
 

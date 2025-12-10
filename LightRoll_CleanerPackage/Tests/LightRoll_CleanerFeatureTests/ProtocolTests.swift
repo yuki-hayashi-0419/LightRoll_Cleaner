@@ -151,7 +151,7 @@ struct UseCaseProtocolTests {
         let status = DeletionLimitStatus(
             todayDeletedCount: 100,
             dailyLimit: 50,
-            premiumStatus: .premium
+            premiumStatus: .premium()
         )
 
         #expect(status.canDelete == true)
@@ -416,12 +416,12 @@ struct MockImplementationTests {
     @Test("MockPurchaseRepositoryがプロトコルに準拠している")
     func mockPurchaseRepositoryConformance() async throws {
         let mock = MockPurchaseRepository()
-        mock.mockPremiumStatus = .premium
+        mock.mockPremiumStatus = .premium()
 
         let status = await mock.getPremiumStatus()
         let result = try await mock.purchase("test_product")
 
-        #expect(status == .premium)
+        #expect(status == .premium())
         #expect(mock.purchaseCalled == true)
 
         if case .success = result {

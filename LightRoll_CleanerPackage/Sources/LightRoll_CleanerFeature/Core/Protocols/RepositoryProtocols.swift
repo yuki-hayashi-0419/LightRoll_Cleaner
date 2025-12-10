@@ -180,18 +180,8 @@ public struct PhotoAsset: Identifiable, Hashable, Sendable {
 // 注意: UserSettings は Models/Settings/UserSettings.swift で正式に定義されています。
 // ここでの仮定義は削除されました。
 
-/// 商品情報（仮定義）
-public struct ProductInfo: Identifiable, Sendable {
-    public let id: String
-    public let displayName: String
-    public let displayPrice: String
-
-    public init(id: String, displayName: String, displayPrice: String) {
-        self.id = id
-        self.displayName = displayName
-        self.displayPrice = displayPrice
-    }
-}
+// 注意: ProductInfo は Monetization/Models/ProductInfo.swift で正式に定義されています。
+// ここでの仮定義は削除されました。
 
 /// 購入結果（仮定義）
 public enum PurchaseResult: Sendable {
