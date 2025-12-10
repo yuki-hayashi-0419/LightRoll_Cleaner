@@ -198,8 +198,8 @@
   "gitHistory": {
     "commits": [
       {
-        "hash": "pending",
-        "message": "feat: impl-052完了 - M7-T11, T12実装（M7モジュール100%完了、497行、18テスト、平均94点）",
+        "hash": "d790be0",
+        "message": "feat: impl-052完了 - M7 Notifications 100%完了（5タスク、1,538行、78テスト、平均97.6点）",
         "date": "2025-12-11"
       },
       {
@@ -208,8 +208,8 @@
         "date": "2025-12-10"
       },
       {
-        "hash": "pending",
-        "message": "feat: impl-052開始 - M7-T08, T09実装（645行、36テスト、100点）",
+        "hash": "d790be0",
+        "message": "feat: impl-052開始 - M7-T08, T09実装（645行、36テスト、100点）（統合済み）",
         "date": "2025-12-10"
       },
       {
