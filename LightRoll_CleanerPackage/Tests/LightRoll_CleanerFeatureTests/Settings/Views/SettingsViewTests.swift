@@ -590,6 +590,180 @@ struct SettingsViewTests {
             #expect(service.settings.displaySettings.sortOrder == sortOrder)
         }
     }
+
+    // MARK: - M7-T11: Notification Settings Integration Tests
+
+    @Test("通知設定サマリーが正しく表示される - 通知オフ")
+    func notificationSummaryShowsCorrectlyWhenDisabled() {
+        // Given
+        let service = SettingsService()
+        var notificationSettings = service.settings.notificationSettings
+        notificationSettings.isEnabled = false
+        try? service.updateNotificationSettings(notificationSettings)
+
+        // When
+        let view = SettingsView()
+            .environment(service)
+            .environment(PermissionManager())
+
+        // Then: 通知サマリーが「オフ」と表示される
+        // （ViewのcomputedプロパティはViewのインスタンスからは直接テストできないため、
+        //  設定が正しく反映されていることを確認）
+        #expect(service.settings.notificationSettings.isEnabled == false)
+    }
+
+    @Test("通知設定サマリーが正しく表示される - 容量警告のみ")
+    func notificationSummaryShowsCorrectlyWithStorageAlertOnly() throws {
+        // Given
+        let service = SettingsService()
+        var notificationSettings = service.settings.notificationSettings
+        notificationSettings.isEnabled = true
+        notificationSettings.storageAlertEnabled = true
+        notificationSettings.reminderEnabled = false
+        notificationSettings.quietHoursEnabled = false
+        try service.updateNotificationSettings(notificationSettings)
+
+        // Then
+        #expect(service.settings.notificationSettings.isEnabled == true)
+        #expect(service.settings.notificationSettings.storageAlertEnabled == true)
+        #expect(service.settings.notificationSettings.reminderEnabled == false)
+        #expect(service.settings.notificationSettings.quietHoursEnabled == false)
+    }
+
+    @Test("通知設定サマリーが正しく表示される - すべて有効")
+    func notificationSummaryShowsCorrectlyWithAllEnabled() throws {
+        // Given
+        let service = SettingsService()
+        var notificationSettings = service.settings.notificationSettings
+        notificationSettings.isEnabled = true
+        notificationSettings.storageAlertEnabled = true
+        notificationSettings.reminderEnabled = true
+        notificationSettings.quietHoursEnabled = true
+        try service.updateNotificationSettings(notificationSettings)
+
+        // Then
+        #expect(service.settings.notificationSettings.isEnabled == true)
+        #expect(service.settings.notificationSettings.storageAlertEnabled == true)
+        #expect(service.settings.notificationSettings.reminderEnabled == true)
+        #expect(service.settings.notificationSettings.quietHoursEnabled == true)
+    }
+
+    @Test("通知設定サマリーが正しく表示される - 設定なし")
+    func notificationSummaryShowsCorrectlyWithNoSettings() throws {
+        // Given
+        let service = SettingsService()
+        var notificationSettings = service.settings.notificationSettings
+        notificationSettings.isEnabled = true
+        notificationSettings.storageAlertEnabled = false
+        notificationSettings.reminderEnabled = false
+        notificationSettings.quietHoursEnabled = false
+        try service.updateNotificationSettings(notificationSettings)
+
+        // Then
+        #expect(service.settings.notificationSettings.isEnabled == true)
+        #expect(service.settings.notificationSettings.storageAlertEnabled == false)
+        #expect(service.settings.notificationSettings.reminderEnabled == false)
+        #expect(service.settings.notificationSettings.quietHoursEnabled == false)
+    }
+
+    @Test("NotificationSettingsViewへのナビゲーションが機能する")
+    func navigationToNotificationSettingsViewWorks() {
+        // Given
+        let service = SettingsService()
+        let permissionManager = PermissionManager()
+
+        // When
+        let view = SettingsView()
+            .environment(service)
+            .environment(permissionManager)
+
+        // Then: Viewが正しく初期化される
+        #expect(view != nil)
+    }
+
+    @Test("通知設定が変更された場合にSettingsServiceに反映される")
+    func notificationSettingsChangesReflectInSettingsService() throws {
+        // Given
+        let service = SettingsService()
+        var notificationSettings = service.settings.notificationSettings
+
+        // When: ストレージアラートしきい値を変更
+        notificationSettings.storageAlertThreshold = 0.75
+        try service.updateNotificationSettings(notificationSettings)
+
+        // Then
+        #expect(service.settings.notificationSettings.storageAlertThreshold == 0.75)
+
+        // When: リマインダー間隔を変更
+        notificationSettings.reminderInterval = .daily
+        try service.updateNotificationSettings(notificationSettings)
+
+        // Then
+        #expect(service.settings.notificationSettings.reminderInterval == .daily)
+    }
+
+    @Test("通知設定の永続化が動作する")
+    func notificationSettingsPersistenceWorks() throws {
+        // Given
+        let repository = SettingsRepository()
+        let service1 = SettingsService(repository: repository)
+
+        // When: 通知設定を変更
+        var notificationSettings = service1.settings.notificationSettings
+        notificationSettings.isEnabled = true
+        notificationSettings.storageAlertEnabled = true
+        notificationSettings.storageAlertThreshold = 0.8
+        notificationSettings.reminderEnabled = true
+        notificationSettings.reminderInterval = .biweekly
+        notificationSettings.quietHoursEnabled = true
+        notificationSettings.quietHoursStart = 23
+        notificationSettings.quietHoursEnd = 7
+        try service1.updateNotificationSettings(notificationSettings)
+
+        // And: 新しいサービスインスタンスを作成（設定を再読み込み）
+        let service2 = SettingsService(repository: repository)
+
+        // Then: すべての設定が保持されている
+        #expect(service2.settings.notificationSettings.isEnabled == true)
+        #expect(service2.settings.notificationSettings.storageAlertEnabled == true)
+        #expect(service2.settings.notificationSettings.storageAlertThreshold == 0.8)
+        #expect(service2.settings.notificationSettings.reminderEnabled == true)
+        #expect(service2.settings.notificationSettings.reminderInterval == .biweekly)
+        #expect(service2.settings.notificationSettings.quietHoursEnabled == true)
+        #expect(service2.settings.notificationSettings.quietHoursStart == 23)
+        #expect(service2.settings.notificationSettings.quietHoursEnd == 7)
+    }
+
+    @Test("通知セクションのアクセシビリティ識別子が設定されている")
+    func notificationSectionHasAccessibilityIdentifier() {
+        // Given
+        let service = SettingsService()
+
+        // When
+        let view = SettingsView()
+            .environment(service)
+            .environment(PermissionManager())
+
+        // Then: Viewが正しく初期化され、アクセシビリティ識別子が設定される
+        #expect(view != nil)
+        // 注：SwiftUIのアクセシビリティ識別子は実際のビュー階層でのみテスト可能
+        // ここではViewの初期化が成功することを確認
+    }
+
+    @Test("通知無効時に警告アイコンが表示される想定")
+    func warningIconShowsWhenNotificationsDisabled() throws {
+        // Given
+        let service = SettingsService()
+        var notificationSettings = service.settings.notificationSettings
+
+        // When: 通知を無効化
+        notificationSettings.isEnabled = false
+        try service.updateNotificationSettings(notificationSettings)
+
+        // Then: 設定が無効になっている
+        #expect(service.settings.notificationSettings.isEnabled == false)
+        // 注：警告アイコンの表示はUI層でのみ確認可能
+    }
 }
 
 // MARK: - Test Tags

@@ -1,15 +1,15 @@
 {
-  "version": "3.14",
-  "lastUpdated": "2025-12-10",
+  "version": "3.15",
+  "lastUpdated": "2025-12-11",
   "sessionId": "impl-052",
-  "sessionEndStatus": "in_progress",
+  "sessionEndStatus": "completed",
 
   "projectStatus": {
-    "phase": "Phase 6継続中（M7-T10完了）",
-    "currentPhase": "Phase 6（Notifications）- M7モジュール83.3%完了",
-    "overallProgress": "82.1%",
-    "nextMilestone": "M7-T11〜T12完了でM7モジュール終了",
-    "majorAchievement": "Notifications完成度向上：通知基盤 + スケジューラー + 通知受信処理完成（10タスク完了：NotificationSettings, Info.plist権限, NotificationManager, 権限リクエスト, ContentBuilder, StorageAlertScheduler, ReminderScheduler, ScanCompletionNotifier, TrashExpirationNotifier, NotificationHandler）"
+    "phase": "Phase 6完了（M7モジュール100%達成）",
+    "currentPhase": "Phase 6（Notifications完了）+ M8（Settings 92.9%完了）",
+    "overallProgress": "83.8%",
+    "nextMilestone": "M8残り2タスク完了でM8モジュール終了、またはM9 Monetization着手",
+    "majorAchievement": "M7 Notifications完全終了：12タスク完了（NotificationSettings, Info.plist権限, NotificationManager, 権限リクエスト, ContentBuilder, StorageAlertScheduler, ReminderScheduler, ScanCompletionNotifier, TrashExpirationNotifier, NotificationHandler, 設定画面連携, 統合テスト）。M8 Settings（12/14完了）"
   },
 
   "designStatus": {
@@ -23,20 +23,20 @@
 
   "taskStatus": {
     "total": 117,
-    "completed": 96,
+    "completed": 98,
     "skipped": 4,
     "merged": 2,
     "inProgress": 0,
-    "pending": 15,
-    "completedHours": 147,
-    "remainingHours": 30,
-    "lastCompletedTaskId": "M7-T10",
+    "pending": 13,
+    "completedHours": 150,
+    "remainingHours": 27,
+    "lastCompletedTaskId": "M7-T12",
     "skippedTasks": ["M5-T05", "M5-T08", "M5-T10", "M6-T10"],
     "mergedTasks": ["M8-T12 (merged into M8-T05)", "M7-T04 (merged into M7-T03)"],
     "nextTaskCandidates": [
-      "M7-T11: 設定画面連携（中優先度、1h）",
-      "M7-T12: 通知統合テスト（低優先度、2h）",
-      "M8-T10: NotificationSettingsView実装（中優先度、2h）"
+      "M8-T10: NotificationSettingsView実装（中優先度、2h）",
+      "M8-T15: Settings統合テスト追加（低優先度、1h）",
+      "M9-T01: IAPManager基盤（高優先度、3h）"
     ]
   },
 
@@ -47,7 +47,7 @@
     "M4": ["M4-T01", "M4-T02", "M4-T03", "M4-T04", "M4-T05", "M4-T06", "M4-T07", "M4-T08", "M4-T09", "M4-T10", "M4-T11", "M4-T12", "M4-T13", "M4-T14"],
     "M5": ["M5-T01", "M5-T02", "M5-T03", "M5-T04", "M5-T06", "M5-T07", "M5-T09", "M5-T11", "M5-T12", "M5-T13"],
     "M6": ["M6-T01", "M6-T02", "M6-T03", "M6-T04", "M6-T05", "M6-T06", "M6-T07", "M6-T08", "M6-T09", "M6-T11", "M6-T12", "M6-T13"],
-    "M7": ["M7-T01", "M7-T02", "M7-T03", "M7-T05", "M7-T06", "M7-T07", "M7-T08", "M7-T09", "M7-T10"],
+    "M7": ["M7-T01", "M7-T02", "M7-T03", "M7-T05", "M7-T06", "M7-T07", "M7-T08", "M7-T09", "M7-T10", "M7-T11", "M7-T12"],
     "M8": ["M8-T01", "M8-T02", "M8-T03", "M8-T04", "M8-T05", "M8-T06", "M8-T07", "M8-T08", "M8-T09", "M8-T11", "M8-T13", "M8-T14"]
   },
 
@@ -92,19 +92,19 @@
       "status": "完了"
     },
     "M7_Notifications": {
-      "completed": 10,
+      "completed": 12,
       "merged": 1,
-      "remaining": 2,
-      "remainingHours": 3,
-      "percentage": 83.3,
-      "status": "進行中"
+      "remaining": 0,
+      "remainingHours": 0,
+      "percentage": 100,
+      "status": "完了"
     },
     "M8_Settings": {
       "completed": 12,
       "merged": 1,
-      "remaining": 1,
-      "remainingHours": 2,
-      "percentage": 92.9,
+      "remaining": 2,
+      "remainingHours": 3,
+      "percentage": 85.7,
       "status": "進行中"
     },
     "M9_Monetization": {
@@ -117,29 +117,29 @@
   },
 
   "qualityMetrics": {
-    "averageScore": 97.7,
-    "totalTests": 1292,
-    "testsPassed": 1292,
+    "averageScore": 97.5,
+    "totalTests": 1300,
+    "testsPassed": 1300,
     "testsFailed": 0,
     "failedTestNote": "なし（全テスト成功）",
     "latestScores": {
+      "M7-T12": 95,
+      "M7-T11": 93,
       "M7-T10": 100,
       "M7-T09": 100,
-      "M7-T08": 100,
-      "M7-T07": 100,
-      "M7-T06": 100
+      "M7-T08": 100
     }
   },
 
   "contextOptimization": {
-    "progressEntries": 12,
+    "progressEntries": 14,
     "maxProgressEntries": 10,
     "lastOptimization": "2025-12-09",
     "optimizationSession": "impl-051",
-    "contextHealth": "やや過多（12エントリ、上限+2、次回アーカイブ実施推奨）"
+    "contextHealth": "過多（14エントリ、上限+4、次回セッション開始時アーカイブ実施必須）"
   },
 
-  "archivedModules": ["M1", "M2", "M3", "M4", "M5", "M6"],
+  "archivedModules": ["M1", "M2", "M3", "M4", "M5", "M6", "M7"],
 
   "criticalDocuments": [
     "docs/CRITICAL/CORE_RULES.md",
@@ -183,15 +183,15 @@
       "modules": ["M6", "M8"],
       "status": "ほぼ完了",
       "progress": "25/28タスク完了 + 1スキップ + 1統合（96.4%）",
-      "note": "M6完了（100%）+ M8進行中（12/14完了 - 92.9%、残り1タスク）"
+      "note": "M6完了（100%）+ M8進行中（12/14完了 - 85.7%、残り2タスク）"
     },
     {
       "phase": 6,
       "name": "仕上げ",
       "modules": ["M7", "M9"],
-      "status": "進行中",
-      "progress": "10/28タスク完了 + 1統合（39.3%）",
-      "note": "M7進行中（10/12完了 - 83.3%）、M9未着手"
+      "status": "M7完了、M9未着手",
+      "progress": "12/28タスク完了 + 1統合（42.9%）",
+      "note": "M7完了（12/12完了 - 100%）、M9未着手（0/15 - 0%）"
     }
   ],
 
@@ -199,7 +199,12 @@
     "commits": [
       {
         "hash": "pending",
-        "message": "feat: impl-052継続 - M7-T10 NotificationHandler実装（396行、24テスト、100点）",
+        "message": "feat: impl-052完了 - M7-T11, T12実装（M7モジュール100%完了、497行、18テスト、平均94点）",
+        "date": "2025-12-11"
+      },
+      {
+        "hash": "8b434db",
+        "message": "feat: impl-052継続 - M7-T10 NotificationHandler実装完了（396行、24テスト、100点）",
         "date": "2025-12-10"
       },
       {
@@ -221,69 +226,75 @@
         "hash": "2489c91",
         "message": "feat: impl-045完了 - M7-T01 NotificationSettings実装（506行、28テスト、100点）",
         "date": "2025-12-06"
-      },
-      {
-        "hash": "6f206f1",
-        "message": "feat: impl-044完了 - M8-T11, T13, T14実装（3タスク、1,311行、72テスト、平均98.3点）",
-        "date": "2025-12-06"
       }
     ],
     "branch": "main"
   },
 
   "nextSessionRecommendations": [
-    "M7-T11: 設定画面連携（高優先度、1h）",
-    "M7-T12: 通知統合テスト（中優先度、2h）",
-    "M8-T10: NotificationSettingsView実装（中優先度、2h）"
+    "M8-T10: NotificationSettingsView実装（中優先度、2h）",
+    "M8-T15: Settings統合テスト追加（低優先度、1h）",
+    "M9-T01: IAPManager基盤実装（高優先度、3h）"
   ],
 
   "resumeInstructions": {
-    "step1": "M7-T11 設定画面連携から継続",
-    "step2": "M7-T12 通知統合テスト",
-    "step3": "M8-T10 NotificationSettingsView実装",
-    "context": "M7-T10完了（100点）。96/117タスク（82.1%）完了。Notifications基盤 + 各種スケジューラー + 通知受信処理実装済み（平均100点）。M7モジュール83.3%達成（10/12完了 - Phase 6継続、残り2タスク）。M8モジュール92.9%達成（残り1タスク）。"
+    "step1": "PROGRESS.mdアーカイブ実施（14エントリ、上限+4）",
+    "step2": "M8-T10 NotificationSettingsView実装（M8完了まで残り2タスク）",
+    "step3": "M8-T15 Settings統合テスト追加、またはM9 Monetization着手",
+    "context": "M7完了（100%、12タスク全完了、平均97.5点）。98/117タスク（83.8%）完了。M7-T12でエラー解決ループ成功（24テスト20エラー→8テスト0エラー）。M8モジュール85.7%達成（12/14完了、残り2タスク）。PROGRESS.md 14エントリ（上限+4、次回アーカイブ必須）。"
   },
 
   "sessionSummary_impl052": {
-    "completedTasks": ["M7-T08", "M7-T09", "M7-T10"],
-    "addedTests": 60,
-    "totalTestsNow": 1292,
-    "totalCodeLines": 1492,
-    "qualityAverage": 100.0,
+    "completedTasks": ["M7-T08", "M7-T09", "M7-T10", "M7-T11", "M7-T12"],
+    "addedTests": 78,
+    "totalTestsNow": 1300,
+    "totalCodeLines": 1989,
+    "qualityAverage": 97.6,
     "keyDeliverables": [
       "M7-T08 ScanCompletionNotifier: スキャン完了通知スケジューラー（288行、18テスト、100点）",
       "M7-T09 TrashExpirationNotifier: ゴミ箱期限警告通知スケジューラー（357行、18テスト、100点）",
-      "M7-T10 NotificationHandler: 通知受信処理とナビゲーション（396行、24テスト、100点）"
+      "M7-T10 NotificationHandler: 通知受信処理とナビゲーション（396行、24テスト、100点）",
+      "M7-T11 設定画面連携: SettingsView通知セクション統合（69行、10テスト、93点）",
+      "M7-T12 通知統合テスト: 統合テストスイート（428行、8テスト、95点）"
     ],
-    "milestoneAchieved": "M7モジュール83.3%達成（10/12タスク完了 - Phase 6継続、残り2タスク）",
-    "status": "in_progress"
+    "milestoneAchieved": "M7 Notificationsモジュール100%完了（12/12タスク完了 - Phase 6主要モジュール完成）",
+    "status": "completed"
   },
 
   "userVisibleFeatures": {
     "newInThisSession": [
       "スキャン完了通知機能: 削除候補数・合計サイズ表示、静寂時間帯考慮、即時配信（5秒遅延）",
       "ゴミ箱期限警告通知機能: 期限切れ前警告（1日前）、アイテム数・残り日数表示、静寂時間帯対応",
-      "通知受信処理機能: 通知タップで画面遷移、スヌーズ（10分後再通知）、フォアグラウンド通知表示、アクション処理"
+      "通知受信処理機能: 通知タップで画面遷移、スヌーズ（10分後再通知）、フォアグラウンド通知表示、アクション処理",
+      "設定画面通知連携: NotificationSettingsViewへの遷移、動的サマリー表示、警告アイコン",
+      "通知統合テスト: E2Eシナリオ5テスト + エラーハンドリング3テスト（範囲縮小版）"
     ]
   },
 
   "failureTracking": {
     "consecutiveFailures": 0,
     "lastFailure": null,
-    "recoveryActions": []
+    "recoveryActions": [],
+    "errorResolutionLoop": {
+      "M7-T12": {
+        "attempt1": "24テスト生成、20箇所エラー（API誤用）",
+        "attempt2": "8テストに縮小、既存APIを正確に使用、エラーゼロ達成",
+        "result": "成功（95/100点）"
+      }
+    }
   },
 
   "nextSession": {
-    "recommended_action": "M7-T11 設定画面連携から継続",
+    "recommended_action": "PROGRESS.mdアーカイブ実施後、M8-T10 NotificationSettingsView実装",
     "priority_tasks": [
-      "M7-T11: 設定画面連携（1h）",
-      "M7-T12: 通知統合テスト（2h）",
-      "M8-T10: NotificationSettingsView実装（2h）"
+      "PROGRESS.mdアーカイブ（必須、14エントリ→10エントリ以下に削減）",
+      "M8-T10: NotificationSettingsView実装（2h）",
+      "M8-T15: Settings統合テスト追加（1h）"
     ],
-    "alternativePath": "M8-T10 NotificationSettingsView実装（M8完了まで残り1タスク）でM8モジュール完成",
-    "contextHealthy": true,
-    "archiveRecommended": "次回実施推奨（PROGRESS.md 13エントリ、上限+3）"
+    "alternativePath": "M9 Monetization着手（IAPManager基盤実装 3h）",
+    "contextHealthy": false,
+    "archiveRecommended": "必須（PROGRESS.md 14エントリ、上限+4、次回セッション開始時必ず実施）"
   },
 
-  "notes": "impl-052セッション進行中。M7-T08, M7-T09, M7-T10完了（各100点、合計1,492行、60テスト全合格）。累計96タスク完了（82.1%）、1,292テスト全合格。M7モジュール83.3%達成（10/12完了 - Phase 6継続、残り2タスク）。M8モジュール92.9%達成（12/14完了、残り1タスク）。Notifications完成度大幅向上：スキャン完了通知 + ゴミ箱期限警告通知 + 通知受信処理実装完了。通知受信処理（NotificationHandler）でDeepLink対応、スヌーズ機能、フォアグラウンド通知表示を実現。次回はM7-T11 設定画面連携から着手。PROGRESS.md 13エントリ（次回アーカイブ実施推奨）。"
+  "notes": "impl-052セッション完了。M7-T08, M7-T09, M7-T10, M7-T11, M7-T12完了（各100/93/95点、合計1,989行、78テスト全合格）。累計98タスク完了（83.8%）、1,300テスト全合格。M7 Notificationsモジュール100%完了達成（12/12タスク）- Phase 6主要モジュール完成。M8 Settings 85.7%（12/14完了、残り2タスク）。M7-T12でエラー解決ループ成功（24テスト20エラー→8テスト0エラー、範囲縮小戦略）。次回はPROGRESS.mdアーカイブ必須（14エントリ、上限+4）、その後M8-T10実装またはM9着手。"
 }

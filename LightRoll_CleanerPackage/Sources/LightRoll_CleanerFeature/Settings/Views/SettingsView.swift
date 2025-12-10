@@ -264,73 +264,64 @@ public struct SettingsView: View {
 
     /// 通知セクション
     private var notificationSection: some View {
-        @Bindable var service = settingsService
-        return Section {
-            SettingsToggle(
-                icon: "bell",
-                iconColor: .orange,
-                title: "通知を許可",
-                subtitle: "アプリからの通知を受け取る",
-                isOn: .init(
-                    get: { service.settings.notificationSettings.isEnabled },
-                    set: { newValue in
-                        var newSettings = service.settings.notificationSettings
-                        newSettings.isEnabled = newValue
-                        try? service.updateNotificationSettings(newSettings)
+        Section {
+            NavigationLink {
+                NotificationSettingsView()
+                    .environment(settingsService)
+            } label: {
+                HStack {
+                    SettingsRow(
+                        icon: "bell.badge",
+                        iconColor: .orange,
+                        title: "通知設定",
+                        subtitle: notificationSummary
+                    )
+
+                    Spacer()
+
+                    if !settingsService.settings.notificationSettings.isEnabled {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.yellow)
+                            .font(.caption)
+                            .accessibilityLabel("通知が無効")
                     }
-                )
-            )
-
-            SettingsToggle(
-                icon: "exclamationmark.triangle",
-                iconColor: .red,
-                title: "容量警告",
-                subtitle: "ストレージ容量が不足したときに通知",
-                isOn: .init(
-                    get: { service.settings.notificationSettings.storageAlertEnabled },
-                    set: { newValue in
-                        var newSettings = service.settings.notificationSettings
-                        newSettings.storageAlertEnabled = newValue
-                        try? service.updateNotificationSettings(newSettings)
-                    }
-                ),
-                disabled: !service.settings.notificationSettings.isEnabled
-            )
-
-            SettingsToggle(
-                icon: "alarm",
-                iconColor: .blue,
-                title: "リマインダー",
-                subtitle: "定期的なクリーンアップを通知",
-                isOn: .init(
-                    get: { service.settings.notificationSettings.reminderEnabled },
-                    set: { newValue in
-                        var newSettings = service.settings.notificationSettings
-                        newSettings.reminderEnabled = newValue
-                        try? service.updateNotificationSettings(newSettings)
-                    }
-                ),
-                disabled: !service.settings.notificationSettings.isEnabled
-            )
-
-            HStack {
-                SettingsRow(
-                    icon: "moon",
-                    iconColor: .purple,
-                    title: "静寂時間"
-                )
-
-                Spacer()
-
-                Text("\(service.settings.notificationSettings.quietHoursStart)時〜\(service.settings.notificationSettings.quietHoursEnd)時")
-                    .foregroundColor(.secondary)
-                    .font(.caption)
+                }
             }
-            .disabled(!service.settings.notificationSettings.isEnabled)
-            .opacity(service.settings.notificationSettings.isEnabled ? 1.0 : 0.5)
+            .accessibilityLabel("通知設定")
+            .accessibilityHint("タップして詳細設定を表示")
+            .accessibilityIdentifier("notificationSettingsLink")
         } header: {
             Text("通知")
         }
+    }
+
+    /// 通知設定のサマリー
+    private var notificationSummary: String {
+        let settings = settingsService.settings.notificationSettings
+
+        if !settings.isEnabled {
+            return "オフ"
+        }
+
+        var components: [String] = []
+
+        if settings.storageAlertEnabled {
+            components.append("容量警告")
+        }
+
+        if settings.reminderEnabled {
+            components.append("リマインダー")
+        }
+
+        if settings.quietHoursEnabled {
+            components.append("静寂時間")
+        }
+
+        if components.isEmpty {
+            return "オン（設定なし）"
+        }
+
+        return components.joined(separator: "、")
     }
 
     // MARK: - Display Section
