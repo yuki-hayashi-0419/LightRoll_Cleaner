@@ -11,9 +11,9 @@
 - **完了モジュール**: M1 Core Infrastructure, M2 Photo Access, M3 Image Analysis, M4 UI Components, M5 Dashboard & Statistics, M6 Deletion & Trash
 - **進行中モジュール**:
   - **M8 Settings & Preferences** (13/14タスク完了 - 92.9%) ✨ ほぼ完了
-  - **M7 Notifications** (5/13タスク完了 - 38.5%) ✨ Phase 6継続
-- **Phase 5-6継続中**: M1〜M6完全実装 + M7・M8部分実装（91/117タスク - 77.8%）
-- **全体進捗**: 91/117タスク (77.8%)
+  - **M7 Notifications** (8/13タスク完了 - 61.5%) ✨ Phase 6継続
+- **Phase 5-6継続中**: M1〜M6完全実装 + M7・M8部分実装（94/117タスク - 80.3%）
+- **全体進捗**: 94/117タスク (80.3%)
 
 ---
 
@@ -733,7 +733,235 @@ M7-T04の権限リクエスト機能は、M7-T03 NotificationManagerに完全に
 **品質スコア**: 100%テスト成功 ⭐⭐⭐
 **テスト成功率**: 21/21 (100%)、0.006秒
 
-**M7モジュール進捗**: 7/13タスク完了（**53.8%達成** 🎉）
+### M7-T08 ScanCompletionNotifier詳細
+
+スキャン完了通知を送信するサービス実装。写真スキャンが完了した際に、削除候補数と合計サイズをユーザーに通知：
+
+| 機能 | 説明 |
+|------|------|
+| **スキャン完了通知** | スキャン完了時に削除候補の情報を即座に通知 |
+| **削除候補情報** | アイテム数と合計サイズを分かりやすく表示 |
+| **結果別メッセージ** | 候補ありと候補なしで異なるメッセージを表示 |
+| **静寂時間帯考慮** | 静寂時間帯中は通知をスキップ |
+| **通知タップ対応** | 通知タップでアプリを開き、結果画面へ遷移 |
+| **パラメータ検証** | 不正な値（負数）の検証とエラーハンドリング |
+
+#### 実装メソッド
+- `notifyScanCompletion(itemCount:totalSize:)` - スキャン完了通知の送信
+- `notifyNoItemsFound()` - 削除候補なしの簡易通知
+- `cancelScanCompletionNotification()` - ペンディング通知のキャンセル
+- `resetNotificationState()` - 通知状態のリセット
+- `clearError()` - エラー状態のクリア
+
+#### 通知コンテンツ
+**削除候補あり**:
+- タイトル: 「スキャン完了」
+- 本文: 「10個の不要ファイルが見つかりました。\n合計サイズ: 50.23 MB\nタップして確認しましょう。」
+
+**削除候補なし**:
+- タイトル: 「スキャン完了」
+- 本文: 「不要なファイルは見つかりませんでした。\nストレージは良好な状態です。」
+
+#### エラーハンドリング
+**ScanCompletionNotifierError列挙型**:
+- `schedulingFailed` - 通知送信失敗
+- `notificationsDisabled` - 通知設定が無効
+- `permissionDenied` - 通知権限が拒否されている
+- `quietHoursActive` - 静寂時間帯中
+- `invalidParameters` - 無効なパラメータ（負数など）
+
+#### 監視可能プロパティ
+- `lastNotifiedItemCount` - 最後に通知した削除候補数
+- `lastNotifiedTotalSize` - 最後に通知した合計サイズ
+- `lastNotificationDate` - 最後の通知送信日時
+- `wasNotificationSent` - 通知が送信されたか
+- `lastError` - 最後に発生したエラー
+
+#### ユーザーへの効果
+- **即時通知**: スキャン完了後5秒で通知を配信
+- **明確な結果**: 削除候補数とサイズを具体的に表示
+- **スマート通知**: 静寂時間帯を自動的に考慮
+- **バッジ対応**: 削除候補がある場合のみバッジ表示
+
+#### 技術的特徴
+- **@Observable + Sendable準拠**: Swift 6 Concurrency完全対応
+- **依存性注入**: NotificationManager、NotificationContentBuilderを注入
+- **5秒遅延トリガー**: UNTimeIntervalNotificationTrigger使用
+- **境界値テスト**: 0件、最大値など18の包括的テスト
+
+**成果物**:
+- ScanCompletionNotifier.swift (288行)
+- ScanCompletionNotifierTests.swift (528行、18テスト）
+
+**品質スコア**: 100%テスト成功 ⭐⭐⭐
+**テスト成功率**: 18/18 (100%)、0.112秒
+
+### M7-T09 TrashExpirationNotifier詳細
+
+ゴミ箱アイテムの期限切れ前に警告通知を送信するスケジューラー実装。30日間の保持期間が近づいた際に自動的にユーザーに通知：
+
+| 機能 | 説明 |
+|------|------|
+| **期限チェック** | ゴミ箱内のアイテムを定期的にチェック |
+| **警告通知** | 期限切れ前（デフォルト1日前）に警告を送信 |
+| **カスタマイズ可能** | 警告日数を調整可能（1〜7日前など） |
+| **詳細情報表示** | アイテム数と残り日数を通知に含める |
+| **優先順位制御** | 最も早く期限切れになるアイテムを優先 |
+| **通知タップ対応** | 通知タップでゴミ箱画面へ遷移 |
+
+#### 実装メソッド
+- `scheduleExpirationWarning()` - 期限警告通知をスケジュール
+- `cancelAllExpirationWarnings()` - すべての期限警告通知をキャンセル
+- `getExpiringItemCount()` - 期限切れ前のアイテム数を取得
+
+#### 通知コンテンツ
+**期限警告通知**:
+- タイトル: 「ゴミ箱の期限警告」
+- 本文: 「3個のアイテムが1日後に期限切れになります。\n今すぐ確認してください。」
+- カテゴリ: TRASH_EXPIRATION
+
+#### エラーハンドリング
+**TrashExpirationNotifierError列挙型**:
+- `schedulingFailed` - 通知スケジューリング失敗
+- `notificationsDisabled` - 通知設定が無効
+- `permissionDenied` - 通知権限が拒否されている
+- `trashEmpty` - ゴミ箱が空（通知不要）
+- `noExpiringItems` - 期限切れ前のアイテムがない
+
+#### 通知スケジューリングロジック
+- **期限計算**: 各アイテムの `expiresAt` から `warningDaysBefore` を減算
+- **トリガー生成**: UNTimeIntervalNotificationTrigger使用
+- **過去の日時処理**: 期限が過去の場合は即座に通知（5秒後）
+- **静寂時間帯調整**: 静寂時間帯中の場合は終了時刻に自動調整
+- **重複防止**: 新規スケジュール前に既存通知を自動キャンセル
+
+#### ユーザーへの効果
+- **リマインダー機能**: 期限切れ前に自動で通知
+- **データロス防止**: 重要な写真の完全削除を未然に防ぐ
+- **柔軟な設定**: 警告タイミングを好みに調整可能
+- **複数アイテム対応**: 複数のアイテムが期限間近でもまとめて通知
+
+#### 技術的特徴
+- **@Observable + Sendable準拠**: Swift 6 Concurrency完全対応
+- **TrashManagerProtocol統合**: ゴミ箱データの取得
+- **時間ベース比較**: 正確な期限判定のためDate比較を実装
+- **18の包括的テスト**: 初期化、スケジューリング、エラー、統合テスト
+
+#### TrashPhoto拡張改善
+**expiringWithin(days:)メソッド修正**:
+- 日数ベース比較から時間ベース比較に変更
+- Date比較による正確な境界条件処理
+- 24時間未満の誤判定を解消
+
+**成果物**:
+- TrashExpirationNotifier.swift (357行)
+- TrashExpirationNotifierTests.swift (446行、18テスト）
+- TrashPhoto.swift (expiringWithin修正)
+
+**品質スコア**: 100%テスト成功 ⭐⭐⭐
+**テスト成功率**: 18/18 (100%)、0.005秒
+
+**M7モジュール進捗**: 9/12タスク完了（**75.0%達成** 🎉）
+
+---
+
+## M7-T10: 通知受信処理実装 (2025-12-10)
+
+### 概要
+通知受信時の処理とナビゲーションを実装。UNUserNotificationCenterDelegateを実装し、通知タップ時の画面遷移（DeepLink対応）、通知アクション処理、フォアグラウンド通知表示、スヌーズ機能を提供。
+
+### 実装機能
+
+#### 1. 通知デリゲート (UNUserNotificationCenterDelegate)
+- **フォアグラウンド通知表示**: willPresent で [.banner, .sound, .badge] 指定
+- **通知タップ処理**: didReceive で通知タップとアクションを処理
+- **非同期処理対応**: nonisolated デリゲートメソッド → Task { @MainActor } で安全な呼び出し
+- **デリゲート登録**: setupAsDelegate() でUNUserNotificationCenter.current().delegateに設定
+
+#### 2. 画面遷移（DeepLink）
+**NotificationDestination enum**:
+- `.home`: ストレージ警告 → ホーム画面
+- `.groupList`: スキャン完了 → グループ一覧
+- `.trash`: ゴミ箱期限警告 → ゴミ箱画面
+- `.reminder`: リマインダー → ホーム画面
+- `.settings`: 設定画面
+- `.unknown`: 不明な通知（デフォルト動作）
+
+**遷移先自動判定**:
+```swift
+public func destination(for identifier: String) -> NotificationDestination {
+    if identifier.hasPrefix("storage_alert") { return .home }
+    else if identifier.hasPrefix("scan_completion") { return .groupList }
+    else if identifier.hasPrefix("trash_expiration") { return .trash }
+    else if identifier.hasPrefix("reminder") { return .reminder }
+    else { return .unknown }
+}
+```
+
+#### 3. 通知アクション処理
+**NotificationAction enum**:
+- `.open`: 通知を開く（デフォルトタップ）
+- `.snooze`: スヌーズ（10分後に再通知）
+- `.cancel`: キャンセル（何もしない）
+- `.openTrash`: ゴミ箱を開く
+- `.startScan`: スキャン開始（ホームへ）
+
+**アクション処理フロー**:
+1. actionIdentifierから NotificationAction を判定
+2. `.open`: handleNotificationTap() 呼び出し → 画面遷移
+3. `.snooze`: handleSnooze() 呼び出し → 10分後再スケジュール
+4. `.openTrash`/`.startScan`: 直接ナビゲーションパスに追加
+5. `.cancel`: エラークリアのみ
+
+#### 4. スヌーズ機能
+- **10分後再通知**: UNTimeIntervalNotificationTrigger(timeInterval: 10 * 60)
+- **通知コピー**: 元の通知内容をコピーし、タイトルに「リマインダー: 」プレフィックス追加
+- **識別子変更**: 元の識別子に "_snooze" サフィックス追加
+- **NotificationManager統合**: scheduleNotification() メソッドで再スケジュール
+
+#### 5. ナビゲーション状態管理
+- **lastDestination**: 最後に受信した通知の遷移先を保持
+- **navigationPath**: 通知タップ履歴を配列で保持（複数タップ対応）
+- **SwiftUI連携**: @Observable により View から自動監視可能
+- **クリアメソッド**: clearNavigationPath(), clearLastDestination()
+
+#### 6. エラーハンドリング
+**NotificationHandlerError enum**:
+- `.invalidNotificationData(reason:)`: 無効な通知データ
+- `.navigationFailed(destination:)`: ナビゲーション失敗
+- `.actionProcessingFailed(action:reason:)`: アクション処理失敗
+- LocalizedError 準拠で日本語エラーメッセージ
+
+### ユーザーメリット
+- **シームレスな画面遷移**: 通知タップで関連画面にすぐアクセス
+- **柔軟なアクション**: 開く、スヌーズ、キャンセル等の選択肢
+- **後で対応可能**: スヌーズで10分後に再通知
+- **アプリ内通知**: フォアグラウンドでも通知を見逃さない
+- **複数通知対応**: ナビゲーション履歴で連続タップにも対応
+
+### 技術的特徴
+- **Swift 6 Concurrency完全対応**: @MainActor, Sendable, nonisolated delegate
+- **MV Pattern準拠**: @Observable サービスとして実装
+- **型安全なナビゲーション**: enum による遷移先管理
+- **テスト可能設計**: 依存性注入でNotificationManager を差し替え可能
+- **24の包括的テスト**: 初期化、遷移先判定、タップ処理、クリア、アクション、スヌーズ、統合テスト
+
+### テスト戦略
+**UNNotification制約への対応**:
+- UNNotificationは直接インスタンス化不可（NSCoding required initializer）
+- UNNotificationRequestとidentifierで動作検証
+- setupAsDelegate()はテスト環境で実行不可（bundleProxyForCurrentProcess is nil）
+- 統合テスト/実機テストでのみ完全検証可能
+
+**成果物**:
+- NotificationHandler.swift (396行)
+- NotificationHandlerTests.swift (451行、24テスト）
+- MockNotificationHandler (デバッグビルド専用)
+
+**品質スコア**: 100%テスト成功 ⭐⭐⭐
+**テスト成功率**: 24/24 (100%)、0.003秒
+
+**M7モジュール進捗**: 10/12タスク完了（**83.3%達成** 🎉）
 
 ---
 

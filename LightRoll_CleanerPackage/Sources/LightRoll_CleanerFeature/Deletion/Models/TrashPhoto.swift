@@ -584,9 +584,17 @@ extension Array where Element == TrashPhoto {
     /// - Parameter days: 日数（デフォルトは7日）
     /// - Returns: フィルタされた写真配列
     public func expiringWithin(days: Int = 7) -> [TrashPhoto] {
-        filter { photo in
-            let remaining = photo.daysUntilExpiration
-            return remaining > 0 && remaining <= days
+        let now = Date()
+        let calendar = Calendar.current
+
+        // 指定日数後の日時を計算
+        guard let thresholdDate = calendar.date(byAdding: .day, value: days, to: now) else {
+            return []
+        }
+
+        // 現在時刻より後で、指定日数以内に期限切れになるものを抽出
+        return filter { photo in
+            photo.expiresAt > now && photo.expiresAt <= thresholdDate
         }
     }
 
