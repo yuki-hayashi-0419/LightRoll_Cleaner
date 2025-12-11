@@ -136,7 +136,8 @@ public final class StubSettingsRepository: SettingsRepositoryProtocol, @unchecke
 // MARK: - Stub Purchase Repository
 
 /// PurchaseRepositoryのスタブ実装
-public final class StubPurchaseRepository: PurchaseRepositoryProtocol, @unchecked Sendable {
+@MainActor
+public final class StubPurchaseRepository: PurchaseRepositoryProtocol {
 
     public init() {}
 
@@ -148,15 +149,23 @@ public final class StubPurchaseRepository: PurchaseRepositoryProtocol, @unchecke
     }
 
     public func purchase(_ productId: String) async throws -> PurchaseResult {
-        return .success
+        return .cancelled // Stub: always returns cancelled
     }
 
-    public func restorePurchases() async throws {
+    public func restorePurchases() async throws -> RestoreResult {
+        return RestoreResult(transactions: [])
+    }
+
+    public func checkSubscriptionStatus() async throws -> PremiumStatus {
+        return .free
+    }
+
+    public func startTransactionListener() {
         // スタブ: 何もしない
     }
 
-    public func getPremiumStatus() async -> PremiumStatus {
-        return .free
+    public func stopTransactionListener() {
+        // スタブ: 何もしない
     }
 }
 
@@ -297,32 +306,7 @@ public final class MockSettingsRepository: SettingsRepositoryProtocol, @unchecke
     }
 }
 
-/// MockPurchaseRepository（テスト用）
-public final class MockPurchaseRepository: PurchaseRepositoryProtocol, @unchecked Sendable {
-
-    public var mockProducts: [ProductInfo] = []
-    public var mockPremiumStatus: PremiumStatus = .free
-    public var purchaseCalled = false
-    public var restoreCalled = false
-
-    public init() {}
-
-    public func fetchProducts() async throws -> [ProductInfo] {
-        return mockProducts
-    }
-
-    public func purchase(_ productId: String) async throws -> PurchaseResult {
-        purchaseCalled = true
-        return .success
-    }
-
-    public func restorePurchases() async throws {
-        restoreCalled = true
-    }
-
-    public func getPremiumStatus() async -> PremiumStatus {
-        return mockPremiumStatus
-    }
-}
+// 注意: MockPurchaseRepository は Monetization/Repositories/MockPurchaseRepository.swift で正式に定義されています。
+// ここでの仮定義は削除されました。
 
 #endif

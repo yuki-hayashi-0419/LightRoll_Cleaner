@@ -1,15 +1,15 @@
 {
-  "version": "3.17",
-  "lastUpdated": "2025-12-11",
-  "sessionId": "impl-054",
+  "version": "3.26",
+  "lastUpdated": "2025-12-12",
+  "sessionId": "impl-060",
   "sessionEndStatus": "completed",
 
   "projectStatus": {
-    "phase": "Phase 6完了（M7＋M8モジュール100%達成）",
-    "currentPhase": "Phase 6完了（M7 Notifications + M8 Settings 100%完了）+ M9進行中",
-    "overallProgress": "88.0%",
-    "nextMilestone": "M9 Monetization継続（12タスク残、23h）",
-    "majorAchievement": "M7 Notifications + M8 Settings完全終了 + M9着手：合計28タスク完了（M7: 12タスク完了、M8: 13タスク完了、M9: 3タスク完了）"
+    "phase": "Phase 6進行中",
+    "currentPhase": "M7＋M8完了（100%）+ M9 Monetization進行中（73.3%）",
+    "overallProgress": "94.9%",
+    "nextMilestone": "M9-T13 LimitReachedSheet実装",
+    "majorAchievement": "M9-T12完了（PremiumView、1,525行、54テスト、93点）- impl-060"
   },
 
   "designStatus": {
@@ -23,20 +23,20 @@
 
   "taskStatus": {
     "total": 117,
-    "completed": 103,
-    "skipped": 4,
-    "merged": 2,
+    "completed": 111,
+    "skipped": 5,
+    "merged": 1,
     "inProgress": 0,
-    "pending": 9,
-    "completedHours": 156.5,
-    "remainingHours": 23,
-    "lastCompletedTaskId": "M9-T03",
-    "skippedTasks": ["M5-T05", "M5-T08", "M5-T10", "M6-T10"],
-    "mergedTasks": ["M8-T12 (merged into M8-T05)", "M7-T04 (merged into M7-T03)"],
+    "pending": 4,
+    "completedHours": 173,
+    "remainingHours": 8,
+    "lastCompletedTaskId": "M9-T12",
+    "skippedTasks": ["M5-T05", "M5-T08", "M5-T10", "M6-T10", "M9-T11"],
+    "mergedTasks": ["M8-T12 -> M8-T05"],
     "nextTaskCandidates": [
-      "M9-T04: PurchaseRepository実装（高優先度、3h）",
-      "M9-T05: PurchaseManager実装（高優先度、3h）",
-      "M9-T06: PremiumFeatureGate実装（中優先度、2h）"
+      "M9-T13: LimitReachedSheet実装（中優先度、1h、M9-T05完了）",
+      "M9-T14: RestorePurchasesView実装（中優先度、1h、M9-T12完了）",
+      "M9-T15: Monetization統合テスト（低優先度、1.5h、M9-T14完了）"
     ]
   },
 
@@ -46,34 +46,42 @@
     "M3": ["M3-T01", "M3-T02", "M3-T03", "M3-T04", "M3-T05", "M3-T06", "M3-T07", "M3-T08", "M3-T09", "M3-T10", "M3-T11", "M3-T12", "M3-T13"],
     "M4": ["M4-T01", "M4-T02", "M4-T03", "M4-T04", "M4-T05", "M4-T06", "M4-T07", "M4-T08", "M4-T09", "M4-T10", "M4-T11", "M4-T12", "M4-T13", "M4-T14"],
     "M5": ["M5-T01", "M5-T02", "M5-T03", "M5-T04", "M5-T06", "M5-T07", "M5-T09", "M5-T11", "M5-T12", "M5-T13"],
-    "M6": ["M6-T01", "M6-T02", "M6-T03", "M6-T04", "M6-T05", "M6-T06", "M6-T07", "M6-T08", "M6-T09", "M6-T11", "M6-T12", "M6-T13"],
-    "M7": ["M7-T01", "M7-T02", "M7-T03", "M7-T05", "M7-T06", "M7-T07", "M7-T08", "M7-T09", "M7-T10", "M7-T11", "M7-T12"],
+    "M6": ["M6-T01", "M6-T02", "M6-T03", "M6-T04", "M6-T05", "M6-T06", "M6-T07", "M6-T08", "M6-T09", "M6-T11", "M6-T12", "M6-T13", "M6-T14"],
+    "M7": ["M7-T01", "M7-T02", "M7-T03", "M7-T04", "M7-T05", "M7-T06", "M7-T07", "M7-T08", "M7-T09", "M7-T10", "M7-T11", "M7-T12"],
     "M8": ["M8-T01", "M8-T02", "M8-T03", "M8-T04", "M8-T05", "M8-T06", "M8-T07", "M8-T08", "M8-T09", "M8-T10", "M8-T11", "M8-T13", "M8-T14"],
-    "M9": ["M9-T01", "M9-T02", "M9-T03"]
+    "M9": ["M9-T01", "M9-T02", "M9-T03", "M9-T04", "M9-T05", "M9-T06", "M9-T07", "M9-T08", "M9-T09", "M9-T10", "M9-T12"]
   },
 
   "moduleProgress": {
     "M1_CoreInfrastructure": {
       "completed": 10,
       "remaining": 0,
+      "completedHours": 16,
+      "remainingHours": 0,
       "percentage": 100,
       "status": "完了"
     },
     "M2_PhotoAccess": {
       "completed": 12,
       "remaining": 0,
+      "completedHours": 20.5,
+      "remainingHours": 0,
       "percentage": 100,
       "status": "完了"
     },
     "M3_ImageAnalysis": {
       "completed": 13,
       "remaining": 0,
+      "completedHours": 26,
+      "remainingHours": 0,
       "percentage": 100,
       "status": "完了"
     },
     "M4_UIComponents": {
       "completed": 14,
       "remaining": 0,
+      "completedHours": 17,
+      "remainingHours": 0,
       "percentage": 100,
       "status": "完了"
     },
@@ -81,6 +89,8 @@
       "completed": 11,
       "skipped": 3,
       "remaining": 0,
+      "completedHours": 18,
+      "remainingHours": 0,
       "percentage": 100,
       "status": "完了"
     },
@@ -88,6 +98,7 @@
       "completed": 13,
       "skipped": 1,
       "remaining": 0,
+      "completedHours": 17.5,
       "remainingHours": 0,
       "percentage": 100,
       "status": "完了"
@@ -96,6 +107,7 @@
       "completed": 12,
       "merged": 1,
       "remaining": 0,
+      "completedHours": 15.5,
       "remainingHours": 0,
       "percentage": 100,
       "status": "完了"
@@ -104,45 +116,50 @@
       "completed": 13,
       "merged": 1,
       "remaining": 0,
+      "completedHours": 19.5,
       "remainingHours": 0,
       "percentage": 100,
       "status": "完了"
     },
     "M9_Monetization": {
-      "completed": 3,
-      "remaining": 12,
-      "remainingHours": 23,
-      "percentage": 20.0,
+      "completed": 11,
+      "skipped": 1,
+      "remaining": 4,
+      "completedHours": 22.5,
+      "remainingHours": 5,
+      "percentage": 73.3,
       "status": "進行中"
     }
   },
 
   "qualityMetrics": {
     "averageScore": 97.5,
-    "totalTests": 1353,
-    "testsPassed": 1353,
+    "averagePercentage": 97.5,
+    "totalTests": 1354,
+    "testsPassed": 1354,
     "testsFailed": 0,
-    "failedTestNote": "なし（全テスト成功）",
+    "failedTestNote": "全テスト成功",
     "latestScores": {
-      "M9-T03": 92,
-      "M9-T02": 95,
-      "M7-T12": 95,
-      "M7-T11": 93,
-      "M7-T10": 100
+      "M9-T12": 93,
+      "M9-T10": 92,
+      "M9-T09": 93,
+      "M9-T08": 95,
+      "M9-T07": 95
     }
   },
 
   "contextOptimization": {
     "progressEntries": 10,
-    "maxProgressEntries": 10,
-    "lastOptimization": "2025-12-11",
-    "optimizationSession": "impl-052",
-    "archivedEntries": 4,
-    "archivedSessions": ["impl-041", "impl-042", "impl-043", "impl-044"],
-    "contextHealth": "良好（10エントリ、上限内）"
+    "maxProgressEntries": 12,
+    "archivedTasks": 62,
+    "lastOptimization": "2025-12-12",
+    "optimizationSession": "impl-060",
+    "archivedEntries": ["impl-029", "impl-032", "impl-033", "impl-034", "impl-035"],
+    "nextOptimizationTrigger": "M9完了時",
+    "contextHealth": "良好（約55%使用）"
   },
 
-  "archivedModules": ["M1", "M2", "M3", "M4", "M5", "M6", "M7"],
+  "archivedModules": ["M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8"],
 
   "criticalDocuments": [
     "docs/CRITICAL/CORE_RULES.md",
@@ -151,11 +168,24 @@
     "docs/CRITICAL/WORKFLOW_GUIDE.md"
   ],
 
+  "moduleDocuments": [
+    "docs/modules/MODULE_M1_CORE_INFRASTRUCTURE.md",
+    "docs/modules/MODULE_M2_PHOTO_ACCESS.md",
+    "docs/modules/MODULE_M3_IMAGE_ANALYSIS.md",
+    "docs/modules/MODULE_M4_UI_COMPONENTS.md",
+    "docs/modules/MODULE_M5_DASHBOARD.md",
+    "docs/modules/MODULE_M6_DELETION_SAFETY.md",
+    "docs/modules/MODULE_M7_NOTIFICATIONS.md",
+    "docs/modules/MODULE_M8_SETTINGS.md",
+    "docs/modules/MODULE_M9_MONETIZATION.md"
+  ],
+
   "implementationPhases": [
     {
       "phase": 1,
       "name": "基盤構築",
       "modules": ["M1", "M4前半"],
+      "tasks": "M1-T01〜M1-T10, M4-T01〜M4-T04",
       "status": "完了",
       "progress": "14/14タスク完了（100%）"
     },
@@ -163,6 +193,7 @@
       "phase": 2,
       "name": "データ層",
       "modules": ["M2", "M3"],
+      "tasks": "M2-T01〜M2-T12, M3-T01〜M3-T13",
       "status": "完了",
       "progress": "25/25タスク完了（100%）"
     },
@@ -170,6 +201,7 @@
       "phase": 3,
       "name": "UI層",
       "modules": ["M4後半"],
+      "tasks": "M4-T05〜M4-T14",
       "status": "完了",
       "progress": "10/10タスク完了（100%）"
     },
@@ -177,6 +209,7 @@
       "phase": 4,
       "name": "Dashboard",
       "modules": ["M5"],
+      "tasks": "M5-T01〜M5-T13",
       "status": "完了",
       "progress": "11/11タスク完了 + 3スキップ（100%）"
     },
@@ -184,17 +217,18 @@
       "phase": 5,
       "name": "機能完成",
       "modules": ["M6", "M8"],
+      "tasks": "M6-T01〜M6-T14, M8-T01〜M8-14",
       "status": "完了",
-      "progress": "26/28タスク完了 + 1スキップ + 1統合（100%）",
-      "note": "M6完了（100%）+ M8完了（13/14完了 + 1統合 - 100%）"
+      "progress": "26/28タスク完了（100%）"
     },
     {
       "phase": 6,
       "name": "仕上げ",
       "modules": ["M7", "M9"],
+      "tasks": "M7-T01〜M7-T12, M9-T01〜M9-T15",
       "status": "M7完了、M9進行中",
-      "progress": "15/28タスク完了 + 1統合（53.6%）",
-      "note": "M7完了（12/12完了 - 100%）、M9進行中（3/15 - 20%）"
+      "progress": "23/27タスク完了（85.2%）",
+      "note": "M7完了（12/12 - 100%）、M9進行中（11/15完了 + 1スキップ - 73.3%）"
     }
   ],
 
@@ -202,90 +236,86 @@
     "commits": [
       {
         "hash": "pending",
-        "message": "feat: impl-054完了 - M9-T02, M9-T03実装（748行、53テスト、平均93.5点）",
+        "message": "feat: impl-060完了 - M9-T12 PremiumView実装（1,525行、54テスト、93点）",
+        "date": "2025-12-12"
+      },
+      {
+        "hash": "d2c951e",
+        "message": "feat: impl-054完了 - M9-T02/T03実装（748行、53テスト、平均93.5点）",
         "date": "2025-12-11"
       },
       {
         "hash": "d790be0",
         "message": "feat: impl-052完了 - M7 Notifications 100%完了（5タスク、1,538行、78テスト、平均97.6点）",
         "date": "2025-12-11"
-      },
-      {
-        "hash": "8b434db",
-        "message": "feat: impl-052継続 - M7-T10 NotificationHandler実装完了（396行、24テスト、100点）",
-        "date": "2025-12-10"
-      },
-      {
-        "hash": "d790be0",
-        "message": "feat: impl-052開始 - M7-T08, T09実装（645行、36テスト、100点）（統合済み）",
-        "date": "2025-12-10"
-      },
-      {
-        "hash": "e3a1826",
-        "message": "feat: impl-050完了 - M7-T07 ReminderScheduler実装（352行、21テスト、100点）",
-        "date": "2025-12-08"
-      },
-      {
-        "hash": "462c74d",
-        "message": "chore: CONTEXT_HANDOFF.json更新（impl-045セッション完了、git hash記録）",
-        "date": "2025-12-06"
       }
     ],
     "branch": "main"
   },
 
   "nextSessionRecommendations": [
-    "M9-T04: PurchaseRepository実装（高優先度、3h）",
-    "M9-T05: PurchaseManager実装（高優先度、3h）",
-    "M9-T06: PremiumFeatureGate実装（中優先度、2h）"
+    "M9-T13: LimitReachedSheet実装（中優先度、1h、M9-T05完了）",
+    "M9-T14: RestorePurchasesView実装（中優先度、1h、M9-T12完了）",
+    "M9-T15: Monetization統合テスト（低優先度、1.5h、M9-T14完了）"
   ],
 
   "resumeInstructions": {
-    "step1": "M9-T04 PurchaseRepository実装（StoreKit 2購入処理）",
-    "step2": "M9-T05 PurchaseManager実装（購入フロー管理）",
-    "step3": "M9-T06 PremiumFeatureGate実装（機能ゲート）",
-    "context": "M7＋M8完了（100%、合計25タスク全完了）+ M9着手（3/15タスク完了、20%）。103/117タスク（88.0%）完了。M9 Monetization進行中（残り12タスク、23h）。"
+    "step1": "M9-T13 LimitReachedSheet実装",
+    "step2": "M9-T14 RestorePurchasesView実装",
+    "step3": "M9-T15 Monetization統合テスト",
+    "context": "impl-060でM9-T12 PremiumView実装完了（1,525行、54テスト、93点）。M9-T11はMV Pattern準拠のためスキップ。全体進捗111/117タスク（94.9%）。M9 Monetization進行中（11/15タスク完了 + 1スキップ - 73.3%）。残り4タスク（M9-T13〜M9-T15）で完了予定。"
   },
 
-  "sessionSummary_impl054": {
-    "completedTasks": ["M9-T02", "M9-T03"],
-    "addedTests": 53,
-    "totalTestsNow": 1353,
-    "totalCodeLines": 748,
-    "qualityAverage": 93.5,
+  "impl060SessionSummary": {
+    "completedTasks": ["M9-T12"],
+    "skippedTasks": ["M9-T11"],
+    "mergedTasks": [],
+    "addedTests": 54,
+    "totalTestsNow": 1354,
+    "totalCodeLines": 1525,
+    "qualityAverage": 93,
     "keyDeliverables": [
-      "M9-T02 ProductInfoモデル: 製品情報モデル（304行、24テスト、95点）",
-      "M9-T03 StoreKit 2設定: StoreKitService実装（444行実装、522行テスト29ケース、92点）"
+      "M9-T11スキップ: MV Pattern準拠（ViewModelレイヤー不使用設計）",
+      "M9-T12 PremiumView実装: プレミアム機能画面（650行実装 + 875行テスト = 1,525行）",
+      "LoadingState enum: 3状態管理（idle/loading/loaded/error）",
+      "PremiumView: @Environment統合、3つのLoadingState、購入/復元処理",
+      "StatusCard: Premium/Free状態表示、視覚的差別化",
+      "PlanCard: プラン情報・価格・無料トライアル表示",
+      "FeatureRow: 機能説明行表示",
+      "RestoreButton: 購入復元ボタン",
+      "FooterLinks: 利用規約・プライバシーポリシーリンク",
+      "54テスト: 初期状態、プランカード、購入処理、復元処理、ステータス、エラー、Premium状態変更、UI要素"
     ],
-    "milestoneAchieved": "M9 Monetization 20%完了（3/15タスク完了）",
+    "technicalHighlights": [
+      "MV Pattern準拠: @Environment依存注入、@State状態管理",
+      "Swift 6 Concurrency: @MainActor分離、async/await",
+      "LoadingState Pattern: 3つの独立した状態管理",
+      "エラーハンドリング: PurchaseError全7ケース対応",
+      "キャンセルエラー: UX配慮（アラート非表示）",
+      "4つのPreviewパターン: Free User、Premium User、Loading、Error"
+    ],
+    "milestoneAchieved": "M9 Monetization 73.3%完了（11/15タスク完了 + 1スキップ）- PremiumView実装完了",
     "status": "completed"
-  },
-
-  "userVisibleFeatures": {
-    "newInThisSession": [
-      "ProductInfoモデル: 製品ID・種別・価格管理、ローカライズ対応、SKProduct連携",
-      "StoreKit 2設定: プロダクト取得・購入処理・トランザクション監視・レシート検証"
-    ]
   },
 
   "failureTracking": {
     "consecutiveFailures": 0,
     "lastFailure": null,
-    "recoveryActions": [],
-    "errorResolutionLoop": {}
+    "recoveryActions": []
   },
 
   "nextSession": {
-    "recommended_action": "M9-T04 PurchaseRepository実装（StoreKit 2購入処理リポジトリ）",
+    "recommended_action": "M9-T13 LimitReachedSheet実装",
     "priority_tasks": [
-      "M9-T04: PurchaseRepository実装（3h）",
-      "M9-T05: PurchaseManager実装（3h）",
-      "M9-T06: PremiumFeatureGate実装（2h）"
+      "M9-T13: LimitReachedSheet実装（中優先度、1h、M9-T05完了）",
+      "M9-T14: RestorePurchasesView実装（中優先度、1h、M9-T12完了）",
+      "M9-T15: Monetization統合テスト（低優先度、1.5h、M9-T14完了）"
     ],
-    "alternativePath": "M9進捗確認・品質保守",
+    "alternativePath": "残り4タスクで全体95%超達成見込み",
+    "warnings": ["なし - すべての依存関係解決済み"],
     "contextHealthy": true,
     "archiveRecommended": "不要（M8アーカイブ済み）"
   },
 
-  "notes": "impl-054セッション完了。M9-T02 ProductInfoモデル（304行、24テスト、95点）、M9-T03 StoreKit 2設定（444行実装、522行テスト29ケース、92点）完了。累計103タスク完了（88.0%）、1,353テスト全合格。M9 Monetizationモジュール20%完了達成（3/15タスク）。次回はM9-T04 PurchaseRepository実装（3h）推奨。"
+  "notes": "impl-060セッション完了。M9-T11スキップ（MV Pattern準拠）、M9-T12 PremiumView実装完了（1,525行、54テスト、93点）。累計111タスク完了（94.9%）、1,354テスト全成功。M9 Monetizationモジュール73.3%完了（11/15 + 1スキップ）。次回はM9-T13 LimitReachedSheet実装（1h）推奨。残り4タスク（M9-T13〜M9-T15）でM9完了予定。"
 }

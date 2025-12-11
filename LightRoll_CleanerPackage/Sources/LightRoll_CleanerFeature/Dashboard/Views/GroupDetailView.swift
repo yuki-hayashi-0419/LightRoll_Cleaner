@@ -49,6 +49,9 @@ public struct GroupDetailView: View {
     /// 戻るアクションのコールバック
     private let onBack: (() -> Void)?
 
+    /// PremiumManager（削除制限チェック用）
+    private let premiumManager: PremiumManager?
+
     // MARK: - State
 
     /// ビューの状態
@@ -62,6 +65,9 @@ public struct GroupDetailView: View {
 
     /// 削除確認ダイアログ表示フラグ
     @State private var showDeleteConfirmation: Bool = false
+
+    /// 削除上限到達シート表示フラグ（M9-T13で使用）
+    @State private var showLimitReachedSheet: Bool = false
 
     /// エラーアラート表示フラグ
     @State private var showErrorAlert: Bool = false
@@ -89,16 +95,19 @@ public struct GroupDetailView: View {
     /// - Parameters:
     ///   - group: 表示するグループ
     ///   - photoProvider: 写真プロバイダー
+    ///   - premiumManager: PremiumManager（削除制限チェック用）
     ///   - onDeletePhotos: 削除アクションのコールバック
     ///   - onBack: 戻るアクションのコールバック
     public init(
         group: PhotoGroup,
         photoProvider: PhotoProvider? = nil,
+        premiumManager: PremiumManager? = nil,
         onDeletePhotos: (([String]) async -> Void)? = nil,
         onBack: (() -> Void)? = nil
     ) {
         self.group = group
         self.photoProvider = photoProvider
+        self.premiumManager = premiumManager
         self.onDeletePhotos = onDeletePhotos
         self.onBack = onBack
     }
@@ -325,7 +334,9 @@ public struct GroupDetailView: View {
 
             // 削除ボタン
             Button(role: .destructive) {
-                showDeleteConfirmation = true
+                Task {
+                    await checkDeletionLimitAndShowConfirmation()
+                }
             } label: {
                 HStack(spacing: LRSpacing.xs) {
                     Image(systemName: "trash")
@@ -494,6 +505,24 @@ public struct GroupDetailView: View {
             selectedPhotoIds.removeAll()
         } else {
             selectedPhotoIds = selectablePhotoIds
+        }
+    }
+
+    /// 削除制限をチェックして確認ダイアログを表示
+    private func checkDeletionLimitAndShowConfirmation() async {
+        guard let premiumManager = premiumManager else {
+            // PremiumManagerが設定されていない場合は制限チェックなしで削除
+            showDeleteConfirmation = true
+            return
+        }
+
+        let remaining = await premiumManager.getRemainingDeletions()
+        if remaining >= selectedPhotoIds.count {
+            // 削除可能
+            showDeleteConfirmation = true
+        } else {
+            // 制限到達時はシートを表示（M9-T13で実装予定）
+            showLimitReachedSheet = true
         }
     }
 

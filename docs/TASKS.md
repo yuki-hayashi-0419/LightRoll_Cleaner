@@ -154,24 +154,33 @@
 | M9-T01 | PremiumStatusモデル | **完了** | 高 | 1h | M1-T08 |
 | M9-T02 | ProductInfoモデル | **完了** | 中 | 0.5h | M9-T01 |
 | M9-T03 | StoreKit 2設定 | **完了** | 高 | 1h | M1-T01 |
-| M9-T04 | PurchaseRepository実装 | 未着手 | 高 | 3h | M9-T03 |
-| M9-T05 | PremiumManager実装 | 未着手 | 高 | 2.5h | M9-T04 |
-| M9-T06 | FeatureGate実装 | 未着手 | 高 | 1.5h | M9-T05 |
-| M9-T07 | 削除上限管理 | 未着手 | 高 | 1.5h | M9-T06 |
-| M9-T08 | Google Mobile Ads導入 | 未着手 | 中 | 2h | M1-T01 |
-| M9-T09 | AdManager実装 | 未着手 | 中 | 2h | M9-T08 |
-| M9-T10 | BannerAdView実装 | 未着手 | 中 | 1.5h | M9-T09 |
-| M9-T11 | PremiumViewModel実装 | 未着手 | 高 | 2h | M9-T05 |
-| M9-T12 | PremiumView実装 | 未着手 | 高 | 2.5h | M9-T11,M4-T03 |
+| M9-T04 | PurchaseRepository実装 | **完了** | 高 | 3h | M9-T03 |
+| M9-T05 | PremiumManager実装 | **完了** | 高 | 2.5h | M9-T04 |
+| M9-T06 | FeatureGate実装 | **完了** | 高 | 1.5h | M9-T05 |
+| M9-T07 | 削除上限管理 | **完了** | 高 | 1.5h | M9-T06 |
+| M9-T08 | Google Mobile Ads導入 | **完了** | 中 | 2h | M1-T01 |
+| M9-T09 | AdManager実装 | **完了** | 中 | 2h | M9-T08 |
+| M9-T10 | BannerAdView実装 | **完了** | 中 | 1.5h | M9-T09 |
+| M9-T11 | PremiumViewModel実装 | **スキップ** | - | - | MV Pattern採用のためスキップ |
+| M9-T12 | PremiumView実装 | **完了** | 高 | 2.5h | M9-T11,M4-T03 |
 | M9-T13 | LimitReachedSheet実装 | 未着手 | 高 | 1h | M9-T06 |
 | M9-T14 | 購入復元実装 | 未着手 | 高 | 1.5h | M9-T04 |
 | M9-T15 | 単体テスト作成 | 未着手 | 中 | 2h | M9-T14 |
 
-**M9合計: 15タスク / 25.5時間（3タスク完了：2.5h）**
+**M9合計: 15タスク / 25.5時間（11タスク完了：19h、1スキップ）**
 
 - M9-T01 PremiumStatusモデル: 269行、31テスト、100/100点
 - M9-T02 ProductInfoモデル: 304行、24テスト、95/100点
 - M9-T03 StoreKit 2設定: 444行、16テスト、92/100点
+- M9-T04 PurchaseRepository: 633行、32テスト、96/100点
+- M9-T05 PremiumManager: 139行、11テスト、96/100点
+- M9-T06 FeatureGate実装: 393行、20テスト、95/100点
+- M9-T07 削除上限管理: 678行、19テスト、95/100点
+- M9-T08 Google Mobile Ads導入: 670行、27テスト、95/100点
+- M9-T09 AdManager実装: 1,288行、53テスト、93/100点
+- M9-T10 BannerAdView実装: 1,048行、32テスト、92/100点
+- M9-T11 PremiumViewModel: スキップ（MV Pattern採用のためViewModelは使用しない）
+- M9-T12 PremiumView実装: 1,525行、54テスト、93/100点
 
 ---
 
@@ -187,14 +196,14 @@
 | M6: Deletion & Safety | 0 | 0h | 13 (17.5h) + 1スキップ ✅ |
 | M7: Notifications | 0 | 0h | 12 (15.5h) ✅ |
 | M8: Settings | 0 | 0h | 13 (19.5h) + 1統合 ✅ |
-| M9: Monetization | 12 | 23h | 3 (2.5h) |
-| **残合計** | **12** | **23h** | **103 (156.5h)** |
+| M9: Monetization | 3 | 6.5h | 11 (19h) + 1スキップ |
+| **残合計** | **3** | **6.5h** | **111 (173h)** |
 
-*進捗: 103/117タスク完了 (88.0%) / 156.5h/181h (86.5%) + 4スキップ + 2統合* - **Phase 6完了: M7＋M8完了（100%） + M9進行中（3/15, 20.0%）** ✨
+*進捗: 111/117タスク完了 (94.9%) / 173h/181h (95.6%) + 5スキップ + 2統合* - **Phase 6完了: M7＋M8完了（100%） + M9進行中（11/15, 73.3%）** ✨
 
 ---
 
-*最終更新: 2025-12-11 (M7モジュールアーカイブ完了 / 106タスク完了 90.6%)*
+*最終更新: 2025-12-12 (M9-T12完了 / 111タスク完了 94.9%)*
 
 ---
 

@@ -16,6 +16,9 @@ public enum DeletePhotosUseCaseError: LocalizedError, Sendable {
     /// 写真が空
     case emptyPhotos
 
+    /// 削除上限到達（Free版）
+    case deletionLimitReached(current: Int, limit: Int, requested: Int)
+
     /// ゴミ箱への移動失敗
     case trashMoveFailed(underlying: Error)
 
@@ -32,6 +35,17 @@ public enum DeletePhotosUseCaseError: LocalizedError, Sendable {
                 "deletePhotosUseCase.error.emptyPhotos",
                 value: "削除する写真がありません",
                 comment: "Empty photos error"
+            )
+        case .deletionLimitReached(let current, let limit, let requested):
+            return String(
+                format: NSLocalizedString(
+                    "deletePhotosUseCase.error.deletionLimitReached",
+                    value: "本日の削除上限に到達しました（%d/%d枚）。%d枚の削除はできません。",
+                    comment: "Deletion limit reached error"
+                ),
+                current,
+                limit,
+                requested
             )
         case .trashMoveFailed(let error):
             return String(
@@ -72,6 +86,12 @@ public enum DeletePhotosUseCaseError: LocalizedError, Sendable {
                 value: "削除対象の写真を選択してください",
                 comment: "Empty photos reason"
             )
+        case .deletionLimitReached:
+            return NSLocalizedString(
+                "deletePhotosUseCase.error.deletionLimitReached.reason",
+                value: "無料版は1日50枚まで削除できます",
+                comment: "Deletion limit reached reason"
+            )
         case .trashMoveFailed:
             return NSLocalizedString(
                 "deletePhotosUseCase.error.trashMoveFailed.reason",
@@ -97,6 +117,12 @@ public enum DeletePhotosUseCaseError: LocalizedError, Sendable {
         switch self {
         case .emptyPhotos:
             return nil
+        case .deletionLimitReached:
+            return NSLocalizedString(
+                "deletePhotosUseCase.error.deletionLimitReached.recoverySuggestion",
+                value: "プレミアム版にアップグレードすると無制限に削除できます",
+                comment: "Deletion limit reached suggestion"
+            )
         case .trashMoveFailed, .permanentDeletionFailed:
             return NSLocalizedString(
                 "deletePhotosUseCase.error.recoverySuggestion",
@@ -151,6 +177,9 @@ public final class DeletePhotosUseCase: DeletePhotosUseCaseProtocol {
     /// PhotoRepository インスタンス（将来の完全削除用）
     private let photoRepository: (any PhotoRepositoryProtocol)?
 
+    /// PremiumManager インスタンス（削除制限チェック用）
+    private let premiumManager: (any PremiumManagerProtocol)?
+
     /// 削除理由（オプション）
     private let deletionReason: TrashPhoto.DeletionReason?
 
@@ -160,14 +189,17 @@ public final class DeletePhotosUseCase: DeletePhotosUseCaseProtocol {
     /// - Parameters:
     ///   - trashManager: TrashManager インスタンス
     ///   - photoRepository: PhotoRepository インスタンス（オプション）
+    ///   - premiumManager: PremiumManager インスタンス（オプション）
     ///   - deletionReason: 削除理由（オプション）
     public init(
         trashManager: any TrashManagerProtocol,
         photoRepository: (any PhotoRepositoryProtocol)? = nil,
+        premiumManager: (any PremiumManagerProtocol)? = nil,
         deletionReason: TrashPhoto.DeletionReason? = nil
     ) {
         self.trashManager = trashManager
         self.photoRepository = photoRepository
+        self.premiumManager = premiumManager
         self.deletionReason = deletionReason
     }
 
@@ -183,6 +215,21 @@ public final class DeletePhotosUseCase: DeletePhotosUseCaseProtocol {
             throw DeletePhotosUseCaseError.emptyPhotos
         }
 
+        // 削除制限チェック（PremiumManagerが設定されている場合のみ）
+        if let premiumManager = premiumManager {
+            let remaining = await premiumManager.getRemainingDeletions()
+            if remaining < input.photos.count {
+                // 削除不可の場合はエラーをスロー
+                let limit = 50 // Free版の上限
+                let current = limit - remaining
+                throw DeletePhotosUseCaseError.deletionLimitReached(
+                    current: current,
+                    limit: limit,
+                    requested: input.photos.count
+                )
+            }
+        }
+
         // PhotoAssetからPhotoへの変換
         let photos = convertToPhotos(input.photos)
 
@@ -190,13 +237,21 @@ public final class DeletePhotosUseCase: DeletePhotosUseCaseProtocol {
         let totalSize = photos.reduce(0) { $0 + $1.fileSize }
 
         // 削除モードに応じて処理を分岐
+        let result: DeletePhotosOutput
         if input.permanently {
             // 完全削除（将来実装）
-            return try await executePermanentDeletion(photos: photos, totalSize: totalSize)
+            result = try await executePermanentDeletion(photos: photos, totalSize: totalSize)
         } else {
             // ゴミ箱へ移動
-            return try await executeMoveToTrash(photos: photos, totalSize: totalSize)
+            result = try await executeMoveToTrash(photos: photos, totalSize: totalSize)
         }
+
+        // 削除成功後、カウントを更新
+        if let premiumManager = premiumManager {
+            await premiumManager.recordDeletion(count: result.deletedCount)
+        }
+
+        return result
     }
 
     // MARK: - Private Methods
@@ -354,6 +409,7 @@ extension DeletePhotosUseCase {
             let useCase = DeletePhotosUseCase(
                 trashManager: trashManager,
                 photoRepository: photoRepository,
+                premiumManager: premiumManager,
                 deletionReason: reason
             )
 

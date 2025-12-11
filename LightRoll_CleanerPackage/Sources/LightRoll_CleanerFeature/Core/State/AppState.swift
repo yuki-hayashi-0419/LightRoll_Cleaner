@@ -100,6 +100,9 @@ public final class AppState: ObservableObject {
     /// 本日の削除件数（無料ユーザー向け制限用）
     @Published public var todayDeleteCount: Int = 0
 
+    /// 最後の削除日
+    @Published public var lastDeleteDate: Date?
+
     /// プレミアムアップグレード画面表示フラグ
     @Published public var showingPremiumUpgrade: Bool = false
 
@@ -135,10 +138,15 @@ public final class AppState: ObservableObject {
 
         isPremium = UserDefaults.standard.bool(forKey: "isPremium")
 
+        // 最後の削除日を読み込み
+        if let lastDeleteDateData = UserDefaults.standard.object(forKey: "lastDeleteDate") as? Date {
+            lastDeleteDate = lastDeleteDateData
+        }
+
         // 本日の削除カウントをリセット（日付が変わっていたら）
         let today = Calendar.current.startOfDay(for: Date())
-        if let lastDeleteDate = UserDefaults.standard.object(forKey: "lastDeleteDate") as? Date {
-            let lastDeleteDay = Calendar.current.startOfDay(for: lastDeleteDate)
+        if let lastDate = lastDeleteDate {
+            let lastDeleteDay = Calendar.current.startOfDay(for: lastDate)
             if today > lastDeleteDay {
                 todayDeleteCount = 0
                 UserDefaults.standard.set(0, forKey: "todayDeleteCount")
@@ -153,9 +161,11 @@ public final class AppState: ObservableObject {
         if let lastScanDate = lastScanDate {
             UserDefaults.standard.set(lastScanDate, forKey: "lastScanDate")
         }
+        if let lastDeleteDate = lastDeleteDate {
+            UserDefaults.standard.set(lastDeleteDate, forKey: "lastDeleteDate")
+        }
         UserDefaults.standard.set(isPremium, forKey: "isPremium")
         UserDefaults.standard.set(todayDeleteCount, forKey: "todayDeleteCount")
-        UserDefaults.standard.set(Date(), forKey: "lastDeleteDate")
     }
 
     // MARK: - Navigation Actions
@@ -311,7 +321,24 @@ public final class AppState: ObservableObject {
     /// - Parameter count: 削除した件数
     public func incrementDeleteCount(by count: Int) {
         todayDeleteCount += count
+        lastDeleteDate = Date()
         persistState()
+    }
+
+    /// 日付が変わっていたら削除カウントをリセット
+    /// - Parameter premiumManager: PremiumManagerインスタンス（オプション）
+    public func checkAndResetDailyCountIfNeeded(premiumManager: PremiumManager? = nil) {
+        let today = Calendar.current.startOfDay(for: Date())
+        if let lastDate = lastDeleteDate {
+            let lastDeleteDay = Calendar.current.startOfDay(for: lastDate)
+            if today > lastDeleteDay {
+                // 日付が変わっている場合はリセット
+                todayDeleteCount = 0
+                lastDeleteDate = today
+                premiumManager?.resetDailyCount()
+                persistState()
+            }
+        }
     }
 
     // MARK: - Alert Actions
@@ -411,6 +438,9 @@ public final class AppState: ObservableObject {
         deleteConfirmationContext = nil
         toastMessage = nil
         showingAlert = false
+
+        todayDeleteCount = 0
+        lastDeleteDate = nil
     }
 }
 

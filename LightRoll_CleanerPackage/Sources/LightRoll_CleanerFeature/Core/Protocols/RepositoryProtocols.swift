@@ -129,29 +129,8 @@ public protocol SettingsRepositoryProtocol: AnyObject, Sendable {
 
 // MARK: - Purchase Repository Protocol
 
-/// 課金リポジトリプロトコル
-/// StoreKitへのアクセスを抽象化
-public protocol PurchaseRepositoryProtocol: AnyObject, Sendable {
-
-    /// 購入可能な商品を取得
-    /// - Returns: 商品の配列
-    /// - Throws: PurchaseError
-    func fetchProducts() async throws -> [ProductInfo]
-
-    /// 商品を購入
-    /// - Parameter productId: 商品ID
-    /// - Returns: 購入結果
-    /// - Throws: PurchaseError
-    func purchase(_ productId: String) async throws -> PurchaseResult
-
-    /// 購入を復元
-    /// - Throws: PurchaseError
-    func restorePurchases() async throws
-
-    /// 現在のプレミアムステータスを取得
-    /// - Returns: プレミアムステータス
-    func getPremiumStatus() async -> PremiumStatus
-}
+// 注意: PurchaseRepositoryProtocol は Monetization/Repositories/PurchaseRepositoryProtocol.swift で正式に定義されています。
+// ここでの仮定義は削除されました。
 
 // MARK: - Placeholder Types
 
@@ -183,18 +162,8 @@ public struct PhotoAsset: Identifiable, Hashable, Sendable {
 // 注意: ProductInfo は Monetization/Models/ProductInfo.swift で正式に定義されています。
 // ここでの仮定義は削除されました。
 
-/// 購入結果（仮定義）
-public enum PurchaseResult: Sendable {
-    case success
-    case pending
-    case cancelled
-    case failed(Error)
-
-    // Sendableへの対応
-    public static func failure(_ error: Error) -> PurchaseResult {
-        return .failed(error)
-    }
-}
+// 注意: PurchaseResult は Monetization/Repositories/PurchaseRepositoryProtocol.swift で正式に定義されています。
+// ここでの仮定義は削除されました。
 
 // 注意: PremiumStatus は Models/Settings/UserSettings.swift で正式に定義されています。
 // ここでの仮定義は削除されました。

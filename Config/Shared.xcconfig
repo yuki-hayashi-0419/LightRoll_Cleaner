@@ -42,6 +42,18 @@ INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = 写真を保存するために
 INFOPLIST_KEY_NSUserNotificationsUsageDescription = 写真の整理タイミング、ストレージ空き容量の警告、定期リマインダーなどの重要な通知をお届けします。
 
 // ==========================================
+// Privacy - App Tracking Transparency
+// ==========================================
+// トラッキング許可の説明（広告表示に必要）
+INFOPLIST_KEY_NSUserTrackingUsageDescription = よりパーソナライズされた広告体験を提供するため、アプリ間でのアクティビティ追跡を許可してください。無料版をご利用いただくための広告表示に使用されます。
+
+// ==========================================
+// Google Mobile Ads
+// ==========================================
+// AdMob App ID（本番時は実際のApp IDに変更必須）
+INFOPLIST_KEY_GADApplicationIdentifier = ca-app-pub-3940256099942544~1458002511
+
+// ==========================================
 // Entitlements
 // ==========================================
 // AI agents can modify Config/LightRoll_Cleaner.entitlements to add capabilities

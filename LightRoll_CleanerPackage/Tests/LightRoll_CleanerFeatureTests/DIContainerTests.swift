@@ -164,8 +164,9 @@ struct DIContainerTests {
         let mockRepo = MockPurchaseRepository()
         mockRepo.mockPremiumStatus = .premium()
 
-        let status = await mockRepo.getPremiumStatus()
-        #expect(status == .premium())
+        let status = try await mockRepo.checkSubscriptionStatus()
+        #expect(status.isPremium == true)
+        #expect(status.subscriptionType == .monthly)
     }
 }
 
@@ -268,6 +269,7 @@ struct ProtocolConformanceTests {
     }
 
     @Test("StubPurchaseRepositoryがプロトコルに準拠している")
+    @MainActor
     func testStubPurchaseRepositoryConformance() async throws {
         let repo: any PurchaseRepositoryProtocol = StubPurchaseRepository()
         let products = try await repo.fetchProducts()
