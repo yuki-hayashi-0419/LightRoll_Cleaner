@@ -23,9 +23,9 @@ TARGETED_DEVICE_FAMILY = 1,2
 // ==========================================
 // Info PLIST
 // ==========================================
-GENERATE_INFOPLIST_FILE = YES
-INFOPLIST_KEY_UISupportedInterfaceOrientations = portrait
-INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = portrait landscape-left landscape-right portrait-upside-down
+// Google AdMobのGADApplicationIdentifierキーを含むため、物理的なInfo.plistを使用
+GENERATE_INFOPLIST_FILE = NO
+INFOPLIST_FILE = Config/Info.plist
 
 // ==========================================
 // Privacy - Photo Library Access
@@ -46,12 +46,6 @@ INFOPLIST_KEY_NSUserNotificationsUsageDescription = 写真の整理タイミン�
 // ==========================================
 // トラッキング許可の説明（広告表示に必要）
 INFOPLIST_KEY_NSUserTrackingUsageDescription = よりパーソナライズされた広告体験を提供するため、アプリ間でのアクティビティ追跡を許可してください。無料版をご利用いただくための広告表示に使用されます。
-
-// ==========================================
-// Google Mobile Ads
-// ==========================================
-// AdMob App ID（本番時は実際のApp IDに変更必須）
-INFOPLIST_KEY_GADApplicationIdentifier = ca-app-pub-3940256099942544~1458002511
 
 // ==========================================
 // Entitlements
