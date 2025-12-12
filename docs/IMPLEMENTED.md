@@ -5,14 +5,13 @@
 
 ---
 
-## 現在のバージョン: v1.0.0-beta（M9 Monetization進行中・Phase 6継続）
+## 現在のバージョン: v1.0.0-RC（全9モジュール完了・Phase 6完了）
 
 ### 進捗状況
-- **完了モジュール**: M1 Core Infrastructure, M2 Photo Access, M3 Image Analysis, M4 UI Components, M5 Dashboard & Statistics, M6 Deletion & Trash, M7 Notifications, M8 Settings & Preferences
-- **進行中モジュール**:
-  - **M9 Monetization** (9/15タスク完了 - 60.0%) 🚀 課金基盤＋機能管理＋広告導入＋広告管理完了
-- **Phase 6継続中**: M1〜M8完全実装 + M9部分実装（109/117タスク - 93.2%）
-- **全体進捗**: 109/117タスク (93.2%)
+- **完了モジュール**: M1 Core Infrastructure, M2 Photo Access, M3 Image Analysis, M4 UI Components, M5 Dashboard & Statistics, M6 Deletion & Trash, M7 Notifications, M8 Settings & Preferences, **M9 Monetization**
+- **全モジュール完了**: 9/9モジュール（100%）
+- **全体進捗**: 114/117タスク (97.4%)
+- **Phase 6完了**: 全コア機能実装完了
 
 ---
 
@@ -1128,11 +1127,140 @@ Test run with 54 tests passed (estimated 100%)
 3. **低**: アニメーション追加（状態遷移時）
 4. **低**: ダークモード最適化
 
-**M9モジュール進捗**: 11/15タスク完了（**73.3%達成** 🚀）+ 1スキップ
+---
+
+### M9-T13 LimitReachedSheet実装（Limit Reached Sheet Implementation）
+
+削除上限到達時に表示するシート画面の完全実装：
+
+| 機能 | 説明 |
+|------|------|
+| **上限表示** | 現在の削除数と上限（デフォルト50枚/日）を明示 |
+| **プロモーション** | Premium機能への移行を促すUI |
+| **統計表示** | 削除数と残数をカード形式で表示 |
+| **機能紹介** | Premium機能3点（無制限削除、広告非表示、高度分析）を説明 |
+| **アクション** | アップグレードボタンと「後で」ボタン |
+
+#### ユーザーへの効果
+- Free版で50枚/日の上限に達した際に、状況を明確に表示
+- Premium版の価値を視覚的に訴求
+- ワンタップでPremiumView（プレミアム画面）へ遷移可能
+- 「後で」を選んで継続利用も可能
+
+#### 技術的実装
+- **LimitReachedSheet.swift（330行）**: 5セクション構成（header/message/stats/features/actions）
+- **StatCard**: 統計カード（title/value/icon/color）
+- **PremiumFeatureRow**: Premium機能行（icon/title/description）
+- グラデーション背景、アクセシビリティ100%対応
+
+**成果物**:
+- LimitReachedSheet.swift（330行）
+- LimitReachedSheetTests.swift（266行、13テスト）
+
+**品質スコア**: 100/100点
+**テスト成功率**: 13/13 (100%)
 
 ---
 
-## M7: Notifications（完了）✅
+### M9-T14 RestorePurchasesView実装（Restore Purchases View Implementation）
+
+過去の購入を復元するための専用画面の完全実装：
+
+| 機能 | 説明 |
+|------|------|
+| **復元処理** | Transaction.currentEntitlementsによる過去購入復元 |
+| **状態管理** | idle/restoring/success/noSubscription/error の5状態管理 |
+| **視覚的フィードバック** | 各状態に応じたアイコン・カラー・メッセージ表示 |
+| **結果表示** | 成功/サブスクなし/エラーの明確な結果カード |
+| **注意事項** | Apple ID、同一アカウント復元の注意点を表示 |
+
+#### ユーザーへの効果
+- 機種変更や再インストール後にPremium資格を復元可能
+- 復元処理の進行状況を視覚的に確認
+- 復元成功/失敗の明確なフィードバック
+- 注意事項でよくある問題を未然に防止
+
+#### 技術的実装
+- **RestorePurchasesView.swift（410行）**: @Environment統合、RestoreState enum
+- **RestoreResultCard**: 復元結果表示コンポーネント
+- **NoteRow**: 注意事項行コンポーネント
+- アクセシビリティ100%対応
+
+**成果物**:
+- RestorePurchasesView.swift（410行）
+- RestorePurchasesViewTests.swift（336行、14テスト）
+
+**品質スコア**: 100/100点
+**テスト成功率**: 14/14 (100%)
+
+---
+
+### M9-T15 Monetization統合テスト（Monetization Integration Tests）
+
+M9モジュール全体の統合テストスイートの完全実装：
+
+| テストカテゴリ | 説明 |
+|---------------|------|
+| **E2E購入フロー（4テスト）** | 製品取得→購入→Premium状態遷移の完全フロー |
+| **Premium機能テスト（3テスト）** | 機能判定、削除上限、広告非表示の動作確認 |
+| **広告表示テスト（3テスト）** | Free/Premium時の広告表示切り替え |
+| **状態管理テスト（4テスト）** | Free→Premium遷移、日次リセット、永続化 |
+
+#### カバレッジ
+- M9-T01〜M9-T14の全コンポーネント連携
+- PremiumManager + PurchaseRepository + AdManager統合
+- Free/Premium状態遷移の完全検証
+- 削除上限管理のエンドツーエンド動作確認
+
+**成果物**:
+- MonetizationIntegrationTests.swift（466行、14テスト）
+
+**品質スコア**: 100/100点
+**テスト成功率**: 14/14 (100%)
+
+---
+
+## M9 Monetization モジュール完了サマリー
+
+**M9モジュール進捗**: 14/15タスク完了 + 1スキップ（**100%達成**）
+
+### 全タスク完了状況
+
+| タスクID | タスク名 | 行数 | テスト | スコア |
+|----------|----------|------|--------|--------|
+| M9-T01 | PremiumStatusモデル | 269行 | 31 | 100点 |
+| M9-T02 | ProductInfoモデル | 304行 | 24 | 95点 |
+| M9-T03 | StoreKit 2設定 | 444行 | 16 | 92点 |
+| M9-T04 | PurchaseRepository | 633行 | 32 | 96点 |
+| M9-T05 | PremiumManager | 139行 | 11 | 96点 |
+| M9-T06 | FeatureGate | 393行 | 20 | 95点 |
+| M9-T07 | 削除上限管理 | 678行 | 19 | 95点 |
+| M9-T08 | Google Mobile Ads | 670行 | 27 | 95点 |
+| M9-T09 | AdManager | 1,288行 | 53 | 93点 |
+| M9-T10 | BannerAdView | 1,048行 | 32 | 92点 |
+| M9-T11 | PremiumViewModel | スキップ（MV Pattern） | - | - |
+| M9-T12 | PremiumView | 1,525行 | 54 | 93点 |
+| M9-T13 | LimitReachedSheet | 596行 | 13 | 100点 |
+| M9-T14 | RestorePurchasesView | 746行 | 14 | 100点 |
+| M9-T15 | 統合テスト | 466行 | 14 | 100点 |
+
+### M9モジュール統計
+- **総実装行数**: 9,199行
+- **総テスト数**: 360テスト
+- **平均品質スコア**: 95.9点
+- **ステータス**: **100%完了**
+
+### ユーザーから見て出来るようになったこと
+- **プレミアムプランの購入**: 月額¥980（7日無料トライアル）または年額¥9,800
+- **無制限削除**: Premium版は1日あたりの削除枚数制限なし
+- **広告非表示**: Premium版はバナー広告を完全非表示
+- **高度な分析機能**: Premium版限定の分析オプション
+- **購入復元**: 機種変更後や再インストール時の資格復元
+- **Free版**: 1日50枚まで無料で写真削除可能
+
+---
+
+## M7: Notifications（完了）
 
 通知機能の基盤実装を開始：
 

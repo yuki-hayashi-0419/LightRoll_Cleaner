@@ -17,6 +17,7 @@ import StoreKit
 
 /// StoreKit 2を使った購入リポジトリ実装
 @MainActor
+@Observable
 public final class PurchaseRepository: PurchaseRepositoryProtocol {
 
     // MARK: - Properties
@@ -25,7 +26,7 @@ public final class PurchaseRepository: PurchaseRepositoryProtocol {
     private var availableProducts: [Product] = []
 
     /// トランザクション監視タスク
-    private var transactionListenerTask: Task<Void, Never>?
+    nonisolated(unsafe) private var transactionListenerTask: Task<Void, Never>?
 
     /// トランザクション更新ハンドラ（テスト用）
     private var onTransactionUpdate: ((Transaction) -> Void)?
@@ -36,7 +37,7 @@ public final class PurchaseRepository: PurchaseRepositoryProtocol {
         // 初期化時は何もしない（startTransactionListenerで監視開始）
     }
 
-    deinit {
+    nonisolated deinit {
         // トランザクション監視タスクをキャンセル
         transactionListenerTask?.cancel()
     }

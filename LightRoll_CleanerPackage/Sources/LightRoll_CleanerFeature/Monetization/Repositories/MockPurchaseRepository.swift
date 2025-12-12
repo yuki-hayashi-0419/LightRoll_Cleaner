@@ -25,8 +25,11 @@ public final class MockPurchaseRepository: PurchaseRepositoryProtocol {
     /// モック用プレミアムステータス
     public var mockPremiumStatus: PremiumStatus = .free
 
-    /// モック用復元トランザクション
-    public var mockRestoreTransactions: [Transaction] = []
+    /// モック用復元結果
+    public var mockRestoreResult: RestoreResult = RestoreResult(transactions: [])
+
+    /// モック用エラー
+    public var mockError: PurchaseError = .unknownError
 
     /// fetchProducts呼び出しフラグ
     public var fetchProductsCalled = false
@@ -89,10 +92,10 @@ public final class MockPurchaseRepository: PurchaseRepositoryProtocol {
         restorePurchasesCalled = true
 
         if shouldThrowError {
-            throw errorToThrow
+            throw mockError
         }
 
-        return RestoreResult(transactions: mockRestoreTransactions)
+        return mockRestoreResult
     }
 
     public func checkSubscriptionStatus() async throws -> PremiumStatus {

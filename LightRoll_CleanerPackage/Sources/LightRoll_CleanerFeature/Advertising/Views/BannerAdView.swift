@@ -9,6 +9,9 @@
 //
 
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 #if canImport(GoogleMobileAds)
 import GoogleMobileAds
 #endif
@@ -80,6 +83,7 @@ public struct BannerAdView: View {
 
         case .loaded:
             // ロード完了: バナー広告を表示
+            #if canImport(GoogleMobileAds) && canImport(UIKit)
             if let bannerView = adManager.showBannerAd() {
                 BannerAdViewRepresentable(bannerView: bannerView)
                     .frame(height: 50) // GADAdSizeBannerの高さ
@@ -90,6 +94,10 @@ public struct BannerAdView: View {
                 // バナーViewが取得できない場合は空のView
                 emptyView
             }
+            #else
+            // Google Mobile Ads SDKが利用できない場合は空のView
+            emptyView
+            #endif
 
         case .failed(let error):
             // エラー時: エラー内容に応じて処理
@@ -112,7 +120,11 @@ public struct BannerAdView: View {
         }
         .frame(height: 50)
         .frame(maxWidth: .infinity)
-        .background(Color(.systemGray6))
+        #if canImport(UIKit)
+        .background(Color(uiColor: .systemGray6))
+        #else
+        .background(Color.gray.opacity(0.1))
+        #endif
         .accessibilityLabel("広告読み込み中")
     }
 
@@ -156,6 +168,7 @@ public struct BannerAdView: View {
 
 // MARK: - BannerAdViewRepresentable
 
+#if canImport(GoogleMobileAds) && canImport(UIKit)
 /// GADBannerViewをSwiftUIで使用するためのラッパー
 ///
 /// UIViewRepresentableを実装してGADBannerViewをSwiftUIで表示します。
@@ -184,6 +197,7 @@ struct BannerAdViewRepresentable: UIViewRepresentable {
         // クリーンアップ処理（必要に応じて）
     }
 }
+#endif
 
 // MARK: - Preview
 

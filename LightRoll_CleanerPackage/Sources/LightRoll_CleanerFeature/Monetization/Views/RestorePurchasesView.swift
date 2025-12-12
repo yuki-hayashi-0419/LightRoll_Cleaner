@@ -1,0 +1,431 @@
+//
+//  RestorePurchasesView.swift
+//  LightRoll_CleanerFeature
+//
+//  M9-T14: RestorePurchasesView実装
+//  購入履歴の復元機能を提供するView
+//
+
+import SwiftUI
+
+// MARK: - RestoreState
+
+/// 復元処理の状態
+enum RestoreState: Equatable {
+    /// アイドル状態（未実行）
+    case idle
+
+    /// 復元処理中
+    case restoring
+
+    /// 復元成功（復元数）
+    case success(count: Int)
+
+    /// 復元失敗（エラーメッセージ）
+    case failure(message: String)
+
+    /// ローディング中かどうか
+    var isRestoring: Bool {
+        if case .restoring = self { return true }
+        return false
+    }
+
+    /// 成功状態かどうか
+    var isSuccess: Bool {
+        if case .success = self { return true }
+        return false
+    }
+
+    /// 失敗状態かどうか
+    var isFailure: Bool {
+        if case .failure = self { return true }
+        return false
+    }
+
+    /// 成功時の復元数
+    var successCount: Int? {
+        if case .success(let count) = self { return count }
+        return nil
+    }
+
+    /// 失敗時のエラーメッセージ
+    var failureMessage: String? {
+        if case .failure(let message) = self { return message }
+        return nil
+    }
+}
+
+// MARK: - RestorePurchasesView
+
+/// 購入履歴復元画面
+///
+/// 過去に購入したサブスクリプションを復元する機能を提供します。
+/// - 復元処理の進行状態を表示
+/// - 成功・失敗時の適切なフィードバック
+/// - エラーハンドリング
+///
+/// ## 使用例
+/// ```swift
+/// NavigationLink("購入を復元") {
+///     RestorePurchasesView()
+/// }
+/// .environment(premiumManager)
+/// .environment(purchaseRepository)
+/// ```
+@MainActor
+public struct RestorePurchasesView: View {
+
+    // MARK: - Environment
+
+    /// プレミアム管理サービス
+    @Environment(PremiumManager.self) private var premiumManager
+
+    /// 購入リポジトリ
+    @Environment(PurchaseRepository.self) private var purchaseRepository
+
+    /// 画面を閉じるためのアクション
+    @Environment(\.dismiss) private var dismiss
+
+    // MARK: - State
+
+    /// 復元処理の状態
+    @State private var restoreState: RestoreState = .idle
+
+    /// 成功アラート表示フラグ
+    @State private var showSuccessAlert = false
+
+    /// エラーアラート表示フラグ
+    @State private var showErrorAlert = false
+
+    // MARK: - Initialization
+
+    public init() {}
+
+    // MARK: - Body
+
+    public var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 32) {
+                    // ヘッダー
+                    headerSection
+
+                    // 説明
+                    descriptionSection
+
+                    // 状態表示
+                    stateSection
+
+                    Spacer(minLength: 40)
+
+                    // アクションボタン
+                    actionButtons
+                }
+                .padding()
+            }
+            .navigationTitle("購入の復元")
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+            #endif
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("閉じる") {
+                        dismiss()
+                    }
+                    .disabled(restoreState.isRestoring)
+                    .accessibilityLabel("画面を閉じる")
+                }
+            }
+            .alert("復元成功", isPresented: $showSuccessAlert) {
+                Button("OK") {
+                    dismiss()
+                }
+            } message: {
+                if let count = restoreState.successCount {
+                    Text("\(count)件の購入を復元しました")
+                }
+            }
+            .alert("復元失敗", isPresented: $showErrorAlert) {
+                Button("OK") { }
+            } message: {
+                if let message = restoreState.failureMessage {
+                    Text(message)
+                }
+            }
+        }
+    }
+
+    // MARK: - Header Section
+
+    private var headerSection: some View {
+        VStack(spacing: 16) {
+            // アイコン
+            ZStack {
+                Circle()
+                    .fill(Color.blue.opacity(0.1))
+                    .frame(width: 100, height: 100)
+
+                Image(systemName: "arrow.clockwise.circle.fill")
+                    .font(.system(size: 50))
+                    .foregroundStyle(.blue)
+            }
+            .accessibilityHidden(true)
+
+            // タイトル
+            Text("購入の復元")
+                .font(.title.bold())
+
+            // サブタイトル
+            Text("過去に購入したPremiumプランを復元します")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("購入の復元。過去に購入したPremiumプランを復元します")
+    }
+
+    // MARK: - Description Section
+
+    private var descriptionSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("復元について")
+                .font(.headline)
+
+            VStack(alignment: .leading, spacing: 12) {
+                DescriptionRow(
+                    icon: "checkmark.circle.fill",
+                    text: "他のデバイスで購入したプランを復元できます"
+                )
+
+                DescriptionRow(
+                    icon: "checkmark.circle.fill",
+                    text: "アプリを再インストールした場合も復元可能です"
+                )
+
+                DescriptionRow(
+                    icon: "checkmark.circle.fill",
+                    text: "復元には数秒かかることがあります"
+                )
+
+                DescriptionRow(
+                    icon: "info.circle.fill",
+                    text: "購入時と同じApple IDでサインインしている必要があります",
+                    color: .orange
+                )
+            }
+        }
+        .padding()
+        #if os(iOS)
+        .background(Color(uiColor: .secondarySystemBackground))
+        #else
+        .background(Color(nsColor: .controlBackgroundColor))
+        #endif
+        .cornerRadius(12)
+    }
+
+    // MARK: - State Section
+
+    @ViewBuilder
+    private var stateSection: some View {
+        switch restoreState {
+        case .idle:
+            // 初期状態：何も表示しない
+            EmptyView()
+
+        case .restoring:
+            // 復元中
+            VStack(spacing: 16) {
+                ProgressView()
+                    .scaleEffect(1.5)
+
+                Text("購入履歴を確認しています...")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 40)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("購入履歴を確認しています")
+
+        case .success(let count):
+            // 復元成功
+            VStack(spacing: 16) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 60))
+                    .foregroundStyle(.green)
+
+                Text("復元完了")
+                    .font(.title2.bold())
+
+                Text("\(count)件の購入を復元しました")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 40)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("復元完了。\(count)件の購入を復元しました")
+
+        case .failure(let message):
+            // 復元失敗
+            VStack(spacing: 16) {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 60))
+                    .foregroundStyle(.red)
+
+                Text("復元に失敗しました")
+                    .font(.title2.bold())
+
+                Text(message)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 40)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("復元に失敗しました。\(message)")
+        }
+    }
+
+    // MARK: - Action Buttons
+
+    private var actionButtons: some View {
+        VStack(spacing: 12) {
+            // 復元ボタン
+            Button {
+                Task { await handleRestore() }
+            } label: {
+                HStack {
+                    if restoreState.isRestoring {
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .tint(.white)
+                    } else {
+                        Image(systemName: "arrow.clockwise")
+                    }
+
+                    Text(restoreState.isRestoring ? "復元中..." : "購入を復元")
+                        .font(.headline)
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(12)
+            }
+            .disabled(restoreState.isRestoring)
+            .accessibilityLabel("購入を復元")
+            .accessibilityHint("過去に購入したプランを復元します")
+
+            // 注意事項
+            Text("※ 購入履歴がない場合、何も復元されません")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.top, 8)
+        }
+    }
+
+    // MARK: - Actions
+
+    /// 復元処理を実行
+    private func handleRestore() async {
+        // 復元中状態に更新
+        restoreState = .restoring
+
+        do {
+            // 復元実行
+            let result = try await purchaseRepository.restorePurchases()
+
+            // Premium状態を更新
+            try await premiumManager.checkPremiumStatus()
+
+            // 結果に応じて状態を更新
+            if result.isSuccess {
+                restoreState = .success(count: result.count)
+                showSuccessAlert = true
+            } else {
+                restoreState = .failure(message: "復元する購入が見つかりませんでした")
+                showErrorAlert = true
+            }
+
+        } catch {
+            // エラー処理
+            let errorMessage = handleRestoreError(error)
+            restoreState = .failure(message: errorMessage)
+            showErrorAlert = true
+        }
+    }
+
+    /// 復元エラーをハンドリング
+    ///
+    /// - Parameter error: 発生したエラー
+    /// - Returns: ユーザー向けエラーメッセージ
+    private func handleRestoreError(_ error: Error) -> String {
+        if let purchaseError = error as? PurchaseError {
+            switch purchaseError {
+            case .purchaseCancelled:
+                return "復元がキャンセルされました"
+
+            case .restorationFailed(let message):
+                return "復元に失敗しました: \(message)"
+
+            case .networkError:
+                return "ネットワークエラーが発生しました。インターネット接続を確認してください"
+
+            case .productNotFound:
+                return "復元する商品が見つかりませんでした"
+
+            case .verificationFailed:
+                return "無効な商品情報です"
+
+            case .purchaseFailed(let message):
+                return "処理に失敗しました: \(message)"
+
+            case .noActiveSubscription:
+                return "有効なサブスクリプションが見つかりませんでした"
+
+            case .unknownError:
+                return "予期しないエラーが発生しました"
+            }
+        }
+
+        return "予期しないエラーが発生しました: \(error.localizedDescription)"
+    }
+}
+
+// MARK: - DescriptionRow
+
+/// 説明行コンポーネント
+private struct DescriptionRow: View {
+    let icon: String
+    let text: String
+    var color: Color = .blue
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: icon)
+                .font(.body)
+                .foregroundColor(color)
+                .frame(width: 24)
+
+            Text(text)
+                .font(.subheadline)
+                .foregroundColor(.primary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(text)
+    }
+}
+
+// MARK: - Previews
+
+
+// MARK: - Previews
+
+#Preview("Restore Purchases") {
+    RestorePurchasesView()
+}

@@ -453,7 +453,11 @@ private struct PlanCard: View {
             .accessibilityHint(product.priceDescription)
         }
         .padding()
+        #if os(iOS)
         .background(Color(uiColor: .secondarySystemBackground))
+        #else
+        .background(Color(nsColor: .controlBackgroundColor))
+        #endif
         .cornerRadius(16)
         .shadow(radius: 2)
     }
