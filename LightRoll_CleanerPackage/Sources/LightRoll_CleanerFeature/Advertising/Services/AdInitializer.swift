@@ -138,11 +138,11 @@ public final class AdInitializer: Sendable {
         #endif
     }
 
+    #if canImport(AppTrackingTransparency)
     /// トラッキング許可状態をログ出力
     ///
     /// - Parameter status: ATTrackingManager.AuthorizationStatus
     private func logTrackingStatus(_ status: ATTrackingManager.AuthorizationStatus) {
-        #if canImport(AppTrackingTransparency)
         switch status {
         case .authorized:
             print("✅ トラッキング許可: 承認されました")
@@ -155,13 +155,14 @@ public final class AdInitializer: Sendable {
         @unknown default:
             print("⚠️ トラッキング許可: 不明な状態")
         }
-        #endif
     }
+    #endif
 
     /// Google Mobile Ads SDKを初期化
     ///
     /// - Throws: 初期化に失敗した場合
     private func initializeGoogleMobileAds() async throws {
+        #if canImport(GoogleMobileAds)
         return await withCheckedContinuation { continuation in
             GADMobileAds.sharedInstance().start { status in
                 // 初期化完了ログ
@@ -173,6 +174,10 @@ public final class AdInitializer: Sendable {
                 continuation.resume()
             }
         }
+        #else
+        print("⚠️ GoogleMobileAds SDK が利用できません")
+        throw AdInitializerError.sdkNotAvailable
+        #endif
     }
 
     /// テストIDの使用状況を検証（デバッグ時のみ）
@@ -200,6 +205,9 @@ public enum AdInitializerError: LocalizedError, Sendable {
     /// トラッキング許可が必要
     case trackingAuthorizationRequired
 
+    /// SDK利用不可
+    case sdkNotAvailable
+
     public var errorDescription: String? {
         switch self {
         case .timeout:
@@ -210,6 +218,9 @@ public enum AdInitializerError: LocalizedError, Sendable {
 
         case .trackingAuthorizationRequired:
             return "広告表示にはトラッキング許可が必要です"
+
+        case .sdkNotAvailable:
+            return "GoogleMobileAds SDKが利用できません"
         }
     }
 
@@ -223,6 +234,9 @@ public enum AdInitializerError: LocalizedError, Sendable {
 
         case .trackingAuthorizationRequired:
             return "設定アプリからトラッキングを許可してください"
+
+        case .sdkNotAvailable:
+            return "GoogleMobileAds SDKがインストールされていません"
         }
     }
 }

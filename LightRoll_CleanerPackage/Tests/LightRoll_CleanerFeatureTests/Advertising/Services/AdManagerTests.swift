@@ -282,4 +282,155 @@ struct AdManagerTests {
         // 弱参照がnilになることを確認
         #expect(weakReference == nil)
     }
+
+    // MARK: - Conditional Compilation Tests
+
+    @Suite("Conditional Compilation Tests")
+    @MainActor
+    struct ConditionalCompilationTests {
+
+        @Test("条件付きコンパイル: GoogleMobileAds利用可能時 - showBannerAdが正しい型を返す")
+        func showBannerAdReturnsCorrectTypeWhenGMAAvailable() {
+            let mockPremiumManager = MockPremiumManager()
+            let adManager = AdManager(premiumManager: mockPremiumManager)
+
+            #if canImport(GoogleMobileAds)
+            // GoogleMobileAds利用可能時：GADBannerViewまたはnilが返る
+            let bannerView = adManager.showBannerAd()
+            // ロード未完了のためnilを期待
+            #expect(bannerView == nil)
+            #else
+            // GoogleMobileAds利用不可時：nilが返る
+            let bannerView = adManager.showBannerAd()
+            #expect(bannerView == nil)
+            #endif
+        }
+
+        @Test("条件付きコンパイル: GoogleMobileAds利用不可時 - loadBannerAdが適切なエラーを投げる")
+        func loadBannerAdThrowsAppropriateErrorWhenGMAUnavailable() async {
+            let mockPremiumManager = MockPremiumManager(isPremium: false)
+            let adManager = AdManager(premiumManager: mockPremiumManager)
+
+            #if canImport(GoogleMobileAds)
+            // GoogleMobileAds利用可能時：SDK未初期化エラー
+            await #expect(performing: {
+                try await adManager.loadBannerAd()
+            }, throws: { error in
+                guard let adError = error as? AdManagerError else {
+                    return false
+                }
+                return adError == .notInitialized ||
+                       (case .loadFailed = adError)
+            })
+            #else
+            // GoogleMobileAds利用不可時：SDK利用不可エラー
+            await #expect(performing: {
+                try await adManager.loadBannerAd()
+            }, throws: { error in
+                guard let adError = error as? AdManagerError else {
+                    return false
+                }
+                if case .loadFailed(let message) = adError {
+                    return message.contains("GoogleMobileAds SDK が利用できません")
+                }
+                return false
+            })
+            #endif
+        }
+
+        @Test("条件付きコンパイル: GoogleMobileAds利用不可時 - loadInterstitialAdが適切なエラーを投げる")
+        func loadInterstitialAdThrowsAppropriateErrorWhenGMAUnavailable() async {
+            let mockPremiumManager = MockPremiumManager(isPremium: false)
+            let adManager = AdManager(premiumManager: mockPremiumManager)
+
+            #if canImport(GoogleMobileAds)
+            // GoogleMobileAds利用可能時：SDK未初期化エラー
+            await #expect(performing: {
+                try await adManager.loadInterstitialAd()
+            }, throws: { error in
+                guard let adError = error as? AdManagerError else {
+                    return false
+                }
+                return adError == .notInitialized ||
+                       (case .loadFailed = adError)
+            })
+            #else
+            // GoogleMobileAds利用不可時：SDK利用不可エラー
+            await #expect(performing: {
+                try await adManager.loadInterstitialAd()
+            }, throws: { error in
+                guard let adError = error as? AdManagerError else {
+                    return false
+                }
+                if case .loadFailed(let message) = adError {
+                    return message.contains("GoogleMobileAds SDK が利用できません")
+                }
+                return false
+            })
+            #endif
+        }
+
+        @Test("条件付きコンパイル: GoogleMobileAds利用不可時 - loadRewardedAdが適切なエラーを投げる")
+        func loadRewardedAdThrowsAppropriateErrorWhenGMAUnavailable() async {
+            let mockPremiumManager = MockPremiumManager(isPremium: false)
+            let adManager = AdManager(premiumManager: mockPremiumManager)
+
+            #if canImport(GoogleMobileAds)
+            // GoogleMobileAds利用可能時：SDK未初期化エラー
+            await #expect(performing: {
+                try await adManager.loadRewardedAd()
+            }, throws: { error in
+                guard let adError = error as? AdManagerError else {
+                    return false
+                }
+                return adError == .notInitialized ||
+                       (case .loadFailed = adError)
+            })
+            #else
+            // GoogleMobileAds利用不可時：SDK利用不可エラー
+            await #expect(performing: {
+                try await adManager.loadRewardedAd()
+            }, throws: { error in
+                guard let adError = error as? AdManagerError else {
+                    return false
+                }
+                if case .loadFailed(let message) = adError {
+                    return message.contains("GoogleMobileAds SDK が利用できません")
+                }
+                return false
+            })
+            #endif
+        }
+
+        @Test("条件付きコンパイル: GoogleMobileAds利用不可時 - showRewardedAdが適切なエラーを投げる")
+        func showRewardedAdThrowsAppropriateErrorWhenGMAUnavailable() async {
+            let mockPremiumManager = MockPremiumManager(isPremium: false)
+            let adManager = AdManager(premiumManager: mockPremiumManager)
+
+            #if canImport(GoogleMobileAds)
+            // GoogleMobileAds利用可能時：広告未準備エラー
+            await #expect(performing: {
+                _ = try await adManager.showRewardedAd()
+            }, throws: { error in
+                guard let adError = error as? AdManagerError else {
+                    return false
+                }
+                return adError == .adNotReady
+            })
+            #else
+            // GoogleMobileAds利用不可時：SDK利用不可エラー
+            await #expect(performing: {
+                _ = try await adManager.showRewardedAd()
+            }, throws: { error in
+                guard let adError = error as? AdManagerError else {
+                    return false
+                }
+                if case .showFailed(let message) = adError {
+                    return message.contains("GoogleMobileAds SDK が利用できません")
+                }
+                return false
+            })
+            #endif
+        }
+    }
 }

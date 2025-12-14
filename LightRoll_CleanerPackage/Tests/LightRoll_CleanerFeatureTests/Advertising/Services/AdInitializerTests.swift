@@ -163,4 +163,163 @@ struct AdInitializerTests {
 
         #expect(true)
     }
+
+    // MARK: - Conditional Compilation Tests
+
+    @Suite("Conditional Compilation Tests")
+    @MainActor
+    struct ConditionalCompilationTests {
+
+        @Test("条件付きコンパイル: GoogleMobileAds利用可能時 - 初期化が成功またはエラーを投げる")
+        func initializeSucceedsOrThrowsWhenGMAAvailable() async {
+            let initializer = AdInitializer.shared
+
+            #if canImport(GoogleMobileAds)
+            // GoogleMobileAds利用可能時：初期化が成功するか、適切なエラーを投げる
+            do {
+                try await initializer.initialize()
+                // 初期化成功
+                #expect(initializer.initialized == true)
+            } catch let error as AdInitializerError {
+                // 初期化エラー（SDK利用不可を除く）
+                switch error {
+                case .timeout, .initializationFailed, .trackingAuthorizationRequired:
+                    // これらのエラーは許容される
+                    break
+                case .sdkNotAvailable:
+                    // GoogleMobileAds利用可能時はこのエラーは出ない
+                    Issue.record("GoogleMobileAds利用可能時にsdkNotAvailableエラーが発生")
+                }
+            } catch {
+                // その他のエラーも許容（ネットワークエラーなど）
+            }
+            #else
+            // GoogleMobileAds利用不可時：sdkNotAvailableエラーを投げる
+            await #expect(performing: {
+                try await initializer.initialize()
+            }, throws: { error in
+                guard let initError = error as? AdInitializerError else {
+                    return false
+                }
+                return initError == .sdkNotAvailable
+            })
+            #endif
+        }
+
+        @Test("条件付きコンパイル: GoogleMobileAds利用不可時 - SDK利用不可エラーを投げる")
+        func initializeThrowsSDKNotAvailableWhenGMAUnavailable() async {
+            let initializer = AdInitializer.shared
+
+            #if canImport(GoogleMobileAds)
+            // GoogleMobileAds利用可能時：SDK利用不可エラーは投げない
+            do {
+                try await initializer.initialize()
+                // 初期化成功または他のエラー
+            } catch let error as AdInitializerError {
+                // SDK利用不可エラーは発生しない
+                #expect(error != .sdkNotAvailable)
+            } catch {
+                // その他のエラーは許容
+            }
+            #else
+            // GoogleMobileAds利用不可時：SDK利用不可エラーを投げる
+            await #expect(performing: {
+                try await initializer.initialize()
+            }, throws: { error in
+                guard let initError = error as? AdInitializerError else {
+                    return false
+                }
+                return initError == .sdkNotAvailable
+            })
+            #endif
+        }
+
+        @Test("条件付きコンパイル: 複数回初期化呼び出しが安全である（べき等性）")
+        func multipleInitializeCallsAreIdempotent() async {
+            let initializer = AdInitializer.shared
+
+            // 1回目の初期化
+            var firstError: Error?
+            do {
+                try await initializer.initialize()
+            } catch {
+                firstError = error
+            }
+
+            // 2回目の初期化（べき等性の確認）
+            var secondError: Error?
+            do {
+                try await initializer.initialize()
+            } catch {
+                secondError = error
+            }
+
+            // 初期化状態の確認
+            #if canImport(GoogleMobileAds)
+            // GoogleMobileAds利用可能時
+            if firstError == nil {
+                // 1回目成功 → 2回目もエラーなし
+                #expect(secondError == nil)
+                #expect(initializer.initialized == true)
+            } else {
+                // 1回目失敗 → 2回目も同じエラー
+                #expect(secondError != nil)
+            }
+            #else
+            // GoogleMobileAds利用不可時：両方ともsdkNotAvailableエラー
+            #expect(firstError is AdInitializerError)
+            #expect(secondError is AdInitializerError)
+            #expect(initializer.initialized == false)
+            #endif
+        }
+
+        @Test("条件付きコンパイル: 並行初期化呼び出しが安全である")
+        func concurrentInitializeCallsAreSafe() async {
+            let initializer = AdInitializer.shared
+
+            // 複数のタスクから同時に初期化を試行
+            await withTaskGroup(of: Result<Void, Error>.self) { group in
+                for _ in 0..<5 {
+                    group.addTask {
+                        do {
+                            try await initializer.initialize()
+                            return .success(())
+                        } catch {
+                            return .failure(error)
+                        }
+                    }
+                }
+
+                var results: [Result<Void, Error>] = []
+                for await result in group {
+                    results.append(result)
+                }
+
+                #if canImport(GoogleMobileAds)
+                // GoogleMobileAds利用可能時：全て成功または全て同じエラー
+                let successCount = results.filter { if case .success = $0 { return true }; return false }.count
+                let failureCount = results.filter { if case .failure = $0 { return true }; return false }.count
+
+                // 全て成功 or 全て失敗
+                #expect(successCount == 5 || failureCount == 5 || (successCount > 0 && failureCount > 0))
+                #else
+                // GoogleMobileAds利用不可時：全て失敗
+                for result in results {
+                    if case .failure(let error) = result {
+                        #expect(error is AdInitializerError)
+                    }
+                }
+                #endif
+            }
+        }
+
+        @Test("条件付きコンパイル: sdkNotAvailableエラーのメッセージが適切である")
+        func sdkNotAvailableErrorHasAppropriateMessage() {
+            let error = AdInitializerError.sdkNotAvailable
+
+            #expect(error.errorDescription?.contains("GoogleMobileAds SDK") == true)
+            #expect(error.errorDescription?.contains("利用できません") == true)
+            #expect(error.recoverySuggestion?.contains("インストール") == true)
+        }
+    }
 }

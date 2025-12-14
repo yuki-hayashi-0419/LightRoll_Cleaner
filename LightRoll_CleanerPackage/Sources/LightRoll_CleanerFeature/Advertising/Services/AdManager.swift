@@ -66,6 +66,7 @@ public final class AdManager {
     /// Premium管理サービス
     private let premiumManager: PremiumManagerProtocol
 
+    #if canImport(GoogleMobileAds)
     /// ロード済みバナー広告
     private var bannerAdView: GADBannerView?
 
@@ -74,12 +75,13 @@ public final class AdManager {
 
     /// ロード済みリワード広告
     private var rewardedAd: GADRewardedAd?
+    #endif
 
     /// 最後にインタースティシャル広告を表示した時刻
-    nonisolated(unsafe) private var lastInterstitialShowTime: Date?
+    @ObservationIgnored private var lastInterstitialShowTime: Date?
 
     /// 最後にリワード広告を表示した時刻
-    nonisolated(unsafe) private var lastRewardedShowTime: Date?
+    @ObservationIgnored private var lastRewardedShowTime: Date?
 
     // MARK: - Constants
 
@@ -156,6 +158,7 @@ public final class AdManager {
     /// バナー広告を表示
     ///
     /// - Returns: バナー広告ビュー（ロード未完了の場合はnil）
+    #if canImport(GoogleMobileAds)
     public func showBannerAd() -> GADBannerView? {
         guard bannerAdState.isLoaded else {
             #if DEBUG
@@ -166,6 +169,14 @@ public final class AdManager {
 
         return bannerAdView
     }
+    #else
+    public func showBannerAd() -> Any? {
+        #if DEBUG
+        print("⚠️ GoogleMobileAds SDK が利用できません")
+        #endif
+        return nil
+    }
+    #endif
 
     // MARK: - Interstitial Ad
 
@@ -223,6 +234,7 @@ public final class AdManager {
     ///
     /// - Throws: 表示に失敗した場合
     public func showInterstitialAd() async throws {
+        #if canImport(GoogleMobileAds)
         // 表示間隔チェック
         if let lastShow = lastInterstitialShowTime,
            Date().timeIntervalSince(lastShow) < Self.minInterstitialInterval {
@@ -265,6 +277,9 @@ public final class AdManager {
             #endif
             throw adError
         }
+        #else
+        throw AdManagerError.showFailed("GoogleMobileAds SDK が利用できません")
+        #endif
     }
 
     // MARK: - Rewarded Ad
@@ -324,6 +339,7 @@ public final class AdManager {
     /// - Returns: 獲得した報酬（視聴完了した場合）
     /// - Throws: 表示に失敗した場合
     public func showRewardedAd() async throws -> AdReward? {
+        #if canImport(GoogleMobileAds)
         // 表示間隔チェック
         if let lastShow = lastRewardedShowTime,
            Date().timeIntervalSince(lastShow) < Self.minRewardedInterval {
@@ -377,6 +393,9 @@ public final class AdManager {
             #endif
             throw adError
         }
+        #else
+        throw AdManagerError.showFailed("GoogleMobileAds SDK が利用できません")
+        #endif
     }
 
     // MARK: - Premium Check
@@ -391,6 +410,7 @@ public final class AdManager {
 
     // MARK: - Internal Loading Methods
 
+    #if canImport(GoogleMobileAds)
     /// バナー広告をロード（内部実装）
     private func loadBannerAdInternal() async throws {
         return try await withCheckedThrowingContinuation { continuation in
@@ -483,21 +503,39 @@ public final class AdManager {
             }
         }
     }
+    #else
+    /// バナー広告をロード（内部実装・SDK無効時）
+    private func loadBannerAdInternal() async throws {
+        throw AdManagerError.loadFailed("GoogleMobileAds SDK が利用できません")
+    }
+
+    /// インタースティシャル広告をロード（内部実装・SDK無効時）
+    private func loadInterstitialAdInternal() async throws {
+        throw AdManagerError.loadFailed("GoogleMobileAds SDK が利用できません")
+    }
+
+    /// リワード広告をロード（内部実装・SDK無効時）
+    private func loadRewardedAdInternal() async throws {
+        throw AdManagerError.loadFailed("GoogleMobileAds SDK が利用できません")
+    }
+    #endif
 
     // MARK: - Utilities
 
     /// ルートビューコントローラーを取得
+    #if canImport(UIKit)
     private func getRootViewController() async -> UIViewController? {
-        #if canImport(UIKit)
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let rootViewController = windowScene.windows.first?.rootViewController else {
             return nil
         }
         return rootViewController
-        #else
-        return nil
-        #endif
     }
+    #else
+    private func getRootViewController() async -> Any? {
+        return nil
+    }
+    #endif
 
     /// タイムアウト付きで処理を実行
     private func withTimeout<T>(
@@ -524,6 +562,7 @@ public final class AdManager {
     }
 }
 
+#if canImport(GoogleMobileAds)
 // MARK: - BannerAdDelegate
 
 /// バナー広告のデリゲート
@@ -548,3 +587,4 @@ private final class BannerAdDelegate: NSObject, GADBannerViewDelegate, @unchecke
 private enum AssociatedKeys {
     static var delegateKey: UInt8 = 0
 }
+#endif
