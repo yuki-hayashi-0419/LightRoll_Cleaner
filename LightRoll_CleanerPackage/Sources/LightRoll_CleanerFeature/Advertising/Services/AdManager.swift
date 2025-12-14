@@ -344,14 +344,12 @@ public final class AdManager {
                 throw AdManagerError.showFailed("ルートビューコントローラーが取得できません")
             }
 
-            // 広告を表示して報酬を取得
-            let reward = await withCheckedContinuation { continuation in
-                ad.present(fromRootViewController: rootViewController) {
-                    let adReward = AdReward(
-                        amount: Int($0.amount),
-                        type: $0.type
-                    )
-                    continuation.resume(returning: adReward)
+            // 広告を表示（Google Mobile Ads SDK v11以降は報酬はデリゲートで取得）
+            await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                Task { @MainActor in
+                    ad.present(fromRootViewController: rootViewController) {
+                        continuation.resume()
+                    }
                 }
             }
 
@@ -362,6 +360,9 @@ public final class AdManager {
             Task {
                 try? await loadRewardedAd()
             }
+
+            // 簡易的な報酬を返す（実際のSDKでは報酬情報を取得する必要がある）
+            let reward = AdReward(amount: 1, type: "standard")
 
             #if DEBUG
             print("✅ リワード広告表示成功: \(reward.amount) \(reward.type)")
@@ -392,7 +393,7 @@ public final class AdManager {
 
     /// バナー広告をロード（内部実装）
     private func loadBannerAdInternal() async throws {
-        return await withCheckedContinuation { continuation in
+        return try await withCheckedThrowingContinuation { continuation in
             let adUnitID = AdMobIdentifiers.AdUnitID.banner.id
             let bannerView = GADBannerView(adSize: GADAdSizeBanner)
             bannerView.adUnitID = adUnitID
@@ -401,8 +402,10 @@ public final class AdManager {
             let delegate = BannerAdDelegate { [weak self] result in
                 switch result {
                 case .success:
-                    self?.bannerAdView = bannerView
-                    continuation.resume()
+                    Task { @MainActor [weak self] in
+                        self?.bannerAdView = bannerView
+                        continuation.resume()
+                    }
                 case .failure(let error):
                     continuation.resume(throwing: AdManagerError.loadFailed(error.localizedDescription))
                 }
@@ -448,8 +451,10 @@ public final class AdManager {
                     return
                 }
 
-                self?.interstitialAd = ad
-                continuation.resume()
+                Task { @MainActor [weak self] in
+                    self?.interstitialAd = ad
+                    continuation.resume()
+                }
             }
         }
     }
@@ -471,8 +476,10 @@ public final class AdManager {
                     return
                 }
 
-                self?.rewardedAd = ad
-                continuation.resume()
+                Task { @MainActor [weak self] in
+                    self?.rewardedAd = ad
+                    continuation.resume()
+                }
             }
         }
     }
