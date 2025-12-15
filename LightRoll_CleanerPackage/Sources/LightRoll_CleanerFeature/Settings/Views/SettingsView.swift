@@ -29,6 +29,40 @@ public struct SettingsView: View {
     /// 権限マネージャー（@Environment経由で注入）
     @Environment(PermissionManager.self) private var permissionManager
 
+    /// プレミアムマネージャー（@Environment経由で注入）
+    @Environment(PremiumManager.self) private var premiumManager
+
+    /// ゴミ箱マネージャー（@Environment経由で注入）
+    @Environment(TrashManager.self) private var trashManager
+
+    // MARK: - Dependencies
+
+    /// 写真削除ユースケース
+    private let deletePhotosUseCase: DeletePhotosUseCase
+
+    /// 写真復元ユースケース
+    private let restorePhotosUseCase: RestorePhotosUseCase
+
+    /// 削除確認サービス
+    private let confirmationService: DeletionConfirmationService
+
+    // MARK: - Initialization
+
+    /// イニシャライザ
+    /// - Parameters:
+    ///   - deletePhotosUseCase: 写真削除ユースケース
+    ///   - restorePhotosUseCase: 写真復元ユースケース
+    ///   - confirmationService: 削除確認サービス
+    public init(
+        deletePhotosUseCase: DeletePhotosUseCase,
+        restorePhotosUseCase: RestorePhotosUseCase,
+        confirmationService: DeletionConfirmationService
+    ) {
+        self.deletePhotosUseCase = deletePhotosUseCase
+        self.restorePhotosUseCase = restorePhotosUseCase
+        self.confirmationService = confirmationService
+    }
+
     // MARK: - State
 
     /// エラーアラート表示フラグ
@@ -39,6 +73,12 @@ public struct SettingsView: View {
 
     /// PermissionsView表示フラグ
     @State private var showingPermissions = false
+
+    /// プレミアムアップグレード画面表示フラグ
+    @State private var showingPremiumUpgrade = false
+
+    /// ゴミ箱画面表示フラグ
+    @State private var showingTrash = false
 
     // MARK: - Body
 
@@ -76,6 +116,16 @@ public struct SettingsView: View {
                     showingError = true
                 }
             }
+            .sheet(isPresented: $showingTrash) {
+                NavigationStack {
+                    TrashView(
+                        trashManager: trashManager,
+                        deletePhotosUseCase: deletePhotosUseCase,
+                        restorePhotosUseCase: restorePhotosUseCase,
+                        confirmationService: confirmationService
+                    )
+                }
+            }
         }
     }
 
@@ -84,33 +134,43 @@ public struct SettingsView: View {
     /// プレミアムセクション
     private var premiumSection: some View {
         Section {
-            VStack(spacing: 12) {
-                HStack(spacing: 12) {
-                    Image(systemName: "star.circle.fill")
-                        .font(.system(size: 40))
-                        .foregroundStyle(.yellow.gradient)
+            Button {
+                showingPremiumUpgrade = true
+            } label: {
+                VStack(spacing: 12) {
+                    HStack(spacing: 12) {
+                        Image(systemName: "star.circle.fill")
+                            .font(.system(size: 40))
+                            .foregroundStyle(.yellow.gradient)
 
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("プレミアムにアップグレード")
-                            .font(.headline)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("プレミアムにアップグレード")
+                                .font(.headline)
 
-                        Text("すべての機能を解放")
-                            .font(.caption)
+                            Text("すべての機能を解放")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
                             .foregroundColor(.secondary)
+                            .font(.caption)
                     }
-
-                    Spacer()
-
-                    Image(systemName: "chevron.right")
-                        .foregroundColor(.secondary)
-                        .font(.caption)
+                    .padding(.vertical, 8)
                 }
-                .padding(.vertical, 8)
             }
+            .buttonStyle(.plain)
             .contentShape(Rectangle())
             .accessibilityElement(children: .combine)
             .accessibilityLabel("プレミアムにアップグレード。すべての機能を解放")
             .accessibilityHint("タップして詳細を表示")
+            .alert("プレミアム機能", isPresented: $showingPremiumUpgrade) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("プレミアム機能は準備中です。\n現在のステータス: \(premiumManager.isPremium ? "プレミアム会員" : "無料会員")")
+            }
         }
     }
 
@@ -409,7 +469,7 @@ public struct SettingsView: View {
     private var otherSection: some View {
         Section {
             Button {
-                // TODO: ゴミ箱画面への遷移（M6-T08 TrashView連携）
+                showingTrash = true
             } label: {
                 SettingsRow(
                     icon: "trash",
@@ -540,9 +600,27 @@ public struct SettingsView: View {
 // MARK: - Preview
 
 #Preview("デフォルト設定") {
-    SettingsView()
-        .environment(SettingsService())
-        .environment(PermissionManager())
+    // 依存関係のモック作成
+    let trashManager = TrashManager()
+    let photoRepository = PhotoRepository(permissionManager: PhotoPermissionManager())
+    let premiumManager = PremiumManager(purchaseRepository: PurchaseRepository())
+    let deletePhotosUseCase = DeletePhotosUseCase(
+        trashManager: trashManager,
+        photoRepository: photoRepository,
+        premiumManager: premiumManager
+    )
+    let restorePhotosUseCase = RestorePhotosUseCase(trashManager: trashManager)
+    let confirmationService = DeletionConfirmationService()
+
+    return SettingsView(
+        deletePhotosUseCase: deletePhotosUseCase,
+        restorePhotosUseCase: restorePhotosUseCase,
+        confirmationService: confirmationService
+    )
+    .environment(SettingsService())
+    .environment(PermissionManager())
+    .environment(premiumManager)
+    .environment(trashManager)
 }
 
 #Preview("自動スキャン有効") {
@@ -556,7 +634,25 @@ public struct SettingsView: View {
         return s
     }()
 
-    SettingsView()
-        .environment(service)
-        .environment(PermissionManager())
+    // 依存関係のモック作成
+    let trashManager = TrashManager()
+    let photoRepository = PhotoRepository(permissionManager: PhotoPermissionManager())
+    let premiumManager = PremiumManager(purchaseRepository: PurchaseRepository())
+    let deletePhotosUseCase = DeletePhotosUseCase(
+        trashManager: trashManager,
+        photoRepository: photoRepository,
+        premiumManager: premiumManager
+    )
+    let restorePhotosUseCase = RestorePhotosUseCase(trashManager: trashManager)
+    let confirmationService = DeletionConfirmationService()
+
+    return SettingsView(
+        deletePhotosUseCase: deletePhotosUseCase,
+        restorePhotosUseCase: restorePhotosUseCase,
+        confirmationService: confirmationService
+    )
+    .environment(service)
+    .environment(PermissionManager())
+    .environment(premiumManager)
+    .environment(trashManager)
 }

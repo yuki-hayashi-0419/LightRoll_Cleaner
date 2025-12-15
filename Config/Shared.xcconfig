@@ -48,6 +48,12 @@ INFOPLIST_KEY_NSUserNotificationsUsageDescription = 写真の整理タイミン�
 INFOPLIST_KEY_NSUserTrackingUsageDescription = よりパーソナライズされた広告体験を提供するため、アプリ間でのアクティビティ追跡を許可してください。無料版をご利用いただくための広告表示に使用されます。
 
 // ==========================================
+// Code Signing
+// ==========================================
+DEVELOPMENT_TEAM = 7HL25LTS58
+CODE_SIGN_STYLE = Automatic
+
+// ==========================================
 // Entitlements
 // ==========================================
 // AI agents can modify Config/LightRoll_Cleaner.entitlements to add capabilities

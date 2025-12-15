@@ -1320,6 +1320,31 @@ public final class PhotoRepository: PhotoRepositoryProtocol, @unchecked Sendable
     }
 }
 
+// MARK: - PhotoProvider Protocol Conformance
+
+/// PhotoProviderプロトコルへの準拠
+extension PhotoRepository: PhotoProvider {
+    /// 指定されたIDの写真を取得
+    /// - Parameter ids: 写真ID配列
+    /// - Returns: 写真配列
+    public func photos(for ids: [String]) async -> [Photo] {
+        // 空の配列チェック
+        guard !ids.isEmpty else { return [] }
+
+        // 各IDに対して写真を取得
+        var photos: [Photo] = []
+        photos.reserveCapacity(ids.count)
+
+        for id in ids {
+            if let photo = await fetchPhotoModel(by: id) {
+                photos.append(photo)
+            }
+        }
+
+        return photos
+    }
+}
+
 // MARK: - PhotoBatchSequence
 
 /// 写真をバッチで取得するためのAsyncSequence

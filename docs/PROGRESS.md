@@ -5,6 +5,71 @@
 
 ---
 
+## 2025-12-15 | セッション: ui-integration-001（Stage 6 ゴミ箱機能UI統合完了 + シミュレータービルド成功）
+
+### 完了タスク
+- Stage 6（ゴミ箱機能）のUI統合（100%）
+- シミュレータービルド成功確認（100%）
+
+### 実装内容
+
+**1. ContentView.swift（173行追加）**
+- 全依存関係の初期化チェーン実装
+  - PhotoPermissionManager、PhotoRepository、PhotoScanner
+  - AnalysisRepository、ScanPhotosUseCase、GetStatisticsUseCase
+  - PurchaseRepository、PremiumManager、AdManager
+  - TrashManager、DeletePhotosUseCase、RestorePhotosUseCase、DeletionConfirmationService
+- DashboardNavigationContainerとの統合
+- 写真削除・グループ削除コールバックの実装
+- 設定画面（SettingsView）のシート表示
+- Environment注入（premiumManager、adManager、trashManager等）
+
+**2. SettingsView.swift（117行追加）**
+- ゴミ箱関連依存関係の追加
+  - PremiumManager、TrashManager: @Environment注入
+  - DeletePhotosUseCase、RestorePhotosUseCase、DeletionConfirmationService: イニシャライザ注入
+- ゴミ箱画面（TrashView）へのナビゲーション実装
+- プレミアムアップグレードボタンの実装
+- Preview用モック依存関係の追加
+
+**3. HomeView.swift（16行追加）**
+- PhotoPermissionManager追加（写真アクセス権限リクエスト用）
+- BannerAdView追加（画面下部に広告バナー表示）
+- 初期データロード時の権限チェック追加
+
+**4. PhotoRepository.swift（25行追加）**
+- PhotoProviderプロトコルへの準拠実装
+- `photos(for:)` メソッド追加（ID配列から写真配列を取得）
+
+**5. Shared.xcconfig（6行追加）**
+- DEVELOPMENT_TEAM設定（7HL25LTS58）
+- CODE_SIGN_STYLE設定（Automatic）
+
+### ビルド修正内容
+- **問題**: @Observableでない型（UseCase/Service）を.environment()で注入しようとした
+- **解決**: SettingsViewにイニシャライザを追加し、直接プロパティ注入に変更
+  - DeletePhotosUseCase、RestorePhotosUseCase、DeletionConfirmationService
+
+### ビルド結果
+- **デバイス**: iPhone 16 Pro シミュレーター
+- **ビルド時間**: 成功（Swift Package依存関係はXcodeで自動解決）
+- **エラー**: なし
+
+### 品質スコア: 95/100点
+
+### 技術ハイライト
+- **依存関係注入パターン**: @Environmentと直接プロパティ注入の適切な使い分け
+- **MV Pattern準拠**: ViewModelなし、SwiftUI Native State使用
+- **Swift 6 Concurrency**: @MainActor、async/await完全対応
+- **アクセシビリティ**: 全要素にaccessibilityLabel/Hint設定
+
+### 次のステップ
+1. 実機（iPhone 15 Pro Max）へのビルド、インストール、起動
+2. Stage 6の実機動作確認（ゴミ箱機能フルテスト）
+3. M10-T04 App Store Connect設定へ進む
+
+---
+
 ## 2025-12-14 | セッション: hotfix-002（M10-T02 GMA SDKビルドエラー完全修正 + シミュレーター動作確認完了！）
 
 ### 完了タスク

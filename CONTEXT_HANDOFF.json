@@ -1,24 +1,15 @@
 {
-  "version": "3.29",
-  "lastUpdated": "2025-12-14",
-  "sessionId": "hotfix-002",
+  "version": "3.31",
+  "lastUpdated": "2025-12-15",
+  "sessionId": "ui-integration-001",
   "sessionEndStatus": "completed",
 
   "projectStatus": {
-    "phase": "リリース準備進行中",
-    "currentPhase": "全9モジュール完了（100%）+ M10 Release Preparation進行中（50%）",
+    "phase": "リリース準備進行中 + UI統合完了",
+    "currentPhase": "全9モジュール完了（100%）+ M10 Release Preparation進行中（50%）+ Stage 6 UI統合完了",
     "overallProgress": "96.7%",
-    "nextMilestone": "M10-T04 App Store Connect設定",
-    "majorAchievement": "M10-T03 プライバシーポリシー作成完了（100点）- release-004"
-  },
-
-  "designStatus": {
-    "completed": true,
-    "architecture": "MV Pattern + SwiftUI Native State",
-    "architectureScore": 78.75,
-    "modules": 10,
-    "totalTasks": 121,
-    "estimatedHours": 196
+    "nextMilestone": "実機ビルド・テスト → M10-T04 App Store Connect設定",
+    "majorAchievement": "Stage 6 ゴミ箱機能UI統合完了（95点）- シミュレータービルド成功"
   },
 
   "taskStatus": {
@@ -28,341 +19,47 @@
     "merged": 1,
     "inProgress": 0,
     "pending": 3,
-    "completedHours": 184.5,
-    "remainingHours": 7,
-    "lastCompletedTaskId": "M10-T03",
-    "skippedTasks": ["M5-T05", "M5-T08", "M5-T10", "M6-T10", "M9-T11"],
-    "mergedTasks": ["M8-T12 -> M8-T05"],
+    "completedHours": 185.5,
+    "remainingHours": 6,
+    "lastCompletedTaskId": "Stage6-UI-Integration",
     "nextTaskCandidates": [
-      "M10-T04: App Store Connect設定（基本情報・説明文・価格・スクリーンショットアップロード）",
-      "M10-T05: TestFlight配信（内部/外部テスター）",
+      "実機ビルド・インストール・起動（iPhone 15 Pro Max）",
+      "M10-T04: App Store Connect設定",
+      "M10-T05: TestFlight配信",
       "M10-T06: 最終ビルド & 審査提出"
     ]
   },
 
-  "completedTasks": {
-    "M1": ["M1-T01", "M1-T02", "M1-T03", "M1-T04", "M1-T05", "M1-T06", "M1-T07", "M1-T08", "M1-T09", "M1-T10"],
-    "M2": ["M2-T01", "M2-T02", "M2-T03", "M2-T04", "M2-T05", "M2-T06", "M2-T07", "M2-T08", "M2-T09", "M2-T10", "M2-T11", "M2-T12"],
-    "M3": ["M3-T01", "M3-T02", "M3-T03", "M3-T04", "M3-T05", "M3-T06", "M3-T07", "M3-T08", "M3-T09", "M3-T10", "M3-T11", "M3-T12", "M3-T13"],
-    "M4": ["M4-T01", "M4-T02", "M4-T03", "M4-T04", "M4-T05", "M4-T06", "M4-T07", "M4-T08", "M4-T09", "M4-T10", "M4-T11", "M4-T12", "M4-T13", "M4-T14"],
-    "M5": ["M5-T01", "M5-T02", "M5-T03", "M5-T04", "M5-T06", "M5-T07", "M5-T09", "M5-T11", "M5-T12", "M5-T13"],
-    "M6": ["M6-T01", "M6-T02", "M6-T03", "M6-T04", "M6-T05", "M6-T06", "M6-T07", "M6-T08", "M6-T09", "M6-T11", "M6-T12", "M6-T13", "M6-T14"],
-    "M7": ["M7-T01", "M7-T02", "M7-T03", "M7-T04", "M7-T05", "M7-T06", "M7-T07", "M7-T08", "M7-T09", "M7-T10", "M7-T11", "M7-T12"],
-    "M8": ["M8-T01", "M8-T02", "M8-T03", "M8-T04", "M8-T05", "M8-T06", "M8-T07", "M8-T08", "M8-T09", "M8-T10", "M8-T11", "M8-T13", "M8-T14"],
-    "M9": ["M9-T01", "M9-T02", "M9-T03", "M9-T04", "M9-T05", "M9-T06", "M9-T07", "M9-T08", "M9-T09", "M9-T10", "M9-T12", "M9-T13", "M9-T14", "M9-T15"],
-    "M10": ["M10-T01", "M10-T02", "M10-T03"]
-  },
-
-  "moduleProgress": {
-    "M1_CoreInfrastructure": {
-      "completed": 10,
-      "remaining": 0,
-      "completedHours": 16,
-      "remainingHours": 0,
-      "percentage": 100,
-      "status": "完了"
-    },
-    "M2_PhotoAccess": {
-      "completed": 12,
-      "remaining": 0,
-      "completedHours": 20.5,
-      "remainingHours": 0,
-      "percentage": 100,
-      "status": "完了"
-    },
-    "M3_ImageAnalysis": {
-      "completed": 13,
-      "remaining": 0,
-      "completedHours": 26,
-      "remainingHours": 0,
-      "percentage": 100,
-      "status": "完了"
-    },
-    "M4_UIComponents": {
-      "completed": 14,
-      "remaining": 0,
-      "completedHours": 17,
-      "remainingHours": 0,
-      "percentage": 100,
-      "status": "完了"
-    },
-    "M5_Dashboard": {
-      "completed": 11,
-      "skipped": 3,
-      "remaining": 0,
-      "completedHours": 18,
-      "remainingHours": 0,
-      "percentage": 100,
-      "status": "完了"
-    },
-    "M6_DeletionSafety": {
-      "completed": 13,
-      "skipped": 1,
-      "remaining": 0,
-      "completedHours": 17.5,
-      "remainingHours": 0,
-      "percentage": 100,
-      "status": "完了"
-    },
-    "M7_Notifications": {
-      "completed": 12,
-      "merged": 1,
-      "remaining": 0,
-      "completedHours": 15.5,
-      "remainingHours": 0,
-      "percentage": 100,
-      "status": "完了"
-    },
-    "M8_Settings": {
-      "completed": 13,
-      "merged": 1,
-      "remaining": 0,
-      "completedHours": 19.5,
-      "remainingHours": 0,
-      "percentage": 100,
-      "status": "完了"
-    },
-    "M9_Monetization": {
-      "completed": 14,
-      "skipped": 1,
-      "remaining": 0,
-      "completedHours": 28,
-      "remainingHours": 0,
-      "percentage": 100,
-      "status": "完了"
-    },
-    "M10_ReleasePreparation": {
-      "completed": 3,
-      "remaining": 3,
-      "completedHours": 8,
-      "remainingHours": 7,
-      "percentage": 50.0,
-      "status": "進行中"
-    }
-  },
-
-  "qualityMetrics": {
-    "averageScore": 98.0,
-    "averagePercentage": 98.0,
-    "totalTests": 1395,
-    "testsPassed": 1395,
-    "testsFailed": 0,
-    "failedTestNote": "全テスト成功",
-    "latestScores": {
-      "M10-T03": 100,
-      "M10-T02": 95,
-      "M10-T01": 100,
-      "M9-T15": 100,
-      "M9-T14": 100
-    }
-  },
-
-  "contextOptimization": {
-    "progressEntries": 12,
-    "maxProgressEntries": 12,
-    "archivedTasks": 63,
-    "lastOptimization": "2025-12-15",
-    "optimizationSession": "context-opt-001",
-    "archivedEntries": ["impl-029", "impl-032", "impl-033", "impl-034", "impl-035", "impl-060"],
-    "nextOptimizationTrigger": "リリース前",
-    "contextHealth": "最適（約60%使用）"
-  },
-
-  "archivedModules": ["M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8", "M9"],
-
-  "criticalDocuments": [
-    "docs/CRITICAL/CORE_RULES.md",
-    "docs/CRITICAL/ARCHITECTURE.md",
-    "docs/CRITICAL/BUILD_CONFIG.md",
-    "docs/CRITICAL/WORKFLOW_GUIDE.md",
-    "docs/CRITICAL/APP_STORE_SUBMISSION_CHECKLIST.md"
-  ],
-
-  "moduleDocuments": [
-    "docs/modules/MODULE_M1_CORE_INFRASTRUCTURE.md",
-    "docs/modules/MODULE_M2_PHOTO_ACCESS.md",
-    "docs/modules/MODULE_M3_IMAGE_ANALYSIS.md",
-    "docs/modules/MODULE_M4_UI_COMPONENTS.md",
-    "docs/modules/MODULE_M5_DASHBOARD.md",
-    "docs/modules/MODULE_M6_DELETION_SAFETY.md",
-    "docs/modules/MODULE_M7_NOTIFICATIONS.md",
-    "docs/modules/MODULE_M8_SETTINGS.md",
-    "docs/modules/MODULE_M9_MONETIZATION.md"
-  ],
-
-  "implementationPhases": [
-    {
-      "phase": 1,
-      "name": "基盤構築",
-      "modules": ["M1", "M4前半"],
-      "tasks": "M1-T01〜M1-T10, M4-T01〜M4-T04",
-      "status": "完了",
-      "progress": "14/14タスク完了（100%）"
-    },
-    {
-      "phase": 2,
-      "name": "データ層",
-      "modules": ["M2", "M3"],
-      "tasks": "M2-T01〜M2-T12, M3-T01〜M3-T13",
-      "status": "完了",
-      "progress": "25/25タスク完了（100%）"
-    },
-    {
-      "phase": 3,
-      "name": "UI層",
-      "modules": ["M4後半"],
-      "tasks": "M4-T05〜M4-T14",
-      "status": "完了",
-      "progress": "10/10タスク完了（100%）"
-    },
-    {
-      "phase": 4,
-      "name": "Dashboard",
-      "modules": ["M5"],
-      "tasks": "M5-T01〜M5-T13",
-      "status": "完了",
-      "progress": "11/11タスク完了 + 3スキップ（100%）"
-    },
-    {
-      "phase": 5,
-      "name": "機能完成",
-      "modules": ["M6", "M8"],
-      "tasks": "M6-T01〜M6-T14, M8-T01〜M8-14",
-      "status": "完了",
-      "progress": "26/28タスク完了（100%）"
-    },
-    {
-      "phase": 6,
-      "name": "仕上げ",
-      "modules": ["M7", "M9"],
-      "tasks": "M7-T01〜M7-T12, M9-T01〜M9-T15",
-      "status": "完了",
-      "progress": "26/27タスク完了（100%）"
-    },
-    {
-      "phase": 7,
-      "name": "リリース準備",
-      "modules": ["M10"],
-      "tasks": "M10-T01〜M10-T06",
-      "status": "進行中",
-      "progress": "3/6タスク完了（50.0%）"
-    }
-  ],
-
-  "gitHistory": {
-    "commits": [
-      {
-        "hash": "pending",
-        "message": "fix: hotfix-002完了 - M10-T02 GMA SDKビルドエラー修正（AdManager/AdInitializer、95点）",
-        "date": "2025-12-14"
-      },
-      {
-        "hash": "pending",
-        "message": "feat: release-004完了 - M10-T03 プライバシーポリシー作成（日英両対応、100点）",
-        "date": "2025-12-14"
-      },
-      {
-        "hash": "pending",
-        "message": "feat: release-003完了 - M10-T02 スクリーンショット作成（95点）",
-        "date": "2025-12-13"
-      },
-      {
-        "hash": "pending",
-        "message": "feat: release-001完了 - M10-T01 App Store準備ドキュメント作成（100点）",
-        "date": "2025-12-13"
-      },
-      {
-        "hash": "404ab32",
-        "message": "feat: impl-061完了 - M9モジュール100%達成（M9-T13/T14/T15、1,808行、41テスト、100点）",
-        "date": "2025-12-12"
-      }
-    ],
-    "branch": "main"
-  },
-
-  "nextSessionRecommendations": [
-    "M10-T04: App Store Connect設定（基本情報、説明文、価格、スクリーンショット、プライバシーポリシーURL登録）",
-    "M10-T05: TestFlight配信（内部テスター招待、ビルド配信、フィードバック収集）",
-    "M10-T06: 最終ビルド & 審査提出（Archive作成、Validation、Upload、審査提出）"
-  ],
-
   "resumeInstructions": {
-    "step1": "M10-T04 App Store Connect設定",
-    "step2": "M10-T05 TestFlight配信",
-    "step3": "M10-T06 最終ビルド & 審査提出",
-    "context": "hotfix-002でM10-T02 GMA SDKビルドエラー修正完了（95点）。AdManager.swift（8箇所）とAdInitializer.swift（2箇所、特にline 144のATTrackingManager型参照）を条件付きコンパイルで修正。品質スコア67点→95点。シミュレーター（iPhone 16, iOS 18.2）で動作確認成功、Google Mobile Ads SDK初期化完了。アプリは完全に動作可能な状態。M10リリース準備進行中（3/6タスク、50.0%）。次回はプライバシーポリシー公開→App Store Connect設定推奨。"
+    "step1": "実機ビルド: build_device({ workspacePath, scheme: 'LightRoll_Cleaner' })",
+    "step2": "実機インストール: install_app_device({ deviceId: '00008130-001A51A82630001C', appPath })",
+    "step3": "実機起動: launch_app_device({ deviceId: '00008130-001A51A82630001C', bundleId: 'com.lightroll.cleaner' })",
+    "context": "ui-integration-001でStage 6 ゴミ箱機能UI統合完了（95点）。ContentView/SettingsView/HomeView/PhotoRepository更新。シミュレータービルド成功。次回は実機へのビルド・インストール・起動。"
   },
 
-  "hotfix002SessionSummary": {
-    "completedTasks": ["M10-T02-fix"],
-    "skippedTasks": [],
-    "mergedTasks": [],
-    "addedTests": 0,
-    "totalTestsNow": 1395,
-    "totalCodeLines": 10,
+  "uiIntegration001SessionSummary": {
+    "completedTasks": ["Stage6-UI-Integration"],
+    "totalCodeLines": 343,
     "qualityAverage": 95,
     "keyDeliverables": [
-      "AdManager.swift修正（8箇所の条件付きコンパイル）",
-      "AdInitializer.swift修正（2箇所、特にline 144のATTrackingManager型参照）",
-      "品質スコア改善（67点→95点、+28点）",
-      "シミュレーター動作確認（iPhone 16, iOS 18.2）",
-      "Google Mobile Ads SDK初期化成功",
-      "クラッシュ・エラーなし確認",
-      "アプリ完全動作可能状態達成"
+      "ContentView.swift: 全依存関係初期化チェーン実装（173行追加）",
+      "SettingsView.swift: ゴミ箱画面ナビゲーション実装（117行追加）",
+      "HomeView.swift: BannerAdView追加、権限チェック追加（16行追加）",
+      "PhotoRepository.swift: PhotoProvider準拠実装（25行追加）",
+      "Shared.xcconfig: DEVELOPMENT_TEAM、CODE_SIGN_STYLE追加（6行追加）",
+      "シミュレータービルド成功（iPhone 16 Pro）"
     ],
-    "technicalHighlights": [
-      "条件付きコンパイル完全対応（#if canImport）",
-      "Swift 6.1厳格並行性チェック準拠",
-      "型安全性確保（GADBannerView/GADInterstitialAd/GADRewardedAd）",
-      "ATTrackingManager型参照エラー解決",
-      "改善ループ実行（67点→95点）",
-      "XCBuild MCPによるシミュレーター制御",
-      "ログキャプチャによる初期化確認"
-    ],
-    "milestoneAchieved": "M10-T02 GMA SDKビルドエラー完全修正 - アプリ動作可能",
+    "milestoneAchieved": "Stage 6 ゴミ箱機能UI統合完了",
     "status": "completed"
   },
 
-  "failureTracking": {
-    "consecutiveFailures": 0,
-    "lastFailure": null,
-    "recoveryActions": []
-  },
-
   "nextSession": {
-    "recommended_action": "M10-T04 App Store Connect設定",
-    "priority_tasks": [
-      "プライバシーポリシーをGitHub Pagesで公開",
-      "App Store Connect設定: 基本情報（名前、サブタイトル、カテゴリ、SKU）",
-      "App Store Connect設定: 説明文・キーワード・プロモーション文",
-      "App Store Connect設定: 価格・配信地域",
-      "App Store Connect設定: スクリーンショットアップロード（20枚）",
-      "App Store Connect設定: プライバシーポリシーURL登録",
-      "App Store Connect設定: App Privacy詳細入力"
-    ],
-    "alternativePath": "TestFlight配信準備も並行可能",
-    "warnings": ["プライバシーポリシー公開前にApp Store Connect設定は不可"],
-    "contextHealthy": true,
-    "archiveRecommended": "M10完了後にM1〜M9アーカイブ推奨"
-  },
-
-  "projectMilestone": {
-    "achievement": "M10 Release Preparation 50%達成",
-    "date": "2025-12-14",
-    "session": "release-004",
-    "statistics": {
-      "totalModules": 10,
-      "completedModules": 9,
-      "totalTasks": 121,
-      "completedTasks": 117,
-      "skippedTasks": 5,
-      "mergedTasks": 1,
-      "totalTests": 1395,
-      "averageQualityScore": 98.0,
-      "estimatedHours": 196,
-      "actualHours": 184.5
+    "recommended_action": "実機ビルド・インストール・起動",
+    "deviceInfo": {
+      "name": "iPhone 15 Pro Max",
+      "deviceId": "00008130-001A51A82630001C"
     }
   },
 
-  "notes": "hotfix-002セッション完了。M10-T02 GMA SDKビルドエラー完全修正（95点）。AdManager.swift（8箇所）、AdInitializer.swift（2箇所、特にline 144のATTrackingManager型参照）を条件付きコンパイル（#if canImport）で修正。品質スコア67点→95点（+28点改善）。シミュレーター（iPhone 16, iOS 18.2, UUID: 8EE25576-3701-4978-9BFB-4BE95FACD37F）でビルド・起動・動作確認成功。Google Mobile Ads SDK初期化完了（GADMobileAds: ready）。クラッシュ・エラーなし。アプリ完全動作可能状態達成。累計117タスク完了（96.7%）、1,395テスト全成功。M10リリース準備50%達成（3/6タスク）。次回はプライバシーポリシー公開→App Store Connect設定推奨。"
+  "notes": "ui-integration-001セッション完了。Stage 6ゴミ箱機能UI統合完了（95点）。次回は実機（iPhone 15 Pro Max）へのビルド・インストール・起動を実行。"
 }

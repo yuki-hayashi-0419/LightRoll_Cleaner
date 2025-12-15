@@ -48,6 +48,9 @@ public struct HomeView: View {
 
     // MARK: - State
 
+    /// 写真権限マネージャー
+    @State private var permissionManager = PhotoPermissionManager()
+
     /// ビューの状態
     @State private var viewState: ViewState = .loading
 
@@ -132,6 +135,12 @@ public struct HomeView: View {
 
                 // メインコンテンツ
                 mainContent
+
+                // バナー広告（画面下部に固定）
+                VStack {
+                    Spacer()
+                    BannerAdView()
+                }
             }
             .navigationTitle(NSLocalizedString(
                 "home.title",
@@ -540,6 +549,13 @@ public struct HomeView: View {
     /// 初期データを読み込み
     private func loadInitialData() async {
         viewState = .loading
+
+        // 写真ライブラリへのアクセス許可をリクエスト
+        let status = permissionManager.checkPermissionStatus()
+        if status == .notDetermined {
+            // 未決定の場合は権限をリクエスト
+            _ = await permissionManager.requestPermission()
+        }
 
         do {
             let output = try await getStatisticsUseCase.execute()
