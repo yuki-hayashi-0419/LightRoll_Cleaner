@@ -1,65 +1,93 @@
 {
-  "version": "3.31",
-  "lastUpdated": "2025-12-15",
-  "sessionId": "ui-integration-001",
+  "version": "3.32",
+  "lastUpdated": "2025-12-16",
+  "sessionId": "device-build-perf-analysis-001",
   "sessionEndStatus": "completed",
 
   "projectStatus": {
-    "phase": "リリース準備進行中 + UI統合完了",
-    "currentPhase": "全9モジュール完了（100%）+ M10 Release Preparation進行中（50%）+ Stage 6 UI統合完了",
-    "overallProgress": "96.7%",
-    "nextMilestone": "実機ビルド・テスト → M10-T04 App Store Connect設定",
-    "majorAchievement": "Stage 6 ゴミ箱機能UI統合完了（95点）- シミュレータービルド成功"
+    "phase": "リリース準備進行中 + パフォーマンス最適化待ち",
+    "currentPhase": "全9モジュール完了（100%）+ M10 Release Preparation進行中（60%）+ 実機ビルド完了",
+    "overallProgress": "97.5%",
+    "nextMilestone": "パフォーマンス最適化 → M10-T04 App Store Connect設定",
+    "majorAchievement": "実機ビルド・インストール・起動成功（iPhone 15 Pro Max）+ パフォーマンス問題特定"
   },
 
   "taskStatus": {
-    "total": 121,
-    "completed": 117,
+    "total": 122,
+    "completed": 118,
     "skipped": 5,
     "merged": 1,
     "inProgress": 0,
     "pending": 3,
-    "completedHours": 185.5,
-    "remainingHours": 6,
-    "lastCompletedTaskId": "Stage6-UI-Integration",
+    "completedHours": 189.5,
+    "remainingHours": 5,
+    "lastCompletedTaskId": "Device-Build-Performance-Analysis",
     "nextTaskCandidates": [
-      "実機ビルド・インストール・起動（iPhone 15 Pro Max）",
+      "パフォーマンス最適化実装（ファイルサイズ取得並列化）",
+      "パフォーマンス最適化実装（フィルタリング前倒し）",
+      "パフォーマンス最適化実装（バッチサイズ最適化）",
       "M10-T04: App Store Connect設定",
-      "M10-T05: TestFlight配信",
-      "M10-T06: 最終ビルド & 審査提出"
+      "M10-T05: TestFlight配信"
     ]
   },
 
   "resumeInstructions": {
-    "step1": "実機ビルド: build_device({ workspacePath, scheme: 'LightRoll_Cleaner' })",
-    "step2": "実機インストール: install_app_device({ deviceId: '00008130-001A51A82630001C', appPath })",
-    "step3": "実機起動: launch_app_device({ deviceId: '00008130-001A51A82630001C', bundleId: 'com.lightroll.cleaner' })",
-    "context": "ui-integration-001でStage 6 ゴミ箱機能UI統合完了（95点）。ContentView/SettingsView/HomeView/PhotoRepository更新。シミュレータービルド成功。次回は実機へのビルド・インストール・起動。"
+    "step1": "PROGRESS.md確認: 直近セッション履歴を読み込み",
+    "step2": "@spec-performanceの分析結果を確認",
+    "step3": "パフォーマンス最適化実装開始: PHAsset+Extensions.swift → PhotoScanner.swift → ScanOptions",
+    "context": "device-build-perf-analysis-001で実機ビルド成功（100点）、パフォーマンス分析完了（95点）。スキャン処理が極端に遅い問題を特定。3つの致命的・重大問題（ファイルサイズ直列取得、非効率フィルタリング、小バッチサイズ）への修正案が準備済み。"
   },
 
-  "uiIntegration001SessionSummary": {
-    "completedTasks": ["Stage6-UI-Integration"],
-    "totalCodeLines": 343,
-    "qualityAverage": 95,
-    "keyDeliverables": [
-      "ContentView.swift: 全依存関係初期化チェーン実装（173行追加）",
-      "SettingsView.swift: ゴミ箱画面ナビゲーション実装（117行追加）",
-      "HomeView.swift: BannerAdView追加、権限チェック追加（16行追加）",
-      "PhotoRepository.swift: PhotoProvider準拠実装（25行追加）",
-      "Shared.xcconfig: DEVELOPMENT_TEAM、CODE_SIGN_STYLE追加（6行追加）",
-      "シミュレータービルド成功（iPhone 16 Pro）"
+  "performanceOptimization": {
+    "status": "analysis_completed",
+    "identifiedIssues": [
+      {
+        "severity": "critical",
+        "location": "PHAsset+Extensions.swift",
+        "issue": "ファイルサイズ取得が直列実行",
+        "impact": "20-30倍の遅延",
+        "solution": "TaskGroup並列化 + キャッシュ導入"
+      },
+      {
+        "severity": "major",
+        "location": "PhotoScanner.swift",
+        "issue": "フィルタリングが非効率",
+        "impact": "30-50%の無駄処理",
+        "solution": "フィルタリング前倒し + 早期終了"
+      },
+      {
+        "severity": "major",
+        "location": "ScanOptions",
+        "issue": "バッチサイズが小さすぎる",
+        "impact": "オーバーヘッド増大",
+        "solution": "100→500に増加 + 動的調整"
+      }
     ],
-    "milestoneAchieved": "Stage 6 ゴミ箱機能UI統合完了",
+    "expectedImprovement": "10-20倍の高速化"
+  },
+
+  "deviceBuildSession": {
+    "completedTasks": ["Device-Build-Performance-Analysis"],
+    "buildSize": "22MB",
+    "signingStatus": "valid",
+    "targetDevice": {
+      "name": "iPhone 15 Pro Max",
+      "deviceId": "00008130-001A51A82630001C"
+    },
+    "qualityAverage": 97.5,
     "status": "completed"
   },
 
   "nextSession": {
-    "recommended_action": "実機ビルド・インストール・起動",
-    "deviceInfo": {
-      "name": "iPhone 15 Pro Max",
-      "deviceId": "00008130-001A51A82630001C"
-    }
+    "recommended_action": "パフォーマンス最適化実装",
+    "priority": "high",
+    "estimatedTime": "2-3時間",
+    "targetFiles": [
+      "LightRoll_CleanerPackage/Sources/PhotoLibrary/Extensions/PHAsset+Extensions.swift",
+      "LightRoll_CleanerPackage/Sources/PhotoLibrary/Scanning/PhotoScanner.swift",
+      "LightRoll_CleanerPackage/Sources/PhotoLibrary/Scanning/ScanOptions.swift"
+    ]
   },
 
-  "notes": "ui-integration-001セッション完了。Stage 6ゴミ箱機能UI統合完了（95点）。次回は実機（iPhone 15 Pro Max）へのビルド・インストール・起動を実行。"
+  "notes": "device-build-perf-analysis-001セッション完了。実機ビルド成功（iPhone 15 Pro Max）。パフォーマンス問題の詳細分析完了。次回はスキャン処理の最適化実装から開始。"
 }
