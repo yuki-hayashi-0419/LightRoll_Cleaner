@@ -15,7 +15,7 @@ import Photos
 // MARK: - Progress Collector Actor
 
 /// テスト用の進捗収集アクター（スレッドセーフ）
-actor ProgressCollector {
+actor ScanProgressCollector {
     var progressValues: [Double] = []
     var callCount: Int = 0
     var lastProgress: PhotoScanProgress?
@@ -589,7 +589,7 @@ struct PhotoScannerProgressTests {
             permissionManager: mockPermission
         )
 
-        let collector = ProgressCollector()
+        let collector = ScanProgressCollector()
 
         do {
             _ = try await scanner.scan(progressHandler: { progress in
@@ -620,7 +620,7 @@ struct PhotoScannerProgressTests {
             permissionManager: mockPermission
         )
 
-        let collector = ProgressCollector()
+        let collector = ScanProgressCollector()
 
         do {
             _ = try await scanner.scan(progressHandler: { progress in
@@ -728,7 +728,7 @@ struct PhotoScannerIntegrationTests {
             permissionManager: mockPermission
         )
 
-        let collector = ProgressCollector()
+        let collector = ScanProgressCollector()
 
         do {
             _ = try await scanner.scan(progressHandler: { progress in
