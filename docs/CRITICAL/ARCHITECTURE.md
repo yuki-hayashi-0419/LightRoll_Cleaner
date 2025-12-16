@@ -455,6 +455,77 @@ func calculateSimilarity(
 let similarityThreshold: Float = 0.85
 ```
 
+### 5.4 分析最適化設計（PERF-OPT-004）[未実装]
+
+**発見された問題（2025-12-16）**
+
+現在の`analyzePhoto()`は同一画像を4回読み込んでいる：
+
+```
+analyzePhoto(photo) - 現在の構造（問題あり）
+├── extractFeaturePrint()  → loadCIImage() → PHImageManager (フル解像度)
+├── detectFaces()          → loadCIImage() → PHImageManager (フル解像度)
+├── detectBlur()           → loadCIImage() → PHImageManager (フル解像度)
+└── detectScreenshot()     → loadCIImage() → PHImageManager (フル解像度)
+```
+
+**影響**
+- 1枚あたり4回のフル解像度（12MB以上）読み込み
+- I/Oボトルネック：48MB/枚のメモリ・I/O負荷
+- Vision Framework処理時間：300-500ms × 4 = 1.2-2秒/枚
+
+**改善設計**
+
+```
+analyzePhoto(photo) - 改善後の構造
+├── 1回だけ loadCIImage (1024x1024縮小版)
+└── VNImageRequestHandler.perform([
+        VNGenerateImageFeaturePrintRequest,    // 特徴抽出
+        VNDetectFaceRectanglesRequest,         // 顔検出
+        // スクショ判定はメタデータベース
+    ])
+    └── detectBlur() (CoreImage Laplacianフィルタで別途)
+```
+
+**実装ポイント**
+
+```swift
+// 改善後の実装イメージ
+func analyzePhoto(_ photo: Photo) async throws -> PhotoAnalysisResult {
+    // 1. 1回だけ縮小版を読み込み
+    let ciImage = try await loadCIImage(photo, maxSize: 1024)
+
+    // 2. Visionリクエストをバッチ実行
+    let handler = VNImageRequestHandler(ciImage: ciImage, options: [:])
+    let featurePrintRequest = VNGenerateImageFeaturePrintRequest()
+    let faceRequest = VNDetectFaceRectanglesRequest()
+
+    try handler.perform([featurePrintRequest, faceRequest])
+
+    // 3. ブレ検出はCoreImageで
+    let blurScore = detectBlurWithLaplacian(ciImage)
+
+    // 4. スクショ判定はメタデータ（UTTypeIdentifier等）
+    let isScreenshot = detectScreenshotFromMetadata(photo.asset)
+
+    return PhotoAnalysisResult(...)
+}
+```
+
+**期待される改善効果**
+
+| 項目 | 現状 | 改善後 | 効果 |
+|------|------|--------|------|
+| 画像読み込み | 4回/枚 | 1回/枚 | **75%削減** |
+| 画像サイズ | フル解像度 | 1024×1024 | **メモリ90%削減** |
+| Visionリクエスト | 4回perform | 1回perform | **オーバーヘッド削減** |
+| 全体処理時間 | 1.2-2秒/枚 | 0.4-0.7秒/枚 | **2-3倍高速化** |
+
+**注意事項**
+- VNFeaturePrintObservationはVNImageRequestHandler単位でのバッチ実行に制約あり（要検証）
+- ブレ検出はCoreImage Laplacianフィルタに切り替え（Vision非依存化）
+- スクリーンショット判定はPHAssetのmediaSubtypes/sourceTypeを活用
+
 ---
 
 ## 6. 状態管理

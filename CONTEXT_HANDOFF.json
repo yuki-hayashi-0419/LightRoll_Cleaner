@@ -1,7 +1,7 @@
 {
-  "version": "3.38",
+  "version": "3.39",
   "lastUpdated": "2025-12-16",
-  "sessionId": "analysis-speed-diagnosis-001",
+  "sessionId": "analysis-bottleneck-001",
   "sessionEndStatus": "completed",
 
   "projectStatus": {
@@ -30,9 +30,10 @@
 
   "contextOptimization": {
     "optimizedDate": "2025-12-16",
+    "lastOptimizationSession": "analysis-bottleneck-001",
     "progressEntries": {
-      "before": 12,
-      "after": 12,
+      "before": 9,
+      "after": 9,
       "archived": 0
     },
     "tasksCompleted": {
@@ -40,14 +41,15 @@
       "totalArchived": 27
     },
     "documentWhitelist": "全ファイル準拠確認済み",
-    "contextSizeReduction": "アーカイブ不要（10件程度）"
+    "contextSizeReduction": "最適化実施（PERFORMANCE_OPT_003_SUMMARY.md統合完了）",
+    "reducedSize": "約8KB（PERFORMANCE_REPORT.md統合）"
   },
 
   "resumeInstructions": {
-    "step1": "PROGRESS.md確認: analysis-speed-diagnosis-001セッション結果を確認（分析速度問題の原因特定完了）",
-    "step2": "AnalysisRepository.swift の analyzePhoto() メソッドを確認（画像4重読み込み箇所）",
+    "step1": "PROGRESS.md確認: analysis-bottleneck-001セッション結果を確認（コンテキスト最適化完了）",
+    "step2": "PERFORMANCE_REPORT.md を確認（全6フェーズのパフォーマンス最適化まとめ）",
     "step3": "次のアクション選択: 分析高速化実装 or App Store Connect設定",
-    "context": "画像の4重読み込みが分析速度の最大ボトルネック。改善策: 1回読み込み + 1024x1024縮小 + VNImageRequestHandler共有で20-30倍高速化見込み。7000枚が約4時間→10-15分に短縮予想。"
+    "context": "コンテキスト最適化完了（PERFORMANCE_OPT_003_SUMMARY.md統合、約8KB削減）。PROGRESS.mdは9セッション（直近10件以内）でアーカイブ不要。全ドキュメントホワイトリスト準拠確認済み。次は分析高速化実装（20-30倍見込み）またはリリース準備（M10-T04）。"
   },
 
   "analysisSpeedOptimization": {
@@ -128,9 +130,11 @@
     "pendingOptimizations": [
       {
         "phase": "analysis_speed_fix",
-        "status": "diagnosed",
+        "taskId": "PERF-OPT-004",
+        "status": "design_completed",
         "issue": "画像4重読み込み + フル解像度 + リクエスト分離",
-        "expectedImprovement": "20-30倍高速化"
+        "designDocument": "docs/CRITICAL/ARCHITECTURE.md セクション5.4",
+        "expectedImprovement": "2-3倍高速化（Vision制約下での実効値）"
       }
     ]
   },
