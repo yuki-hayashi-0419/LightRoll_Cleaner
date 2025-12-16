@@ -120,6 +120,36 @@ public actor BlurDetector {
         )
     }
 
+    /// CIImageから直接ブレ検出を実行（最適化版）
+    ///
+    /// - Parameters:
+    ///   - ciImage: 対象のCIImage（既に読み込まれた画像）
+    ///   - assetIdentifier: アセット識別子
+    /// - Returns: 検出されたブレ情報
+    /// - Throws: AnalysisError
+    /// - Note: 画像を再読み込みせずに、既に読み込まれたCIImageを使用するため高速
+    ///         AnalysisRepository.analyzePhoto() での最適化に使用
+    public func detectBlur(
+        from ciImage: CIImage,
+        assetIdentifier: String
+    ) async throws -> BlurDetectionResult {
+        // ラプラシアン分散法でブレスコアを計算
+        let blurScore = try calculateBlurScore(from: ciImage)
+
+        // シャープネススコア（1.0 - blurScore）
+        let sharpnessScore = 1.0 - blurScore
+
+        // ブレ判定
+        let isBlurry = blurScore >= options.blurThreshold
+
+        return BlurDetectionResult(
+            photoId: assetIdentifier,
+            blurScore: blurScore,
+            sharpnessScore: sharpnessScore,
+            isBlurry: isBlurry
+        )
+    }
+
     /// Photo配列からブレ検出を実行（便利メソッド）
     ///
     /// - Parameters:

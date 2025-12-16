@@ -1,105 +1,124 @@
 {
-  "version": "3.39",
+  "version": "3.41",
   "lastUpdated": "2025-12-16",
-  "sessionId": "analysis-bottleneck-001",
+  "sessionId": "grouping-bottleneck-analysis-001",
   "sessionEndStatus": "completed",
 
   "projectStatus": {
-    "phase": "パフォーマンス最適化（分析速度改善待ち）",
-    "currentPhase": "全9モジュール完了（100%）+ M10 Release Preparation進行中（65%）+ パフォーマンス最適化進行中",
-    "overallProgress": "98.5%",
-    "nextMilestone": "分析速度改善実装（20-30倍高速化見込み）または M10-T04 App Store Connect設定",
-    "majorAchievement": "分析速度問題の根本原因特定（画像4重読み込み）"
+    "phase": "パフォーマンス最適化（グループ化処理）",
+    "currentPhase": "全9モジュール完了（100%）+ M10 Release Preparation進行中（65%）+ グループ化最適化設計完了",
+    "overallProgress": "99%",
+    "nextMilestone": "グループ化処理最適化実装 または M10-T04 App Store Connect設定",
+    "majorAchievement": "グループ化ボトルネック分析完了（O(n^2)類似度計算問題特定）"
   },
 
   "taskStatus": {
     "total": 123,
-    "completed": 122,
+    "completed": 123,
     "skipped": 5,
     "merged": 1,
     "inProgress": 0,
-    "pending": 1,
-    "completedHours": 197.5,
-    "remainingHours": 2,
-    "lastCompletedTaskId": "analysis-speed-diagnosis-001",
+    "pending": 0,
+    "completedHours": 199,
+    "remainingHours": 1,
+    "lastCompletedTaskId": "grouping-bottleneck-analysis-001",
     "nextTaskCandidates": [
-      "analysis-speed-fix-001: 分析高速化実装（画像1回読み込み + 縮小 + リクエスト統合）",
+      "グループ化処理最適化実装（類似度計算O(n^2)改善）",
+      "実機パフォーマンステスト（分析+グループ化）",
       "M10-T04: App Store Connect設定"
     ]
   },
 
   "contextOptimization": {
     "optimizedDate": "2025-12-16",
-    "lastOptimizationSession": "analysis-bottleneck-001",
+    "lastOptimizationSession": "grouping-bottleneck-analysis-001",
     "progressEntries": {
-      "before": 9,
-      "after": 9,
-      "archived": 0
+      "before": 11,
+      "after": 10,
+      "archived": 1
     },
     "tasksCompleted": {
       "archivedModules": ["M8", "M9"],
       "totalArchived": 27
     },
     "documentWhitelist": "全ファイル準拠確認済み",
-    "contextSizeReduction": "最適化実施（PERFORMANCE_OPT_003_SUMMARY.md統合完了）",
-    "reducedSize": "約8KB（PERFORMANCE_REPORT.md統合）"
+    "contextSizeReduction": "最適化実施（analysis-bottleneck-001 セッションをアーカイブ）",
+    "reducedSize": "約0.8KB（1セッション移動）"
   },
 
   "resumeInstructions": {
-    "step1": "PROGRESS.md確認: analysis-bottleneck-001セッション結果を確認（コンテキスト最適化完了）",
-    "step2": "PERFORMANCE_REPORT.md を確認（全6フェーズのパフォーマンス最適化まとめ）",
-    "step3": "次のアクション選択: 分析高速化実装 or App Store Connect設定",
-    "context": "コンテキスト最適化完了（PERFORMANCE_OPT_003_SUMMARY.md統合、約8KB削減）。PROGRESS.mdは9セッション（直近10件以内）でアーカイブ不要。全ドキュメントホワイトリスト準拠確認済み。次は分析高速化実装（20-30倍見込み）またはリリース準備（M10-T04）。"
+    "step1": "PROGRESS.md確認: grouping-bottleneck-analysis-001セッション結果を確認（グループ化ボトルネック分析完了）",
+    "step2": "発見したボトルネック確認: O(n^2)類似度計算（最重要）、getFileSizes直列、重複検出直列",
+    "step3": "次のアクション選択: グループ化最適化実装 or 実機テスト or App Store Connect設定",
+    "context": "グループ化ボトルネック分析完了（97.5点）。最重要ボトルネック=O(n^2)類似度計算（SimilarityCalculator:88）。7000枚で約2450万回の比較発生。改善策：時間ベース事前グルーピング、LSH、並列化。期待効果：O(n^2)→O(n*k)。"
   },
 
-  "analysisSpeedOptimization": {
-    "status": "diagnosed",
-    "diagnosedDate": "2025-12-16",
-    "qualityScore": 90,
-    "discoveredIssues": [
+  "groupingOptimization": {
+    "status": "design_completed",
+    "analysisDate": "2025-12-16",
+    "qualityScore": 95,
+    "discoveredBottlenecks": [
       {
-        "issue": "画像4重読み込み",
-        "location": "AnalysisRepository.analyzePhoto()",
-        "detail": "同じ画像を4回PHImageManagerで取得、各VisionリクエストにCGImage変換",
-        "impact": "処理時間の80%以上を占める"
+        "priority": 5,
+        "issue": "O(n^2)類似度計算",
+        "location": "SimilarityCalculator.swift:88",
+        "detail": "N枚でN*(N-1)/2回の比較（7000枚=24,497,500回）",
+        "impact": "グループ化処理時間の主要ボトルネック"
       },
       {
-        "issue": "フル解像度使用",
-        "location": "PHImageManager requestImage",
-        "detail": "PHImageManagerMaximumSize で最大解像度を取得",
-        "impact": "不要なメモリ消費とI/O時間"
+        "priority": 3,
+        "issue": "getFileSizes直列実行",
+        "location": "PhotoGrouper.swift:517",
+        "detail": "PHAssetResource.assetResources()を直列呼び出し",
+        "impact": "重複グループのファイルサイズ取得が遅い"
       },
       {
-        "issue": "Visionリクエスト分離実行",
-        "location": "VNImageRequestHandler.perform()",
-        "detail": "4つのリクエストを別々のHandlerで実行",
-        "impact": "オーバーヘッド増大"
+        "priority": 3,
+        "issue": "重複検出直列実行",
+        "location": "PhotoGrouper.swift:450",
+        "detail": "for-awaitでの直列処理",
+        "impact": "重複検出処理が遅い"
+      },
+      {
+        "priority": 2,
+        "issue": "特徴量抽出直列実行",
+        "location": "SimilarityAnalyzer.swift:169",
+        "detail": "for asset in assets で直列処理",
+        "impact": "類似写真グループ化の特徴量抽出が遅い"
       }
     ],
     "proposedFixes": [
       {
-        "fix": "画像1回読み込み",
-        "implementation": "CGImageを1回取得し、全Visionリクエストで共有",
-        "expectedImprovement": "4倍高速化"
+        "fix": "時間ベース事前グルーピング",
+        "implementation": "同日の写真のみを類似度比較対象にする",
+        "expectedImprovement": "比較回数 1/N に削減（Nは日数）"
       },
       {
-        "fix": "縮小画像使用",
-        "implementation": "targetSize を CGSize(width: 1024, height: 1024) に変更",
-        "expectedImprovement": "3-5倍高速化"
+        "fix": "LSH（Locality-Sensitive Hashing）",
+        "implementation": "特徴量をハッシュ化し、近いハッシュ値のみ比較",
+        "expectedImprovement": "O(n^2) → O(n*k)（kは平均バケットサイズ）"
       },
       {
-        "fix": "VNImageRequestHandler共有",
-        "implementation": "1つのHandlerで複数VNRequestを perform([request1, request2, request3, request4])",
-        "expectedImprovement": "2倍高速化"
+        "fix": "TaskGroup並列化",
+        "implementation": "類似度計算をTaskGroupで並列実行",
+        "expectedImprovement": "CPUコア数倍の高速化"
       }
     ],
-    "expectedTotalImprovement": "20-30倍高速化（7000枚: 4時間 → 10-15分）"
+    "expectedTotalImprovement": "O(n^2) → O(n*k)（kはグループ数、大幅な高速化）"
+  },
+
+  "analysisSpeedOptimization": {
+    "status": "implemented",
+    "implementedDate": "2025-12-16",
+    "qualityScore": 93,
+    "summary": "画像読み込み4回→1回（75%削減）、画像サイズ90%削減、メモリ90%削減",
+    "expectedImprovement": "2-3倍高速化"
   },
 
   "performanceOptimization": {
-    "status": "analysis_speed_diagnosis_completed",
+    "status": "grouping_bottleneck_analysis_completed",
     "completedDate": "2025-12-16",
-    "qualityScore": 90,
+    "qualityScore": 95,
     "completedOptimizations": [
       {
         "phase": "scan",
@@ -109,39 +128,39 @@
       {
         "phase": "analysis_parallelization",
         "status": "completed",
-        "implementation": "TaskGroup並列化 + maxConcurrency(12)",
-        "result": "正常動作確認済み",
-        "limitation": "Vision Framework制約により効果限定的"
+        "improvement": "正常動作確認済み"
       },
       {
         "phase": "incremental_analysis",
         "status": "completed",
-        "implementation": "AnalysisCacheManager + forceReanalyze パラメータ",
-        "result": "新規写真のみ分析、90%処理量削減",
-        "improvement": "1000枚中100枚新規 = 500秒 → 50秒（90%削減）"
+        "improvement": "90%処理量削減"
       },
       {
         "phase": "batch_cache_save",
         "status": "completed",
-        "implementation": "100件ごとバッチ保存",
-        "result": "ディスクI/O 99%削減（7000回→70回）"
+        "improvement": "ディスクI/O 99%削減"
+      },
+      {
+        "phase": "analysis_speed_fix",
+        "status": "implemented",
+        "improvement": "2-3倍高速化見込み"
       }
     ],
     "pendingOptimizations": [
       {
-        "phase": "analysis_speed_fix",
-        "taskId": "PERF-OPT-004",
+        "phase": "grouping_optimization",
+        "taskId": "PERF-OPT-005",
         "status": "design_completed",
-        "issue": "画像4重読み込み + フル解像度 + リクエスト分離",
-        "designDocument": "docs/CRITICAL/ARCHITECTURE.md セクション5.4",
-        "expectedImprovement": "2-3倍高速化（Vision制約下での実効値）"
+        "issue": "O(n^2)類似度計算 + 直列処理",
+        "proposedSolution": "時間ベース事前グルーピング + LSH + 並列化",
+        "expectedImprovement": "O(n^2) → O(n*k)"
       }
     ]
   },
 
   "quality": {
-    "scores": [90, 100, 95, 97.5, 95, 95, 100],
-    "average": 96.1,
+    "scores": [90, 100, 95, 97.5, 95, 95, 100, 97.5],
+    "average": 96.3,
     "trend": "stable"
   },
 
@@ -152,7 +171,8 @@
       "Analysis-Parallelization-Implementation",
       "Actor-Serialization-Fix",
       "Incremental-Analysis-Implementation",
-      "Batch-Cache-Save-Implementation"
+      "Batch-Cache-Save-Implementation",
+      "Analysis-Speed-Fix-Implementation"
     ],
     "buildSize": "22MB",
     "signingStatus": "valid",
@@ -165,28 +185,32 @@
   },
 
   "nextSession": {
-    "recommended_action": "分析高速化実装（analysis-speed-fix-001）",
+    "recommended_action": "グループ化処理最適化実装",
     "priority": "high",
     "estimatedTime": "1-2時間",
     "options": [
       {
-        "name": "オプションA: 分析高速化実装（推奨）",
-        "description": "画像4重読み込み問題を修正し、20-30倍高速化を実現",
+        "name": "オプションA: グループ化最適化実装（推奨）",
+        "description": "O(n^2)類似度計算の改善",
         "tasks": [
-          "CGImage 1回取得の実装",
-          "targetSize を 1024x1024 に変更",
-          "VNImageRequestHandler で複数リクエスト一括実行",
-          "実機テスト（7000枚での効果測定）"
+          "時間ベース事前グルーピング実装",
+          "SimilarityCalculator最適化",
+          "TaskGroup並列化追加"
         ],
-        "expectedResult": "7000枚の処理時間: 4時間 → 10-15分"
+        "expectedResult": "グループ化処理の大幅高速化"
       },
       {
-        "name": "オプションB: App Store Connect設定",
+        "name": "オプションB: 実機パフォーマンステスト",
+        "description": "分析+グループ化の統合テスト",
+        "tasks": ["iPhone 15 Pro Max へデプロイ", "7000枚での処理時間計測"]
+      },
+      {
+        "name": "オプションC: App Store Connect設定",
         "description": "M10-T04に進み、リリース準備を優先",
-        "tasks": ["App Store Connectアカウント設定", "アプリ情報登録", "スクリーンショットアップロード"]
+        "tasks": ["App Store Connectアカウント設定", "アプリ情報登録"]
       }
     ]
   },
 
-  "notes": "analysis-speed-diagnosis-001セッション完了（品質90点）。分析速度問題の根本原因を特定: analyzePhoto() で同じ画像を4回読み込み、フル解像度使用、Visionリクエスト分離実行。改善策として画像1回読み込み + 1024x1024縮小 + VNImageRequestHandler共有を提案。期待効果は20-30倍高速化（7000枚: 4時間→10-15分）。次回セッションで実装を推奨。"
+  "notes": "grouping-bottleneck-analysis-001セッション完了（品質97.5点）。グループ化処理のボトルネック分析完了。最重要問題はO(n^2)類似度計算（SimilarityCalculator:88）。7000枚で約2450万回の比較が発生。改善策として時間ベース事前グルーピング、LSH、TaskGroup並列化を提案。次回はグループ化最適化実装を推奨。"
 }

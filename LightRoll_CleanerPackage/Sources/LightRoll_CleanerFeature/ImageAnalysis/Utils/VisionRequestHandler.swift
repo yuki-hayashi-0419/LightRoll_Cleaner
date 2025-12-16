@@ -156,11 +156,94 @@ public actor VisionRequestHandler {
 
     // MARK: - Private Methods
 
-    /// PHAsset から CIImage を読み込む
+    /// PHAsset から最適化されたサイズの CIImage を読み込む（縮小版）
+    ///
+    /// 分析用途に最適化された画像を取得（Vision Frameworkの推奨サイズ）
+    /// - Parameters:
+    ///   - asset: 対象の PHAsset
+    ///   - maxSize: 最大画像サイズ（デフォルト: 1024px、Vision Framework推奨値）
+    /// - Returns: 縮小された CIImage
+    /// - Throws: AnalysisError
+    /// - Note: Vision Framework は 299x299 ~ 1024x1024 で十分な精度を発揮
+    ///         メモリ使用量を大幅削減しつつ、分析品質は維持される
+    public func loadOptimizedCIImage(
+        from asset: PHAsset,
+        maxSize: CGFloat = 1024
+    ) async throws -> CIImage {
+        return try await withCheckedThrowingContinuation { continuation in
+            let options = PHImageRequestOptions()
+            options.deliveryMode = .highQualityFormat
+            options.isNetworkAccessAllowed = true
+            options.isSynchronous = false
+            options.resizeMode = .fast // 高速リサイズモード
+
+            // 縮小サイズを計算（アスペクト比を維持）
+            let targetSize = CGSize(width: maxSize, height: maxSize)
+
+            PHImageManager.default().requestImage(
+                for: asset,
+                targetSize: targetSize,
+                contentMode: .aspectFit,
+                options: options
+            ) { image, info in
+                // エラーチェック
+                if let error = info?[PHImageErrorKey] as? Error {
+                    let analysisError = AnalysisError.visionFrameworkError(
+                        "画像読み込みエラー: \(error.localizedDescription)"
+                    )
+                    continuation.resume(throwing: analysisError)
+                    return
+                }
+
+                // キャンセルチェック
+                if let isCancelled = info?[PHImageCancelledKey] as? Bool, isCancelled {
+                    continuation.resume(throwing: AnalysisError.cancelled)
+                    return
+                }
+
+                // UIImage から CIImage を作成
+                guard let uiImage = image else {
+                    let error = AnalysisError.visionFrameworkError(
+                        "画像の取得に失敗しました"
+                    )
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                // UIImage/NSImage -> CIImage への変換
+                #if os(iOS)
+                // iOS環境: UIImage.cgImage を使用
+                guard let cgImage = uiImage.cgImage else {
+                    let error = AnalysisError.visionFrameworkError(
+                        "CGImage の取得に失敗しました"
+                    )
+                    continuation.resume(throwing: error)
+                    return
+                }
+                let ciImage = CIImage(cgImage: cgImage)
+                #else
+                // macOS環境: NSImage から CGImage を取得
+                guard let cgImage = uiImage.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+                    let error = AnalysisError.visionFrameworkError(
+                        "CGImage の取得に失敗しました"
+                    )
+                    continuation.resume(throwing: error)
+                    return
+                }
+                let ciImage = CIImage(cgImage: cgImage)
+                #endif
+
+                continuation.resume(returning: ciImage)
+            }
+        }
+    }
+
+    /// PHAsset から CIImage を読み込む（フル解像度版）
     ///
     /// - Parameter asset: 対象の PHAsset
     /// - Returns: CIImage
     /// - Throws: AnalysisError
+    /// - Note: 後方互換性のために残されています。新規実装では loadOptimizedCIImage() を使用してください
     private func loadCIImage(from asset: PHAsset) async throws -> CIImage {
         return try await withCheckedThrowingContinuation { continuation in
             let options = PHImageRequestOptions()
