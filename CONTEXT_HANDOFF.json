@@ -1,40 +1,38 @@
 {
-  "version": "3.37",
+  "version": "3.38",
   "lastUpdated": "2025-12-16",
-  "sessionId": "incremental-analysis-001",
+  "sessionId": "analysis-speed-diagnosis-001",
   "sessionEndStatus": "completed",
 
   "projectStatus": {
-    "phase": "リリース準備進行中（インクリメンタル分析実装完了）",
-    "currentPhase": "全9モジュール完了（100%）+ M10 Release Preparation進行中（65%）+ パフォーマンス最適化Phase完了",
+    "phase": "パフォーマンス最適化（分析速度改善待ち）",
+    "currentPhase": "全9モジュール完了（100%）+ M10 Release Preparation進行中（65%）+ パフォーマンス最適化進行中",
     "overallProgress": "98.5%",
-    "nextMilestone": "実機検証 または M10-T04 App Store Connect設定",
-    "majorAchievement": "インクリメンタル分析実装完了（90%処理量削減・品質100点満点）"
+    "nextMilestone": "分析速度改善実装（20-30倍高速化見込み）または M10-T04 App Store Connect設定",
+    "majorAchievement": "分析速度問題の根本原因特定（画像4重読み込み）"
   },
 
   "taskStatus": {
-    "total": 122,
-    "completed": 121,
+    "total": 123,
+    "completed": 122,
     "skipped": 5,
     "merged": 1,
     "inProgress": 0,
-    "pending": 0,
-    "completedHours": 196.5,
-    "remainingHours": 0,
-    "lastCompletedTaskId": "incremental-analysis-001",
+    "pending": 1,
+    "completedHours": 197.5,
+    "remainingHours": 2,
+    "lastCompletedTaskId": "analysis-speed-diagnosis-001",
     "nextTaskCandidates": [
-      "バックグラウンド処理実装（BGTaskScheduler）",
-      "インクリメンタル分析実装（新規写真のみ処理）",
-      "M10-T04: App Store Connect設定",
-      "M10-T05: TestFlight配信"
+      "analysis-speed-fix-001: 分析高速化実装（画像1回読み込み + 縮小 + リクエスト統合）",
+      "M10-T04: App Store Connect設定"
     ]
   },
 
   "contextOptimization": {
     "optimizedDate": "2025-12-16",
     "progressEntries": {
-      "before": 11,
-      "after": 11,
+      "before": 12,
+      "after": 12,
       "archived": 0
     },
     "tasksCompleted": {
@@ -46,16 +44,60 @@
   },
 
   "resumeInstructions": {
-    "step1": "PROGRESS.md確認: incremental-analysis-001セッション結果を確認（インクリメンタル分析完了）",
-    "step2": "AnalysisCacheManager.swift と AnalysisRepository.swift の実装を確認",
-    "step3": "次のアクション選択: 実機検証（1000枚での実測） or App Store Connect設定",
-    "context": "incremental-analysis-001でインクリメンタル分析実装完了。新規写真のみを分析することで90%処理量削減を実現。品質スコア100点満点。次は実機での効果測定またはリリース準備（App Store Connect設定）。"
+    "step1": "PROGRESS.md確認: analysis-speed-diagnosis-001セッション結果を確認（分析速度問題の原因特定完了）",
+    "step2": "AnalysisRepository.swift の analyzePhoto() メソッドを確認（画像4重読み込み箇所）",
+    "step3": "次のアクション選択: 分析高速化実装 or App Store Connect設定",
+    "context": "画像の4重読み込みが分析速度の最大ボトルネック。改善策: 1回読み込み + 1024x1024縮小 + VNImageRequestHandler共有で20-30倍高速化見込み。7000枚が約4時間→10-15分に短縮予想。"
+  },
+
+  "analysisSpeedOptimization": {
+    "status": "diagnosed",
+    "diagnosedDate": "2025-12-16",
+    "qualityScore": 90,
+    "discoveredIssues": [
+      {
+        "issue": "画像4重読み込み",
+        "location": "AnalysisRepository.analyzePhoto()",
+        "detail": "同じ画像を4回PHImageManagerで取得、各VisionリクエストにCGImage変換",
+        "impact": "処理時間の80%以上を占める"
+      },
+      {
+        "issue": "フル解像度使用",
+        "location": "PHImageManager requestImage",
+        "detail": "PHImageManagerMaximumSize で最大解像度を取得",
+        "impact": "不要なメモリ消費とI/O時間"
+      },
+      {
+        "issue": "Visionリクエスト分離実行",
+        "location": "VNImageRequestHandler.perform()",
+        "detail": "4つのリクエストを別々のHandlerで実行",
+        "impact": "オーバーヘッド増大"
+      }
+    ],
+    "proposedFixes": [
+      {
+        "fix": "画像1回読み込み",
+        "implementation": "CGImageを1回取得し、全Visionリクエストで共有",
+        "expectedImprovement": "4倍高速化"
+      },
+      {
+        "fix": "縮小画像使用",
+        "implementation": "targetSize を CGSize(width: 1024, height: 1024) に変更",
+        "expectedImprovement": "3-5倍高速化"
+      },
+      {
+        "fix": "VNImageRequestHandler共有",
+        "implementation": "1つのHandlerで複数VNRequestを perform([request1, request2, request3, request4])",
+        "expectedImprovement": "2倍高速化"
+      }
+    ],
+    "expectedTotalImprovement": "20-30倍高速化（7000枚: 4時間 → 10-15分）"
   },
 
   "performanceOptimization": {
-    "status": "incremental_analysis_completed",
+    "status": "analysis_speed_diagnosis_completed",
     "completedDate": "2025-12-16",
-    "qualityScore": 100,
+    "qualityScore": 90,
     "completedOptimizations": [
       {
         "phase": "scan",
@@ -75,41 +117,28 @@
         "implementation": "AnalysisCacheManager + forceReanalyze パラメータ",
         "result": "新規写真のみ分析、90%処理量削減",
         "improvement": "1000枚中100枚新規 = 500秒 → 50秒（90%削減）"
-      }
-    ],
-    "discoveredLimitations": [
+      },
       {
-        "component": "Vision Framework (VNFeaturePrintObservation)",
-        "issue": "1枚あたり300-500ms（フレームワーク固有の処理時間）",
-        "cause": "GPU/NPU処理で並列化してもハードウェアリソース競合",
-        "impact": "1000枚 = 最低5-8分は避けられない",
-        "workaround": [
-          "バックグラウンド処理（BGTaskScheduler）でユーザー体験改善",
-          "インクリメンタル分析（新規写真のみ）で処理量削減",
-          "分析結果キャッシュ永続化で再処理回避",
-          "軽量アルゴリズム（pHash等）への切り替え検討"
-        ]
+        "phase": "batch_cache_save",
+        "status": "completed",
+        "implementation": "100件ごとバッチ保存",
+        "result": "ディスクI/O 99%削減（7000回→70回）"
       }
     ],
-    "documentationCreated": [
-      "docs/CRITICAL/PERFORMANCE_OPT_002_IMPLEMENTATION.md",
-      "docs/CRITICAL/CONCURRENCY_TEST_REPORT.md",
-      "docs/CRITICAL/CONCURRENCY_VERIFICATION_SUMMARY.md",
-      "docs/CRITICAL/TEST_EXECUTION_GUIDE.md",
-      "docs/PERFORMANCE_OPT_003_SUMMARY.md"
-    ],
-    "newImplementations": [
-      "AnalysisCacheManager.swift (245行、Actor isolation)",
-      "AnalysisRepository.swift (forceReanalyze パラメータ追加)",
-      "AnalysisCacheManagerTests.swift (25件)",
-      "AnalysisRepositoryIncrementalTests.swift (20件)"
+    "pendingOptimizations": [
+      {
+        "phase": "analysis_speed_fix",
+        "status": "diagnosed",
+        "issue": "画像4重読み込み + フル解像度 + リクエスト分離",
+        "expectedImprovement": "20-30倍高速化"
+      }
     ]
   },
 
   "quality": {
-    "scores": [100, 95, 97.5, 95, 95, 100],
-    "average": 97.1,
-    "trend": "improving"
+    "scores": [90, 100, 95, 97.5, 95, 95, 100],
+    "average": 96.1,
+    "trend": "stable"
   },
 
   "deviceBuildSession": {
@@ -117,40 +146,43 @@
       "Device-Build-Performance-Analysis",
       "Scan-Optimization-Verification",
       "Analysis-Parallelization-Implementation",
-      "Actor-Serialization-Fix"
+      "Actor-Serialization-Fix",
+      "Incremental-Analysis-Implementation",
+      "Batch-Cache-Save-Implementation"
     ],
     "buildSize": "22MB",
     "signingStatus": "valid",
     "targetDevice": {
       "name": "iPhone 15 Pro Max",
-      "deviceId": "00008130-001A51A82630001C"
+      "deviceId": "00008130-001A51A02630001C"
     },
     "qualityAverage": 95,
     "status": "completed"
   },
 
   "nextSession": {
-    "recommended_action": "実機検証（1000枚での効果測定） または App Store Connect設定",
-    "priority": "medium",
+    "recommended_action": "分析高速化実装（analysis-speed-fix-001）",
+    "priority": "high",
     "estimatedTime": "1-2時間",
     "options": [
       {
-        "name": "オプションA: 実機検証",
-        "description": "インクリメンタル分析の効果を実機（1000枚）で測定",
-        "tasks": ["実機ビルド・インストール", "1000枚分析の実測", "キャッシュヒット率90%での効果確認"]
+        "name": "オプションA: 分析高速化実装（推奨）",
+        "description": "画像4重読み込み問題を修正し、20-30倍高速化を実現",
+        "tasks": [
+          "CGImage 1回取得の実装",
+          "targetSize を 1024x1024 に変更",
+          "VNImageRequestHandler で複数リクエスト一括実行",
+          "実機テスト（7000枚での効果測定）"
+        ],
+        "expectedResult": "7000枚の処理時間: 4時間 → 10-15分"
       },
       {
         "name": "オプションB: App Store Connect設定",
         "description": "M10-T04に進み、リリース準備を優先",
         "tasks": ["App Store Connectアカウント設定", "アプリ情報登録", "スクリーンショットアップロード"]
-      },
-      {
-        "name": "オプションC: 既存テスト修正",
-        "description": "重複Tag定義を修正してテスト実行可能にする",
-        "tasks": ["DashboardEdgeCaseTests.swift修正", "DashboardIntegrationTests.swift修正", "テスト全実行"]
       }
     ]
   },
 
-  "notes": "incremental-analysis-001セッション完了（品質100点満点）。AnalysisCacheManager実装により、新規写真のみを分析する仕組みを構築。1000枚中100枚新規の場合、処理時間を500秒→50秒に削減（90%削減）。並列化（performance-opt-003）+ インクリメンタル分析（incremental-analysis-001）の組み合わせにより、パフォーマンス最適化フェーズ完了。次は実機での効果測定、またはリリース準備（M10-T04 App Store Connect設定）を推奨。"
+  "notes": "analysis-speed-diagnosis-001セッション完了（品質90点）。分析速度問題の根本原因を特定: analyzePhoto() で同じ画像を4回読み込み、フル解像度使用、Visionリクエスト分離実行。改善策として画像1回読み込み + 1024x1024縮小 + VNImageRequestHandler共有を提案。期待効果は20-30倍高速化（7000枚: 4時間→10-15分）。次回セッションで実装を推奨。"
 }
