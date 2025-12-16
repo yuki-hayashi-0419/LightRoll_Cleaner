@@ -137,6 +137,16 @@ public struct ScanOptions: Sendable {
         batchSize: 500
     )
 
+    /// 分析最適化オプション（緊急パッチ）
+    /// 動画除外 + スクリーンショット除外で処理量を20-30%削減
+    public static let optimized = ScanOptions(
+        includeVideos: false,
+        includeScreenshots: false,
+        dateRange: nil,
+        fetchFileSize: true,
+        batchSize: 500
+    )
+
     /// 高速スキャン用オプション（ファイルサイズなし）
     /// 大きめのバッチサイズで最速処理
     public static let fast = ScanOptions(

@@ -83,6 +83,7 @@ public protocol ImageAnalysisRepositoryProtocol: Actor {
     /// 複数写真の総合分析（バッチ処理）
     func analyzePhotos(
         _ photos: [Photo],
+        forceReanalyze: Bool,
         progress: (@Sendable (Double) async -> Void)?
     ) async throws -> [PhotoAnalysisResult]
 
@@ -158,6 +159,9 @@ public actor AnalysisRepository: ImageAnalysisRepositoryProtocol {
     /// リポジトリ設定オプション
     private let options: AnalysisRepositoryOptions
 
+    /// 分析キャッシュマネージャー
+    private let cacheManager: AnalysisCacheManager
+
     // MARK: - Initialization
 
     /// イニシャライザ
@@ -172,6 +176,7 @@ public actor AnalysisRepository: ImageAnalysisRepositoryProtocol {
     ///   - screenshotDetector: スクリーンショット検出器（省略時は新規作成）
     ///   - photoGrouper: 写真グルーパー（省略時は新規作成）
     ///   - bestShotSelector: ベストショット選定器（省略時は新規作成）
+    ///   - cacheManager: 分析キャッシュマネージャー（省略時は新規作成）
     ///   - options: リポジトリ設定オプション（省略時はデフォルト値）
     public init(
         visionRequestHandler: VisionRequestHandler? = nil,
@@ -183,6 +188,7 @@ public actor AnalysisRepository: ImageAnalysisRepositoryProtocol {
         screenshotDetector: ScreenshotDetector? = nil,
         photoGrouper: PhotoGrouper? = nil,
         bestShotSelector: BestShotSelector? = nil,
+        cacheManager: AnalysisCacheManager? = nil,
         options: AnalysisRepositoryOptions = AnalysisRepositoryOptions()
     ) {
         self.visionRequestHandler = visionRequestHandler ?? VisionRequestHandler()
@@ -194,6 +200,7 @@ public actor AnalysisRepository: ImageAnalysisRepositoryProtocol {
         self.screenshotDetector = screenshotDetector ?? ScreenshotDetector()
         self.photoGrouper = photoGrouper ?? PhotoGrouper()
         self.bestShotSelector = bestShotSelector ?? BestShotSelector()
+        self.cacheManager = cacheManager ?? AnalysisCacheManager()
         self.options = options
     }
 
@@ -288,13 +295,16 @@ public actor AnalysisRepository: ImageAnalysisRepositoryProtocol {
     ///
     /// - Parameters:
     ///   - photos: 分析対象の写真配列
+    ///   - forceReanalyze: trueの場合はキャッシュを無視して全写真を再分析
     ///   - progress: 進捗コールバック（0.0〜1.0）
     /// - Returns: 分析結果配列
     /// - Throws: AnalysisError
     /// - Note: TaskGroupによる並列処理で5-10倍高速化
     ///         同時実行数は12並列に制限（メモリ効率とパフォーマンスのバランス）
+    ///         forceReanalyze=falseの場合はキャッシュから既存結果を取得し、新規写真のみ分析
     public func analyzePhotos(
         _ photos: [Photo],
+        forceReanalyze: Bool = false,
         progress: (@Sendable (Double) async -> Void)? = nil
     ) async throws -> [PhotoAnalysisResult] {
         guard !photos.isEmpty else {
@@ -303,6 +313,26 @@ public actor AnalysisRepository: ImageAnalysisRepositoryProtocol {
 
         // 並列実行数を制御（メモリとCPUのバランス）
         let maxConcurrency = 12
+
+        // インクリメンタル分析: キャッシュチェック
+        var photosToAnalyze: [(index: Int, photo: Photo)] = []
+        var cachedResults: [(index: Int, result: PhotoAnalysisResult)] = []
+
+        if forceReanalyze {
+            // 強制再分析の場合は全写真を対象
+            photosToAnalyze = photos.enumerated().map { ($0.offset, $0.element) }
+        } else {
+            // キャッシュチェックで新規写真と既存写真を分離
+            for (index, photo) in photos.enumerated() {
+                if let cached = await cacheManager.loadResult(for: photo.localIdentifier) {
+                    // キャッシュから取得
+                    cachedResults.append((index, cached))
+                } else {
+                    // 新規写真として分析対象に追加
+                    photosToAnalyze.append((index, photo))
+                }
+            }
+        }
 
         // 進捗カウンター（Actorで保護）
         actor ProgressCounter {
@@ -321,18 +351,40 @@ public actor AnalysisRepository: ImageAnalysisRepositoryProtocol {
 
         let progressCounter = ProgressCounter(total: photos.count)
 
-        // TaskGroupで並列処理
-        return try await withThrowingTaskGroup(of: (Int, PhotoAnalysisResult).self) { group in
-            var results: [(Int, PhotoAnalysisResult)] = []
-            results.reserveCapacity(photos.count)
+        // キャッシュヒット分の進捗を事前に通知
+        for _ in cachedResults {
+            let currentProgress = await progressCounter.increment()
+            await progress?(currentProgress)
+        }
 
-            // 写真をバッチに分割して処理（同時実行数を制御）
-            for (index, photo) in photos.enumerated() {
+        // TaskGroupで並列処理（新規写真のみ）
+        // バッチ保存用のバッファ（100件ごとに保存）
+        let saveBatchSize = 100
+        var saveBuffer: [PhotoAnalysisResult] = []
+        saveBuffer.reserveCapacity(saveBatchSize)
+
+        let newResults = try await withThrowingTaskGroup(of: (Int, PhotoAnalysisResult).self) { group in
+            var results: [(Int, PhotoAnalysisResult)] = []
+            results.reserveCapacity(photosToAnalyze.count)
+
+            // 新規写真をバッチに分割して処理（同時実行数を制御）
+            for (taskIndex, photoTuple) in photosToAnalyze.enumerated() {
+                let (originalIndex, photo) = photoTuple
+
                 // 同時実行数を制限
-                if index >= maxConcurrency {
+                if taskIndex >= maxConcurrency {
                     // 1つ完了するまで待機
                     if let (completedIndex, result) = try await group.next() {
                         results.append((completedIndex, result))
+
+                        // バッチ保存バッファに追加
+                        saveBuffer.append(result)
+
+                        // バッファが一定数に達したらバッチ保存
+                        if saveBuffer.count >= saveBatchSize {
+                            await self.cacheManager.saveResults(saveBuffer)
+                            saveBuffer.removeAll(keepingCapacity: true)
+                        }
 
                         // 進捗通知
                         let currentProgress = await progressCounter.increment()
@@ -347,14 +399,14 @@ public actor AnalysisRepository: ImageAnalysisRepositoryProtocol {
                 group.addTask {
                     do {
                         let result = try await self.analyzePhoto(photo)
-                        return (index, result)
+                        return (originalIndex, result)
                     } catch {
                         // 個別エラーは記録して続行
                         let defaultResult = PhotoAnalysisResult(
                             photoId: photo.localIdentifier,
                             qualityScore: 0.0
                         )
-                        return (index, defaultResult)
+                        return (originalIndex, defaultResult)
                     }
                 }
             }
@@ -363,15 +415,34 @@ public actor AnalysisRepository: ImageAnalysisRepositoryProtocol {
             for try await (completedIndex, result) in group {
                 results.append((completedIndex, result))
 
+                // バッチ保存バッファに追加
+                saveBuffer.append(result)
+
+                // バッファが一定数に達したらバッチ保存
+                if saveBuffer.count >= saveBatchSize {
+                    await self.cacheManager.saveResults(saveBuffer)
+                    saveBuffer.removeAll(keepingCapacity: true)
+                }
+
                 // 進捗通知
                 let currentProgress = await progressCounter.increment()
                 await progress?(currentProgress)
             }
 
-            // インデックスでソートして元の順序を保持
-            results.sort { $0.0 < $1.0 }
-            return results.map { $0.1 }
+            // 残りをバッチ保存
+            if !saveBuffer.isEmpty {
+                await self.cacheManager.saveResults(saveBuffer)
+            }
+
+            return results
         }
+
+        // 新規分析結果とキャッシュ結果を統合
+        var allResults = cachedResults + newResults
+
+        // インデックスでソートして元の順序を保持
+        allResults.sort { $0.0 < $1.0 }
+        return allResults.map { $0.1 }
     }
 
     // MARK: - Public Methods - グルーピング
