@@ -101,7 +101,7 @@ public enum PhotoRepositoryError: Error, Equatable, Sendable {
 // MARK: - FetchOptions
 
 /// 写真取得オプション
-public struct PhotoFetchOptions: Sendable {
+public struct PhotoFetchOptions {
 
     /// ソート順序
     public enum SortOrder: Sendable {
@@ -130,24 +130,30 @@ public struct PhotoFetchOptions: Sendable {
     /// 取得上限（nil の場合は全件）
     public let limit: Int?
 
+    /// フィルター条件（NSPredicate）
+    public let predicate: NSPredicate?
+
     /// デフォルトオプション
     public static let `default` = PhotoFetchOptions(
         sortOrder: .creationDateDescending,
         mediaTypeFilter: .all,
         includeFileSize: false,
-        limit: nil
+        limit: nil,
+        predicate: nil
     )
 
     public init(
         sortOrder: SortOrder = .creationDateDescending,
         mediaTypeFilter: MediaTypeFilter = .all,
         includeFileSize: Bool = false,
-        limit: Int? = nil
+        limit: Int? = nil,
+        predicate: NSPredicate? = nil
     ) {
         self.sortOrder = sortOrder
         self.mediaTypeFilter = mediaTypeFilter
         self.includeFileSize = includeFileSize
         self.limit = limit
+        self.predicate = predicate
     }
 
     /// PHFetchOptions に変換
@@ -176,6 +182,11 @@ public struct PhotoFetchOptions: Sendable {
         // 取得上限
         if let limit = limit {
             options.fetchLimit = limit
+        }
+
+        // フィルター条件
+        if let predicate = predicate {
+            options.predicate = predicate
         }
 
         return options

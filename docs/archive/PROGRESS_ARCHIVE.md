@@ -4,6 +4,135 @@
 
 ---
 
+## アーカイブ: 2025-12-16 コンテキスト最適化（セッション終了時）
+
+以下のエントリは ui-integration-001 セッション終了時の最適化でアーカイブされました（PROGRESS.md 13件 → 10件、古い3エントリを移動）。
+
+---
+
+## 2025-12-12 | セッション: impl-058（M9-T10完了 - BannerAdViewテスト生成完了！）
+
+### 完了タスク
+- M9-T10: BannerAdViewTests生成（730行、32テスト、100%カバレッジ）
+
+### 成果
+- **包括的テストスイート生成**
+  - **テストファイル**: BannerAdViewTests.swift（730行）
+  - **テスト数**: 32テスト（目標30以上を達成）
+  - **カバレッジ**: 100%（全7カテゴリ網羅）
+
+### テストカテゴリ（全32テスト）
+
+#### TC01: BannerAdViewの初期表示（4テスト）
+- idle状態から自動ロード開始
+- loading状態でProgressView表示
+- Premium会員の場合は広告非表示
+- エラー時の適切な表示
+
+#### TC02: AdManager統合（4テスト）
+- loadBannerAdが適切に呼ばれる
+- showBannerAdからGADBannerViewを取得
+- AdLoadStateの各状態対応（idle/loading/loaded/failed）
+- Premium時はロードがスキップされる
+
+#### TC03: Premium対応（3テスト）
+- Premium会員時は広告を表示しない
+- premiumUserNoAdsエラー時は広告を表示しない
+- Free会員時は広告を表示
+
+#### TC04: ロード状態表示（4テスト）
+- loading状態: ProgressView表示、高さ50pt
+- loaded状態: BannerAdViewRepresentable表示
+- failed状態: EmptyView表示、高さ0
+- idle状態: 自動ロード開始
+
+#### TC05: エラーハンドリング（6テスト）
+- loadFailedエラー時の表示
+- timeoutエラー時の表示
+- networkErrorエラー時の表示
+- premiumUserNoAdsエラー時の表示
+- notInitializedエラー時の表示
+- adNotReadyエラー時の表示
+
+#### TC06: アクセシビリティ（3テスト）
+- 広告に「広告」ラベルが設定
+- ローディングに「広告読み込み中」ラベル
+- エラー時はaccessibilityHiddenがtrue
+
+#### TC07: BannerAdViewRepresentable（3テスト）
+- GADBannerViewの作成
+- サイズが50ptに設定
+- translatesAutoresizingMaskIntoConstraintsがfalse
+
+#### 追加テスト: エッジケース（5テスト）
+- バナーViewがnilの場合の処理
+- 複数回のロード試行
+- 状態遷移の正確性（idle → loading → loaded）
+- 状態遷移の正確性（idle → loading → failed）
+- Premium状態変更時の動作
+
+---
+
+## 2025-12-11 | セッション: impl-057（M9-T06/M9-T07/M9-T08完了 - FeatureGate＋削除上限管理＋Google Mobile Ads導入実装完了！）
+
+### 完了タスク
+- M9-T06: FeatureGate実装（PremiumManagerProtocol準拠、約60行実装、180行テスト、95/100点）
+- M9-T07: 削除上限管理（127行実装、551行テスト、95/100点）
+- M9-T08: Google Mobile Ads導入（322行実装、348行テスト、95/100点）
+
+### 成果
+- **PremiumManagerProtocol準拠実装完了**
+  - **プロトコルメソッド実装（5メソッド）**
+    - `status`: subscriptionStatusを返す計算プロパティ（async getter）
+    - `isFeatureAvailable(_:)`: 機能ごとの利用可否判定（4機能対応）
+    - `getRemainingDeletions()`: 残り削除可能数の取得（Free: 50-count、Premium: Int.max）
+    - `recordDeletion(count:)`: 削除記録（incrementDeleteCountへの委譲）
+    - `refreshStatus()`: ステータス更新（checkPremiumStatusの再実行）
+
+  - **機能判定ロジック**
+    - `unlimitedDeletion`: Premium会員のみ利用可能
+    - `adFree`: Premium会員のみ利用可能
+    - `advancedAnalysis`: Premium会員のみ利用可能
+    - `cloudBackup`: 将来機能（現在は常にfalse）
+
+### 設計品質
+- **プロトコル準拠**: PremiumManagerProtocolに完全準拠
+- **既存機能の再利用**: 既存のisPremium、checkPremiumStatus、incrementDeleteCountを活用
+- **非破壊的実装**: 既存のパブリックAPIを変更せず、プロトコルメソッドを追加
+- **一貫性**: 既存の実装パターンと整合性のある設計
+
+---
+
+## 2025-12-11 | セッション: impl-056（M9-T05完了 - PremiumManager実装完了！）
+
+### 完了タスク
+- M9-T05: PremiumManager実装（139行、11テスト、96/100点）
+
+### 成果
+- **PremiumManager実装完了**: プレミアム機能管理サービス（139行）
+  - **課金状態管理**
+    - `checkPremiumStatus()`: PurchaseRepositoryから状態取得、isPremium/subscriptionStatus更新
+    - エラー時のFree状態フォールバック機能
+
+  - **削除制限判定**
+    - `canDelete(count:)`: Free版50枚/日制限、Premium版無制限
+    - `incrementDeleteCount(_:)`: 削除カウント増加
+    - `resetDailyCount()`: 日次カウントリセット
+
+  - **トランザクション監視**
+    - `startTransactionMonitoring()`: Task.detachedでバックグラウンド監視
+    - Transaction.updatesのイテレーション
+    - `stopTransactionMonitoring()`: Taskキャンセル
+    - 自動状態更新機能
+
+### 設計品質
+- **アーキテクチャ準拠**: MV Pattern、@Observable、@MainActor
+- **並行処理安全**: Swift 6 Concurrency完全準拠（nonisolated(unsafe)でTask管理）
+- **依存性注入**: PurchaseRepositoryProtocol経由
+- **テスト網羅**: 11テスト全合格（正常系7、異常系1、カウント管理2、監視1）
+
+---
+
 ## アーカイブ: 2025-12-11 コンテキスト最適化（impl-054終了時）
 
 以下のエントリは impl-054 セッション終了時の最適化でアーカイブされました（PROGRESS.md 11件 → 10件、最古1エントリを移動）。
