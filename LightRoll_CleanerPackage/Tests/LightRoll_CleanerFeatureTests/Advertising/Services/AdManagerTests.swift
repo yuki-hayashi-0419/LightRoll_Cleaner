@@ -151,8 +151,12 @@ struct AdManagerTests {
                 return false
             }
             // SDK未初期化またはロード失敗のいずれか
-            return adError == .notInitialized ||
-                   (case .loadFailed = adError)
+            switch adError {
+            case .notInitialized, .loadFailed:
+                return true
+            default:
+                return false
+            }
         })
     }
 
@@ -167,8 +171,12 @@ struct AdManagerTests {
             guard let adError = error as? AdManagerError else {
                 return false
             }
-            return adError == .notInitialized ||
-                   (case .loadFailed = adError)
+            switch adError {
+            case .notInitialized, .loadFailed:
+                return true
+            default:
+                return false
+            }
         })
     }
 
@@ -183,8 +191,12 @@ struct AdManagerTests {
             guard let adError = error as? AdManagerError else {
                 return false
             }
-            return adError == .notInitialized ||
-                   (case .loadFailed = adError)
+            switch adError {
+            case .notInitialized, .loadFailed:
+                return true
+            default:
+                return false
+            }
         })
     }
 

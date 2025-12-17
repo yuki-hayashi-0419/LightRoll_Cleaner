@@ -16,7 +16,7 @@ import SwiftUI
 
 // MARK: - Boundary Value Tests
 
-@Suite("Dashboard境界値テスト", .tags(.edgeCase, .boundary))
+@Suite("Dashboard境界値テスト")
 @MainActor
 struct BoundaryValueTests {
 
@@ -184,7 +184,7 @@ struct BoundaryValueTests {
 
 // MARK: - Error Handling Tests
 
-@Suite("Dashboardエラーハンドリングテスト", .tags(.edgeCase, .errorHandling))
+@Suite("Dashboardエラーハンドリングテスト")
 @MainActor
 struct DashboardErrorHandlingTests {
 
@@ -319,7 +319,7 @@ struct DashboardErrorHandlingTests {
 
 // MARK: - Date and Time Edge Cases
 
-@Suite("Dashboard日付・時刻エッジケーステスト", .tags(.edgeCase, .dateTime))
+@Suite("Dashboard日付・時刻エッジケーステスト")
 @MainActor
 struct DateTimeEdgeCaseTests {
 
@@ -395,7 +395,7 @@ struct DateTimeEdgeCaseTests {
 
 // MARK: - Dimension Edge Cases
 
-@Suite("Dashboard次元エッジケーステスト", .tags(.edgeCase, .dimensions))
+@Suite("Dashboard次元エッジケーステスト")
 @MainActor
 struct DimensionEdgeCaseTests {
 
@@ -443,7 +443,7 @@ struct DimensionEdgeCaseTests {
 
 // MARK: - Navigation Edge Cases
 
-@Suite("Dashboardナビゲーションエッジケーステスト", .tags(.edgeCase))
+@Suite("Dashboardナビゲーションエッジケーステスト")
 @MainActor
 struct NavigationEdgeCaseTests {
 
@@ -524,7 +524,7 @@ struct NavigationEdgeCaseTests {
 
 // MARK: - Unicode and Special Character Tests
 
-@Suite("DashboardUnicode・特殊文字テスト", .tags(.edgeCase, .unicode))
+@Suite("DashboardUnicode・特殊文字テスト")
 @MainActor
 struct UnicodeEdgeCaseTests {
 
@@ -598,7 +598,7 @@ struct UnicodeEdgeCaseTests {
 
 // MARK: - Concurrent Access Tests
 
-@Suite("Dashboard並行アクセステスト", .tags(.edgeCase, .concurrency))
+@Suite("Dashboard並行アクセステスト")
 @MainActor
 struct ConcurrentAccessTests {
 
@@ -655,14 +655,4 @@ struct ConcurrentAccessTests {
     }
 }
 
-// MARK: - Custom Test Tags
-
-extension Tag {
-    @Tag static var edgeCase: Self
-    @Tag static var boundary: Self
-    @Tag static var errorHandling: Self
-    @Tag static var dateTime: Self
-    @Tag static var dimensions: Self
-    @Tag static var unicode: Self
-    @Tag static var concurrency: Self
-}
+// タグは共通定義を使用

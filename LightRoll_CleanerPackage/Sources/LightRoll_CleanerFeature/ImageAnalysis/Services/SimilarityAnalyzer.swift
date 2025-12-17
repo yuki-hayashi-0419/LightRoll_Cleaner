@@ -38,6 +38,9 @@ public actor SimilarityAnalyzer {
     /// 分析キャッシュマネージャー（特徴量ハッシュ再利用用）
     private let cacheManager: AnalysisCacheManager
 
+    /// LSHハッシャー（高速候補ペア検出用）
+    private let lshHasher: LSHHasher
+
     /// 分析オプション
     private let options: SimilarityAnalysisOptions
 
@@ -49,18 +52,21 @@ public actor SimilarityAnalyzer {
     ///   - similarityCalculator: 類似度計算器（省略時は新規作成）
     ///   - timeBasedGrouper: 時間ベースグルーパー（省略時は新規作成、24時間単位）
     ///   - cacheManager: 分析キャッシュマネージャー（省略時は新規作成）
+    ///   - lshHasher: LSHハッシャー（省略時は新規作成）
     ///   - options: 分析オプション
     public init(
         featurePrintExtractor: FeaturePrintExtractor? = nil,
         similarityCalculator: SimilarityCalculator? = nil,
         timeBasedGrouper: TimeBasedGrouper? = nil,
         cacheManager: AnalysisCacheManager? = nil,
+        lshHasher: LSHHasher? = nil,
         options: SimilarityAnalysisOptions = .default
     ) {
         self.featurePrintExtractor = featurePrintExtractor ?? FeaturePrintExtractor()
         self.similarityCalculator = similarityCalculator ?? SimilarityCalculator()
         self.timeBasedGrouper = timeBasedGrouper ?? TimeBasedGrouper(timeWindow: 24 * 60 * 60)
         self.cacheManager = cacheManager ?? AnalysisCacheManager()
+        self.lshHasher = lshHasher ?? LSHHasher()
         self.options = options
     }
 
@@ -185,8 +191,9 @@ public actor SimilarityAnalyzer {
 
     /// 時間グループ内で類似写真を検出（内部メソッド）
     ///
-    /// 最適化: キャッシュされたfeaturePrintHashを優先使用し、
-    /// 画像からの特徴量再抽出を回避することで大幅な高速化を実現。
+    /// 最適化:
+    /// 1. キャッシュされたfeaturePrintHashを優先使用し、画像からの特徴量再抽出を回避
+    /// 2. LSHで候補ペアを事前絞り込みし、全ペア比較を回避（O(n²) → O(n + k)）
     ///
     /// - Parameters:
     ///   - assets: 対象のPHAsset配列
@@ -224,15 +231,28 @@ public actor SimilarityAnalyzer {
         let cacheHitRate = Double(cachedFeatures.count) / Double(assets.count) * 100
         print("    💾 キャッシュヒット: \(cachedFeatures.count)/\(assets.count) (\(String(format: "%.1f", cacheHitRate))%)")
 
-        // フェーズ2: キャッシュされた特徴量から類似ペア検出（進捗 0.2〜0.7 of this group）
+        // フェーズ2: LSHで候補ペアを絞り込み（進捗 0.2〜0.4 of this group）
+        let lshEnd = progressRange.start + progressDelta * 0.4
+        var candidatePairs: [(String, String)] = []
+
+        if !cachedFeatures.isEmpty {
+            // LSHで高速候補ペア検出
+            candidatePairs = await lshHasher.findCandidatePairs(features: cachedFeatures)
+            print("    🔍 LSH候補ペア: \(candidatePairs.count)組（全ペア比較なら\(cachedFeatures.count * (cachedFeatures.count - 1) / 2)組）")
+        }
+
+        await progress?(lshEnd)
+
+        // フェーズ3: 候補ペアのみ詳細類似度計算（進捗 0.4〜0.7 of this group）
         let similarPairsEnd = progressRange.start + progressDelta * 0.7
         var allSimilarPairs: [SimilarityPair] = []
         var allIds: [String] = cachedFeatures.map { $0.id }
 
-        // キャッシュベースの類似ペア検出（高速）
-        if !cachedFeatures.isEmpty {
-            let cachedPairs = try await similarityCalculator.findSimilarPairsFromCache(
+        // 候補ペアに対してのみ類似度計算（大幅高速化）
+        if !candidatePairs.isEmpty {
+            let cachedPairs = try await similarityCalculator.findSimilarPairsFromCandidates(
                 cachedFeatures: cachedFeatures,
+                candidatePairs: candidatePairs,
                 threshold: options.similarityThreshold
             )
             allSimilarPairs.append(contentsOf: cachedPairs)

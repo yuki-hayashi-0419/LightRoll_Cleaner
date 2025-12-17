@@ -88,6 +88,26 @@
 - **推奨解決策**: LSH（Locality Sensitive Hashing）導入でO(n)化
 - **次回実装予定**: LSHによるグループ化高速化（目標: 7000枚を1-3分で処理）
 
+**キャッシュ検証不整合問題（2025-12-17発見）** - grouping-lsh-analysis-001セッション:
+- **問題箇所**:
+  - AnalysisRepository.swift:362 - Phase 2のキャッシュチェック
+  - SimilarityAnalyzer.swift:220-221 - Phase 3のキャッシュチェック
+- **症状**:
+  - 40%以降のグループ化処理が遅い
+  - キャッシュヒットしているはずの写真がVision APIで再抽出される
+- **根本原因**:
+  - Phase 2はキャッシュエントリ存在のみをチェック
+  - Phase 3はfeaturePrintHashも必須としてチェック
+  - featurePrintHashがnilの写真が二重処理される
+- **推奨修正**:
+  ```swift
+  // Phase 2のキャッシュチェック条件を修正（AnalysisRepository.swift:362）
+  if let cached = await cacheManager.loadResult(for: photo.localIdentifier),
+     cached.featurePrintHash != nil {
+  ```
+- **優先度**: 高（パフォーマンスに直接影響）
+- **ステータス**: 未修正（次回セッションで対応予定）
+
 ### ユーザーへの影響（パフォーマンス最適化全体）
 - **グループ化処理の大幅高速化**: 7000枚の写真を数秒〜数十秒で処理できるようになりました
 - **処理中のフリーズ解消**: O(n^2)問題の解決により、アプリがスムーズに動作します
@@ -2008,4 +2028,4 @@ public func destination(for identifier: String) -> NotificationDestination {
 
 ---
 
-*最終更新: 2025-12-16 (M8-T14 パフォーマンス最適化完了)*
+*最終更新: 2025-12-17 (キャッシュ検証不整合問題を記録)*

@@ -166,6 +166,64 @@ public actor SimilarityCalculator {
         return pairs.sorted { $0.similarity > $1.similarity }
     }
 
+    /// LSHで絞り込まれた候補ペアのみから類似ペアを検出（高速化版）
+    ///
+    /// LSHハッシュで事前に絞り込まれた候補ペアに対してのみ類似度計算を実行。
+    /// これによりO(n²)の全ペア比較をO(k)（k = 候補ペア数）に削減。
+    ///
+    /// - Parameters:
+    ///   - cachedFeatures: 写真IDと特徴量ハッシュのペア配列
+    ///   - candidatePairs: LSHで絞り込まれた候補ペア（ID1, ID2）のリスト
+    ///   - threshold: 類似判定の閾値
+    /// - Returns: 類似ペアの配列
+    /// - Throws: AnalysisError
+    public func findSimilarPairsFromCandidates(
+        cachedFeatures: [(id: String, hash: Data)],
+        candidatePairs: [(String, String)],
+        threshold: Float? = nil
+    ) async throws -> [SimilarityPair] {
+        let similarityThreshold = threshold ?? options.similarityThreshold
+        var pairs: [SimilarityPair] = []
+
+        // IDからハッシュへの高速参照マップを作成
+        var hashMap: [String: Data] = [:]
+        for feature in cachedFeatures {
+            hashMap[feature.id] = feature.hash
+        }
+
+        // 候補ペアに対してのみ類似度を計算
+        for (index, (id1, id2)) in candidatePairs.enumerated() {
+            // ハッシュが存在するかチェック
+            guard let hash1 = hashMap[id1],
+                  let hash2 = hashMap[id2] else {
+                continue
+            }
+
+            // 類似度を計算
+            let similarity = try calculateSimilarityFromCache(
+                hash1: hash1,
+                hash2: hash2
+            )
+
+            // 閾値以上の場合、ペアとして追加
+            if similarity >= similarityThreshold {
+                let pair = SimilarityPair(
+                    id1: id1,
+                    id2: id2,
+                    similarity: similarity
+                )
+                pairs.append(pair)
+            }
+
+            // キャンセルチェック（100ペアごと）
+            if index % 100 == 0 {
+                try Task.checkCancellation()
+            }
+        }
+
+        return pairs.sorted { $0.similarity > $1.similarity }
+    }
+
     /// 複数の観測結果から類似度ペアを検出
     ///
     /// - Parameters:

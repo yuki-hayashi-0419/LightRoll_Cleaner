@@ -19,7 +19,7 @@ import UIKit
 
 // MARK: - UseCase + View Integration Tests
 
-@Suite("Dashboard統合テスト: UseCase + View", .tags(.integration, .dashboard))
+@Suite("Dashboard統合テスト: UseCase + View")
 @MainActor
 struct UseCaseViewIntegrationTests {
 
@@ -174,7 +174,7 @@ struct UseCaseViewIntegrationTests {
 
 // MARK: - Router + View Integration Tests
 
-@Suite("Dashboard統合テスト: Router + View", .tags(.integration))
+@Suite("Dashboard統合テスト: Router + View")
 @MainActor
 struct RouterViewIntegrationTests {
 
@@ -317,7 +317,7 @@ struct RouterViewIntegrationTests {
 
 // MARK: - Data Consistency Tests
 
-@Suite("Dashboard統合テスト: データ整合性", .tags(.integration, .dataConsistency))
+@Suite("Dashboard統合テスト: データ整合性")
 @MainActor
 struct DataConsistencyTests {
 
@@ -417,7 +417,7 @@ struct DataConsistencyTests {
 
 // MARK: - Performance Integration Tests
 
-@Suite("Dashboard統合テスト: パフォーマンス", .tags(.integration, .dashboardPerformance))
+@Suite("Dashboard統合テスト: パフォーマンス")
 @MainActor
 struct PerformanceIntegrationTests {
 
@@ -496,10 +496,4 @@ struct PerformanceIntegrationTests {
     }
 }
 
-// MARK: - Custom Test Tags
-
-extension Tag {
-    @Tag static var integration: Self
-    @Tag static var dataConsistency: Self
-    @Tag static var dashboardPerformance: Self
-}
+// タグは共通定義を使用
