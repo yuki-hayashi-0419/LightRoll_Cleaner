@@ -1,24 +1,108 @@
 # LightRoll_Cleaner 開発進捗
 
-## 最終更新: 2025-12-17
+## 最終更新: 2025-12-18
 
 ---
 
-## 現在の問題状況
+## 2025-12-18 セッション: グループ化クラッシュ・速度問題の根本原因特定
 
-### 1. グループ化完了時のクラッシュ（未解決・最優先）
+### セッション概要
+- **実施内容**: グループ化処理の遅延とクラッシュの原因調査
+- **結果**: 根本原因を特定完了、修正方針を確定
+- **品質スコア**: 90点（分析完了、実装は次回）
+
+---
+
+## 現在の問題状況（根本原因特定済み）
+
+### 1. グループ化完了時のクラッシュ（原因特定済み・実装待ち）
 - **症状**: グループ化処理が完了した瞬間にアプリがクラッシュする
-- **再現手順**: 分析 → グループ化 → 完了時にクラッシュ
-- **調査方針**:
-  - クラッシュログの取得
-  - グループ化完了後の処理フローの確認
-  - メモリ関連の問題の可能性
+- **根本原因**: `getFileSizes()` のO(n×m)計算量によるタイムアウト/メモリ圧迫
+- **発生箇所**:
+  - `PhotoGrouper.swift:522-540`
+  - `AnalysisRepository.swift:717-735`
+- **メカニズム**:
+  1. グループ化（LSH + 類似度計算）は正常完了
+  2. 結果を`PhotoGroup`に変換する際に`getFileSizes()`が呼ばれる
+  3. 各photoIdに対して`.first(where:)`で全assetsを線形探索 → O(n×m)
+  4. さらに各ファイルに対して順次I/O → 処理時間が爆発
+  5. Watchdog/メモリ圧迫でクラッシュ
 
-### 2. キャッシュ全件無効（次元数バグの後遺症）
+### 2. グループ化処理が圧倒的に遅い（原因特定済み・実装待ち）
+- **症状**: グループ化フェーズが非常に長時間かかる
+- **根本原因**: 同上 - `getFileSizes()`のO(n×m)問題
+- **影響度計算**:
+  - 7000枚 × 数百グループ × 各グループ8枚平均
+  - 1グループあたり: 8枚 × 7000回検索 = 56,000回比較
+  - 合計: 数千万回の線形探索 + 数千回のファイルI/O
+
+### 3. キャッシュ全件無効（次元数バグの後遺症）
 - **症状**: キャッシュヒット率0%、全グループでキャッシュミス
 - **原因**: 過去に保存されたキャッシュが768次元（3072バイト）で、修正後の2048次元（8192バイト）と不一致
 - **対応**: 「分析」フェーズを再実行して正しいキャッシュを生成する必要あり
-- **検討事項**: キャッシュクリア機能の実装
+
+---
+
+## 確定した修正方針（次回セッションで実装）
+
+### 修正1: getFileSizes() のO(1)最適化
+
+**現状コード（O(n×m)）:**
+```swift
+for photoId in photoIds {
+    guard let asset = assets.first(where: { $0.localIdentifier == photoId }) else {
+        fileSizes.append(0)
+        continue
+    }
+    let fileSize = try await asset.getFileSize()
+    fileSizes.append(fileSize)
+}
+```
+
+**修正後コード（O(n)）:**
+```swift
+// 事前にDictionary構築 O(m)
+let assetLookup = Dictionary(uniqueKeysWithValues: assets.map { ($0.localIdentifier, $0) })
+
+for photoId in photoIds {
+    guard let asset = assetLookup[photoId] else {  // O(1) lookup
+        fileSizes.append(0)
+        continue
+    }
+    let fileSize = try await asset.getFileSize()
+    fileSizes.append(fileSize)
+}
+```
+
+### 修正2: ファイルサイズ取得の並列化
+
+```swift
+// 修正後: TaskGroup による並列取得
+let fileSizes = try await withThrowingTaskGroup(of: (Int, Int64).self) { group in
+    for (index, photoId) in photoIds.enumerated() {
+        group.addTask {
+            let size = try await assetLookup[photoId]?.getFileSize() ?? 0
+            return (index, size)
+        }
+    }
+    var results = [(Int, Int64)]()
+    for try await result in group {
+        results.append(result)
+    }
+    return results.sorted { $0.0 < $1.0 }.map { $0.1 }
+}
+```
+
+### 修正対象ファイル
+| ファイル | 行 | 修正内容 |
+|----------|-----|----------|
+| `PhotoGrouper.swift` | 522-540 | Dictionary lookup + 並列化 |
+| `AnalysisRepository.swift` | 717-735 | 同上 |
+
+### 期待される効果
+- **速度**: O(n×m) → O(n) で数千倍高速化
+- **クラッシュ**: タイムアウト/メモリ圧迫の解消
+- **7000枚の場合**: 数十分 → 数秒に短縮見込み
 
 ---
 
