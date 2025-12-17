@@ -2530,3 +2530,120 @@ LightRoll_CleanerPackage/
 M9-T10: BannerAdView実装は、プロジェクト品質基準の「90点以上」を満たし、**次のタスクへ進行可能**です。
 
 ---
+## 2025-12-12 | セッション: impl-061（M9モジュール100%完了！M9-T13/T14/T15完了）
+
+### 完了タスク
+- M9-T13: LimitReachedSheet実装（596行、13テスト、100/100点）
+- M9-T14: RestorePurchasesView実装（746行、14テスト、100/100点）
+- M9-T15: Monetization統合テスト（466行、14テスト、100/100点）
+
+### セッション成果サマリー
+- **合計実装行数**: 1,808行
+- **合計テストケース**: 41テスト
+- **平均品質スコア**: 100点（3タスク全て満点）
+- **M9モジュール**: 100%完了（15/15タスク + 1スキップ）
+
+---
+
+### M9-T14: RestorePurchasesView実装（746行、14テスト、100点）
+
+**実装内容（746行）**:
+1. **RestorePurchasesView（メインView）**
+   - @Environment統合（PremiumManager、PurchaseRepository）
+   - 復元状態管理（RestoreState enum: idle/restoring/success/noSubscription/error）
+   - 復元処理の非同期実行（handleRestore()）
+   - 結果に応じた視覚的フィードバック
+   - アクセシビリティ完全対応
+
+2. **UI構成**
+   - ヘッダーセクション（アイコン、タイトル、説明）
+   - 復元ボタン（ローディング状態対応）
+   - 結果表示カード（成功/サブスクなし/エラー）
+   - 注意事項セクション
+
+3. **サブコンポーネント**
+   - RestoreResultCard: 復元結果表示
+   - NoteRow: 注意事項行
+
+**テスト結果（14テスト）**:
+- 初期状態テスト（2ケース）
+- 復元処理テスト（4ケース）
+- エラーハンドリングテスト（4ケース）
+- UI要素テスト（4ケース）
+
+---
+
+### M9-T15: Monetization統合テスト（466行、14テスト、100点）
+
+**実装内容（466行）**:
+1. **MonetizationIntegrationTests（統合テストスイート）**
+   - E2E購入フロー（4テスト）
+   - Premium機能テスト（3テスト）
+   - 広告表示テスト（3テスト）
+   - 状態管理テスト（4テスト）
+
+2. **テストカバレッジ**
+   - M9-T01〜M9-T14の全コンポーネント連携
+   - PremiumManager + PurchaseRepository + AdManager統合
+   - Free/Premium状態遷移
+   - 削除上限管理の動作確認
+
+**技術ハイライト**:
+- モック依存注入によるテスト分離
+- async/awaitによる非同期テスト
+- 状態遷移の完全検証
+- エッジケーステスト
+
+---
+
+### M9モジュール完全終了サマリー
+
+**全タスク完了状況**:
+| タスクID | タスク名 | 行数 | テスト | スコア |
+|----------|----------|------|--------|--------|
+| M9-T01 | PremiumStatusモデル | 269行 | 31 | 100点 |
+| M9-T02 | ProductInfoモデル | 304行 | 24 | 95点 |
+| M9-T03 | StoreKit 2設定 | 444行 | 16 | 92点 |
+| M9-T04 | PurchaseRepository | 633行 | 32 | 96点 |
+| M9-T05 | PremiumManager | 139行 | 11 | 96点 |
+| M9-T06 | FeatureGate | 393行 | 20 | 95点 |
+| M9-T07 | 削除上限管理 | 678行 | 19 | 95点 |
+| M9-T08 | Google Mobile Ads | 670行 | 27 | 95点 |
+| M9-T09 | AdManager | 1,288行 | 53 | 93点 |
+| M9-T10 | BannerAdView | 1,048行 | 32 | 92点 |
+| M9-T11 | PremiumViewModel | スキップ | - | - |
+| M9-T12 | PremiumView | 1,525行 | 54 | 93点 |
+| M9-T13 | LimitReachedSheet | 596行 | 13 | 100点 |
+| M9-T14 | RestorePurchasesView | 746行 | 14 | 100点 |
+| M9-T15 | 統合テスト | 466行 | 14 | 100点 |
+
+**M9モジュール統計**:
+- 総実装行数: 9,199行
+- 総テスト数: 360テスト
+- 平均品質スコア: 95.9点
+- ステータス: **100%完了**
+
+---
+
+### プロジェクト全体進捗
+
+**マイルストーン達成**:
+- M1 Core Infrastructure: 100%完了
+- M2 Photo Access: 100%完了
+- M3 Image Analysis: 100%完了
+- M4 UI Components: 100%完了
+- M5 Dashboard: 100%完了
+- M6 Deletion & Safety: 100%完了
+- M7 Notifications: 100%完了
+- M8 Settings: 100%完了
+- **M9 Monetization: 100%完了**
+
+**全体統計**:
+- 完了タスク: 114/117（97.4%）
+- 総テスト数: 1,395テスト
+- 累計完了時間: 178h/181h（98.3%）
+- 残りタスク: 3（Phase 7の最終調整タスク）
+
+---
+
+---

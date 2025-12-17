@@ -60,6 +60,16 @@
 - Vision Frameworkリクエスト統合による2-3倍高速化見込み
 - 詳細: ARCHITECTURE.md セクション5.4
 
+**グループ化最適化実装（2025-12-17）**:
+- 時間ベース事前グルーピングによる比較回数99%削減
+- O(n^2) → O(n*k) への計算量改善（kは時間グループ数）
+- TaskGroup並列処理による高速化
+- 品質スコア92点達成
+- **成果物**:
+  - TimeBasedGrouper.swift（121行）：撮影時刻ベースの事前グルーピング
+  - OptimizedGroupingService.swift（178行）：最適化されたグループ化サービス
+  - テストケース（240行）：TimeBasedGrouperTests + OptimizedGroupingServiceTests
+
 ---
 
 ## M1: 基盤機能（完了）
