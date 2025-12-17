@@ -58,24 +58,112 @@ public actor SimilarityCalculator {
         return Swift.max(0.0, Swift.min(1.0, similarity))
     }
 
-    /// 2つの FeaturePrintResult 間の類似度を計算（便利メソッド）
+    /// 2つの特徴量ハッシュ（Data）間のコサイン類似度を計算
     ///
-    /// 注: VNFeaturePrintObservation はハッシュから復元できないため、
-    /// このメソッドは実行時の観測結果を直接保持している場合のみ使用可能
+    /// キャッシュされた featurePrintHash を使用して高速に類似度を計算
+    /// VNFeaturePrintObservation の再抽出が不要
     ///
     /// - Parameters:
-    ///   - result1: 1つ目の特徴量結果
-    ///   - result2: 2つ目の特徴量結果
-    /// - Returns: 類似度スコア
-    /// - Throws: AnalysisError
-    public func calculateSimilarity(
-        between result1: FeaturePrintResult,
-        and result2: FeaturePrintResult
+    ///   - hash1: 1つ目の特徴量ハッシュ（Float配列のData）
+    ///   - hash2: 2つ目の特徴量ハッシュ（Float配列のData）
+    /// - Returns: コサイン類似度スコア（0.0〜1.0）
+    /// - Throws: AnalysisError（データが不正な場合）
+    public func calculateSimilarityFromCache(
+        hash1: Data,
+        hash2: Data
     ) throws -> Float {
-        // FeaturePrintResult からは observation を直接復元できないため、
-        // このメソッドは主にテスト用途
-        // 実装では observation を保持する別の構造体を使用することを推奨
-        throw AnalysisError.similarityCalculationFailed
+        // データサイズが一致することを確認
+        guard hash1.count == hash2.count, hash1.count > 0 else {
+            throw AnalysisError.similarityCalculationFailed
+        }
+
+        let elementCount = hash1.count / MemoryLayout<Float>.size
+        guard elementCount > 0 else {
+            throw AnalysisError.similarityCalculationFailed
+        }
+
+        // Float配列として読み取り、コサイン類似度を計算
+        var dotProduct: Float = 0
+        var magnitude1: Float = 0
+        var magnitude2: Float = 0
+
+        hash1.withUnsafeBytes { ptr1 in
+            hash2.withUnsafeBytes { ptr2 in
+                let floats1 = ptr1.bindMemory(to: Float.self)
+                let floats2 = ptr2.bindMemory(to: Float.self)
+
+                for i in 0..<elementCount {
+                    let v1 = floats1[i]
+                    let v2 = floats2[i]
+                    dotProduct += v1 * v2
+                    magnitude1 += v1 * v1
+                    magnitude2 += v2 * v2
+                }
+            }
+        }
+
+        // ゼロ除算を防止
+        let denominator = sqrt(magnitude1) * sqrt(magnitude2)
+        guard denominator > 0 else {
+            return 0.0
+        }
+
+        // コサイン類似度（-1〜1を0〜1にスケール）
+        let cosineSimilarity = dotProduct / denominator
+        let normalizedSimilarity = (cosineSimilarity + 1.0) / 2.0
+
+        return Swift.max(0.0, Swift.min(1.0, normalizedSimilarity))
+    }
+
+    /// キャッシュされた特徴量ハッシュから類似ペアを検出
+    ///
+    /// 分析フェーズで保存された featurePrintHash を使用して高速にペアを検出
+    /// VNFeaturePrintObservation の再抽出が不要なため大幅に高速化
+    ///
+    /// - Parameters:
+    ///   - cachedFeatures: 写真IDと特徴量ハッシュのペア配列
+    ///   - threshold: 類似判定の閾値
+    /// - Returns: 類似ペアの配列
+    /// - Throws: AnalysisError
+    public func findSimilarPairsFromCache(
+        cachedFeatures: [(id: String, hash: Data)],
+        threshold: Float? = nil
+    ) async throws -> [SimilarityPair] {
+        let similarityThreshold = threshold ?? options.similarityThreshold
+        var pairs: [SimilarityPair] = []
+
+        let count = cachedFeatures.count
+
+        // すべての組み合わせについて類似度を計算
+        for i in 0..<count {
+            for j in (i + 1)..<count {
+                let item1 = cachedFeatures[i]
+                let item2 = cachedFeatures[j]
+
+                // キャッシュから類似度を計算
+                let similarity = try calculateSimilarityFromCache(
+                    hash1: item1.hash,
+                    hash2: item2.hash
+                )
+
+                // 閾値以上の場合、ペアとして追加
+                if similarity >= similarityThreshold {
+                    let pair = SimilarityPair(
+                        id1: item1.id,
+                        id2: item2.id,
+                        similarity: similarity
+                    )
+                    pairs.append(pair)
+                }
+
+                // キャンセルチェック（100ペアごと）
+                if (i * count + j) % 100 == 0 {
+                    try Task.checkCancellation()
+                }
+            }
+        }
+
+        return pairs.sorted { $0.similarity > $1.similarity }
     }
 
     /// 複数の観測結果から類似度ペアを検出

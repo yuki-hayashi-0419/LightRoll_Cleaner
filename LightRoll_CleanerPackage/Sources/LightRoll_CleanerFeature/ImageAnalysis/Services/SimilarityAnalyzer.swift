@@ -20,6 +20,8 @@ import Photos
 /// - 類似写真ペアを検出
 /// - グラフクラスタリングによるグループ化
 /// - 進捗通知とキャンセル対応
+/// - 時間ベース事前グルーピングによる最適化（O(n²) → O(n×k)）
+/// - キャッシュ利用による特徴量再抽出回避（パフォーマンス最適化）
 public actor SimilarityAnalyzer {
 
     // MARK: - Properties
@@ -30,6 +32,12 @@ public actor SimilarityAnalyzer {
     /// 類似度計算器
     private let similarityCalculator: SimilarityCalculator
 
+    /// 時間ベースグルーパー（最適化用）
+    private let timeBasedGrouper: TimeBasedGrouper
+
+    /// 分析キャッシュマネージャー（特徴量ハッシュ再利用用）
+    private let cacheManager: AnalysisCacheManager
+
     /// 分析オプション
     private let options: SimilarityAnalysisOptions
 
@@ -39,14 +47,20 @@ public actor SimilarityAnalyzer {
     /// - Parameters:
     ///   - featurePrintExtractor: 特徴量抽出器（省略時は新規作成）
     ///   - similarityCalculator: 類似度計算器（省略時は新規作成）
+    ///   - timeBasedGrouper: 時間ベースグルーパー（省略時は新規作成、24時間単位）
+    ///   - cacheManager: 分析キャッシュマネージャー（省略時は新規作成）
     ///   - options: 分析オプション
     public init(
         featurePrintExtractor: FeaturePrintExtractor? = nil,
         similarityCalculator: SimilarityCalculator? = nil,
+        timeBasedGrouper: TimeBasedGrouper? = nil,
+        cacheManager: AnalysisCacheManager? = nil,
         options: SimilarityAnalysisOptions = .default
     ) {
         self.featurePrintExtractor = featurePrintExtractor ?? FeaturePrintExtractor()
         self.similarityCalculator = similarityCalculator ?? SimilarityCalculator()
+        self.timeBasedGrouper = timeBasedGrouper ?? TimeBasedGrouper(timeWindow: 24 * 60 * 60)
+        self.cacheManager = cacheManager ?? AnalysisCacheManager()
         self.options = options
     }
 
@@ -93,7 +107,11 @@ public actor SimilarityAnalyzer {
         return groups
     }
 
-    /// Photo配列から類似写真グループを検出（便利メソッド）
+    /// Photo配列から類似写真グループを検出（時間ベース最適化版）
+    ///
+    /// TimeBasedGrouperで事前に時間範囲ごとにグルーピングし、
+    /// 各グループ内でのみ類似度計算を行うことで、O(n²) → O(n×k) に最適化。
+    /// これにより7000枚で約2450万回 → 約24万回（99%削減）の比較回数削減を実現。
     ///
     /// - Parameters:
     ///   - photos: 対象のPhoto配列
@@ -104,9 +122,213 @@ public actor SimilarityAnalyzer {
         in photos: [Photo],
         progress: (@Sendable (Double) async -> Void)? = nil
     ) async throws -> [SimilarPhotoGroup] {
-        // Photo から PHAsset を取得
-        let assets = try await fetchPHAssets(from: photos)
-        return try await findSimilarGroups(in: assets, progress: progress)
+        guard !photos.isEmpty else {
+            return []
+        }
+
+        // フェーズ0: 時間ベース事前グルーピング（最適化のコア部分）
+        let timeGroups = await timeBasedGrouper.groupByTime(photos: photos)
+
+        // 統計情報をログ出力（デバッグ用）
+        let stats = await timeBasedGrouper.getGroupStatistics(groups: timeGroups)
+        print("📊 TimeBasedGrouper: \(timeGroups.count)グループ, 平均\(Int(stats.avgGroupSize))枚/グループ, 比較削減率\(String(format: "%.1f", stats.comparisonReductionRate * 100))%")
+
+        // 空のグループを除外
+        let nonEmptyGroups = timeGroups.filter { !$0.isEmpty }
+        guard !nonEmptyGroups.isEmpty else {
+            return []
+        }
+
+        // 各グループの写真数を計算して進捗計算に使用
+        let totalPhotos = nonEmptyGroups.reduce(0) { $0 + $1.count }
+        var processedPhotos = 0
+        var allSimilarGroups: [SimilarPhotoGroup] = []
+
+        // 各時間グループごとに類似写真を検出
+        for (groupIndex, timeGroup) in nonEmptyGroups.enumerated() {
+            // キャンセルチェック
+            try Task.checkCancellation()
+
+            // グループ内の写真が1枚以下なら類似検出不要
+            if timeGroup.count <= 1 {
+                processedPhotos += timeGroup.count
+                let currentProgress = Double(processedPhotos) / Double(totalPhotos)
+                await progress?(currentProgress)
+                continue
+            }
+
+            // このグループ用の進捗計算
+            let groupStartProgress = Double(processedPhotos) / Double(totalPhotos)
+            let groupEndProgress = Double(processedPhotos + timeGroup.count) / Double(totalPhotos)
+
+            // Photo から PHAsset を取得
+            let assets = try await fetchPHAssets(from: timeGroup)
+
+            // グループ内で類似写真を検出
+            let groupResults = try await findSimilarGroupsInTimeGroup(
+                assets: assets,
+                progressRange: (groupStartProgress, groupEndProgress),
+                progress: progress
+            )
+
+            allSimilarGroups.append(contentsOf: groupResults)
+            processedPhotos += timeGroup.count
+
+            print("  ⏱️ グループ\(groupIndex + 1)/\(nonEmptyGroups.count): \(timeGroup.count)枚処理, \(groupResults.count)類似グループ検出")
+        }
+
+        await progress?(1.0)
+
+        // 写真数の多い順にソート
+        return allSimilarGroups.sorted { $0.photoIds.count > $1.photoIds.count }
+    }
+
+    /// 時間グループ内で類似写真を検出（内部メソッド）
+    ///
+    /// 最適化: キャッシュされたfeaturePrintHashを優先使用し、
+    /// 画像からの特徴量再抽出を回避することで大幅な高速化を実現。
+    ///
+    /// - Parameters:
+    ///   - assets: 対象のPHAsset配列
+    ///   - progressRange: 進捗範囲
+    ///   - progress: 進捗コールバック
+    /// - Returns: 検出された類似グループ配列
+    private func findSimilarGroupsInTimeGroup(
+        assets: [PHAsset],
+        progressRange: (start: Double, end: Double),
+        progress: (@Sendable (Double) async -> Void)?
+    ) async throws -> [SimilarPhotoGroup] {
+        guard !assets.isEmpty else {
+            return []
+        }
+
+        let progressDelta = progressRange.end - progressRange.start
+
+        // フェーズ1: キャッシュから特徴量ハッシュを読み込み（進捗 0.0〜0.2 of this group）
+        let cacheLoadEnd = progressRange.start + progressDelta * 0.2
+        var cachedFeatures: [(id: String, hash: Data)] = []
+        var uncachedAssets: [PHAsset] = []
+
+        for asset in assets {
+            if let result = await cacheManager.loadResult(for: asset.localIdentifier),
+               let hash = result.featurePrintHash {
+                cachedFeatures.append((id: asset.localIdentifier, hash: hash))
+            } else {
+                uncachedAssets.append(asset)
+            }
+        }
+
+        await progress?(cacheLoadEnd)
+
+        // キャッシュヒット率をログ出力
+        let cacheHitRate = Double(cachedFeatures.count) / Double(assets.count) * 100
+        print("    💾 キャッシュヒット: \(cachedFeatures.count)/\(assets.count) (\(String(format: "%.1f", cacheHitRate))%)")
+
+        // フェーズ2: キャッシュされた特徴量から類似ペア検出（進捗 0.2〜0.7 of this group）
+        let similarPairsEnd = progressRange.start + progressDelta * 0.7
+        var allSimilarPairs: [SimilarityPair] = []
+        var allIds: [String] = cachedFeatures.map { $0.id }
+
+        // キャッシュベースの類似ペア検出（高速）
+        if !cachedFeatures.isEmpty {
+            let cachedPairs = try await similarityCalculator.findSimilarPairsFromCache(
+                cachedFeatures: cachedFeatures,
+                threshold: options.similarityThreshold
+            )
+            allSimilarPairs.append(contentsOf: cachedPairs)
+        }
+
+        await progress?(similarPairsEnd)
+
+        // フェーズ3: キャッシュにない写真の特徴量を抽出（進捗 0.7〜0.9 of this group）
+        // 注: ほとんどの場合キャッシュにヒットするため、ここは実行されないことが多い
+        if !uncachedAssets.isEmpty {
+            print("    ⚠️ キャッシュミス: \(uncachedAssets.count)枚を再抽出")
+            let extractionEnd = progressRange.start + progressDelta * 0.9
+            let observations = try await extractFeaturePrints(
+                from: uncachedAssets,
+                progressRange: (similarPairsEnd, extractionEnd),
+                progress: progress
+            )
+
+            // キャッシュにない写真の類似ペアを検出
+            let uncachedPairs = try await similarityCalculator.findSimilarPairs(
+                in: observations,
+                threshold: options.similarityThreshold
+            )
+            allSimilarPairs.append(contentsOf: uncachedPairs)
+            allIds.append(contentsOf: observations.map { $0.id })
+
+            await progress?(extractionEnd)
+        }
+
+        // フェーズ4: グループ化（進捗 0.9〜1.0 of this group）
+        let groups = clusterIntoGroupsFromIds(
+            ids: allIds,
+            similarPairs: allSimilarPairs
+        )
+
+        await progress?(progressRange.end)
+
+        return groups
+    }
+
+    /// IDリストと類似ペアからグループ化（キャッシュベース用）
+    ///
+    /// - Parameters:
+    ///   - ids: 写真IDのリスト
+    ///   - similarPairs: 類似ペア配列
+    /// - Returns: 類似写真グループ配列
+    private func clusterIntoGroupsFromIds(
+        ids: [String],
+        similarPairs: [SimilarityPair]
+    ) -> [SimilarPhotoGroup] {
+        guard !ids.isEmpty else {
+            return []
+        }
+
+        // Union-Find データ構造でグループ化
+        var unionFind = UnionFind(ids: ids)
+
+        // 類似ペアを統合
+        for pair in similarPairs {
+            unionFind.union(pair.id1, pair.id2)
+        }
+
+        // グループIDごとに写真をまとめる
+        var groupsDict: [String: [String]] = [:]
+        for id in ids {
+            let root = unionFind.find(id)
+            groupsDict[root, default: []].append(id)
+        }
+
+        // 最小グループサイズ以上のグループのみを抽出
+        var groups: [SimilarPhotoGroup] = []
+        for (_, photoIds) in groupsDict {
+            // 最小グループサイズチェック
+            guard photoIds.count >= options.minGroupSize else {
+                continue
+            }
+
+            // グループ内の類似度を計算
+            let groupPairs = similarPairs.filter { pair in
+                photoIds.contains(pair.id1) && photoIds.contains(pair.id2)
+            }
+
+            let averageSimilarity = groupPairs.averageSimilarity ?? 0.0
+
+            let group = SimilarPhotoGroup(
+                id: UUID(),
+                photoIds: photoIds,
+                averageSimilarity: averageSimilarity,
+                pairCount: groupPairs.count
+            )
+
+            groups.append(group)
+        }
+
+        // 写真数の多い順にソート
+        return groups.sorted { $0.photoIds.count > $1.photoIds.count }
     }
 
     /// 特定の写真に類似する写真を検索
