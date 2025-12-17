@@ -331,8 +331,12 @@ struct AdManagerTests {
                 guard let adError = error as? AdManagerError else {
                     return false
                 }
-                return adError == .notInitialized ||
-                       (case .loadFailed = adError)
+                switch adError {
+                case .notInitialized, .loadFailed:
+                    return true
+                default:
+                    return false
+                }
             })
             #else
             // GoogleMobileAds利用不可時：SDK利用不可エラー
@@ -363,8 +367,12 @@ struct AdManagerTests {
                 guard let adError = error as? AdManagerError else {
                     return false
                 }
-                return adError == .notInitialized ||
-                       (case .loadFailed = adError)
+                switch adError {
+                case .notInitialized, .loadFailed:
+                    return true
+                default:
+                    return false
+                }
             })
             #else
             // GoogleMobileAds利用不可時：SDK利用不可エラー
@@ -395,8 +403,12 @@ struct AdManagerTests {
                 guard let adError = error as? AdManagerError else {
                     return false
                 }
-                return adError == .notInitialized ||
-                       (case .loadFailed = adError)
+                switch adError {
+                case .notInitialized, .loadFailed:
+                    return true
+                default:
+                    return false
+                }
             })
             #else
             // GoogleMobileAds利用不可時：SDK利用不可エラー

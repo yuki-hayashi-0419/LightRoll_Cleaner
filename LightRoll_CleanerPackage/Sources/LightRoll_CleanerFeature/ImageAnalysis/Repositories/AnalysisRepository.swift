@@ -358,12 +358,16 @@ public actor AnalysisRepository: ImageAnalysisRepositoryProtocol {
             photosToAnalyze = photos.enumerated().map { ($0.offset, $0.element) }
         } else {
             // キャッシュチェックで新規写真と既存写真を分離
+            // 【重要】featurePrintHashも検証して、Phase 3（グループ化）との整合性を確保
+            // Phase 3ではfeaturePrintHash必須のため、nil または空の場合は再分析対象とする
             for (index, photo) in photos.enumerated() {
-                if let cached = await cacheManager.loadResult(for: photo.localIdentifier) {
-                    // キャッシュから取得
+                if let cached = await cacheManager.loadResult(for: photo.localIdentifier),
+                   let hash = cached.featurePrintHash,
+                   !hash.isEmpty {
+                    // 完全なキャッシュから取得（有効なfeaturePrintHashあり）
                     cachedResults.append((index, cached))
                 } else {
-                    // 新規写真として分析対象に追加
+                    // 新規写真または不完全なキャッシュ（featurePrintHashがnilまたは空）は再分析
                     photosToAnalyze.append((index, photo))
                 }
             }
