@@ -257,9 +257,21 @@ public actor AnalysisRepository: ImageAnalysisRepositoryProtocol {
         if let visionResult = visionResult,
            let featurePrintRequest = visionResult.request(ofType: VNGenerateImageFeaturePrintRequest.self),
            let featurePrint = featurePrintRequest.results?.first as? VNFeaturePrintObservation {
-            // VNFeaturePrintObservation のデータを Data に変換
-            let hash = featurePrint.data.withUnsafeBytes { bytes in
-                Data(bytes)
+            // VNFeaturePrintObservation のデータを正しくFloat配列として抽出
+            // 注意: observation.data は内部フォーマット（768要素相当）であり、
+            //       elementCount（2048）を使用して正しいサイズのDataを生成する必要がある
+            let elementCount = featurePrint.elementCount
+            var hash = Data(count: elementCount * MemoryLayout<Float>.size)
+            hash.withUnsafeMutableBytes { pointer in
+                guard let baseAddress = pointer.baseAddress else { return }
+                let floatPointer = baseAddress.assumingMemoryBound(to: Float.self)
+                featurePrint.data.withUnsafeBytes { observationBytes in
+                    guard let observationAddress = observationBytes.baseAddress else { return }
+                    floatPointer.initialize(
+                        from: observationAddress.assumingMemoryBound(to: Float.self),
+                        count: elementCount
+                    )
+                }
             }
             builder.setFeaturePrintHash(hash)
         }
@@ -353,21 +365,24 @@ public actor AnalysisRepository: ImageAnalysisRepositoryProtocol {
         var photosToAnalyze: [(index: Int, photo: Photo)] = []
         var cachedResults: [(index: Int, result: PhotoAnalysisResult)] = []
 
+        // VNFeaturePrintObservation の正しいサイズ: 2048次元 × 4バイト（Float）= 8192バイト
+        let expectedFeaturePrintHashSize = 2048 * MemoryLayout<Float>.size  // 8192
+
         if forceReanalyze {
             // 強制再分析の場合は全写真を対象
             photosToAnalyze = photos.enumerated().map { ($0.offset, $0.element) }
         } else {
             // キャッシュチェックで新規写真と既存写真を分離
             // 【重要】featurePrintHashも検証して、Phase 3（グループ化）との整合性を確保
-            // Phase 3ではfeaturePrintHash必須のため、nil または空の場合は再分析対象とする
+            // Phase 3ではfeaturePrintHash必須のため、nil・空・不正サイズの場合は再分析対象とする
             for (index, photo) in photos.enumerated() {
                 if let cached = await cacheManager.loadResult(for: photo.localIdentifier),
                    let hash = cached.featurePrintHash,
-                   !hash.isEmpty {
-                    // 完全なキャッシュから取得（有効なfeaturePrintHashあり）
+                   hash.count == expectedFeaturePrintHashSize {
+                    // 完全なキャッシュから取得（有効なfeaturePrintHashあり、正しいサイズ）
                     cachedResults.append((index, cached))
                 } else {
-                    // 新規写真または不完全なキャッシュ（featurePrintHashがnilまたは空）は再分析
+                    // 新規写真または不完全なキャッシュ（featurePrintHashがnil・空・不正サイズ）は再分析
                     photosToAnalyze.append((index, photo))
                 }
             }

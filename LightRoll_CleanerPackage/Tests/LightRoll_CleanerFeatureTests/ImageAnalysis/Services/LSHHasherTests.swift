@@ -377,6 +377,129 @@ struct LSHHasherTests {
         // 64ビットの有効なハッシュ値が生成されること
         #expect(hash != 0)
     }
+
+    // MARK: - 動的次元数対応テスト（VNFeaturePrint互換）
+
+    @Test("2048次元（VNFeaturePrint標準）で動的検出が正常に動作すること")
+    func testDynamicDimensionDetection_2048Dimensions() async {
+        // featureDimensionを指定せずに初期化（動的検出モード）
+        let hasher = LSHHasher()
+        let featureData = createFeatureData2048(seed: 2000)
+
+        let hash = await hasher.computeLSHHash(from: featureData)
+
+        // 有効なハッシュ値が生成されること（0以外）
+        #expect(hash != 0)
+    }
+
+    @Test("動的次元数検出で同一データから同一ハッシュが生成されること")
+    func testDynamicDimension_SameDataProducesSameHash() async {
+        let hasher = LSHHasher()
+        let featureData = createFeatureData2048(seed: 2100)
+
+        let hash1 = await hasher.computeLSHHash(from: featureData)
+        let hash2 = await hasher.computeLSHHash(from: featureData)
+
+        #expect(hash1 == hash2)
+        #expect(hash1 != 0)
+    }
+
+    @Test("動的次元数検出で類似データから近いハッシュが生成されること")
+    func testDynamicDimension_SimilarDataProducesSimilarHash() async {
+        let hasher = LSHHasher()
+        let originalData = createFeatureData2048(seed: 2200)
+        let similarData = createSimilarFeatureData2048(original: originalData, noise: 0.05)
+
+        let hash1 = await hasher.computeLSHHash(from: originalData)
+        let hash2 = await hasher.computeLSHHash(from: similarData)
+
+        // ハミング距離を計算（異なるビット数）
+        let hammingDistance = (hash1 ^ hash2).nonzeroBitCount
+
+        // 類似データはハミング距離が小さいはず（64ビット中、20ビット以下の差）
+        #expect(hammingDistance < 20)
+    }
+
+    @Test("動的次元数でグルーピングが正常に動作すること")
+    func testDynamicDimension_GroupByLSH() async {
+        let hasher = LSHHasher()
+
+        let data1 = createFeatureData2048(seed: 2300)
+        let data2 = createSimilarFeatureData2048(original: data1, noise: 0.05)
+        let data3 = createFeatureData2048(seed: 2400) // 全く異なるデータ
+
+        let features = [
+            (id: "id1", hash: data1),
+            (id: "id2", hash: data2),
+            (id: "id3", hash: data3)
+        ]
+
+        let groups = await hasher.groupByLSH(features: features)
+
+        // グループが生成されること
+        #expect(groups.count >= 1)
+
+        // id1とid2が同じグループに入る可能性が高い
+        let containsBothSimilar = groups.contains { group in
+            group.contains("id1") && group.contains("id2")
+        }
+        #expect(containsBothSimilar)
+    }
+
+    @Test("動的次元数で候補ペアが正しく生成されること")
+    func testDynamicDimension_FindCandidatePairs() async {
+        let hasher = LSHHasher()
+
+        let data1 = createFeatureData2048(seed: 2500)
+        let data2 = createSimilarFeatureData2048(original: data1, noise: 0.05)
+        let data3 = createSimilarFeatureData2048(original: data1, noise: 0.05)
+
+        let features = [
+            (id: "id1", hash: data1),
+            (id: "id2", hash: data2),
+            (id: "id3", hash: data3)
+        ]
+
+        let pairs = await hasher.findCandidatePairs(features: features)
+
+        // 少なくとも1つのペアが生成されること
+        #expect(pairs.count >= 1)
+
+        // ペアに重複がないこと
+        let pairSet = Set(pairs.map { "\($0.0)|\($0.1)" })
+        #expect(pairSet.count == pairs.count)
+    }
+
+    // MARK: - 2048次元用ヘルパーメソッド
+
+    /// 2048次元のテスト用特徴量データを生成（VNFeaturePrint互換）
+    private func createFeatureData2048(seed: Int = 0) -> Data {
+        var generator = TestRandomGenerator(seed: UInt64(seed))
+        let features: [Float] = (0..<2048).map { _ in
+            Float.random(in: -1...1, using: &generator)
+        }
+        return Data(bytes: features, count: features.count * MemoryLayout<Float>.stride)
+    }
+
+    /// 2048次元の類似した特徴量データを生成
+    private func createSimilarFeatureData2048(original: Data, noise: Float = 0.1) -> Data {
+        let originalFeatures = original.withUnsafeBytes { buffer -> [Float] in
+            guard let baseAddress = buffer.baseAddress else { return [] }
+            return Array(
+                UnsafeBufferPointer(
+                    start: baseAddress.assumingMemoryBound(to: Float.self),
+                    count: buffer.count / MemoryLayout<Float>.stride
+                )
+            )
+        }
+
+        var generator = TestRandomGenerator(seed: 12345)
+        let noisyFeatures: [Float] = originalFeatures.map { value in
+            value + Float.random(in: -noise...noise, using: &generator)
+        }
+
+        return Data(bytes: noisyFeatures, count: noisyFeatures.count * MemoryLayout<Float>.stride)
+    }
 }
 
 // MARK: - Supporting Types

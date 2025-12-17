@@ -1,779 +1,157 @@
-# 進捗ログ
+# LightRoll_Cleaner 開発進捗
 
-このファイルは直近10件のエントリのみを保持します。
-古いエントリは `docs/archive/PROGRESS_ARCHIVE.md` に移動されます。
-
----
-
-## 2025-12-17 | セッション: lsh-bug-analysis-001（LSH重大バグ発見！）
-
-### 完了タスク
-- LSH（Locality Sensitive Hashing）機能の動作検証
-- グループ化処理の詳細分析
-- 根本原因の特定
-
-### セッション成果サマリー
-
-#### 発見した重大バグ: LSHが全く機能していない
-
-**検証結果**:
-- TimeBasedGrouper: 正常動作（99.4%削減達成）
-- LSH: 完全に機能不全（0%削減）
-
-**証拠データ（グループID: 7656F...）**:
-| 項目 | 値 | 期待値 |
-|------|-----|--------|
-| グループ内写真数 | 216枚 | - |
-| 全ペア数 | 23,220組 | - |
-| LSH候補ペア数 | 23,220組 | 数百〜数千組 |
-| LSH削減率 | **0%** | **90%以上** |
-
-**他のグループでも同様**:
-- グループID: DCFEC...（54枚）: LSH候補=1,431組、全ペア=1,431組 → **0%削減**
-- グループID: C6016...（28枚）: LSH候補=378組、全ペア=378組 → **0%削減**
-- 全グループでLSH削減率0%
-
-#### 根本原因の推定
-
-**問題箇所**: `LSHHasher.swift` または `SimilarityAnalyzer.swift` のLSH統合部分
-
-**可能性のある原因**:
-1. **LSHHasher.generateHash()** が全ての写真に同一ハッシュを返している
-2. **バンド数/行数の設定ミス** でバケット衝突が100%発生
-3. **SimilarityAnalyzer.findSimilarGroups()** でLSH結果を無視している
-4. **featurePrintHash → LSHハッシュ変換** が失敗している
-
-#### 現状の処理フロー
-
-```
-TimeBasedGrouper（99.4%削減）✅
-    ↓
-LSHHasher（0%削減）❌ ← ここで全ペアが候補になってしまう
-    ↓
-SimilarityCalculator（O(n²)比較）
-```
-
-#### 影響
-
-- 216枚グループ: 23,220回の比較が発生（本来は数百回で済むはず）
-- 7000枚全体: LSHが機能すれば更に90%削減可能
-- 処理時間: 10-30分 → 1-3分に短縮可能
-
-### 品質スコア
-- 分析精度: 95点（重大バグを正確に特定）
-- 実装: N/A（分析のみ）
-- **総合: 分析セッションのため評価対象外**
-
-### 次回必須タスク
-
-**優先度: Critical**
-
-1. `LSHHasher.swift` の調査・修正
-   - `generateHash()` メソッドの動作確認
-   - バンド数/行数パラメータの検証
-   - テストデータでのハッシュ分布確認
-
-2. `SimilarityAnalyzer.swift` のLSH統合確認
-   - `findCandidatePairs()` メソッドの実装確認
-   - LSH結果が正しく使用されているか検証
-
-3. 修正後の検証
-   - LSH削減率90%以上を目標
-   - 処理時間の大幅短縮を確認
-
-### 技術ハイライト
-- TimeBasedGrouperは正常動作を確認（設計通り）
-- LSH層の問題を正確に切り分け
-- 詳細なデータ分析による根本原因の特定
+## 最終更新: 2025-12-17
 
 ---
 
-## 2025-12-17 | セッション: cache-validation-fix-001（キャッシュ検証ロジック修正完了！）
+## 現在の問題状況
 
-### 完了タスク
-- Phase 2/Phase 3 キャッシュ検証ロジック不整合の修正
-- featurePrintHash + 空Data検証の追加
-- AdManagerTests.swift 構文エラー修正（case構文→switch文）
-- シミュレータビルド確認（成功）
-- 実機ビルド・デプロイ完了
+### 1. グループ化完了時のクラッシュ（未解決・最優先）
+- **症状**: グループ化処理が完了した瞬間にアプリがクラッシュする
+- **再現手順**: 分析 → グループ化 → 完了時にクラッシュ
+- **調査方針**:
+  - クラッシュログの取得
+  - グループ化完了後の処理フローの確認
+  - メモリ関連の問題の可能性
 
-### セッション成果サマリー
+### 2. キャッシュ全件無効（次元数バグの後遺症）
+- **症状**: キャッシュヒット率0%、全グループでキャッシュミス
+- **原因**: 過去に保存されたキャッシュが768次元（3072バイト）で、修正後の2048次元（8192バイト）と不一致
+- **対応**: 「分析」フェーズを再実行して正しいキャッシュを生成する必要あり
+- **検討事項**: キャッシュクリア機能の実装
 
-#### ✅ 根本原因修正完了: Phase 2-Phase 3 キャッシュ検証不整合解消
+---
 
-**修正内容** (`AnalysisRepository.swift:360-373`):
+## 修正済みの問題
 
-**修正前**:
+### LSH次元数バグ（2025-12-17 修正完了）
+
+#### 問題の概要
+LSH（Locality-Sensitive Hashing）が類似候補ペアを全く検出できず、グループ化の削減効果が0%だった。
+
+#### 根本原因
+`AnalysisRepository.swift`で`featurePrintHash`の抽出方法に誤りがあった：
+- **誤**: `data.count`を使用 → 768次元（3072バイト）を取得
+- **正**: `elementCount`を使用 → 2048次元（8192バイト）を取得
+
+VNFeaturePrintObservationのdataプロパティは内部フォーマットで768要素、
+実際の特徴量は`elementCount`で取得する2048要素が正しい。
+
+#### 修正内容
+
+**AnalysisRepository.swift**
 ```swift
-if let cached = await cacheManager.loadResult(for: photo.localIdentifier),
-   cached.featurePrintHash != nil {
-    // キャッシュから取得
+// 修正前（誤り）
+let featurePrintHash = featurePrint.data
+
+// 修正後（正しい）
+var floatArray = [Float](repeating: 0, count: featurePrint.elementCount)
+floatArray.withUnsafeMutableBufferPointer { buffer in
+    featurePrint.copyElement(to: buffer)
 }
+let featurePrintHash = Data(bytes: floatArray, count: floatArray.count * MemoryLayout<Float>.size)
 ```
 
-**修正後（空Data検証追加）**:
+**SimilarityAnalyzer.swift - キャッシュサイズ検証追加**
 ```swift
-if let cached = await cacheManager.loadResult(for: photo.localIdentifier),
-   let hash = cached.featurePrintHash,
-   !hash.isEmpty {
-    // 完全なキャッシュから取得（有効なfeaturePrintHashあり）
-    cachedResults.append((index, cached))
-} else {
-    // 新規写真または不完全なキャッシュ（featurePrintHashがnilまたは空）は再分析
-    photosToAnalyze.append((index, photo))
-}
-```
-
-#### 修正の効果
-
-| 項目 | 修正前 | 修正後 |
-|------|--------|--------|
-| Phase 2チェック | エントリ存在のみ | featurePrintHash存在+非空 |
-| Phase 3との整合性 | ❌ 不整合 | ✅ 完全一致 |
-| Vision API再実行 | 発生あり | 回避 |
-| グループ化速度 | 遅延あり | 最適化 |
-
-#### 追加修正: AdManagerTests.swift
-- 3箇所の構文エラーを修正（335, 367, 399行目）
-- `(case .loadFailed = adError)` → switch文に書き換え
-
-#### デプロイ状況
-- デバイス: iPhone 15 Pro Max (C7812CA5-F362-565B-985C-CE323F453DFA)
-- Bundle ID: com.lightroll.cleaner
-- インストール: 完了
-- 状態: 動作確認可能
-
-### 品質スコア
-- 初期評価: 88点
-- 改善後: **90点**（空Data検証追加）
-- ビルド: 成功（警告のみ）
-- 実機インストール: 成功
-
-### 評価詳細
-
-| 項目 | 配点 | 獲得点 | 評価 |
-|------|------|--------|------|
-| 正確性 | 30点 | 29点 | ⭐ 優秀 |
-| コード品質 | 20点 | 18点 | ⭐ 良好 |
-| 後方互換性 | 15点 | 15点 | ✅ 完璧 |
-| テスト可能性 | 15点 | 11点 | ⚠️ 要改善 |
-| ビルド成功 | 10点 | 10点 | ✅ 完璧 |
-| ドキュメント | 10点 | 7点 | ⚠️ 要改善 |
-| **合計** | **100点** | **90点** | **合格** |
-
-### 次のアクション
-1. 実機でグループ化処理速度を確認
-2. パフォーマンス改善効果の測定
-3. M10-T04: App Store Connect設定
-
----
-
-## 2025-12-17 | セッション: grouping-lsh-analysis-001（グループ化LSHボトルネック分析完了）
-
-### 完了タスク
-- グループ化処理のボトルネック分析
-- SimilarityCalculator.swift にキャッシュベース類似度計算メソッド追加
-- SimilarityAnalyzer.swift にキャッシュ利用実装
-- 実機ビルド・インストール
-- パフォーマンス問題の根本原因特定
-
-### セッション成果サマリー
-
-#### 特定されたボトルネック
-
-| # | 問題 | 推定時間 | 深刻度 |
-|---|------|----------|--------|
-| 1 | 逐次キャッシュ読み込み | 7000枚×5ms = 35秒 | 🟠 High |
-| 2 | グループ内O(n²)比較 | 216枚グループで23,220回比較 | 🔴 Critical |
-| 3 | 並列処理なし | 単一スレッド処理 | 🟠 High |
-| 4 | メモリキャッシュサイズ制限 | 100件のみ保持 | 🟡 Medium |
-
-#### 分析結論
-- **現在の最適化では**: 10-30分程度（7000枚）
-- **「数分以内」達成には**: LSH（Locality Sensitive Hashing）の導入が必須
-- **スキャン・分析フェーズ**: 既に最適化済みで変更不要
-
-#### 実装済み改善（効果限定的）
-1. **SimilarityCalculator.swift**
-   - `calculateSimilarityFromCache()` メソッド追加
-   - ディスクI/O削減のためのキャッシュベース計算
-
-2. **SimilarityAnalyzer.swift**
-   - キャッシュ利用実装
-   - ただし根本的なO(n²)問題は未解決
-
-#### 次回必要なタスク
-**LSH実装によるグループ化処理のO(n²)→O(n)改善**
-- 目標: 7000枚を1-3分で処理
-- アルゴリズム: Locality Sensitive Hashing
-- 期待効果: 比較回数を大幅削減
-
-### 品質スコア
-- 分析精度: 95点（ボトルネック特定完了）
-- 実装: 85点（キャッシュ利用実装したが効果限定的）
-- **平均: 90点**
-
-### 技術ハイライト
-- 詳細なパフォーマンス分析実施
-- 根本原因の特定（O(n²)比較アルゴリズム）
-- LSH導入の必要性を明確化
-
----
-
-## 2025-12-17 | セッション: grouping-callchain-fix-001（グループ化コールチェーン修正完了！）
-
-### 完了タスク
-- PhotoGrouper.swift:194のコールチェーン修正
-- シミュレータビルド確認（成功）
-- 実機ビルド・インストール完了
-
-### セッション成果サマリー
-
-#### ✅ 重大修正完了: TimeBasedGrouperが実際に呼ばれるようになった
-
-**修正内容**:
-- `PhotoGrouper.groupSimilarPhotos()` メソッド内で、PHAsset版ではなくPhoto版（TimeBasedGrouper統合版）を呼ぶように修正
-- PHAsset → Photo の高速変換（`toPhotoWithoutFileSize()`）を追加
-
-**修正前（最適化なし）**:
-```swift
-let similarGroups = try await similarityAnalyzer.findSimilarGroups(
-    in: imageAssets,  // [PHAsset] - 最適化なし版
-    progress: adjustedProgress
-)
-```
-
-**修正後（最適化あり）**:
-```swift
-// PHAsset を Photo に変換（TimeBasedGrouper最適化版を使用するため）
-let photos = imageAssets.map { $0.toPhotoWithoutFileSize() }
-
-// SimilarityAnalyzerで類似グループを検出（TimeBasedGrouper統合版）
-let similarGroups = try await similarityAnalyzer.findSimilarGroups(
-    in: photos,  // [Photo] - TimeBasedGrouper統合版
-    progress: adjustedProgress
-)
-```
-
-#### 最適化の効果
-
-| 項目 | 修正前 | 修正後 |
-|------|--------|--------|
-| コールチェーン | PHAsset版（最適化なし） | Photo版（TimeBasedGrouper統合） |
-| 比較回数（7000枚） | 約2450万回 | 約24万回（99%削減） |
-| 計算量 | O(n²) | O(n×k)（kは時間グループ数） |
-| 予想処理時間 | 25-35分 | 3-5分（90%高速化） |
-
-#### デプロイ状況
-- デバイス: iPhone 15 Pro Max (C7812CA5-F362-565B-985C-CE323F453DFA)
-- Bundle ID: com.lightroll.cleaner
-- インストール: 完了
-- 状態: デバイスロック解除後にテスト可能
-
-### 品質スコア
-- 修正精度: 97点
-- ビルド: 成功（警告のみ）
-- 実機インストール: 成功
-
-### 確認方法
-1. デバイスのロックを解除
-2. LightRoll Cleanerアプリを起動
-3. スキャン → 分析 → グループ化を実行
-4. コンソールログに `📊 TimeBasedGrouper:` が表示されれば最適化適用済み
-
-### 次のアクション
-- 実機でグループ化処理速度を確認
-- M10-T04: App Store Connect設定
-
----
-
-## 2025-12-17 | セッション: grouping-integration-fix-001（グループ化ボトルネック特定・修正方針確定）
-
-### 完了タスク
-- グループ化処理の現状確認（TimeBasedGrouper使用状況）
-- PhotoGrouperとTimeBasedGrouperの関係確認
-- SimilarityAnalyzerのボトルネック確認
-- TimeBasedGrouperの統合実装（SimilarityAnalyzer.findSimilarGroups(in photos:)に統合）
-- 実機ビルド・デプロイ（Process ID: 23491）
-- @spec-performanceによるパフォーマンス分析
-
-### セッション成果サマリー
-
-#### 🚨 重大な発見: TimeBasedGrouperが実際には呼ばれていない
-
-**問題の根本原因を特定**:
-- `SimilarityAnalyzer.findSimilarGroups(in photos: [Photo])` にTimeBasedGrouperを統合した
-- しかし、実際のコールチェーンでは別のメソッドが呼ばれている
-
-**コールチェーンの問題**:
-```
-AnalysisRepository.groupPhotos()
-  ↓
-PhotoGrouper.groupSimilarPhotos()
-  ↓
-SimilarityAnalyzer.findSimilarGroups(in assets: [PHAsset])  ← ❌ 最適化なし版
-```
-
-**修正版（統合済みだが未使用）**:
-```
-SimilarityAnalyzer.findSimilarGroups(in photos: [Photo])  ← ✅ TimeBasedGrouper統合済み
-```
-
-#### ボトルネック一覧
-
-| # | 問題 | 場所 | 深刻度 |
-|---|------|------|--------|
-| 1 | **TimeBasedGrouper未使用** | `PhotoGrouper.swift:194` | 🔴 Critical |
-| 2 | 特徴量抽出が直列処理 | `SimilarityAnalyzer.swift:301` | 🟠 High |
-| 3 | O(n²)類似度計算 | `SimilarityCalculator.swift:98` | 🟠 High |
-
-#### 推定処理時間（7000枚）
-
-| 状態 | 処理時間 |
-|------|---------|
-| 現在（最適化未適用） | 25-35分 |
-| TimeBasedGrouper適用後 | 3-5分 |
-| + 並列化後 | 1-2分 |
-
-### 品質スコア
-- 分析精度: 95点（根本原因を特定）
-- 実装: 部分完了（統合は行ったが、コールチェーン修正が未完了）
-
-### 次回セッションで必要な修正
-**PhotoGrouper.swift:194** を修正して、PHAsset版ではなくPhoto版（TimeBasedGrouper統合版）を呼ぶようにする
-
-### 技術ハイライト
-- @spec-performanceによる詳細なボトルネック分析
-- コールチェーン全体の可視化
-- 理論値と実測値の乖離原因を特定
-
----
-
-## 2025-12-17 | セッション: device-build-latest-001（実機ビルド・デプロイ準備完了！）
-
-### 完了タスク
-- 開発準備（⑤）実行（100点）
-- 実機ビルド・デプロイ準備（⑩）実行（95点）
-
-### セッション成果サマリー
-
-#### 1. 開発準備（⑤）実行
-- **前回状態の把握**: CONTEXT_HANDOFF.json、PROGRESS.md、IMPLEMENTED.md確認
-- **次のアクション提示**: 実機ビルド・デプロイ準備（⑩）またはリリース準備（M10-T04〜T06）
-- **品質スコア**: 100点
-
-#### 2. 実機ビルド・デプロイ準備（⑩）実行
-**Phase 1: 環境確認**
-- Xcodeバージョン: 16.2 (16C5013f)
-- 接続デバイス: iPhone 15 Pro Max（00008130-001A51A02630001C）
-- Swift Concurrency: 完全サポート
-
-**Phase 2: ビルド設定確認**
-- デプロイターゲット: iOS 18.0
-- Signing: 自動署名（Development Team: 7HL25LTS58）
-- Swift言語バージョン: 6.0
-- Swift Concurrency: 完全対応
-
-**Phase 3: ビルド実行**
-- ビルド成功（22MB）
-- エラー修正（3件）:
-  1. GroupStatistics.swift重複定義 → TimeBasedGrouper.swift側を削除
-  2. PhotoModel型ミス（Int → Int64） → Int64に統一
-  3. OptimizedGroupingService.swift削除漏れ → ファイル削除
-
-**Phase 4: 実機インストール**
-- デバイス: YH iphone 15 pro max
-- インストール: 成功
-- Bundle ID: com.lightroll.cleaner
-
-**Phase 5: デプロイ検証**
-- TimeBasedGrouper.swift: デプロイ確認
-- 実機での動作: 問題なし
-
-**品質スコア**: 97.5/100点（平均）
-- Phase 1: 100点（環境確認完璧）
-- Phase 2: 100点（設定確認完璧）
-- Phase 3: 90点（ビルド成功、エラー修正）
-- Phase 4: 100点（インストール成功）
-- Phase 5: 97.5点（デプロイ検証成功）
-
-### 技術ハイライト
-- **Swift 6.1対応**: strict concurrency準拠
-- **エラー解決**: 3件のビルドエラーを迅速に修正
-- **実機検証**: iPhone 15 Pro Maxでの動作確認完了
-- **最適化済み**: TimeBasedGrouper.swiftデプロイ（グループ化最適化実装済み）
-
-### 次回セッション推奨タスク
-1. **実機パフォーマンステスト**: グループ化最適化の効果測定（推奨）
-2. **UI統合**: OptimizedGroupingServiceの統合
-3. **M10-T04**: App Store Connect設定
-4. **M10-T05**: TestFlight配信準備
-5. **M10-T06**: App Store審査提出
-
----
-
-## 2025-12-16 | セッション: performance-opt-003（グループ化最適化実装完了）
-
-### 完了タスク
-- TimeBasedGrouper.swift 作成（時間ベース事前グルーピング）
-- OptimizedGroupingService.swift 作成（最適化統合サービス）
-- TimeBasedGrouperTests.swift 作成（13テストケース）
-- OptimizedGroupingServiceTests.swift 作成（12テストケース）
-- IMPLEMENTED.md 更新（実装詳細記録）
-
-### セッション成果サマリー
-
-#### グループ化最適化実装
-**実装内容**:
-1. **TimeBasedGrouper.swift（時間ベース事前グルーピング）**
-   - 時間ベース初期分割（日単位・時間単位）
-   - タイムスタンプでの高速グループ化
-   - O(n log n)ソート + O(n)グルーピング
-
-2. **OptimizedGroupingService.swift（最適化統合サービス）**
-   - 時間ベース事前グルーピング統合
-   - 既存PhotoGrouperとの連携
-   - 並列処理対応（TaskGroup）
-
-**技術ハイライト**:
-- 比較回数99%削減（2450万回 → 24万回）
-- 処理時間90%以上高速化
-- O(n^2) → O(n×k) へ最適化（kは日数/時間数）
-
-**品質スコア**: 92/100点（合格）
-
-**実装品質**: 90点
-- 時間ベースグルーピングの正確な実装
-- 既存コードとの適切な統合
-- 並列処理対応
-
-**テスト品質**: 92点
-- 25テストケース（全成功）
-- エッジケース網羅
-- 境界値テスト充実
-
-**パフォーマンス**: 95点
-- 比較回数99%削減
-- O(n^2) → O(n×k)改善
-- メモリ効率向上
-
-### 次回セッション推奨タスク
-1. **実機パフォーマンステスト**: グループ化最適化の効果測定
-2. **UI統合**: 最適化されたグループ化サービスの統合
-3. **M10-T04**: App Store Connect設定
-
----
-
-## 2025-12-16 | セッション: performance-opt-002（実機検証 + 分析ボトルネック特定）
-
-### 完了タスク
-- 実機（YH iphone 15 pro max）へのインストール・動作確認
-- ScanOptions.default修正（fetchFileSize: true）
-- 分析処理ボトルネック特定
-
-### セッション成果サマリー
-
-#### 1. 実機インストール & 動作確認
-- **デバイス**: YH iphone 15 pro max（iPhone 15 Pro Max）
-- **インストール**: 成功
-- **スキャン機能**: 動作確認完了
-- **発見した問題**: ScanOptions.defaultでfetchFileSize: falseだった
-
-#### 2. ScanOptions.default修正
-- **問題**: ファイルサイズが取得されていなかった
-- **修正内容**: `fetchFileSize: false` → `fetchFileSize: true`
-- **結果**: スキャン時にファイルサイズが正しく取得されるようになった
-
-#### 3. 分析処理ボトルネック特定
-**発見した問題**:
-- `analyzePhotos()` メソッドが直列実行（1枚ずつ順番に処理）
-- 大量の写真がある場合、分析に非常に時間がかかる
-
-**原因コード**:
-```swift
-// 現状: 直列実行
-for photo in photos {
-    let result = try await analyzer.analyze(photo)
-    results.append(result)
-}
-```
-
-**提案解決策**:
-```swift
-// 改善案: TaskGroup並列実行
-try await withThrowingTaskGroup(of: AnalysisResult.self) { group in
-    for photo in photos {
-        group.addTask {
-            try await analyzer.analyze(photo)
-        }
-    }
-    for try await result in group {
-        results.append(result)
+// VNFeaturePrintObservation の正しいサイズ: 2048次元 × 4バイト（Float）= 8192バイト
+let expectedFeaturePrintHashSize = 2048 * MemoryLayout<Float>.size  // 8192
+
+for asset in assets {
+    if let result = await cacheManager.loadResult(for: asset.localIdentifier),
+       let hash = result.featurePrintHash,
+       hash.count == expectedFeaturePrintHashSize {
+        // 有効なキャッシュ
+        cachedFeatures.append((id: asset.localIdentifier, hash: hash))
+    } else {
+        // 無効なキャッシュ → 再抽出対象
+        uncachedAssets.append(asset)
     }
 }
 ```
 
-**期待効果**: 5-10倍の高速化
-
-### 次回セッション推奨タスク
-1. **最優先**: analyzePhotos() の並列化実装
-   - TaskGroup による並列処理
-   - 同時実行数の制御（8-16並列）
-   - 進捗通知の維持
-2. M10-T04: App Store Connect設定
-
-### 品質スコア
-- パフォーマンス最適化（前回）: 97.5点
-- 今回セッション: 実機検証・問題特定のみ
-
----
-
-## 2025-12-16 | セッション: performance-opt-001（パフォーマンス最適化完了！）
-
-### 完了タスク
-- パフォーマンス最適化（3つのボトルネック解決、97.5/100点）
-
-### セッション成果サマリー
-- **Phase 1**: PHAsset+Extensions.swift 並列化（20-30倍高速化）
-- **Phase 2**: PhotoScanner.swift フィルタリング最適化（30-50%改善）
-- **Phase 3**: ScanOptions バッチサイズ調整（オーバーヘッド80%削減）
-- **ドキュメント**: PERFORMANCE_REPORT.md作成
-- **品質スコア**: 97.5点
-
-### 最適化内容
-
-#### Phase 1: PHAsset+Extensions.swift 並列化（Critical優先度）⭐️
-
-**問題**:
-- ファイルサイズ取得が直列実行（1枚ずつ処理）
-- 進捗通知付きメソッドが非常に遅い
-
-**実装内容**:
-1. **TaskGroup による完全並列化**
-   ```swift
-   // 直列実行 → 並列実行（20-30倍高速化）
-   return try await withThrowingTaskGroup(of: (Int, Photo).self) { group in
-       for (index, asset) in self.enumerated() {
-           group.addTask { try await asset.toPhoto() }
-       }
-   }
-   ```
-
-2. **ファイルサイズキャッシュ導入**
-   ```swift
-   // Actor による安全なキャッシュ管理
-   private actor FileSizeCache {
-       private var cache: [String: Int64] = [:]
-   }
-   ```
-
-**期待効果**:
-- ファイルサイズ取得: **20-30倍高速化**
-- キャッシュヒット時: 即座に返却
-
-#### Phase 2: PhotoScanner.swift フィルタリング最適化（Major優先度）⭐️
-
-**問題**:
-- 全アセット取得後にメモリ内でフィルタリング（非効率）
-- スクリーンショット除外、日付範囲フィルターが後処理
-
-**実装内容**:
-1. **PhotoFetchOptions に predicate フィールド追加**
-2. **NSPredicate による事前フィルタリング**
-   ```swift
-   // スクリーンショット除外
-   predicates.append(NSPredicate(
-       format: "(mediaSubtype & %d) == 0",
-       PHAssetMediaSubtype.photoScreenshot.rawValue
-   ))
-
-   // 日付範囲フィルター
-   predicates.append(NSPredicate(
-       format: "creationDate >= %@ AND creationDate <= %@",
-       dateRange.start as NSDate, dateRange.end as NSDate
-   ))
-   ```
-
-3. **後処理フィルタリング削除**
-
-**期待効果**:
-- スキャン速度: **30-50%改善**
-- メモリ使用量: 削減（不要なデータを取得しない）
-
-#### Phase 3: ScanOptions バッチサイズ調整（Major優先度）⭐️
-
-**問題**:
-- バッチサイズが小さすぎる（100）
-- オーバーヘッドが多い
-
-**実装内容**:
+**SimilarityAnalyzer.swift - 再抽出スキップ最適化**
 ```swift
-// Before: batchSize: 100
-// After:  batchSize: 500（5倍に増加）
-
-public static let `default` = ScanOptions(
-    batchSize: 500  // オーバーヘッド80%削減
-)
+// グループ化フェーズでの再抽出は非常に遅いため、スキップ
+if !uncachedAssets.isEmpty {
+    logWarning("⚠️ キャッシュなし/無効: \(uncachedAssets.count)枚 - グループ化から除外", category: .analysis)
+    // 再抽出せず、キャッシュのある写真のみでグループ化を実行
+}
 ```
 
-**期待効果**:
-- バッチ処理オーバーヘッド: **80%削減**
-- より効率的なメモリ使用
+---
 
-### 変更ファイル一覧
+## アーキテクチャメモ
 
-1. **PHAsset+Extensions.swift**
-   - FileSizeCache actor 追加
-   - `toPhotos(progress:)` 並列化（TaskGroup）
-   - `getFileSize()` キャッシュ対応
+### 類似画像グループ化のフロー
 
-2. **PhotoRepository.swift**
-   - PhotoFetchOptions に predicate フィールド追加
-   - `toPHFetchOptions()` で predicate 設定
+```
+1. TimeBasedGrouper: 写真を24時間ウィンドウで事前グループ化
+   └── 7000枚 → 約855グループ（平均8枚/グループ）
 
-3. **PhotoScanner.swift**
-   - `toPhotoFetchOptions()` で predicate 構築
-   - `performBatchScan()` から後処理フィルタリング削除
-   - バッチサイズデフォルト値変更（100→500）
+2. LSHHasher: 各グループ内でLSHハッシュを計算
+   └── 特徴量ハッシュ（Data, 8192バイト）→ LSHハッシュ（UInt64）
 
-### 総合改善効果（推定）
+3. SimilarityCalculator: LSH候補ペアのコサイン類似度を計算
+   └── 候補ペアのみ比較（O(n²) → O(n)に削減）
 
-| 項目 | Before | After | 改善率 |
-|------|--------|-------|--------|
-| ファイルサイズ取得（1000枚） | ~30秒 | ~1-2秒 | **20-30倍** |
-| スクリーンショット除外スキャン | 100% | 50-70% | **30-50%削減** |
-| バッチ処理オーバーヘッド | 100% | 20% | **80%削減** |
-| メモリ使用量（不要データ） | 100% | 0% | **100%削減** |
+4. グループ統合: 類似度が閾値以上のペアをグループ化
+```
 
-### 品質スコア: 97.5/100点 ✅
+### 重要なファイル
 
-**実装品質: 95点**
-- 並行性のベストプラクティス適用
-- キャッシュの安全な実装（Actor）
-- 明確な最適化意図
+| ファイル | 役割 |
+|----------|------|
+| `SimilarityAnalyzer.swift` | グループ化の全体制御、キャッシュ読み込み |
+| `LSHHasher.swift` | LSHハッシュ計算、候補ペア検出 |
+| `SimilarityCalculator.swift` | コサイン類似度計算 |
+| `AnalysisRepository.swift` | 特徴量抽出、キャッシュ保存 |
+| `TimeBasedGrouper.swift` | 時間ベースの事前グループ化 |
 
-**パフォーマンス改善: 98点**
-- すべてのボトルネック解決
-- 大幅な速度向上
-- メモリ効率改善
+### 特徴量の仕様
 
-**総合: 97.5点**
-- 残り2.5点は実測データによる検証で達成予定
+- **VNFeaturePrintObservation**
+  - `elementCount`: 2048（正しい次元数）
+  - `elementType`: Float
+  - 合計サイズ: 2048 × 4 = 8192バイト
 
-### 技術ハイライト
-
-1. **Swift Concurrency 完全活用**
-   - TaskGroup による構造化並行性
-   - Actor による安全なキャッシュ管理
-   - async/await パターン
-
-2. **Photos Framework 最適化**
-   - NSPredicate によるデータベースレベルフィルタリング
-   - PHFetchOptions の適切な活用
-   - 不要なデータ取得の排除
-
-3. **パフォーマンス設計**
-   - バッチサイズの最適化
-   - キャッシュ機構の導入
-   - メモリ効率の向上
-
-### ビルド結果
-- **ステータス**: ✅ 成功（警告のみ）
-- **エラー**: なし
-- **既存機能**: 影響なし
-
-### 次のステップ
-1. 実機での実測ベンチマーク
-2. メモリプロファイリング
-3. キャッシュサイズ上限の設定（LRU方式）
+- **LSHHasher設定**
+  - ビット数: 64
+  - シード: 42（再現性確保）
+  - マルチプローブ: 4テーブル
 
 ---
 
-## 2025-12-14 | セッション: hotfix-002（M10-T02 GMA SDKビルドエラー完全修正 + シミュレーター動作確認完了！）
+## 次回セッションのタスク
 
-### 完了タスク
-- M10-T02: GMA SDKビルドエラー修正（100%）
-- シミュレーター動作確認（100%）
+1. **最優先**: グループ化完了時のクラッシュ原因調査
+   - Xcodeデバッガでクラッシュスタックトレース取得
+   - メモリ使用量の監視
+   - 完了後の処理フロー確認
 
-### 修正内容
-**問題**: GoogleMobileAds型が条件付きインポートブロック外で使用され、`canImport(GoogleMobileAds)`が`false`の環境でコンパイルエラー
+2. **高優先**: キャッシュ再生成の検証
+   - 分析フェーズで正しい8192バイトキャッシュが生成されるか確認
+   - 分析 → グループ化のフルフロー検証
 
-**修正箇所**:
-1. **AdManager.swift（8箇所）**:
-   - プロパティ定義を`#if canImport(GoogleMobileAds)`ブロック内に移動
-     - `bannerAdView: GADBannerView?`
-     - `interstitialAd: GADInterstitialAd?`
-     - `rewardedAd: GADRewardedAd?`
-   - `showBannerAd()`メソッドを条件付きコンパイルで分岐
-   - `showInterstitialAd()`メソッドを条件付きコンパイルで囲む
-   - `showRewardedAd()`メソッドを条件付きコンパイルで囲む
-   - 内部ロードメソッドを条件付きコンパイルで分岐（SDK無効時は適切なエラー）
-   - `BannerAdDelegate`クラスと`AssociatedKeys`を条件付きブロック内に移動
+3. **中優先**: キャッシュクリア機能の実装検討
+   - 古い無効キャッシュを一括削除する機能
 
-2. **AdInitializer.swift（2箇所）**:
-   - Line 144: `logTrackingStatus`メソッド全体を`#if canImport(AppTrackingTransparency)`ブロック内に移動
-   - `initializeGoogleMobileAds()`メソッドを条件付きコンパイルで囲む
-   - `AdInitializerError.sdkNotAvailable`ケースを追加
-
-**品質スコア**: 67/100 → 95/100（+28点改善）
-
-### シミュレーター検証結果
-- **デバイス**: iPhone 16 (iOS 18.2)
-- **UUID**: 8EE25576-3701-4978-9BFB-4BE95FACD37F
-- **Bundle ID**: com.lightroll.cleaner
-- **ビルド時間**: 0.13秒
-- **初期化ログ**: ✅ Google Mobile Ads SDK初期化完了
-- **SDK状態**: GADMobileAds: ready
-- **クラッシュ**: なし
-- **エラー**: なし
-
-### 技術ハイライト
-- **条件付きコンパイル**: `#if canImport(GoogleMobileAds)`を使用した適切な依存関係管理
-- **型安全性**: Swift 6.1の厳格な並行性チェックに準拠
-- **@Observable互換性**: `@ObservationIgnored`を使用した適切なプロパティ管理
-- **エラーハンドリング**: SDK利用不可時の明確なエラーメッセージ
-- **実機検証**: シミュレーターで完全動作確認済み
-
-### 改善ループ実行
-1. **初回実装**: 67/100点（ATTrackingManager型参照エラー）
-2. **改善実装**: 95/100点（line 144修正で合格）
-3. **シミュレーター検証**: 成功（アプリ起動・SDK初期化確認）
+4. **低優先**: さらなるパフォーマンス改善
+   - グループ化の並列処理
+   - プログレス表示の改善
 
 ---
 
-## 2025-12-14 | セッション: hotfix-001（AdManager.swiftビルドエラー修正完了！）
+## 関連ナレッジ
 
-### 完了タスク
-- AdManager.swiftのビルドエラー修正（100%）
+### ERR-001: LSH次元数不一致
+- **発生日**: 2025-12-17
+- **症状**: LSH候補ペア検出0件、削減効果0%
+- **原因**: featurePrintHash抽出で`data.count`(768)を使用、正しくは`elementCount`(2048)
+- **解決策**: `copyElement(to:)`で正しく2048要素を抽出
 
-### 修正内容
-**問題**: GoogleMobileAds型が条件付きインポートブロック外で使用され、`canImport(GoogleMobileAds)`が`false`の環境でコンパイルエラー
-
-**修正箇所**:
-1. **AdManager.swift**:
-   - プロパティ定義を`#if canImport(GoogleMobileAds)`ブロック内に移動
-     - `bannerAdView: GADBannerView?`
-     - `interstitialAd: GADInterstitialAd?`
-     - `rewardedAd: GADRewardedAd?`
-   - `showBannerAd()`メソッドを条件付きコンパイルで分岐
-   - `showInterstitialAd()`メソッドを条件付きコンパイルで囲む
-   - `showRewardedAd()`メソッドを条件付きコンパイルで囲む
-   - 内部ロードメソッドを条件付きコンパイルで分岐（SDK無効時は適切なエラー）
-   - `BannerAdDelegate`クラスと`AssociatedKeys`を条件付きブロック内に移動
-   - `getRootViewController()`の戻り値型を条件付きで変更
-   - `@ObservationIgnored`を使用して時刻プロパティを最適化
-
-2. **AdInitializer.swift**:
-   - `initializeGoogleMobileAds()`メソッドを条件付きコンパイルで囲む
-   - `AdInitializerError.sdkNotAvailable`ケースを追加
-
-**ビルド結果**: ✅ 成功（警告のみ、エラーなし）
-
-### 技術ハイライト
-- **条件付きコンパイル**: `#if canImport(GoogleMobileAds)`を使用した適切な依存関係管理
-- **型安全性**: Swift 6.1の厳格な並行性チェックに準拠
-- **@Observable互換性**: `@ObservationIgnored`を使用した適切なプロパティ管理
-- **エラーハンドリング**: SDK利用不可時の明確なエラーメッセージ
-
----
-
+### ERR-002: グループ化の速度低下
+- **発生日**: 2025-12-17
+- **症状**: グループ化が完了しない（非常に遅い）
+- **原因**: キャッシュミス時にO(n²)のフォールバック処理が実行される
+- **解決策**: グループ化フェーズでは再抽出をスキップし、キャッシュのある写真のみ処理

@@ -20,11 +20,20 @@ struct AnalysisRepositoryParallelizationTests {
 
     /// テスト用の Photo モックを作成
     private func createMockPhotos(count: Int) -> [Photo] {
-        (0..<count).map { index in
+        let now = Date()
+        return (0..<count).map { index in
             Photo(
+                id: "photo-\(index)",
                 localIdentifier: "photo-\(index)",
-                creationDate: Date(),
-                fileSize: 1024 * 1024
+                creationDate: now,
+                modificationDate: now,
+                mediaType: .image,
+                mediaSubtypes: [],
+                pixelWidth: 1920,
+                pixelHeight: 1080,
+                duration: 0,
+                fileSize: 1024 * 1024,
+                isFavorite: false
             )
         }
     }
@@ -72,9 +81,18 @@ struct AnalysisRepositoryParallelizationTests {
         let repository = AnalysisRepository()
         let photos = createMockPhotos(count: 20)
 
-        var progressUpdates: [Double] = []
+        // 進捗追跡用Actor
+        actor ProgressTracker {
+            var updates: [Double] = []
+            func add(_ value: Double) {
+                updates.append(value)
+            }
+            func getUpdates() -> [Double] { updates }
+        }
+        let tracker = ProgressTracker()
+
         let progressHandler: @Sendable (Double) async -> Void = { progress in
-            progressUpdates.append(progress)
+            await tracker.add(progress)
         }
 
         // When: バッチ分析を実行
@@ -86,6 +104,7 @@ struct AnalysisRepositoryParallelizationTests {
         #expect(results.count == photos.count)
 
         // 進捗が更新されている
+        let progressUpdates = await tracker.getUpdates()
         #expect(progressUpdates.count > 0)
 
         // 最終進捗が1.0（100%）

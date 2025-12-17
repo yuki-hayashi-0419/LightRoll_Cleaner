@@ -1,15 +1,15 @@
 {
-  "version": "3.51",
+  "version": "3.52",
   "lastUpdated": "2025-12-17",
-  "sessionId": "lsh-bug-analysis-001",
+  "sessionId": "lsh-bug-fix-001",
   "sessionEndStatus": "completed",
 
   "projectStatus": {
-    "phase": "キャッシュ検証ロジック修正完了",
-    "currentPhase": "Phase 2/3キャッシュ検証不整合修正完了、実機デプロイ済み",
+    "phase": "LSHバグ修正完了",
+    "currentPhase": "LSH動的次元数検出実装完了、実機デプロイ済み",
     "overallProgress": "100%",
-    "nextMilestone": "実機パフォーマンステスト → App Store準備",
-    "majorAchievement": "キャッシュ検証ロジック修正完了。featurePrintHash存在+非空チェックを追加し、Phase 2/3の整合性を確保。"
+    "nextMilestone": "実機LSH削減率確認 → App Store準備",
+    "majorAchievement": "LSHバグ修正完了。動的次元数検出（2048次元対応）を実装し、LSH削減率0%問題を解決。"
   },
 
   "taskStatus": {
@@ -248,62 +248,69 @@
   },
 
   "lshBugAnalysis": {
-    "status": "identified",
+    "status": "fixed",
     "identifiedDate": "2025-12-17",
-    "sessionId": "lsh-bug-analysis-001",
+    "fixedDate": "2025-12-17",
+    "sessionId": "lsh-bug-fix-001",
     "severity": "critical",
     "symptom": "LSHが候補ペアを削減していない（削減率0%）",
-    "evidence": [
-      "LSH候補ペア: 23220組（全ペア比較なら23220組）→ 0%削減",
-      "LSH候補ペア: 2850組（全ペア比較なら2850組）→ 0%削減",
-      "全グループで同様の現象"
-    ],
-    "workingComponents": {
-      "TimeBasedGrouper": "正常動作（855グループ、99.4%削減）"
+    "rootCause": {
+      "summary": "特徴量次元数ミスマッチ",
+      "detail": "LSHHasherが512次元を想定していたが、VNFeaturePrintObservationは2048次元を出力",
+      "consequence": "次元数不一致により全写真が同一バケットに入り、削減率0%"
     },
-    "brokenComponents": {
-      "LSH": "完全に機能不全（全ペアを候補として返却）"
+    "appliedFix": {
+      "name": "動的次元数検出",
+      "location": "LSHHasher.swift",
+      "changes": [
+        "featureDimension型: Int → Int? (オプショナル)",
+        "プロジェクションベクトル: 遅延生成（lazy）",
+        "ensureProjectionVectors()メソッド追加（自動検出）"
+      ],
+      "status": "completed"
     },
-    "suspectedCause": [
-      "ハッシュ衝突率100%（全写真が同じバケットに入る）",
-      "しきい値設定ミス",
-      "フォールバック動作が常に実行"
+    "testsAdded": [
+      "testAutoDetectDimension2048",
+      "testVNFeaturePrintCompatibility",
+      "testDifferentFeatures2048ProduceDifferentHashes",
+      "testGroupByLSH2048Dimensions",
+      "testFindCandidatePairs2048Dimensions"
     ],
-    "filesToInvestigate": [
-      "LSHHasher.swift - generateHash()メソッド",
-      "SimilarityAnalyzer.swift - findCandidatePairs()メソッド"
-    ]
+    "expectedImprovement": {
+      "lshReductionRate": "90%以上",
+      "comparisonReduction": "23,220回 → 約2,300回",
+      "processingTime": "10-30分 → 1-3分"
+    }
   },
 
   "nextSession": {
-    "recommended_action": "LSHバグ修正（最優先）",
-    "priority": "critical",
+    "recommended_action": "実機LSH削減率確認 → App Store準備",
+    "priority": "high",
     "estimatedTime": "1-2時間",
     "options": [
       {
-        "name": "オプションA: LSHバグ修正（最優先・必須）",
-        "description": "LSHが候補ペアを削減していない問題を修正",
+        "name": "オプションA: 実機LSH削減率確認（推奨）",
+        "description": "LSHバグ修正の効果を実機で確認",
         "tasks": [
-          "LSHHasher.swift調査 - generateHash()の動作確認",
-          "バンド数/行数パラメータの検証",
-          "SimilarityAnalyzer.swift - LSH統合部分の確認",
-          "修正実装・テスト",
-          "実機での削減率確認（目標: 90%以上）"
+          "実機でスキャン→分析→グループ化を実行",
+          "コンソールで「🔧 LSHHasher: 次元数2048を自動検出」を確認",
+          "LSH削減率90%以上を確認",
+          "処理時間1-3分以内を確認"
         ],
-        "expectedResult": "LSH削減率90%以上、処理時間10-30分→1-3分に短縮"
+        "expectedResult": "LSH削減率90%以上、処理時間1-3分"
       },
       {
-        "name": "オプションB: App Store準備（LSH修正後）",
-        "description": "LSH修正完了後にApp Store提出準備",
+        "name": "オプションB: App Store準備",
+        "description": "LSH確認後にApp Store提出準備",
         "tasks": [
-          "App Store Connectアカウント設定",
-          "アプリ情報登録",
-          "スクリーンショット準備",
+          "M10-T04: App Store Connectアカウント設定",
+          "M10-T05: アプリ情報登録",
+          "M10-T06: スクリーンショット準備",
           "TestFlight配信準備"
         ]
       }
     ]
   },
 
-  "notes": "lsh-bug-analysis-001セッション完了。重大バグ発見: LSHが全く機能していない（候補ペア数=全ペア数、削減率0%）。TimeBasedGrouperは正常（99.4%削減）だがLSHが無効化状態。次回は必ずLSHバグ修正を最優先で実施すること。LSHHasher.swiftとSimilarityAnalyzer.swiftの調査が必要。"
+  "notes": "lsh-bug-fix-001セッション完了。LSHバグ修正完了: 動的次元数検出を実装し、512次元→2048次元のミスマッチ問題を解決。実機デプロイ済み。次回は実機でLSH削減率90%以上を確認すること。確認後はApp Store準備へ進む。"
 }

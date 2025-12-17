@@ -11,40 +11,80 @@ import Foundation
 /// - 7000枚: 350,000比較 → 約7,000回ハッシュ計算 + α比較（98%削減）
 /// - ハッシュ計算: O(n×d) (d = 特徴量次元数)
 /// - バケット内比較: O(n×k) (k = バケットサイズ平均、k << n)
+///
+/// ## 次元数対応
+/// - featureDimension = nil の場合、最初の特徴量から自動検出
+/// - VNFeaturePrintObservation は通常2048次元
 public actor LSHHasher: Sendable {
     // MARK: - Properties
 
     /// ハッシュビット数（調整可能）
     private let numberOfBits: Int
 
-    /// ランダム射影ベクトル（再現性のためシード固定）
-    private let projectionVectors: [[Float]]
+    /// ランダム射影ベクトル（遅延生成）
+    private var projectionVectors: [[Float]]?
 
-    /// 特徴量の次元数（CLIP特徴量は512次元）
-    private let featureDimension: Int
+    /// 特徴量の次元数（nil時は自動検出）
+    private var featureDimension: Int?
+
+    /// ランダムシード（再現性確保）
+    private let seed: UInt64
 
     // MARK: - Initialization
 
     /// LSHHasherを初期化
     /// - Parameters:
     ///   - numberOfBits: ハッシュビット数（デフォルト: 64）
-    ///   - featureDimension: 特徴量の次元数（デフォルト: 512、CLIP特徴量）
+    ///   - featureDimension: 特徴量の次元数（nil時は自動検出、VNFeaturePrintは2048）
     ///   - seed: ランダム射影ベクトル生成のシード値（再現性確保）
     public init(
         numberOfBits: Int = 64,
-        featureDimension: Int = 512,
+        featureDimension: Int? = nil,
         seed: UInt64 = 42
     ) {
         self.numberOfBits = numberOfBits
         self.featureDimension = featureDimension
+        self.seed = seed
 
-        // ランダム射影ベクトルを生成（シード固定で再現性確保）
+        // featureDimensionが指定されている場合は即座にプロジェクションベクトルを生成
+        if let dimension = featureDimension {
+            self.projectionVectors = Self.generateProjectionVectors(
+                numberOfBits: numberOfBits,
+                featureDimension: dimension,
+                seed: seed
+            )
+        } else {
+            self.projectionVectors = nil
+        }
+    }
+
+    // MARK: - Private Methods
+
+    /// プロジェクションベクトルを生成（静的メソッド）
+    private static func generateProjectionVectors(
+        numberOfBits: Int,
+        featureDimension: Int,
+        seed: UInt64
+    ) -> [[Float]] {
         var generator = SeededRandomNumberGenerator(seed: seed)
-        self.projectionVectors = (0..<numberOfBits).map { _ in
+        return (0..<numberOfBits).map { _ in
             (0..<featureDimension).map { _ in
                 Float.random(in: -1...1, using: &generator)
             }
         }
+    }
+
+    /// 必要に応じてプロジェクションベクトルを初期化（actor内で状態変更）
+    private func ensureProjectionVectors(for dimension: Int) {
+        guard projectionVectors == nil else { return }
+
+        featureDimension = dimension
+        projectionVectors = Self.generateProjectionVectors(
+            numberOfBits: numberOfBits,
+            featureDimension: dimension,
+            seed: seed
+        )
+        logInfo("🔧 LSHHasher: 次元数\(dimension)を自動検出、プロジェクションベクトル生成完了", category: .analysis)
     }
 
     // MARK: - Public Methods
@@ -66,15 +106,28 @@ public actor LSHHasher: Sendable {
             )
         }
 
-        // 次元数チェック
-        guard features.count == featureDimension else {
+        // 空の特徴量は0を返す
+        guard !features.isEmpty else {
+            return 0
+        }
+
+        // 動的次元数検出: プロジェクションベクトルが未初期化なら生成
+        if projectionVectors == nil {
+            ensureProjectionVectors(for: features.count)
+        }
+
+        // 次元数チェック（初期化後）
+        guard let currentDimension = featureDimension,
+              features.count == currentDimension,
+              let vectors = projectionVectors else {
             // 次元数が異なる場合は0を返す（エラーハンドリング）
+            logWarning("⚠️ LSHHasher: 次元数不一致 (expected: \(featureDimension ?? -1), actual: \(features.count))", category: .analysis)
             return 0
         }
 
         // 各射影ベクトルとの内積を計算してビットを生成
         var hash: UInt64 = 0
-        for (index, projectionVector) in projectionVectors.enumerated() {
+        for (index, projectionVector) in vectors.enumerated() {
             // 内積計算: dot(features, projectionVector)
             let dotProduct = zip(features, projectionVector)
                 .map { $0 * $1 }

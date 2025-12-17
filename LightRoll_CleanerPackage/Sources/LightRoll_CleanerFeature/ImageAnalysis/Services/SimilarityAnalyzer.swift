@@ -137,7 +137,7 @@ public actor SimilarityAnalyzer {
 
         // 統計情報をログ出力（デバッグ用）
         let stats = await timeBasedGrouper.getGroupStatistics(groups: timeGroups)
-        print("📊 TimeBasedGrouper: \(timeGroups.count)グループ, 平均\(Int(stats.avgGroupSize))枚/グループ, 比較削減率\(String(format: "%.1f", stats.comparisonReductionRate * 100))%")
+        logInfo("📊 TimeBasedGrouper: \(timeGroups.count)グループ, 平均\(Int(stats.avgGroupSize))枚/グループ, 比較削減率\(String(format: "%.1f", stats.comparisonReductionRate * 100))%", category: .analysis)
 
         // 空のグループを除外
         let nonEmptyGroups = timeGroups.filter { !$0.isEmpty }
@@ -180,7 +180,7 @@ public actor SimilarityAnalyzer {
             allSimilarGroups.append(contentsOf: groupResults)
             processedPhotos += timeGroup.count
 
-            print("  ⏱️ グループ\(groupIndex + 1)/\(nonEmptyGroups.count): \(timeGroup.count)枚処理, \(groupResults.count)類似グループ検出")
+            logDebug("  ⏱️ グループ\(groupIndex + 1)/\(nonEmptyGroups.count): \(timeGroup.count)枚処理, \(groupResults.count)類似グループ検出", category: .analysis)
         }
 
         await progress?(1.0)
@@ -216,11 +216,24 @@ public actor SimilarityAnalyzer {
         var cachedFeatures: [(id: String, hash: Data)] = []
         var uncachedAssets: [PHAsset] = []
 
+        // VNFeaturePrintObservation の正しいサイズ: 2048次元 × 4バイト（Float）= 8192バイト
+        let expectedFeaturePrintHashSize = 2048 * MemoryLayout<Float>.size  // 8192
+        var invalidCacheCount = 0
+
         for asset in assets {
             if let result = await cacheManager.loadResult(for: asset.localIdentifier),
-               let hash = result.featurePrintHash {
+               let hash = result.featurePrintHash,
+               hash.count == expectedFeaturePrintHashSize {
+                // 有効なキャッシュ（正しいサイズのfeaturePrintHashあり）
                 cachedFeatures.append((id: asset.localIdentifier, hash: hash))
+            } else if let result = await cacheManager.loadResult(for: asset.localIdentifier),
+                      let hash = result.featurePrintHash,
+                      hash.count != expectedFeaturePrintHashSize {
+                // 無効なキャッシュ（サイズ不正）→ 再抽出対象
+                invalidCacheCount += 1
+                uncachedAssets.append(asset)
             } else {
+                // キャッシュなし → 再抽出対象
                 uncachedAssets.append(asset)
             }
         }
@@ -229,7 +242,10 @@ public actor SimilarityAnalyzer {
 
         // キャッシュヒット率をログ出力
         let cacheHitRate = Double(cachedFeatures.count) / Double(assets.count) * 100
-        print("    💾 キャッシュヒット: \(cachedFeatures.count)/\(assets.count) (\(String(format: "%.1f", cacheHitRate))%)")
+        logDebug("    💾 キャッシュヒット: \(cachedFeatures.count)/\(assets.count) (\(String(format: "%.1f", cacheHitRate))%)", category: .analysis)
+        if invalidCacheCount > 0 {
+            logWarning("    ⚠️ 無効キャッシュ検出: \(invalidCacheCount)件（サイズ不正、再分析必要）", category: .analysis)
+        }
 
         // フェーズ2: LSHで候補ペアを絞り込み（進捗 0.2〜0.4 of this group）
         let lshEnd = progressRange.start + progressDelta * 0.4
@@ -238,7 +254,7 @@ public actor SimilarityAnalyzer {
         if !cachedFeatures.isEmpty {
             // LSHで高速候補ペア検出
             candidatePairs = await lshHasher.findCandidatePairs(features: cachedFeatures)
-            print("    🔍 LSH候補ペア: \(candidatePairs.count)組（全ペア比較なら\(cachedFeatures.count * (cachedFeatures.count - 1) / 2)組）")
+            logInfo("    🔍 LSH候補ペア: \(candidatePairs.count)組（全ペア比較なら\(cachedFeatures.count * (cachedFeatures.count - 1) / 2)組）", category: .analysis)
         }
 
         await progress?(lshEnd)
@@ -260,26 +276,20 @@ public actor SimilarityAnalyzer {
 
         await progress?(similarPairsEnd)
 
-        // フェーズ3: キャッシュにない写真の特徴量を抽出（進捗 0.7〜0.9 of this group）
-        // 注: ほとんどの場合キャッシュにヒットするため、ここは実行されないことが多い
+        // フェーズ3: キャッシュにない写真の処理
+        // 【最適化】グループ化フェーズでの再抽出は非常に遅いため、スキップする
+        // キャッシュが無効な写真は分析フェーズで再処理する必要がある
         if !uncachedAssets.isEmpty {
-            print("    ⚠️ キャッシュミス: \(uncachedAssets.count)枚を再抽出")
-            let extractionEnd = progressRange.start + progressDelta * 0.9
-            let observations = try await extractFeaturePrints(
-                from: uncachedAssets,
-                progressRange: (similarPairsEnd, extractionEnd),
-                progress: progress
-            )
+            let uncachedRate = Double(uncachedAssets.count) / Double(assets.count) * 100
+            logWarning("    ⚠️ キャッシュなし/無効: \(uncachedAssets.count)枚 (\(String(format: "%.1f", uncachedRate))%) - グループ化から除外", category: .analysis)
 
-            // キャッシュにない写真の類似ペアを検出
-            let uncachedPairs = try await similarityCalculator.findSimilarPairs(
-                in: observations,
-                threshold: options.similarityThreshold
-            )
-            allSimilarPairs.append(contentsOf: uncachedPairs)
-            allIds.append(contentsOf: observations.map { $0.id })
+            if uncachedRate > 50 {
+                logWarning("    🔴 キャッシュヒット率が低すぎます。「分析」を先に実行してください。", category: .analysis)
+            }
 
-            await progress?(extractionEnd)
+            // 【重要】再抽出はスキップし、キャッシュ済みの写真のみでグループ化を続行
+            // 再抽出 + O(n²)比較は非常に遅いため、グループ化フェーズでは行わない
+            // uncachedAssets の写真は今回のグループ化には含まれない
         }
 
         // フェーズ4: グループ化（進捗 0.9〜1.0 of this group）
