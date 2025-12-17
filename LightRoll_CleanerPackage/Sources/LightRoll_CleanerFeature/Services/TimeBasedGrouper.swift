@@ -1,4 +1,5 @@
 import Foundation
+import Photos
 
 /// 時間ベースで写真を事前グルーピングするサービス
 /// 大量の写真の類似度計算を最適化するため、時間的に近い写真のみを比較対象にする
@@ -15,18 +16,18 @@ public actor TimeBasedGrouper {
     /// 写真を撮影時刻でソートし、時間範囲ごとにグループ化
     /// - Parameter photos: グループ化する写真の配列
     /// - Returns: 時間範囲ごとにグループ化された写真の配列
-    public func groupByTime(photos: [PhotoModel]) -> [[PhotoModel]] {
+    public func groupByTime(photos: [Photo]) -> [[Photo]] {
         guard !photos.isEmpty else { return [] }
 
         // 撮影日時でソート
-        let sortedPhotos = photos.sorted { $0.capturedDate < $1.capturedDate }
+        let sortedPhotos = photos.sorted { $0.creationDate < $1.creationDate }
 
-        var groups: [[PhotoModel]] = []
-        var currentGroup: [PhotoModel] = [sortedPhotos[0]]
-        var groupStartTime = sortedPhotos[0].capturedDate
+        var groups: [[Photo]] = []
+        var currentGroup: [Photo] = [sortedPhotos[0]]
+        var groupStartTime = sortedPhotos[0].creationDate
 
         for photo in sortedPhotos.dropFirst() {
-            let timeDifference = photo.capturedDate.timeIntervalSince(groupStartTime)
+            let timeDifference = photo.creationDate.timeIntervalSince(groupStartTime)
 
             if timeDifference <= timeWindow {
                 // 同じ時間範囲内ならグループに追加
@@ -35,7 +36,7 @@ public actor TimeBasedGrouper {
                 // 時間範囲を超えたら新しいグループ開始
                 groups.append(currentGroup)
                 currentGroup = [photo]
-                groupStartTime = photo.capturedDate
+                groupStartTime = photo.creationDate
             }
         }
 
@@ -50,7 +51,7 @@ public actor TimeBasedGrouper {
     /// グループ統計情報を取得
     /// - Parameter groups: 分析するグループの配列
     /// - Returns: グループ数、最小/最大/平均サイズ、総比較回数削減率
-    public func getGroupStatistics(groups: [[PhotoModel]]) -> GroupStatistics {
+    public func getGroupStatistics(groups: [[Photo]]) -> GroupingStatistics {
         let groupCount = groups.count
         let sizes = groups.map { $0.count }
         let minSize = sizes.min() ?? 0
@@ -65,7 +66,7 @@ public actor TimeBasedGrouper {
             ? Double(originalComparisons - optimizedComparisons) / Double(originalComparisons)
             : 0
 
-        return GroupStatistics(
+        return GroupingStatistics(
             groupCount: groupCount,
             minGroupSize: minSize,
             maxGroupSize: maxSize,
@@ -76,7 +77,7 @@ public actor TimeBasedGrouper {
 }
 
 /// グループ統計情報
-public struct GroupStatistics: Sendable {
+public struct GroupingStatistics: Sendable {
     public let groupCount: Int
     public let minGroupSize: Int
     public let maxGroupSize: Int

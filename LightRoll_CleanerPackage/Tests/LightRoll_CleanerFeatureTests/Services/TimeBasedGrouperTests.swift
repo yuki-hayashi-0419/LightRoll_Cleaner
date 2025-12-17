@@ -8,18 +8,20 @@ struct TimeBasedGrouperTests {
 
     // MARK: - Helper
 
-    /// テスト用の PhotoModel を作成
-    private func makePhoto(id: String, capturedDate: Date, fileSize: Int64 = 1000) -> PhotoModel {
-        PhotoModel(
+    /// テスト用の Photo を作成
+    private func makePhoto(id: String, capturedDate: Date, fileSize: Int64 = 1000) -> Photo {
+        Photo(
             id: id,
-            fileName: "\(id).jpg",
-            filePath: "/test/\(id).jpg",
+            localIdentifier: id,
+            creationDate: capturedDate,
+            modificationDate: capturedDate,
+            mediaType: .image,
+            mediaSubtypes: MediaSubtypes(),
+            pixelWidth: 1920,
+            pixelHeight: 1080,
+            duration: 0,
             fileSize: fileSize,
-            capturedDate: capturedDate,
-            modifiedDate: capturedDate,
-            width: 1920,
-            height: 1080,
-            orientation: .up
+            isFavorite: false
         )
     }
 
@@ -136,7 +138,7 @@ struct TimeBasedGrouperTests {
         let baseDate = Date()
 
         // 100枚の写真を10日間に分散（各日10枚）
-        var photos: [PhotoModel] = []
+        var photos: [Photo] = []
         for day in 0..<10 {
             for hour in 0..<10 {
                 let date = baseDate.addingTimeInterval(Double(day * 24 * 3600 + hour * 3600))
