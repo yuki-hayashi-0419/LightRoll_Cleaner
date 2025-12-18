@@ -4,6 +4,124 @@
 
 ---
 
+## 2025-12-18 セッション④: ui-integration-fix-001（終了）
+
+### セッション概要
+- **セッションID**: ui-integration-fix-001
+- **実施内容**: DashboardNavigationContainer.taskブロック修正 + 実機テスト
+- **品質スコア**: 90点（コード実装完了）
+- **終了理由**: 実機テストで未解決の問題発見、ユーザー指示で次セッションへ延期
+
+### 完了したタスク
+
+#### 1. DashboardNavigationContainer.swift修正（完了）
+- **箇所**: DashboardNavigationContainer.swift:110-120（.taskブロック）
+- **問題**: .taskが未実装でcurrentGroupsが常に空配列
+- **修正内容**:
+  - `scanPhotosUseCase.loadSavedGroups()`でcurrentGroupsを読み込み
+  - hasSavedGroups()で存在確認後に読み込み
+  - try-catchで適切なエラーハンドリング
+- **コード品質**: 90点
+
+#### 2. ビルド検証（完了）
+- Swift Packageビルド: 成功
+- コンパイルエラー: なし
+- 実機デプロイ: 成功（YH iphone 15 pro max）
+
+### 未解決の問題（CRITICAL - 次セッション必須）
+
+#### 問題1: ナビゲーションがホームに戻る（P0）
+- **症状**: 「グループを確認」ボタンをタップするとホーム画面に戻る
+- **期待動作**: GroupListViewが表示されるべき
+- **推定原因**:
+  - DashboardRouter.navigateToGroupList()の問題
+  - NavigationStack.pathの状態管理問題
+  - NavigationDestinationの設定ミス
+
+#### 問題2: 2回目タップでクラッシュ（P0）
+- **症状**: 同じボタンを2回タップするとアプリがクラッシュ
+- **推定原因**:
+  - 状態破損（corrupted state）
+  - NavigationPath操作の競合
+  - ビュー再生成時のメモリ問題
+
+### 調査が必要な箇所
+
+1. **DashboardRouter.swift**
+   - `navigateToGroupList()`の実装
+   - NavigationPathへの追加処理
+
+2. **NavigationStack設定**
+   - .navigationDestination(for:)の設定
+   - パス管理の整合性
+
+3. **デバイスログ取得方法**
+   ```bash
+   # Xcodeでログキャプチャを開始
+   xcodebuildmcp: start_device_log_cap bundleId="com.example.LightRollCleaner"
+
+   # クラッシュを再現
+   # ログキャプチャを停止して分析
+   xcodebuildmcp: stop_device_log_cap logSessionId="SESSION_ID"
+   ```
+
+### アーキテクチャ観点での分析（spec-architect）
+
+#### コード品質評価（90/100点）
+| 観点 | スコア | 詳細 |
+|------|--------|------|
+| データフロー | 25/25 | @Stateで自動UI更新、適切な状態管理 |
+| エラーハンドリング | 20/25 | try-catch実装、エラー時の安全なフォールバック |
+| コード品質 | 20/20 | async/await、@MainActor適切使用、Swift 6準拠 |
+| SwiftUI統合 | 15/15 | .taskモディファイア適切使用、ライフサイクル管理 |
+| ドキュメント | 10/15 | コメント追加済み、改善余地あり |
+
+#### アーキテクチャ上の懸念点
+
+1. **NavigationStack状態管理の複雑性**
+   - DashboardRouter が @Observable で path を管理
+   - NavigationStack(path: $router.path) でバインディング
+   - 下位Viewでのpath変更がSwiftUI再描画サイクルに影響する可能性
+
+2. **データフロー分離**
+   - currentGroups: DashboardNavigationContainer の @State
+   - HomeViewでのスキャン結果との同期経路が不明確
+   - GroupListViewへのprops渡しで参照が古くなる可能性
+
+3. **技術的負債候補**
+   - router.onNavigateToSettings クロージャのキャプチャ
+   - DashboardDestination enum の Hashable 実装確認必要
+   - GroupListView初期化時の例外処理
+
+#### 次セッション技術的推奨事項
+
+**デバッグ手順**:
+```swift
+// router.path変更の監視追加（DashboardNavigationContainer.body）
+.onChange(of: router.path) { oldValue, newValue in
+    print("🧭 NavigationPath changed:")
+    print("   old: \(oldValue)")
+    print("   new: \(newValue)")
+}
+```
+
+**確認ポイント**:
+1. `router.navigateToGroupList(filterType:)` 呼び出し確認
+2. `path.append(.groupList)` 後のpath状態
+3. `.navigationDestination` でのマッチング確認
+4. `destinationView(for:)` の呼び出し確認
+
+### 生成・更新ドキュメント
+
+| ファイル | 内容 |
+|----------|------|
+| INTEGRATION_ANALYSIS_REPORT.md | 分析結果と修正内容（更新） |
+| SESSION_SUMMARY_ui-integration-fix-001.md | セッションサマリー（新規） |
+| PROGRESS.md | 進捗記録（本更新） |
+| CONTEXT_HANDOFF.json | 引き継ぎ情報（更新予定） |
+
+---
+
 ## 2025-12-18 セッション③: race-condition-fix-001（終了）
 
 ### セッション概要

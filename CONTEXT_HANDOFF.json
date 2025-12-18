@@ -1,39 +1,42 @@
 {
-  "version": "3.55",
+  "version": "3.56",
   "lastUpdated": "2025-12-18",
-  "sessionId": "race-condition-fix-001",
-  "sessionEndStatus": "partial",
+  "sessionId": "ui-integration-fix-001",
+  "sessionEndStatus": "blocked",
 
   "projectStatus": {
-    "phase": "レースコンディション修正完了 + PhotoGroup永続化実装中",
-    "currentPhase": "PhotoGroup永続化の完全統合待ち",
+    "phase": "ナビゲーション統合問題（P0）発見・分析完了",
+    "currentPhase": "P0バグ修正待ち → PhotoGroup永続化",
     "overallProgress": "95%",
-    "nextMilestone": "PhotoGroup永続化完成 → 実機パフォーマンステスト",
-    "majorAchievement": "HomeView.swiftのレースコンディションバグ修正完了（UIフリーズ解消）。PhotoGroupRepository.swift作成（JSONベース永続化）。SIMD最適化は前セッションで実装済み（95点）。"
+    "nextMilestone": "ナビゲーション修正 → PhotoGroup永続化 → 実機テスト",
+    "majorAchievement": "DashboardRouter統合の根本原因特定完了。race-condition-fix-001でHomeViewレースコンディション修正済み（UIフリーズ解消）。PhotoGroupRepository.swift作成済み（JSONベース永続化）。SIMD最適化完了（95点）。"
   },
 
   "taskStatus": {
-    "total": 132,
+    "total": 138,
     "completed": 130,
     "skipped": 5,
     "merged": 1,
-    "inProgress": 2,
-    "pending": 0,
-    "completedHours": 216,
-    "remainingHours": 3,
-    "lastCompletedTaskId": "race-condition-fix-001",
+    "inProgress": 0,
+    "pending": 6,
+    "blockedP0": 2,
+    "completedHours": 218,
+    "remainingHours": 5,
+    "lastCompletedTaskId": "ui-integration-fix-001",
     "nextTaskCandidates": [
-      "PhotoGroup永続化の完全統合",
-      "アプリ起動時のグループ読み込み実装",
-      "実機パフォーマンステスト（レースコンディション修正後）"
+      "【P0】「グループを確認」ボタンがホームに戻る問題の修正",
+      "【P0】2回目タップ時のクラッシュ修正",
+      "DashboardRouter.swift の詳細レビュー",
+      "NavigationStack path デバッグ",
+      "PhotoGroup永続化の完全統合（P0修正後）"
     ]
   },
 
   "contextOptimization": {
     "optimizedDate": "2025-12-18",
-    "lastOptimizationSession": "race-condition-fix-001",
+    "lastOptimizationSession": "ui-integration-fix-001",
     "progressEntries": {
-      "before": 2,
+      "before": 3,
       "after": 3,
       "archived": 0
     },
@@ -41,17 +44,18 @@
       "archivedModules": ["M9"],
       "totalArchived": 29
     },
-    "documentWhitelist": "全ファイル準拠確認済み",
-    "contextSizeReduction": "維持",
+    "documentWhitelist": "全ファイル準拠確認済み（SESSION_SUMMARY 2件、INTEGRATION_ANALYSIS_REPORT 1件）",
+    "contextSizeReduction": "維持（アーカイブ不要）",
     "reducedSize": "N/A"
   },
 
   "resumeInstructions": {
-    "step1": "PROGRESS.md確認: race-condition-fix-001セッション結果を確認（レースコンディション修正完了、85点）",
-    "step2": "PhotoGroup永続化統合: AnalysisRepository.groupPhotos()に保存処理追加、loadGroups()メソッド実装",
-    "step3": "アプリ起動時のグループ読み込み: HomeView.onAppearでグループ復元処理追加",
-    "step4": "実機テスト: レースコンディション修正後の動作確認 + グループ化処理時間計測",
-    "context": "SIMD最適化は前セッションで完了済み（SimilarityCalculator.swift実装済み、95点）。本セッションでHomeViewのレースコンディションバグを修正（UIフリーズ解消）。PhotoGroupRepository.swift作成済みだが、AnalysisRepositoryへの完全統合とアプリ起動時の読み込み処理が未完了。"
+    "step1": "【最優先】P0バグ修正: docs/INTEGRATION_ANALYSIS_REPORT.md の根本原因レポート確認",
+    "step2": "DashboardRouter.swift レビュー: navigateToGroupList()とNavigationStack path管理の検証",
+    "step3": "実機デバッグ: 「グループを確認」ボタンタップ時のログ取得、クラッシュ再現テスト",
+    "step4": "P0修正後: PhotoGroup永続化統合（AnalysisRepository.groupPhotos()保存処理追加）",
+    "step5": "最終確認: 実機パフォーマンステスト（レースコンディション修正 + SIMD最適化効果測定）",
+    "context": "【重要】ui-integration-fix-001でナビゲーション統合のP0バグを発見・分析完了。DashboardRouter.navigateToGroupList()がホームに戻る問題と2回目タップでクラッシュする問題を特定。修正なしでセッション終了（根本原因特定のみ完了）。SIMD最適化完了済み（95点）、HomeViewレースコンディション修正済み（85点）。PhotoGroupRepository.swift作成済みだが統合は未完了。"
   },
 
   "groupingPerformanceIssue": {
@@ -203,33 +207,49 @@
   },
 
   "nextSession": {
-    "recommended_action": "PhotoGroup永続化の完全統合",
-    "priority": "high",
+    "recommended_action": "P0ナビゲーション問題の修正",
+    "priority": "P0 - CRITICAL",
     "estimatedTime": "30分-1時間",
     "tasks": [
       {
-        "name": "AnalysisRepository.groupPhotos()に保存処理追加",
-        "description": "グループ化完了後にPhotoGroupRepository.saveGroups()を呼び出す",
-        "priority": 1
+        "name": "【P0】DashboardRouterのナビゲーション調査・修正",
+        "description": "navigateToGroupList()がホームに戻る問題を調査。NavigationPath管理、DashboardDestination定義を確認",
+        "priority": 1,
+        "files": ["DashboardRouter.swift", "DashboardNavigationContainer.swift"]
       },
       {
-        "name": "AnalysisRepository.loadGroups()メソッド実装",
-        "description": "PhotoGroupRepositoryからグループを読み込む",
-        "priority": 2
+        "name": "【P0】2回目タップ時のクラッシュ修正",
+        "description": "クラッシュログを取得し、状態破損・競合の原因を特定",
+        "priority": 2,
+        "debugMethod": "start_device_log_cap → 問題再現 → stop_device_log_cap"
       },
       {
-        "name": "HomeView起動時のグループ復元",
-        "description": "onAppearでloadGroups()を呼び出し、前回のグループを復元",
+        "name": "動作確認・リグレッションテスト",
+        "description": "修正後、グループリスト表示・詳細画面遷移・削除機能を検証",
         "priority": 3
       },
       {
-        "name": "実機パフォーマンステスト",
-        "description": "レースコンディション修正とSIMD最適化の効果確認",
+        "name": "P1: PhotoGroup永続化統合（P0完了後）",
+        "description": "AnalysisRepository.groupPhotos()に保存処理追加",
         "priority": 4
       }
     ],
-    "newFiles": {
-      "PhotoGroupRepository": "LightRoll_CleanerPackage/Sources/LightRoll_CleanerFeature/ImageAnalysis/Repositories/PhotoGroupRepository.swift"
+    "completedInThisSession": {
+      "DashboardNavigationContainerTaskFix": {
+        "file": "DashboardNavigationContainer.swift",
+        "lines": "110-120",
+        "change": ".taskブロックでscanPhotosUseCase.loadSavedGroups()呼び出し追加",
+        "qualityScore": 90,
+        "buildStatus": "成功",
+        "deployStatus": "成功（YH iphone 15 pro max）",
+        "functionalStatus": "失敗（ナビゲーション問題発覚）"
+      }
+    },
+    "relatedFiles": {
+      "DashboardRouter": "LightRoll_CleanerPackage/Sources/LightRoll_CleanerFeature/Dashboard/Navigation/DashboardRouter.swift",
+      "DashboardNavigationContainer": "LightRoll_CleanerPackage/Sources/LightRoll_CleanerFeature/Dashboard/Navigation/DashboardNavigationContainer.swift",
+      "GroupListView": "LightRoll_CleanerPackage/Sources/LightRoll_CleanerFeature/GroupList/Views/GroupListView.swift",
+      "AnalysisReport": "docs/INTEGRATION_ANALYSIS_REPORT.md"
     }
   },
 
@@ -260,5 +280,42 @@
     ]
   },
 
-  "notes": "race-condition-fix-001セッション終了。HomeViewのレースコンディション修正完了（await progressTask.result追加）。PhotoGroupRepository.swift新規作成。AnalysisRepositoryへの統合は部分完了。SIMD最適化は前セッションで完了済み（95点）。次回はPhotoGroup永続化の完全統合と実機テストを実施予定。"
+  "uiIntegrationIssue": {
+    "status": "identified",
+    "identifiedDate": "2025-12-18",
+    "fixedDate": null,
+    "qualityScore": null,
+    "severity": "critical_p0",
+    "symptoms": [
+      "「グループを確認」ボタンタップでHomeViewに戻る",
+      "2回目タップでアプリクラッシュ（App not running）"
+    ],
+    "rootCause": {
+      "summary": "DashboardRouter.navigateToGroupList()の統合不完全",
+      "possibleCauses": [
+        "NavigationStack pathの更新タイミング問題",
+        "DashboardDestination.groupList caseの未定義",
+        "@Observable state管理の競合",
+        "ナビゲーション統合の実装漏れ"
+      ],
+      "analysisDocument": "docs/INTEGRATION_ANALYSIS_REPORT.md",
+      "relatedFiles": [
+        "LightRoll_CleanerPackage/Sources/LightRoll_CleanerFeature/Dashboard/ViewModels/DashboardRouter.swift",
+        "LightRoll_CleanerPackage/Sources/LightRoll_CleanerFeature/Dashboard/Views/HomeView.swift",
+        "LightRoll_CleanerPackage/Sources/LightRoll_CleanerFeature/Dashboard/Views/GroupListView.swift"
+      ]
+    },
+    "plannedFix": {
+      "step1": "DashboardRouter.swiftの詳細レビュー",
+      "step2": "NavigationStack path管理の検証",
+      "step3": "実機デバッグとログ取得",
+      "step4": "根本原因に基づく修正実装"
+    },
+    "expectedResult": {
+      "navigation": "「グループを確認」ボタンでGroupListViewへ正常遷移",
+      "stability": "複数回タップでもクラッシュしない"
+    }
+  },
+
+  "notes": "ui-integration-fix-001セッション終了。ナビゲーション統合のP0バグを発見・分析完了（修正は未実施）。根本原因レポートはdocs/INTEGRATION_ANALYSIS_REPORT.mdに記載。次回セッションでP0修正を最優先実施。race-condition-fix-001でHomeViewレースコンディション修正済み（85点）。PhotoGroupRepository.swift作成済みだが統合は部分完了。SIMD最適化完了済み（95点）。"
 }
