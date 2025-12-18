@@ -33,6 +33,9 @@ let package = Package(
             ],
             swiftSettings: [
                 .swiftLanguageMode(.v5)
+                // Swift 6モード: 将来の完全移行のため一旦無効化
+                // TODO: 全モジュールのSendable準拠を完了させてから.v6に移行
+                // 既に@Sendableは追加済み（getFileSizesメソッド）
             ]
         ),
         .testTarget(

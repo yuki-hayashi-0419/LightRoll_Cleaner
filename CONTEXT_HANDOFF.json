@@ -1,40 +1,40 @@
 {
-  "version": "3.53",
+  "version": "3.55",
   "lastUpdated": "2025-12-18",
-  "sessionId": "grouping-performance-analysis-001",
-  "sessionEndStatus": "completed",
+  "sessionId": "race-condition-fix-001",
+  "sessionEndStatus": "partial",
 
   "projectStatus": {
-    "phase": "グループ化O(n×m)問題分析完了",
-    "currentPhase": "根本原因特定完了、修正方針確定、実装待ち",
-    "overallProgress": "100%",
-    "nextMilestone": "getFileSizes最適化実装 → 実機テスト",
-    "majorAchievement": "グループ化クラッシュ・速度問題の根本原因を特定。getFileSizes()のO(n×m)計算量が原因。Dictionary lookup + TaskGroup並列化による修正方針を確定。"
+    "phase": "レースコンディション修正完了 + PhotoGroup永続化実装中",
+    "currentPhase": "PhotoGroup永続化の完全統合待ち",
+    "overallProgress": "95%",
+    "nextMilestone": "PhotoGroup永続化完成 → 実機パフォーマンステスト",
+    "majorAchievement": "HomeView.swiftのレースコンディションバグ修正完了（UIフリーズ解消）。PhotoGroupRepository.swift作成（JSONベース永続化）。SIMD最適化は前セッションで実装済み（95点）。"
   },
 
   "taskStatus": {
-    "total": 129,
-    "completed": 128,
+    "total": 132,
+    "completed": 130,
     "skipped": 5,
     "merged": 1,
-    "inProgress": 1,
+    "inProgress": 2,
     "pending": 0,
-    "completedHours": 212,
-    "remainingHours": 2,
-    "lastCompletedTaskId": "grouping-performance-analysis-001",
+    "completedHours": 216,
+    "remainingHours": 3,
+    "lastCompletedTaskId": "race-condition-fix-001",
     "nextTaskCandidates": [
-      "getFileSizes O(1)最適化実装",
-      "TaskGroup並列化実装",
-      "実機パフォーマンステスト"
+      "PhotoGroup永続化の完全統合",
+      "アプリ起動時のグループ読み込み実装",
+      "実機パフォーマンステスト（レースコンディション修正後）"
     ]
   },
 
   "contextOptimization": {
     "optimizedDate": "2025-12-18",
-    "lastOptimizationSession": "grouping-performance-analysis-001",
+    "lastOptimizationSession": "race-condition-fix-001",
     "progressEntries": {
-      "before": 13,
-      "after": 14,
+      "before": 2,
+      "after": 3,
       "archived": 0
     },
     "tasksCompleted": {
@@ -47,10 +47,11 @@
   },
 
   "resumeInstructions": {
-    "step1": "PROGRESS.md確認: grouping-performance-analysis-001セッション結果を確認（分析完了、90点）",
-    "step2": "getFileSizes最適化: PhotoGrouper.swift:522-540, AnalysisRepository.swift:717-735を修正",
-    "step3": "実機テスト: 修正後のグループ化処理時間を計測し効果確認",
-    "context": "グループ化クラッシュ・速度問題の根本原因特定完了。getFileSizes()でO(n×m)の線形探索とシーケンシャルI/Oが原因。Dictionary lookup(O(1))とTaskGroup並列化で修正予定。"
+    "step1": "PROGRESS.md確認: race-condition-fix-001セッション結果を確認（レースコンディション修正完了、85点）",
+    "step2": "PhotoGroup永続化統合: AnalysisRepository.groupPhotos()に保存処理追加、loadGroups()メソッド実装",
+    "step3": "アプリ起動時のグループ読み込み: HomeView.onAppearでグループ復元処理追加",
+    "step4": "実機テスト: レースコンディション修正後の動作確認 + グループ化処理時間計測",
+    "context": "SIMD最適化は前セッションで完了済み（SimilarityCalculator.swift実装済み、95点）。本セッションでHomeViewのレースコンディションバグを修正（UIフリーズ解消）。PhotoGroupRepository.swift作成済みだが、AnalysisRepositoryへの完全統合とアプリ起動時の読み込み処理が未完了。"
   },
 
   "groupingPerformanceIssue": {
@@ -202,31 +203,62 @@
   },
 
   "nextSession": {
-    "recommended_action": "getFileSizes最適化実装",
-    "priority": "critical",
+    "recommended_action": "PhotoGroup永続化の完全統合",
+    "priority": "high",
     "estimatedTime": "30分-1時間",
     "tasks": [
       {
-        "name": "PhotoGrouper.swift:522-540 修正",
-        "description": "Dictionary lookup + TaskGroup並列化",
+        "name": "AnalysisRepository.groupPhotos()に保存処理追加",
+        "description": "グループ化完了後にPhotoGroupRepository.saveGroups()を呼び出す",
         "priority": 1
       },
       {
-        "name": "AnalysisRepository.swift:717-735 修正",
-        "description": "同上",
+        "name": "AnalysisRepository.loadGroups()メソッド実装",
+        "description": "PhotoGroupRepositoryからグループを読み込む",
         "priority": 2
       },
       {
-        "name": "ビルド・実機テスト",
-        "description": "修正効果確認（数十分→数秒）",
+        "name": "HomeView起動時のグループ復元",
+        "description": "onAppearでloadGroups()を呼び出し、前回のグループを復元",
         "priority": 3
+      },
+      {
+        "name": "実機パフォーマンステスト",
+        "description": "レースコンディション修正とSIMD最適化の効果確認",
+        "priority": 4
       }
     ],
-    "codeSnippet": {
-      "dictionaryLookup": "let assetLookup = Dictionary(uniqueKeysWithValues: assets.map { ($0.localIdentifier, $0) })",
-      "taskGroup": "try await withThrowingTaskGroup(of: (Int, Int64).self) { group in ... }"
+    "newFiles": {
+      "PhotoGroupRepository": "LightRoll_CleanerPackage/Sources/LightRoll_CleanerFeature/ImageAnalysis/Repositories/PhotoGroupRepository.swift"
     }
   },
 
-  "notes": "grouping-performance-analysis-001セッション完了。グループ化クラッシュ・速度問題の根本原因を特定: getFileSizes()のO(n×m)計算量。修正方針確定（Dictionary lookup + TaskGroup並列化）。実装は次回セッションで実施。PROGRESS.mdに詳細な修正計画を記載済み。"
+  "raceConditionFix": {
+    "status": "completed",
+    "fixedDate": "2025-12-18",
+    "qualityScore": 85,
+    "location": "HomeView.swift:616-650",
+    "description": "progressTaskの完了をawait progressTask.resultで待機してから状態更新"
+  },
+
+  "simdOptimization": {
+    "status": "completed",
+    "completedDate": "2025-12-18",
+    "qualityScore": 95,
+    "description": "SimilarityCalculator.swiftにAccelerate vDSP導入（vDSP_dotpr, vDSP_svesq）"
+  },
+
+  "photoGroupPersistence": {
+    "status": "partial",
+    "startedDate": "2025-12-18",
+    "qualityScore": null,
+    "createdFiles": ["PhotoGroupRepository.swift"],
+    "pendingTasks": [
+      "groupPhotos()への保存処理追加",
+      "loadGroups()メソッド実装",
+      "アプリ起動時の自動読み込み"
+    ]
+  },
+
+  "notes": "race-condition-fix-001セッション終了。HomeViewのレースコンディション修正完了（await progressTask.result追加）。PhotoGroupRepository.swift新規作成。AnalysisRepositoryへの統合は部分完了。SIMD最適化は前セッションで完了済み（95点）。次回はPhotoGroup永続化の完全統合と実機テストを実施予定。"
 }

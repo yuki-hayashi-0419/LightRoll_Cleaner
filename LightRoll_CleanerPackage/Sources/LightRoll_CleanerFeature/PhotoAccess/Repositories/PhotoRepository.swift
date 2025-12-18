@@ -101,7 +101,7 @@ public enum PhotoRepositoryError: Error, Equatable, Sendable {
 // MARK: - FetchOptions
 
 /// 写真取得オプション
-public struct PhotoFetchOptions {
+public struct PhotoFetchOptions: @unchecked Sendable {
 
     /// ソート順序
     public enum SortOrder: Sendable {

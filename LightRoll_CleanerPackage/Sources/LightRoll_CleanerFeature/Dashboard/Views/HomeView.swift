@@ -615,7 +615,10 @@ public struct HomeView: View {
 
         do {
             let result = try await scanPhotosUseCase.execute()
+
+            // progressTaskの完了を待つ（レースコンディション回避）
             progressTask.cancel()
+            _ = await progressTask.result  // 完了を待機（成功/失敗を無視）
 
             // 結果を保存
             lastScanResult = result
@@ -624,13 +627,16 @@ public struct HomeView: View {
             await refreshData()
 
             viewState = .loaded
+            scanProgress = nil  // タスク完了後に状態をクリア
             showScanCompleteToast = true
 
             // 3秒後にトーストを非表示
             try? await Task.sleep(for: .seconds(3))
             showScanCompleteToast = false
         } catch {
+            // エラー時もprogressTaskの完了を待つ
             progressTask.cancel()
+            _ = await progressTask.result
 
             if case ScanPhotosUseCaseError.scanCancelled = error {
                 // キャンセルは正常終了
@@ -640,9 +646,8 @@ public struct HomeView: View {
                 showErrorAlert = true
                 viewState = .loaded
             }
+            scanProgress = nil  // エラー時も状態をクリア
         }
-
-        scanProgress = nil
     }
 
     /// スキャンをキャンセル

@@ -9,6 +9,7 @@
 
 import Foundation
 @preconcurrency import Vision
+import Accelerate
 
 // MARK: - SimilarityCalculator
 
@@ -115,6 +116,63 @@ public actor SimilarityCalculator {
         return Swift.max(0.0, Swift.min(1.0, normalizedSimilarity))
     }
 
+    /// Accelerate SIMDを使用した高速コサイン類似度計算
+    ///
+    /// キャッシュされた featurePrintHash を使用し、vDSP関数で高速計算を実行。
+    /// 通常版の `calculateSimilarityFromCache()` と比較して5-10倍の高速化が期待できる。
+    ///
+    /// - Parameters:
+    ///   - hash1: 1つ目の特徴量ハッシュ（8192バイト、Float配列として扱う）
+    ///   - hash2: 2つ目の特徴量ハッシュ（8192バイト、Float配列として扱う）
+    /// - Returns: 正規化されたコサイン類似度（0.0〜1.0）
+    /// - Throws: AnalysisError（データサイズ不一致またはゼロベクトルの場合）
+    public func calculateSimilarityFromCacheSIMD(
+        hash1: Data,
+        hash2: Data
+    ) throws -> Float {
+        // データサイズ検証
+        guard hash1.count == hash2.count, hash1.count > 0 else {
+            throw AnalysisError.similarityCalculationFailed
+        }
+
+        let count = hash1.count / MemoryLayout<Float>.size
+        guard count > 0 else {
+            throw AnalysisError.similarityCalculationFailed
+        }
+
+        return try hash1.withUnsafeBytes { ptr1 in
+            try hash2.withUnsafeBytes { ptr2 in
+                guard let floats1 = ptr1.bindMemory(to: Float.self).baseAddress else {
+                    throw AnalysisError.similarityCalculationFailed
+                }
+                guard let floats2 = ptr2.bindMemory(to: Float.self).baseAddress else {
+                    throw AnalysisError.similarityCalculationFailed
+                }
+
+                // SIMD dot product（内積計算）
+                var dotProduct: Float = 0
+                vDSP_dotpr(floats1, 1, floats2, 1, &dotProduct, vDSP_Length(count))
+
+                // SIMD sum of squares（二乗和計算）
+                var mag1: Float = 0
+                var mag2: Float = 0
+                vDSP_svesq(floats1, 1, &mag1, vDSP_Length(count))
+                vDSP_svesq(floats2, 1, &mag2, vDSP_Length(count))
+
+                // コサイン類似度計算
+                let denominator = sqrt(mag1) * sqrt(mag2)
+                guard denominator > Float.ulpOfOne else {
+                    throw AnalysisError.similarityCalculationFailed
+                }
+
+                let cosineSimilarity = dotProduct / denominator
+
+                // [-1, 1] → [0, 1]に正規化
+                return max(0.0, min(1.0, (cosineSimilarity + 1.0) / 2.0))
+            }
+        }
+    }
+
     /// キャッシュされた特徴量ハッシュから類似ペアを検出
     ///
     /// 分析フェーズで保存された featurePrintHash を使用して高速にペアを検出
@@ -199,8 +257,8 @@ public actor SimilarityCalculator {
                 continue
             }
 
-            // 類似度を計算
-            let similarity = try calculateSimilarityFromCache(
+            // 類似度をSIMD版で計算（高速化）
+            let similarity = try calculateSimilarityFromCacheSIMD(
                 hash1: hash1,
                 hash2: hash2
             )

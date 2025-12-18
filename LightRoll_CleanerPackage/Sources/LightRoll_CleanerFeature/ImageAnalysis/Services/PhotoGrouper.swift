@@ -523,20 +523,24 @@ public actor PhotoGrouper {
         for photoIds: [String],
         from assets: [PHAsset]
     ) async throws -> [Int64] {
-        var fileSizes: [Int64] = []
-        fileSizes.reserveCapacity(photoIds.count)
+        // O(m)で事前にDictionary構築（線形探索O(n×m)を回避）
+        let assetLookup = Dictionary(uniqueKeysWithValues: assets.map { ($0.localIdentifier, $0) })
 
-        for photoId in photoIds {
-            guard let asset = assets.first(where: { $0.localIdentifier == photoId }) else {
-                fileSizes.append(0)
-                continue
+        // TaskGroupで並列にファイルサイズを取得
+        return try await withThrowingTaskGroup(of: (Int, Int64).self) { group in
+            for (index, photoId) in photoIds.enumerated() {
+                group.addTask { @Sendable in
+                    let size = try await assetLookup[photoId]?.getFileSize() ?? 0
+                    return (index, size)
+                }
             }
-
-            let fileSize = try await asset.getFileSize()
-            fileSizes.append(fileSize)
+            var results = [(Int, Int64)]()
+            results.reserveCapacity(photoIds.count)
+            for try await result in group {
+                results.append(result)
+            }
+            return results.sorted { $0.0 < $1.0 }.map { $0.1 }
         }
-
-        return fileSizes
     }
 }
 

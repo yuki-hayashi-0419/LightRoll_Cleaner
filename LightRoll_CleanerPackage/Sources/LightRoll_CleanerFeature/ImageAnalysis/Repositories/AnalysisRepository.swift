@@ -162,6 +162,9 @@ public actor AnalysisRepository: ImageAnalysisRepositoryProtocol {
     /// 分析キャッシュマネージャー
     private let cacheManager: AnalysisCacheManager
 
+    /// PhotoGroup永続化リポジトリ
+    private let photoGroupRepository: PhotoGroupRepositoryProtocol
+
     // MARK: - Initialization
 
     /// イニシャライザ
@@ -177,6 +180,7 @@ public actor AnalysisRepository: ImageAnalysisRepositoryProtocol {
     ///   - photoGrouper: 写真グルーパー（省略時は新規作成）
     ///   - bestShotSelector: ベストショット選定器（省略時は新規作成）
     ///   - cacheManager: 分析キャッシュマネージャー（省略時は新規作成）
+    ///   - photoGroupRepository: PhotoGroup永続化リポジトリ（省略時は新規作成）
     ///   - options: リポジトリ設定オプション（省略時はデフォルト値）
     public init(
         visionRequestHandler: VisionRequestHandler? = nil,
@@ -189,6 +193,7 @@ public actor AnalysisRepository: ImageAnalysisRepositoryProtocol {
         photoGrouper: PhotoGrouper? = nil,
         bestShotSelector: BestShotSelector? = nil,
         cacheManager: AnalysisCacheManager? = nil,
+        photoGroupRepository: PhotoGroupRepositoryProtocol? = nil,
         options: AnalysisRepositoryOptions = AnalysisRepositoryOptions()
     ) {
         self.visionRequestHandler = visionRequestHandler ?? VisionRequestHandler()
@@ -201,6 +206,17 @@ public actor AnalysisRepository: ImageAnalysisRepositoryProtocol {
         self.photoGrouper = photoGrouper ?? PhotoGrouper()
         self.bestShotSelector = bestShotSelector ?? BestShotSelector()
         self.cacheManager = cacheManager ?? AnalysisCacheManager()
+
+        // PhotoGroupRepository のデフォルトインスタンス作成（失敗時は何もしないダミー実装）
+        if let repository = photoGroupRepository {
+            self.photoGroupRepository = repository
+        } else if let defaultRepository = try? FileSystemPhotoGroupRepository.makeDefault() {
+            self.photoGroupRepository = defaultRepository
+        } else {
+            // フォールバック: 何もしないダミーリポジトリ（エラーを避けるため）
+            self.photoGroupRepository = NoOpPhotoGroupRepository()
+        }
+
         self.options = options
     }
 
@@ -718,20 +734,24 @@ public actor AnalysisRepository: ImageAnalysisRepositoryProtocol {
         for photoIds: [String],
         from assets: [PHAsset]
     ) async throws -> [Int64] {
-        var fileSizes: [Int64] = []
-        fileSizes.reserveCapacity(photoIds.count)
+        // O(m)で事前にDictionary構築（線形探索O(n×m)を回避）
+        let assetLookup = Dictionary(uniqueKeysWithValues: assets.map { ($0.localIdentifier, $0) })
 
-        for photoId in photoIds {
-            guard let asset = assets.first(where: { $0.localIdentifier == photoId }) else {
-                fileSizes.append(0)
-                continue
+        // TaskGroupで並列にファイルサイズを取得
+        return try await withThrowingTaskGroup(of: (Int, Int64).self) { group in
+            for (index, photoId) in photoIds.enumerated() {
+                group.addTask { @Sendable in
+                    let size = try await assetLookup[photoId]?.getFileSize() ?? 0
+                    return (index, size)
+                }
             }
-
-            let fileSize = try await asset.getFileSize()
-            fileSizes.append(fileSize)
+            var results = [(Int, Int64)]()
+            results.reserveCapacity(photoIds.count)
+            for try await result in group {
+                results.append(result)
+            }
+            return results.sorted { $0.0 < $1.0 }.map { $0.1 }
         }
-
-        return fileSizes
     }
 
     /// 総合品質スコアを計算
