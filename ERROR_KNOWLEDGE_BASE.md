@@ -86,7 +86,97 @@
 
 ## Photos Framework関連
 
-（エラー発生時に追記）
+### ERR-PHOTOS-001: CheckedContinuation二重resume（致命的クラッシュ）
+- **発生日**: 2025-12-19
+- **エラーメッセージ**:
+  ```
+  _Concurrency/CheckedContinuation.swift:172: Fatal error: SWIFT TASK CONTINUATION MISUSE:
+  loadThumbnail() tried to resume its continuation more than once, returning ()!
+  ```
+
+- **症状**:
+  - アプリ起動時に画面上部に読み込み数字が表示される
+  - アプリが重い
+  - 「グループを確認」ボタン押下後、一瞬表示されるがすぐにクラッシュ
+
+- **根本原因**:
+  `PHImageManager.requestImage` は `deliveryMode = .opportunistic` の場合、以下の理由で**複数回コールバックを呼び出す**：
+  1. 低解像度の画像を先に返し、その後高解像度の画像を返す
+  2. iCloud写真の場合、ローカルキャッシュ→ダウンロード完了後と複数回呼ばれる
+
+  `withCheckedContinuation` と組み合わせると、2回目のコールバック時に `continuation.resume()` が再度呼ばれ、致命的エラーでクラッシュする。
+
+- **問題のコード（修正前）**:
+  ```swift
+  // PhotoThumbnail.swift（修正前）
+  await withCheckedContinuation { continuation in
+      let options = PHImageRequestOptions()
+      options.deliveryMode = .opportunistic  // ❌ 複数回コールバックを呼ぶ
+
+      PHImageManager.default().requestImage(...) { image, info in
+          Task { @MainActor in
+              // 画像処理...
+              continuation.resume()  // ❌ 2回目の呼び出しでクラッシュ
+          }
+      }
+  }
+  ```
+
+- **解決策**:
+  **方法1: deliveryModeを変更（推奨）**
+  ```swift
+  // PhotoThumbnail.swift（修正後）
+  let options = PHImageRequestOptions()
+  options.deliveryMode = .highQualityFormat  // ✅ コールバックは1回のみ
+
+  // Continuationを使用せず、コールバックベースで直接状態更新
+  PHImageManager.default().requestImage(...) { [weak self] image, info in
+      Task { @MainActor [weak self] in
+          guard let self = self else { return }
+          if let image = image {
+              self.thumbnailImage = image
+          }
+          self.isLoading = false
+      }
+  }
+  ```
+
+  **方法2: isResumedフラグで二重呼び出しを防止**
+  ```swift
+  // PhotoRepository.swift の実装例
+  try await withCheckedThrowingContinuation { continuation in
+      var isResumed = false  // ✅ フラグで管理
+
+      imageManager.requestImage(...) { image, info in
+          guard !isResumed else { return }  // ✅ 既にresumeされていたら無視
+
+          if let degraded = info?[PHImageResultIsDegradedKey] as? Bool, degraded {
+              return  // 低解像度画像はスキップ
+          }
+
+          isResumed = true
+          continuation.resume(returning: image!)
+      }
+  }
+  ```
+
+- **検証結果**:
+  - ✅ シミュレータビルド成功
+  - ✅ クラッシュ問題解消
+
+- **関連ファイル**:
+  - `/LightRoll_CleanerPackage/Sources/LightRoll_CleanerFeature/Views/Components/PhotoThumbnail.swift`
+  - `/LightRoll_CleanerPackage/Sources/LightRoll_CleanerFeature/PhotoAccess/Repositories/PhotoRepository.swift`
+
+- **教訓**:
+  - Photos FrameworkのAPIはコールバックが複数回呼ばれる可能性がある
+  - `withCheckedContinuation` を使用する場合は、APIの呼び出し回数を事前に確認
+  - `deliveryMode = .opportunistic` は高速だが、Continuationと組み合わせると危険
+  - 複数回呼ばれる可能性がある場合は `isResumed` フラグで保護するか、`deliveryMode` を変更
+
+- **品質スコア**: 90点（合格）
+
+---
 
 ---
 

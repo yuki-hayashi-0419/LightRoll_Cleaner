@@ -455,6 +455,7 @@ public final class PhotoRepository: PhotoRepositoryProtocol, @unchecked Sendable
     ) async throws -> UIImage {
         try await withCheckedThrowingContinuation { continuation in
             let phOptions = options.toPHImageRequestOptions()
+            var isResumed = false
 
             imageManager.requestImage(
                 for: asset,
@@ -462,19 +463,25 @@ public final class PhotoRepository: PhotoRepositoryProtocol, @unchecked Sendable
                 contentMode: options.contentMode,
                 options: phOptions
             ) { image, info in
+                // 既にresumeされていたら何もしない
+                guard !isResumed else { return }
+
                 // エラーチェック
                 if let error = info?[PHImageErrorKey] as? Error {
+                    isResumed = true
                     continuation.resume(throwing: PhotoRepositoryError.unknown(error.localizedDescription))
                     return
                 }
 
                 // キャンセルチェック
                 if let cancelled = info?[PHImageCancelledKey] as? Bool, cancelled {
+                    isResumed = true
                     continuation.resume(throwing: PhotoRepositoryError.fetchCancelled)
                     return
                 }
 
-                // 高品質モードでない場合、degraded（低解像度）の画像は無視
+                // 高品質モードでない場合、degraded（低解像度）の画像も受け入れる
+                // 高品質モードの場合、最終画像が来るまで待つ
                 if options.quality != .fast {
                     if let degraded = info?[PHImageResultIsDegradedKey] as? Bool, degraded {
                         return
@@ -482,10 +489,12 @@ public final class PhotoRepository: PhotoRepositoryProtocol, @unchecked Sendable
                 }
 
                 guard let image = image else {
+                    isResumed = true
                     continuation.resume(throwing: PhotoRepositoryError.thumbnailGenerationFailed)
                     return
                 }
 
+                isResumed = true
                 continuation.resume(returning: image)
             }
         }
@@ -519,6 +528,7 @@ public final class PhotoRepository: PhotoRepositoryProtocol, @unchecked Sendable
     ) async throws -> ThumbnailResult {
         try await withCheckedThrowingContinuation { continuation in
             let phOptions = options.toPHImageRequestOptions()
+            var isResumed = false
 
             imageManager.requestImage(
                 for: asset,
@@ -526,14 +536,19 @@ public final class PhotoRepository: PhotoRepositoryProtocol, @unchecked Sendable
                 contentMode: options.contentMode,
                 options: phOptions
             ) { image, info in
+                // 既にresumeされていたら何もしない
+                guard !isResumed else { return }
+
                 // エラーチェック
                 if let error = info?[PHImageErrorKey] as? Error {
+                    isResumed = true
                     continuation.resume(throwing: PhotoRepositoryError.unknown(error.localizedDescription))
                     return
                 }
 
                 // キャンセルチェック
                 if let cancelled = info?[PHImageCancelledKey] as? Bool, cancelled {
+                    isResumed = true
                     continuation.resume(throwing: PhotoRepositoryError.fetchCancelled)
                     return
                 }
@@ -542,8 +557,10 @@ public final class PhotoRepository: PhotoRepositoryProtocol, @unchecked Sendable
                 let isInCloud = info?[PHImageResultIsInCloudKey] as? Bool ?? false
 
                 // 高品質モードでない場合、degraded画像も受け入れる
+                // 高品質モードの場合、最終画像が来るまで待つ
                 if options.quality == .fast || !isDegraded {
                     guard let image = image else {
+                        isResumed = true
                         continuation.resume(throwing: PhotoRepositoryError.thumbnailGenerationFailed)
                         return
                     }
@@ -553,6 +570,7 @@ public final class PhotoRepository: PhotoRepositoryProtocol, @unchecked Sendable
                         isDegraded: isDegraded,
                         isLocallyAvailable: !isInCloud
                     )
+                    isResumed = true
                     continuation.resume(returning: result)
                 }
             }

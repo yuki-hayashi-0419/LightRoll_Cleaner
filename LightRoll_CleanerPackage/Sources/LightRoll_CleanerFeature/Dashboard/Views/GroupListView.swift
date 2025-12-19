@@ -170,73 +170,71 @@ public struct GroupListView: View {
     // MARK: - Body
 
     public var body: some View {
-        NavigationStack {
-            ZStack {
-                // 背景グラデーション
-                backgroundGradient
+        ZStack {
+            // 背景グラデーション
+            backgroundGradient
 
-                // メインコンテンツ
-                mainContent
+            // メインコンテンツ
+            mainContent
+        }
+        .navigationTitle(navigationTitle)
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.large)
+        #endif
+        .toolbar {
+            toolbarContent
+        }
+        .onAppear {
+            // 初期フィルタを設定
+            if filterType == nil {
+                filterType = initialFilterType
             }
-            .navigationTitle(navigationTitle)
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.large)
-            #endif
-            .toolbar {
-                toolbarContent
+        }
+        .alert(
+            NSLocalizedString(
+                "groupList.error.title",
+                value: "エラー",
+                comment: "Error alert title"
+            ),
+            isPresented: $showErrorAlert
+        ) {
+            Button(NSLocalizedString("common.ok", value: "OK", comment: "OK button")) {
+                showErrorAlert = false
             }
-            .onAppear {
-                // 初期フィルタを設定
-                if filterType == nil {
-                    filterType = initialFilterType
-                }
-            }
-            .alert(
+        } message: {
+            Text(errorMessage)
+        }
+        .confirmationDialog(
+            NSLocalizedString(
+                "groupList.delete.title",
+                value: "選択したグループを削除",
+                comment: "Delete confirmation title"
+            ),
+            isPresented: $showDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button(
                 NSLocalizedString(
-                    "groupList.error.title",
-                    value: "エラー",
-                    comment: "Error alert title"
+                    "groupList.delete.confirm",
+                    value: "削除する",
+                    comment: "Delete confirm button"
                 ),
-                isPresented: $showErrorAlert
+                role: .destructive
             ) {
-                Button(NSLocalizedString("common.ok", value: "OK", comment: "OK button")) {
-                    showErrorAlert = false
+                Task {
+                    await deleteSelectedGroups()
                 }
-            } message: {
-                Text(errorMessage)
             }
-            .confirmationDialog(
-                NSLocalizedString(
-                    "groupList.delete.title",
-                    value: "選択したグループを削除",
-                    comment: "Delete confirmation title"
-                ),
-                isPresented: $showDeleteConfirmation,
-                titleVisibility: .visible
-            ) {
-                Button(
-                    NSLocalizedString(
-                        "groupList.delete.confirm",
-                        value: "削除する",
-                        comment: "Delete confirm button"
-                    ),
-                    role: .destructive
-                ) {
-                    Task {
-                        await deleteSelectedGroups()
-                    }
-                }
 
-                Button(
-                    NSLocalizedString("common.cancel", value: "キャンセル", comment: "Cancel button"),
-                    role: .cancel
-                ) {}
-            } message: {
-                Text(deleteConfirmationMessage)
-            }
-            .sheet(isPresented: $showFilterSheet) {
-                filterSheet
-            }
+            Button(
+                NSLocalizedString("common.cancel", value: "キャンセル", comment: "Cancel button"),
+                role: .cancel
+            ) {}
+        } message: {
+            Text(deleteConfirmationMessage)
+        }
+        .sheet(isPresented: $showFilterSheet) {
+            filterSheet
         }
     }
 

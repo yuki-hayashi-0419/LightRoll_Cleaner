@@ -305,6 +305,15 @@ public struct PhotoThumbnail: View {
     // MARK: - Image Loading
 
     /// サムネイル画像を非同期で読み込む
+    ///
+    /// ## 重要: PHImageManager.requestImage の二重コールバック対策
+    /// Photos Frameworkの `requestImage` は以下の場合に複数回コールバックを呼ぶ：
+    /// - deliveryMode = .opportunistic の場合（低解像度→高解像度）
+    /// - iCloud写真のダウンロード中
+    ///
+    /// この問題を解決するため、以下の対策を実施：
+    /// 1. deliveryMode を .highQualityFormat に変更し、コールバックを1回のみに
+    /// 2. Continuationは使用せず、直接Task内で状態更新
     @MainActor
     private func loadThumbnail() async {
         isLoading = true
@@ -323,8 +332,10 @@ public struct PhotoThumbnail: View {
         }
 
         // 画像リクエストオプションの設定
+        // CRITICAL: deliveryMode を .highQualityFormat に設定
+        // .opportunistic はコールバックを複数回呼び出すため、Continuationと相性が悪い
         let options = PHImageRequestOptions()
-        options.deliveryMode = .opportunistic
+        options.deliveryMode = .highQualityFormat  // 変更: .opportunistic → .highQualityFormat
         options.resizeMode = .fast
         options.isNetworkAccessAllowed = true
         options.isSynchronous = false
@@ -340,23 +351,35 @@ public struct PhotoThumbnail: View {
             height: LRLayout.thumbnailSizeMD * scale
         )
 
-        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-            PHImageManager.default().requestImage(
-                for: asset,
-                targetSize: thumbnailSize,
-                contentMode: .aspectFill,
-                options: options
-            ) { image, info in
-                Task { @MainActor in
-                    if let image = image {
-                        self.thumbnailImage = image
-                        self.loadError = false
-                    } else {
-                        self.loadError = true
-                    }
-                    self.isLoading = false
-                    continuation.resume()
+        // Continuationを使用せず、コールバックベースで直接状態更新
+        // deliveryMode = .highQualityFormat により、コールバックは必ず1回のみ呼ばれる
+        PHImageManager.default().requestImage(
+            for: asset,
+            targetSize: thumbnailSize,
+            contentMode: .aspectFill,
+            options: options
+        ) { image, info in
+            Task { @MainActor in
+                // キャンセルされた場合は何もしない
+                if let cancelled = info?[PHImageCancelledKey] as? Bool, cancelled {
+                    isLoading = false
+                    return
                 }
+
+                // エラーチェック
+                if info?[PHImageErrorKey] as? Error != nil {
+                    loadError = true
+                    isLoading = false
+                    return
+                }
+
+                if let image = image {
+                    thumbnailImage = image
+                    loadError = false
+                } else {
+                    loadError = true
+                }
+                isLoading = false
             }
         }
     }

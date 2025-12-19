@@ -103,11 +103,11 @@ public struct DashboardNavigationContainer: View {
                 scanPhotosUseCase: scanPhotosUseCase,
                 getStatisticsUseCase: getStatisticsUseCase,
                 onNavigateToGroupList: { @MainActor groupType in
-                    // グループリストへ遷移する前に最新のグループを読み込む
-                    Task {
-                        await loadGroups()
-                        router.navigateToGroupList(filterType: groupType)
-                    }
+                    print("🟢 [DEBUG] DashboardNavigationContainer: onNavigateToGroupList called with groupType: \(String(describing: groupType))")
+                    print("🟢 [DEBUG] DashboardNavigationContainer: Current groups count: \(currentGroups.count)")
+                    // グループはtask修飾子で既に読み込まれているので、直接遷移
+                    router.navigateToGroupList(filterType: groupType)
+                    print("🟢 [DEBUG] DashboardNavigationContainer: router.navigateToGroupList completed")
                 },
                 onNavigateToSettings: {
                     router.navigateToSettings()

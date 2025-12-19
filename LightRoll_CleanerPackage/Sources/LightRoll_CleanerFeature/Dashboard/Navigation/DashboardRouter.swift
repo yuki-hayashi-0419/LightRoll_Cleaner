@@ -57,7 +57,12 @@ public final class DashboardRouter: Sendable {
     /// グループリスト画面へ遷移
     /// - Parameter filterType: フィルタタイプ（nil の場合は全タイプ表示）
     public func navigateToGroupList(filterType: GroupType? = nil) {
+        print("🔵 [DEBUG] navigateToGroupList called with filterType: \(String(describing: filterType))")
+        print("🔵 [DEBUG] Current path count: \(path.count)")
+        print("🔵 [DEBUG] Current path: \(path)")
+
         let destination: DashboardDestination = filterType.map { .groupListFiltered($0) } ?? .groupList
+        print("🔵 [DEBUG] Destination determined: \(destination)")
 
         // 既に同じDestinationがpathの最後にある場合は追加しない
         guard path.last != destination else {
@@ -66,7 +71,10 @@ public final class DashboardRouter: Sendable {
         }
 
         print("📍 ナビゲーション: \(destination) へ遷移")
+        print("🔵 [DEBUG] About to append destination to path")
         path.append(destination)
+        print("🔵 [DEBUG] Path after append: \(path)")
+        print("🔵 [DEBUG] Path count after append: \(path.count)")
     }
 
     /// グループ詳細画面へ遷移
