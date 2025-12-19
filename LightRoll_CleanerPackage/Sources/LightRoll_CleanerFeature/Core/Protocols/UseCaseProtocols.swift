@@ -49,6 +49,15 @@ public protocol ScanPhotosUseCaseProtocol: NoInputUseCaseProtocol where Output =
 
     /// 現在スキャン中かどうか
     var isScanning: Bool { get }
+
+    /// 保存されているPhotoGroupを読み込み
+    /// - Returns: 保存されているPhotoGroup配列（なければ空配列）
+    /// - Throws: Error
+    func loadSavedGroups() async throws -> [PhotoGroup]
+
+    /// 保存されているPhotoGroupの有無を確認
+    /// - Returns: グループが保存されている場合true
+    func hasSavedGroups() async -> Bool
 }
 
 // MARK: - Group Photos UseCase Protocol

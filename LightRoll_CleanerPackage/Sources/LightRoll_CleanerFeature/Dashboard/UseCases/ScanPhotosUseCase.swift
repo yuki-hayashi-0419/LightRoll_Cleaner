@@ -129,6 +129,19 @@ public final class ScanPhotosUseCase: ScanPhotosUseCaseProtocol {
         progressContinuation?.finish()
     }
 
+    /// 保存されているPhotoGroupを読み込み
+    /// - Returns: 保存されているPhotoGroup配列（なければ空配列）
+    /// - Throws: Error
+    public func loadSavedGroups() async throws -> [PhotoGroup] {
+        try await analysisRepository.loadGroups()
+    }
+
+    /// 保存されているPhotoGroupの有無を確認
+    /// - Returns: グループが保存されている場合true
+    public func hasSavedGroups() async -> Bool {
+        await analysisRepository.hasGroups()
+    }
+
     // MARK: - Private Methods
 
     /// スキャン処理の実行

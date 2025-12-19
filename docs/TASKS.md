@@ -206,6 +206,41 @@
 
 ---
 
+## 🔴 P0（緊急・次セッション最優先）
+
+### ナビゲーション統合の修正
+- [ ] 「グループを確認」ボタンがホームに戻る問題の修正
+  - 優先度: P0
+  - セッション: ui-integration-fix-001
+  - 関連: DashboardRouter.navigateToGroupList()
+  - 影響: アプリの基本機能が使用不可
+  - 検証: docs/INTEGRATION_ANALYSIS_REPORT.md
+
+- [ ] 2回目タップ時のクラッシュ修正
+  - 優先度: P0
+  - セッション: ui-integration-fix-001
+  - 関連: NavigationStack path管理
+  - 影響: アプリの安定性に重大な影響
+  - 症状: "App not running"エラー
+
+### 調査タスク
+- [ ] DashboardRouter.swift の詳細レビュー
+  - navigateToGroupList()メソッド検証
+  - @Observable state管理確認
+
+- [ ] NavigationStack path デバッグ
+  - path更新ロジック検証
+  - タイミング問題調査
+
+- [ ] クラッシュログの取得と分析
+  - 実機でのクラッシュ再現
+  - Xcodeコンソールログ確認
+
+- [ ] DashboardDestination enum の検証
+  - groupList caseの正確な動作確認
+
+---
+
 ## M10: Release Preparation（リリース準備）
 
 新規追加モジュール - App Store提出準備
@@ -234,7 +269,7 @@
 
 ---
 
-*最終更新: 2025-12-14 (M9完了 100% + M10-T03完了 / 117タスク完了 97.5%)*
+*最終更新: 2025-12-18 (M9完了 100% + M10-T03完了 + P0タスク追加 / 121タスク 96.7%)*
 
 ---
 

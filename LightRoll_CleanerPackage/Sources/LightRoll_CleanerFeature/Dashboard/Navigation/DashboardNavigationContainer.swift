@@ -10,6 +10,13 @@
 
 import SwiftUI
 
+// MARK: - Notification Extensions
+
+extension Notification.Name {
+    /// グループ読み込み失敗時の通知
+    static let groupLoadFailure = Notification.Name("groupLoadFailure")
+}
+
 // MARK: - DashboardNavigationContainer
 
 /// ダッシュボードモジュールのナビゲーションコンテナ
@@ -95,8 +102,12 @@ public struct DashboardNavigationContainer: View {
             HomeView(
                 scanPhotosUseCase: scanPhotosUseCase,
                 getStatisticsUseCase: getStatisticsUseCase,
-                onNavigateToGroupList: { groupType in
-                    router.navigateToGroupList(filterType: groupType)
+                onNavigateToGroupList: { @MainActor groupType in
+                    // グループリストへ遷移する前に最新のグループを読み込む
+                    Task {
+                        await loadGroups()
+                        router.navigateToGroupList(filterType: groupType)
+                    }
                 },
                 onNavigateToSettings: {
                     router.navigateToSettings()
@@ -108,8 +119,36 @@ public struct DashboardNavigationContainer: View {
         }
         .environment(router)
         .task {
-            // スキャン結果を監視してグループ一覧を更新
-            // TODO: ScanPhotosUseCaseから結果を取得する仕組みを追加
+            // 初回起動時に保存されているグループを読み込み
+            await loadGroups()
+        }
+    }
+
+    // MARK: - Helper Methods (private)
+
+    /// グループを読み込む
+    private func loadGroups() async {
+        // 保存されているグループを読み込み
+        if await scanPhotosUseCase.hasSavedGroups() {
+            do {
+                currentGroups = try await scanPhotosUseCase.loadSavedGroups()
+                print("✅ グループ読み込み成功: \(currentGroups.count)件")
+            } catch {
+                print("⚠️ グループ読み込みエラー: \(error)")
+                currentGroups = []
+
+                // ユーザーへのエラー通知
+                Task { @MainActor in
+                    NotificationCenter.default.post(
+                        name: .groupLoadFailure,
+                        object: nil,
+                        userInfo: ["error": error.localizedDescription]
+                    )
+                }
+            }
+        } else {
+            print("ℹ️ 保存済みグループなし")
+            currentGroups = []
         }
     }
 
@@ -164,12 +203,11 @@ public struct DashboardNavigationContainer: View {
         }
     }
 
-    // MARK: - Helper Methods
-
-    /// グループ一覧を更新
+    /// グループ一覧を更新（外部から呼び出し可能）
     /// - Parameter groups: 新しいグループ一覧
     public func updateGroups(_ groups: [PhotoGroup]) {
         currentGroups = groups
+        print("📝 グループ更新: \(groups.count)件")
     }
 }
 

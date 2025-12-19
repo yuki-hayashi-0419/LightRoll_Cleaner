@@ -544,6 +544,33 @@ public struct HomeView: View {
         return "\(progress.processedCount) / \(progress.totalCount)"
     }
 
+    /// 保存されたグループからScanResultを生成
+    private func createScanResultFromGroups(_ groups: [PhotoGroup]) -> ScanResult {
+        // グループタイプ別の内訳を計算
+        let groupedByType = Dictionary(grouping: groups) { $0.type }
+
+        let breakdown = GroupBreakdown(
+            similarGroups: groupedByType[.similar]?.count ?? 0,
+            screenshotCount: groupedByType[.screenshot]?.reduce(0) { $0 + $1.count } ?? 0,
+            blurryCount: groupedByType[.blurry]?.reduce(0) { $0 + $1.count } ?? 0,
+            largeVideoCount: groupedByType[.largeVideo]?.reduce(0) { $0 + $1.count } ?? 0
+        )
+
+        // 削減可能容量を計算
+        let potentialSavings = groups.reduce(0) { $0 + $1.reclaimableSize }
+
+        // 総写真数を計算
+        let totalPhotosScanned = groups.reduce(0) { $0 + $1.count }
+
+        return ScanResult(
+            totalPhotosScanned: totalPhotosScanned,
+            groupsFound: groups.count,
+            potentialSavings: potentialSavings,
+            duration: 0, // 復元時は所要時間不明
+            groupBreakdown: breakdown
+        )
+    }
+
     // MARK: - Data Loading
 
     /// 初期データを読み込み
@@ -566,6 +593,29 @@ public struct HomeView: View {
                 groupSummaries: [:], // グループサマリーはスキャン後に更新
                 scannedPhotoCount: output.totalPhotos
             )
+
+            // 保存されているグループを読み込み
+            if await scanPhotosUseCase.hasSavedGroups() {
+                do {
+                    photoGroups = try await scanPhotosUseCase.loadSavedGroups()
+
+                    // グループが読み込めたら最終スキャン結果を復元
+                    if !photoGroups.isEmpty {
+                        lastScanResult = createScanResultFromGroups(photoGroups)
+                    }
+                } catch {
+                    // グループ読み込みエラーはログに記録（UI表示には影響しない）
+                    print("⚠️ 保存済みグループの読み込みに失敗: \(error.localizedDescription)")
+
+                    // ユーザーへのエラー通知
+                    errorMessage = NSLocalizedString(
+                        "home.error.groupLoadFailure",
+                        value: "グループの読み込みに失敗しました。もう一度お試しください。",
+                        comment: "Group load failure error message"
+                    )
+                    showErrorAlert = true
+                }
+            }
 
             // TODO: クリーンアップ履歴の読み込み（CleanupRecordRepository実装後）
             cleanupHistory = []
@@ -620,8 +670,24 @@ public struct HomeView: View {
             progressTask.cancel()
             _ = await progressTask.result  // 完了を待機（成功/失敗を無視）
 
-            // 結果を保存
+            // スキャン完了後にグループを読み込む
             lastScanResult = result
+
+            // グループを読み込み
+            do {
+                photoGroups = try await scanPhotosUseCase.loadSavedGroups()
+                print("✅ グループ読み込み成功: \(photoGroups.count)件")
+            } catch {
+                print("⚠️ グループ読み込みエラー: \(error)")
+
+                // ユーザーへのエラー通知
+                errorMessage = NSLocalizedString(
+                    "home.error.groupLoadFailure",
+                    value: "グループの読み込みに失敗しました。もう一度お試しください。",
+                    comment: "Group load failure error message"
+                )
+                showErrorAlert = true
+            }
 
             // 統計を更新
             await refreshData()

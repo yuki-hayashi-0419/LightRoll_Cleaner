@@ -96,6 +96,15 @@ public protocol ImageAnalysisRepositoryProtocol: Actor {
     /// グループからベストショットを選定
     func selectBestShot(from group: PhotoGroup) async throws -> Int?
 
+    /// 保存されているPhotoGroupを読み込み
+    func loadGroups() async throws -> [PhotoGroup]
+
+    /// 保存されているPhotoGroupをクリア
+    func clearGroups() async throws
+
+    /// 保存されているPhotoGroupの有無を確認
+    func hasGroups() async -> Bool
+
     /// 類似写真グループの検出
     func findSimilarGroups(
         in photos: [Photo],
@@ -524,6 +533,7 @@ public actor AnalysisRepository: ImageAnalysisRepositoryProtocol {
     ///   - progress: 進捗コールバック（0.0〜1.0）
     /// - Returns: 検出されたグループ配列
     /// - Throws: AnalysisError
+    /// - Note: グループ化完了後、自動的に永続化される
     public func groupPhotos(
         _ photos: [Photo],
         progress: (@Sendable (Double) async -> Void)? = nil
@@ -541,6 +551,15 @@ public actor AnalysisRepository: ImageAnalysisRepositoryProtocol {
         // PhotoGrouperで全種類のグルーピングを実行
         let groups = try await photoGrouper.groupPhotos(assets, progress: progress)
 
+        // グループ化結果を永続化（エラーは記録するが処理は継続）
+        do {
+            try await photoGroupRepository.save(groups)
+        } catch {
+            // 永続化失敗はログに記録（実装時に適切なロガーを使用）
+            print("⚠️ グループ永続化に失敗: \(error.localizedDescription)")
+            // エラーを投げずに処理を継続（グループ化結果は返す）
+        }
+
         return groups
     }
 
@@ -551,6 +570,41 @@ public actor AnalysisRepository: ImageAnalysisRepositoryProtocol {
     /// - Throws: AnalysisError
     public func selectBestShot(from group: PhotoGroup) async throws -> Int? {
         return try await bestShotSelector.selectBestShot(from: group)
+    }
+
+    /// 保存されているPhotoGroupを読み込み
+    ///
+    /// - Returns: 保存されているPhotoGroup配列（なければ空配列）
+    /// - Throws: AnalysisError
+    /// - Note: キャッシュ機構と連携して最新の状態を返す
+    public func loadGroups() async throws -> [PhotoGroup] {
+        do {
+            let groups = try await photoGroupRepository.load()
+            return groups
+        } catch {
+            // 読み込みエラーは記録してエラーを投げる
+            print("⚠️ グループ読み込みに失敗: \(error.localizedDescription)")
+            throw AnalysisError.groupingFailed
+        }
+    }
+
+    /// 保存されているPhotoGroupをクリア
+    ///
+    /// - Throws: AnalysisError
+    public func clearGroups() async throws {
+        do {
+            try await photoGroupRepository.clear()
+        } catch {
+            print("⚠️ グループクリアに失敗: \(error.localizedDescription)")
+            throw AnalysisError.groupingFailed
+        }
+    }
+
+    /// 保存されているPhotoGroupの有無を確認
+    ///
+    /// - Returns: グループが保存されている場合true
+    public func hasGroups() async -> Bool {
+        await photoGroupRepository.hasGroups()
     }
 
     /// 類似写真グループの検出

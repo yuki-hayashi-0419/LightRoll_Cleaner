@@ -57,11 +57,16 @@ public final class DashboardRouter: Sendable {
     /// グループリスト画面へ遷移
     /// - Parameter filterType: フィルタタイプ（nil の場合は全タイプ表示）
     public func navigateToGroupList(filterType: GroupType? = nil) {
-        if let filterType = filterType {
-            path.append(.groupListFiltered(filterType))
-        } else {
-            path.append(.groupList)
+        let destination: DashboardDestination = filterType.map { .groupListFiltered($0) } ?? .groupList
+
+        // 既に同じDestinationがpathの最後にある場合は追加しない
+        guard path.last != destination else {
+            print("⚠️ 既に \(destination) に遷移済みのため、重複pushをスキップ")
+            return
         }
+
+        print("📍 ナビゲーション: \(destination) へ遷移")
+        path.append(destination)
     }
 
     /// グループ詳細画面へ遷移
