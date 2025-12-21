@@ -2307,3 +2307,66 @@ public func destination(for identifier: String) -> NotificationDestination {
 ---
 
 *最終更新: 2025-12-18 (品質スコア75→90点への改善)*
+
+---
+
+## P0クラッシュ修正: NavigationStack二重ネスト問題 (2025-12-21)
+
+### ユーザーから見て出来るようになったこと
+- **グループ詳細画面への遷移が安定**: 類似写真グループをタップしても、NavigationPath型不一致クラッシュが発生しなくなりました
+- **実機での動作確認完了**: iPhone実機でグループ詳細遷移が正常に動作することを確認
+
+### 修正内容
+- **NavigationStack二重ネスト解消**: ContentView.swiftのNavigationStackをGroup{}に変更
+- **ルーティング最適化**: ResultsViewがNavigationStackを所有し、navigationDestinationを適切に管理
+- **型安全性確保**: PhotoGroupとNavigationPath間の型不一致を解消
+
+### 関連コミット
+- 38c9e67: fix: NavigationStack入れ子によるグループ詳細遷移時クラッシュを修正
+- 24e7d99: fix: P0 NavigationPath comparisonTypeMismatch クラッシュ修正
+
+### セッション
+**p0-navigation-stack-fix-001**
+
+---
+
+## 統合漏れ発見: ゴミ箱機能 (2025-12-21)
+
+### 発見内容
+**MODULE_M06（Deletion & Trash）の統合漏れ**
+
+M6モジュール（削除・ゴミ箱機能）は実装完了しているが、Dashboard（M5）との統合が漏れていることを発見。
+
+### 問題の詳細
+| 項目 | 現状 | あるべき姿 |
+|------|------|-----------|
+| 削除処理 | PhotoRepositoryを直接呼び出し | DeletePhotosUseCaseを経由 |
+| ゴミ箱追加 | されない | 削除時にゴミ箱に追加 |
+| 削除結果 | 即座に完全削除 | ゴミ箱に移動（30日後に完全削除） |
+
+### 影響範囲
+- **ContentView.swift**: 削除処理がDeletePhotosUseCaseを使用せず
+- **ユーザー体験**: 誤削除した写真を復元できない
+
+### 実装状態
+| コンポーネント | 状態 | 備考 |
+|---------------|------|------|
+| DeletePhotosUseCase | ✅ 実装済み | M6モジュール内 |
+| TrashRepository | ✅ 実装済み | M6モジュール内 |
+| TrashView | ✅ 実装済み | M6モジュール内 |
+| Dashboard統合 | ❌ 未統合 | **今回発見** |
+
+### 次回修正予定
+1. ContentView.swiftの削除処理を`DeletePhotosUseCase`経由に変更
+2. ゴミ箱タブへのナビゲーション追加（必要に応じて）
+3. 統合テストの実施
+
+### 備考
+**新機能追加ではなく、既存実装の統合漏れ修正**として扱う。
+
+### セッション
+**integration-verification-001**
+
+---
+
+*最終更新: 2025-12-21 (P0クラッシュ修正・ゴミ箱統合漏れ発見)*

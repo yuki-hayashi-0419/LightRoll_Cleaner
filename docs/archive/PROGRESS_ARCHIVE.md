@@ -4,6 +4,113 @@
 
 ---
 
+## アーカイブ: 2025-12-21 context-optimization-002 実行時
+
+以下のエントリは context-optimization-002 実行時（セッション9終了後）のコンテキスト最適化でアーカイブされました。
+（PROGRESS.md 9セッション → 4セッション、古いセッション3〜6を移動）
+
+---
+
+### 2025-12-18 セッション③: race-condition-fix-001（アーカイブ）
+
+**セッション概要**:
+- セッションID: race-condition-fix-001
+- 実施内容: HomeViewレースコンディション修正 + PhotoGroup永続化実装開始
+- 品質スコア: 85点（修正完了、永続化は部分実装）
+- 終了理由: ユーザー指示による中断
+
+**完了タスク**:
+1. HomeView.swiftのレースコンディションバグ修正（performGrouping関数）
+2. PhotoGroupデータ永続化処理実装（部分完了）
+
+**修正ファイル**: HomeView.swift, PhotoGroupRepository.swift（新規）, AnalysisRepository.swift
+
+---
+
+### 2025-12-18 セッション④: ui-integration-fix-001（アーカイブ）
+
+**セッション概要**:
+- セッションID: ui-integration-fix-001
+- 実施内容: DashboardNavigationContainer.taskブロック修正 + 実機テスト
+- 品質スコア: 90点（コード実装完了）
+- 終了理由: 実機テストで未解決の問題発見
+
+**完了タスク**:
+1. DashboardNavigationContainer.swift修正（.taskブロック）
+2. ビルド検証（成功）
+
+**未解決問題（後続セッションで解決済み）**:
+- ナビゲーションがホームに戻る問題（P0）
+- 2回目タップでクラッシュ（P0）
+
+---
+
+### 2025-12-19 セッション⑤: p0-navigation-fix-002（アーカイブ）
+
+**セッション概要**:
+- セッションID: p0-navigation-fix-002
+- 実施内容: P0問題修正（ナビゲーション機能不全）+ 品質改善
+- 品質スコア: 初回72点 → 改善後90点（平均81点）
+- 終了理由: 目標達成（P0修正完了、実機デプロイ成功）
+
+**完了タスク**:
+1. 実装統合状況の包括チェック（統合率85%）
+2. P0問題修正（DashboardRouter, HomeView）
+3. テストケース生成（16件）
+4. 品質改善（ユーザーフィードバック追加）
+5. 実機デプロイ（iPhone 15 Pro Max）
+
+**修正ファイル**: DashboardRouter.swift, DashboardNavigationContainer.swift, HomeView.swift, DashboardNavigationP0FixTests.swift
+
+---
+
+### 2025-12-19 セッション⑥: integration-completion-001（アーカイブ）
+
+**セッション概要**:
+- セッションID: integration-completion-001
+- 実施内容: シミュレーターアプリへの完全統合 + 品質改善
+- 品質スコア: 平均88.5点
+- 終了理由: 目標達成（統合完了）
+
+**完了タスク**:
+1. シミュレーターアプリへの統合（100%達成）
+2. Continuation二重resumeクラッシュの修正（95点）
+3. パフォーマンス改善
+4. テストケース生成（58件）
+
+**未解決問題（後続セッションで対応）**:
+- グループ詳細表示時のクラッシュ（P0 → セッション⑦で修正）
+
+---
+
+## アーカイブ: 2025-12-21 p0-navigation-stack-fix-001 セッション終了時
+
+以下のエントリは p0-navigation-stack-fix-001 セッション終了時のコンテキスト最適化でアーカイブされました（PROGRESS.md 9セッション → 7セッション + 技術リファレンス圧縮）。
+
+---
+
+### 2025-12-18 セッション1〜2: SIMD最適化検討・完了（アーカイブ）
+
+**セッション概要**:
+- セッション1: グループ化処理SIMD最適化検討（getFileSizes()最適化完了：92点）
+- セッション2: SIMD最適化詳細設計完了（95点）
+
+**完了した最適化**:
+1. getFileSizes()最適化: O(n×m) → O(m) Dictionary + TaskGroup並列化
+2. キャッシュ検証整合性確認: 8192バイトサイズ検証実装
+3. SimilarityCalculator SIMD設計: Accelerate vDSP導入準備完了
+
+**アーカイブされた技術情報**:
+- パフォーマンスボトルネック分析（SimilarityCalculator 50億演算問題）
+- 処理フロー全体図（Phase 0〜4）
+- ERR-001〜ERR-004の詳細解説
+- SIMD実装コード例
+- LSH最適化オプション（128ビット、マルチプローブ、Metal GPU）
+
+**参照先**: 詳細は本アーカイブ下部または `docs/CRITICAL/BUILD_ERRORS.md` を参照
+
+---
+
 ## アーカイブ: 2025-12-17 grouping-lsh-analysis-001 セッション終了時
 
 以下のエントリは grouping-lsh-analysis-001 セッション終了時の最適化でアーカイブされました（PROGRESS.md 11件 → 10件、最古の2エントリを移動）。

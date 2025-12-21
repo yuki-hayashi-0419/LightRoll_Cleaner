@@ -1,15 +1,15 @@
 {
-  "version": "3.60",
+  "version": "3.61",
   "lastUpdated": "2025-12-21",
-  "sessionId": "p0-navigation-stack-fix-001",
-  "sessionEndStatus": "test-pending",
+  "sessionId": "trash-integration-analysis-001",
+  "sessionEndStatus": "completed",
 
   "projectStatus": {
-    "phase": "P0 NavigationStack二重ネスト修正完了 → ユーザーテスト待ち",
-    "currentPhase": "実機デプロイ完了 → クラッシュテスト結果待ち",
+    "phase": "ゴミ箱統合問題分析完了 → 修正実装待ち",
+    "currentPhase": "実機テスト確認完了 → 新問題発見 → 修正方針決定",
     "overallProgress": "98%",
-    "nextMilestone": "ユーザーテスト確認 → 品質スコア90点達成 → App Store提出",
-    "majorAchievement": "P0 NavigationStack二重ネスト修正完了。GroupDetailView.swift、HomeView.swiftからNavigationStackラッパーを削除。実機デプロイ成功（iPhone 15 Pro Max）。ログキャプチャ開始（セッションID: fb307a28-5a07-4a88-98ee-893b1a889556）。次回はユーザーテスト結果確認とログ分析が必要。"
+    "nextMilestone": "ゴミ箱統合修正 → E2Eテスト → 品質スコア90点達成 → App Store提出",
+    "majorAchievement": "NavigationStack二重ネスト修正が正常動作確認。新問題発見: ゴミ箱機能が統合されていない（ContentView.swiftでDeletePhotosUseCaseではなくPhotoRepositoryを直接使用）。設計審査84点。修正方針決定済み。"
   },
 
   "taskStatus": {
@@ -17,80 +17,107 @@
     "completed": 136,
     "skipped": 5,
     "merged": 1,
-    "inProgress": 0,
+    "inProgress": 1,
     "pending": 1,
     "blockedP0": 0,
     "completedHours": 226,
-    "remainingHours": 2,
-    "lastCompletedTaskId": "p0-navigation-stack-fix-001",
+    "remainingHours": 3,
+    "lastCompletedTaskId": "trash-integration-analysis-001",
+    "currentTask": "ゴミ箱統合修正実装",
     "nextTaskCandidates": [
-      "ユーザーによるクラッシュテスト実行結果確認",
-      "ログセッションID: fb307a28-5a07-4a88-98ee-893b1a889556 分析",
-      "品質スコア90点達成（テストカバレッジ向上）",
+      "ContentView.swift の onDeletePhotos/onDeleteGroups 修正",
+      "シミュレーター/実機でE2Eテスト",
+      "品質スコア90点達成",
       "M10-T04: App Store Connect設定"
     ]
   },
 
   "contextOptimization": {
     "optimizedDate": "2025-12-21",
-    "lastOptimizationSession": "p0-navigation-stack-fix-001",
+    "lastOptimizationSession": "context-optimization-002",
     "progressEntries": {
-      "before": 7,
-      "after": 8,
-      "archived": 0
+      "before": 9,
+      "after": 5,
+      "archived": 4
     },
     "tasksCompleted": {
       "archivedModules": ["M9"],
       "totalArchived": 29
     },
     "sessionSummaries": {
-      "active": 5,
-      "archived": 1,
-      "archivedFiles": ["SESSION_SUMMARY_race-condition-fix-001.md"]
+      "active": 4,
+      "archived": 5,
+      "archivedFiles": [
+        "SESSION_SUMMARY_race-condition-fix-001.md",
+        "SESSION_SUMMARY_ui-integration-fix-001.md",
+        "SESSION_SUMMARY_p0-quality-improvement-001.md",
+        "SESSION_SUMMARY_p0-navigation-fix-002.md"
+      ]
     },
-    "documentWhitelist": "全ファイル準拠確認済み（SESSION_SUMMARY 5件）",
-    "contextSizeReduction": "維持（アーカイブ不要）",
-    "reducedSize": "N/A",
+    "documentWhitelist": "全ファイル準拠確認済み（ホワイトリスト違反なし）",
+    "contextSizeReduction": "PROGRESS.md: 630行→370行（41%削減）",
+    "reducedSize": "約18KB",
+    "archivedContent": "セッション③〜⑥をPROGRESS_ARCHIVE.mdへ移動",
     "nextOptimizationTrigger": "10タスク完了後 または モジュール完了時"
   },
 
   "resumeInstructions": {
-    "step1": "【優先】ユーザーテスト結果確認: ログセッションID: fb307a28-5a07-4a88-98ee-893b1a889556 を分析",
-    "step2": "【検証】E2Eテスト: スキャン→グループ化→詳細表示→削除 のフロー確認",
-    "step3": "【品質】テストカバレッジ向上: 85点 → 90点を目指す",
-    "step4": "【次タスク】App Store提出準備の継続（M10-T04以降）",
-    "step5": "【確認】NavigationStack二重ネスト問題が完全に解消されているか検証",
-    "context": "【重要】p0-navigation-stack-fix-001セッションでNavigationStack二重ネスト修正完了。GroupDetailView.swift、HomeView.swiftからNavigationStackラッパー削除。実機デプロイ成功（iPhone 15 Pro Max、Process ID: 31761）。ユーザーによるクラッシュテスト実行待ち。"
+    "step1": "【実装】ContentView.swift の onDeletePhotos を DeletePhotosUseCase.execute() に修正",
+    "step2": "【実装】ContentView.swift の onDeleteGroups を DeletePhotosUseCase.execute() に修正",
+    "step3": "【検証】シミュレーターでゴミ箱機能のE2Eテスト実施",
+    "step4": "【検証】実機でゴミ箱機能のE2Eテスト実施",
+    "step5": "【品質】テストカバレッジ向上: 品質スコア90点達成を目指す",
+    "context": "【重要】trash-integration-analysis-001セッションで新問題発見。ゴミ箱機能がContentView.swiftで統合されていない。DeletePhotosUseCaseを使用せずPhotoRepositoryを直接使用しているため、写真がゴミ箱に入らず即時削除される。修正方針は決定済み（UseCase経由に変更）。"
+  },
+
+  "trashIntegrationIssue": {
+    "status": "analysis-completed",
+    "identifiedDate": "2025-12-21",
+    "designReviewScore": 84,
+    "severity": "high",
+    "symptom": "写真を削除してもゴミ箱に入らず、直接Photos.appから消える",
+    "expectedBehavior": "アプリ内ゴミ箱に30日保管 → その後完全削除",
+    "currentBehavior": "PHAssetChangeRequest.deleteAssetsで即時削除",
+    "rootCause": "ContentView.swiftでDeletePhotosUseCaseではなくPhotoRepositoryを直接使用",
+    "affectedFiles": [
+      {
+        "file": "ContentView.swift",
+        "method": "onDeletePhotos",
+        "issue": "PhotoRepository.delete()を直接使用"
+      },
+      {
+        "file": "ContentView.swift",
+        "method": "onDeleteGroups",
+        "issue": "PhotoRepository.delete()を直接使用"
+      }
+    ],
+    "fixPlan": {
+      "step1": "onDeletePhotos を DeletePhotosUseCase.execute(photos, permanent: false) に変更",
+      "step2": "onDeleteGroups を DeletePhotosUseCase.execute(photos, permanent: false) に変更",
+      "step3": "E2Eテストでゴミ箱機能確認"
+    }
   },
 
   "p0NavigationStackFix": {
-    "status": "fixed-pending-verification",
+    "status": "verified",
     "identifiedDate": "2025-12-21",
     "fixedDate": "2025-12-21",
-    "qualityScore": "pending",
-    "severity": "resolved-pending",
+    "verifiedDate": "2025-12-21",
+    "qualityScore": 90,
+    "severity": "resolved",
     "symptom": "グループ詳細表示時にNavigationStack二重ネストでクラッシュ",
-    "impact": "修正完了 - テスト結果待ち",
-    "logSessionId": "fb307a28-5a07-4a88-98ee-893b1a889556",
-    "rootCause": "GroupDetailView.swift、HomeView.swiftでNavigationStackが二重にネストされていた",
+    "impact": "修正完了・実機テストで正常動作確認",
     "fixedComponents": [
       {
         "file": "GroupDetailView.swift",
         "line": "117-121",
-        "changes": "NavigationStackラッパー削除、DashboardNavigationContainerで既に包まれているため不要"
+        "changes": "NavigationStackラッパー削除"
       },
       {
         "file": "HomeView.swift",
-        "changes": "NavigationStackラッパー削除、親コンテナで管理"
+        "changes": "NavigationStackラッパー削除"
       }
-    ],
-    "deviceDeployment": {
-      "device": "iPhone 15 Pro Max",
-      "processId": 31761,
-      "buildResult": "成功",
-      "installResult": "成功",
-      "launchResult": "成功"
-    }
+    ]
   },
 
   "p0GroupDetailCrash": {
@@ -101,7 +128,6 @@
     "severity": "resolved",
     "symptom": "グループを選択すると中身が表示されずにアプリが落ちる",
     "impact": "修正完了 - 最適化機能（ベストショット選択、削除提案）が使用可能に",
-    "logSessionId": "37590cb8-7f87-4e87-a03b-b48dc5c4afbb",
     "rootCause": "PhotoThumbnail.swift内のContinuation二重resume問題",
     "fixedComponents": [
       {
@@ -125,20 +151,15 @@
   },
 
   "e2eTestResults": {
-    "session": "p0-group-detail-crash-fix-001",
+    "session": "trash-integration-analysis-001",
     "date": "2025-12-21",
-    "simulator": {
-      "status": "completed",
-      "passRate": "94.4%",
-      "passed": 17,
-      "failed": 1,
-      "total": 18,
-      "failedTest": "スクロールテスト（UI要素検出問題）"
-    },
     "device": {
-      "status": "pending",
-      "logSessionId": "fb307a28-5a07-4a88-98ee-893b1a889556",
-      "targetDevice": "iPhone 15 Pro Max"
+      "status": "completed",
+      "results": {
+        "navigationStackFix": "正常動作確認",
+        "groupDetailNavigation": "クラッシュなし",
+        "photoDeletion": "動作するがゴミ箱未統合（新問題）"
+      }
     }
   },
 
@@ -208,8 +229,8 @@
   },
 
   "quality": {
-    "scores": [90, 100, 95, 97.5, 95, 95, 100, 97.5, 92, 97.5, 97, 90, 92, 90, 90, 90, 72, 90, 92, 92, 95, 75, 81, 85],
-    "average": 90.5,
+    "scores": [90, 100, 95, 97.5, 95, 95, 100, 97.5, 92, 97.5, 97, 90, 92, 90, 90, 90, 72, 90, 92, 92, 95, 75, 81, 85, 84],
+    "average": 90.1,
     "trend": "stable"
   },
 
@@ -233,7 +254,8 @@
       "Integration-Completion-001",
       "P0-Group-Detail-Crash-Fix-001",
       "P0-Navigation-Type-Mismatch-Fix-001",
-      "P0-Navigation-Stack-Fix-001"
+      "P0-Navigation-Stack-Fix-001",
+      "Trash-Integration-Analysis-001"
     ],
     "buildSize": "22MB",
     "signingStatus": "valid",
@@ -241,7 +263,7 @@
       "name": "YH iphone 15 pro max",
       "deviceId": "C7812CA5-F362-565B-985C-CE323F453DFA"
     },
-    "qualityAverage": 90.5,
+    "qualityAverage": 90.1,
     "status": "deployed",
     "lastDeployDate": "2025-12-21"
   },
@@ -268,33 +290,32 @@
   },
 
   "nextSession": {
-    "recommended_action": "ユーザーテスト結果確認 + ログ分析",
+    "recommended_action": "ゴミ箱統合修正の実装",
     "priority": "HIGH",
     "estimatedTime": "1時間",
     "tasks": [
       {
-        "name": "ユーザークラッシュテスト結果確認",
-        "description": "ユーザーがグループ詳細表示をテストした結果を確認",
+        "name": "ContentView.swift の onDeletePhotos 修正",
+        "description": "PhotoRepository.delete() を DeletePhotosUseCase.execute() に変更",
         "priority": 1
       },
       {
-        "name": "ログセッション分析",
-        "description": "ログセッションID: fb307a28-5a07-4a88-98ee-893b1a889556 を分析、クラッシュ解消確認",
-        "priority": 2,
-        "logSessionId": "fb307a28-5a07-4a88-98ee-893b1a889556"
+        "name": "ContentView.swift の onDeleteGroups 修正",
+        "description": "PhotoRepository.delete() を DeletePhotosUseCase.execute() に変更",
+        "priority": 2
+      },
+      {
+        "name": "E2Eテスト実施",
+        "description": "シミュレーター/実機でゴミ箱機能確認",
+        "priority": 3
       },
       {
         "name": "品質スコア90点達成",
         "description": "テストカバレッジ向上、ドキュメント同期完了",
-        "priority": 3
-      },
-      {
-        "name": "App Store提出準備",
-        "description": "M10-T04: App Store Connect設定、M10-T05: TestFlight配信",
         "priority": 4
       }
     ]
   },
 
-  "notes": "p0-navigation-stack-fix-001セッション完了（テスト待ち）。NavigationStack二重ネスト問題を修正。GroupDetailView.swift（Line 117-121）とHomeView.swiftからNavigationStackラッパーを削除。実機デプロイ成功（iPhone 15 Pro Max、Process ID: 31761）。ログキャプチャ開始（ID: fb307a28-5a07-4a88-98ee-893b1a889556）。次回はユーザーテスト結果確認とログ分析を実施。"
+  "notes": "trash-integration-analysis-001セッション完了。NavigationStack二重ネスト修正は実機テストで正常動作確認。新問題発見: ゴミ箱機能がContentView.swiftで統合されていない。DeletePhotosUseCaseを使用せずPhotoRepositoryを直接使用しているため、写真がゴミ箱に入らず即時削除される。設計審査84点。修正方針決定済み（UseCase経由に変更）。次回セッションでゴミ箱統合修正を実装予定。"
 }
