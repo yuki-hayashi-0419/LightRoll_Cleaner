@@ -164,7 +164,7 @@ public struct DashboardNavigationContainer: View {
                 photoProvider: photoProvider,
                 initialFilterType: nil,
                 onGroupTap: { group in
-                    router.navigateToGroupDetail(group: group)
+                    router.navigateToGroupDetail(groupId: group.id)
                 },
                 onDeleteGroups: onDeleteGroups,
                 onBack: {
@@ -178,7 +178,7 @@ public struct DashboardNavigationContainer: View {
                 photoProvider: photoProvider,
                 initialFilterType: groupType,
                 onGroupTap: { group in
-                    router.navigateToGroupDetail(group: group)
+                    router.navigateToGroupDetail(groupId: group.id)
                 },
                 onDeleteGroups: onDeleteGroups,
                 onBack: {
@@ -186,15 +186,23 @@ public struct DashboardNavigationContainer: View {
                 }
             )
 
-        case .groupDetail(let group):
-            GroupDetailView(
-                group: group,
-                photoProvider: photoProvider,
-                onDeletePhotos: onDeletePhotos,
-                onBack: {
+        case .groupDetail(let groupId):
+            // currentGroupsからgroupIdに対応するグループを取得
+            if let group = currentGroups.first(where: { $0.id == groupId }) {
+                GroupDetailView(
+                    group: group,
+                    photoProvider: photoProvider,
+                    onDeletePhotos: onDeletePhotos,
+                    onBack: {
+                        router.navigateBack()
+                    }
+                )
+            } else {
+                // グループが見つからない場合はエラービューを表示
+                GroupNotFoundView(groupId: groupId) {
                     router.navigateBack()
                 }
-            )
+            }
 
         case .settings:
             // 設定画面は外部モジュールのため、ここでは処理しない
@@ -211,6 +219,58 @@ public struct DashboardNavigationContainer: View {
     }
 }
 
+// MARK: - GroupNotFoundView
+
+/// グループが見つからない場合に表示するビュー
+@MainActor
+private struct GroupNotFoundView: View {
+    /// 見つからなかったグループのID
+    let groupId: UUID
+
+    /// 戻るアクションのコールバック
+    let onBack: () -> Void
+
+    var body: some View {
+        VStack(spacing: LRSpacing.lg) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.system(size: 48))
+                .foregroundStyle(.secondary)
+
+            Text(NSLocalizedString(
+                "groupNotFound.title",
+                value: "グループが見つかりません",
+                comment: "Group not found title"
+            ))
+            .font(.headline)
+
+            Text(NSLocalizedString(
+                "groupNotFound.message",
+                value: "指定されたグループは削除されたか、存在しません。",
+                comment: "Group not found message"
+            ))
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal)
+
+            Button {
+                onBack()
+            } label: {
+                Text(NSLocalizedString(
+                    "groupNotFound.back",
+                    value: "戻る",
+                    comment: "Go back button"
+                ))
+                .font(.body.weight(.semibold))
+            }
+            .buttonStyle(.borderedProminent)
+            .padding(.top)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.LightRoll.background)
+    }
+}
+
 // MARK: - Preview
 
 #if DEBUG
@@ -222,6 +282,12 @@ public struct DashboardNavigationContainer: View {
     Text("DashboardNavigationContainer Preview")
         .font(.headline)
         .padding()
+}
+
+#Preview("グループ未発見ビュー") {
+    GroupNotFoundView(groupId: UUID()) {
+        print("戻るボタンがタップされました")
+    }
 }
 
 #endif

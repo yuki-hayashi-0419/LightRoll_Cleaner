@@ -77,38 +77,30 @@ struct DashboardRouterTests {
     func testNavigateToGroupDetail() async {
         // Given
         let router = DashboardRouter()
-        let group = PhotoGroup(
-            type: .similar,
-            photoIds: ["photo1", "photo2"],
-            fileSizes: [1_000_000, 1_000_000]
-        )
+        let groupId = UUID()
 
         // When
-        router.navigateToGroupDetail(group: group)
+        router.navigateToGroupDetail(groupId: groupId)
 
         // Then
         #expect(router.path.count == 1)
-        #expect(router.path.first == .groupDetail(group))
+        #expect(router.path.first == .groupDetail(groupId))
     }
 
     @Test("複数の画面に連続して遷移できること")
     func testNavigateMultipleScreens() async {
         // Given
         let router = DashboardRouter()
-        let group = PhotoGroup(
-            type: .screenshot,
-            photoIds: ["photo1"],
-            fileSizes: [1_000_000]
-        )
+        let groupId = UUID()
 
         // When
         router.navigateToGroupList()
-        router.navigateToGroupDetail(group: group)
+        router.navigateToGroupDetail(groupId: groupId)
 
         // Then
         #expect(router.path.count == 2)
         #expect(router.path[0] == .groupList)
-        #expect(router.path[1] == .groupDetail(group))
+        #expect(router.path[1] == .groupDetail(groupId))
     }
 
     // MARK: - Back Navigation Tests
@@ -144,14 +136,10 @@ struct DashboardRouterTests {
     func testNavigateToRoot() async {
         // Given
         let router = DashboardRouter()
-        let group = PhotoGroup(
-            type: .similar,
-            photoIds: ["photo1"],
-            fileSizes: [1_000_000]
-        )
+        let groupId = UUID()
 
         router.navigateToGroupList()
-        router.navigateToGroupDetail(group: group)
+        router.navigateToGroupDetail(groupId: groupId)
 
         // When
         router.navigateToRoot()
@@ -164,20 +152,12 @@ struct DashboardRouterTests {
     func testNavigateBackToDestination() async {
         // Given
         let router = DashboardRouter()
-        let group1 = PhotoGroup(
-            type: .similar,
-            photoIds: ["photo1"],
-            fileSizes: [1_000_000]
-        )
-        let group2 = PhotoGroup(
-            type: .screenshot,
-            photoIds: ["photo2"],
-            fileSizes: [1_000_000]
-        )
+        let groupId1 = UUID()
+        let groupId2 = UUID()
 
         router.navigateToGroupList()
-        router.navigateToGroupDetail(group: group1)
-        router.navigateToGroupDetail(group: group2)
+        router.navigateToGroupDetail(groupId: groupId1)
+        router.navigateToGroupDetail(groupId: groupId2)
 
         // When
         router.navigateBackTo(.groupList)
@@ -191,16 +171,12 @@ struct DashboardRouterTests {
     func testNavigateBackToNonExistentDestination() async {
         // Given
         let router = DashboardRouter()
-        let group = PhotoGroup(
-            type: .similar,
-            photoIds: ["photo1"],
-            fileSizes: [1_000_000]
-        )
+        let groupId = UUID()
 
         router.navigateToGroupList()
 
         // When
-        router.navigateBackTo(.groupDetail(group))
+        router.navigateBackTo(.groupDetail(groupId))
 
         // Then
         #expect(router.path.count == 1)
@@ -326,18 +302,17 @@ struct DashboardDestinationTests {
     @Test("グループ詳細遷移先の等価性判定")
     func testGroupDetailEquality() async {
         // Given
-        let group = PhotoGroup(
-            type: .similar,
-            photoIds: ["photo1"],
-            fileSizes: [1_000_000]
-        )
+        let groupId = UUID()
 
-        let dest1 = DashboardDestination.groupDetail(group)
-        let dest2 = DashboardDestination.groupDetail(group)
+        let dest1 = DashboardDestination.groupDetail(groupId)
+        let dest2 = DashboardDestination.groupDetail(groupId)
+        let dest3 = DashboardDestination.groupDetail(UUID())
 
         // Then
-        // 同じグループインスタンスを使用しているため等価
+        // 同じグループIDを使用しているため等価
         #expect(dest1 == dest2)
+        // 異なるグループIDは非等価
+        #expect(dest1 != dest3)
     }
 
     @Test("異なる遷移先の非等価性判定")

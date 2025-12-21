@@ -105,16 +105,12 @@ struct DashboardRouterP0FixTests {
         let router = DashboardRouter()
         router.navigateToGroupList(filterType: .similar)
         router.navigateToGroupList(filterType: .blurry)
-        let group = PhotoGroup(
-            type: .screenshot,
-            photoIds: ["photo1"],
-            fileSizes: [1_000_000]
-        )
-        router.navigateToGroupDetail(group: group)
+        let groupId = UUID()
+        router.navigateToGroupDetail(groupId: groupId)
         #expect(router.path.count == 3)
 
         // When: path末尾と同じdestinationへの遷移を試みる
-        router.navigateToGroupDetail(group: group)
+        router.navigateToGroupDetail(groupId: groupId)
 
         // Then: 重複pushは防止される（groupDetailは重複チェック対象外なので追加される）
         // ※ navigateToGroupDetail は重複チェックを実装していないため、追加される

@@ -20,8 +20,8 @@ public enum DashboardDestination: Hashable, Sendable {
     /// グループリスト画面（特定タイプでフィルタ）
     case groupListFiltered(GroupType)
 
-    /// グループ詳細画面
-    case groupDetail(PhotoGroup)
+    /// グループ詳細画面（グループIDで指定）
+    case groupDetail(UUID)
 
     /// 設定画面（外部モジュール）
     case settings
@@ -78,9 +78,9 @@ public final class DashboardRouter: Sendable {
     }
 
     /// グループ詳細画面へ遷移
-    /// - Parameter group: 表示するグループ
-    public func navigateToGroupDetail(group: PhotoGroup) {
-        path.append(.groupDetail(group))
+    /// - Parameter groupId: 表示するグループのID
+    public func navigateToGroupDetail(groupId: UUID) {
+        path.append(.groupDetail(groupId))
     }
 
     /// 設定画面へ遷移（外部モジュール）
