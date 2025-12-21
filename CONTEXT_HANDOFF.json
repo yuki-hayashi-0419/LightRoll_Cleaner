@@ -1,15 +1,15 @@
 {
-  "version": "3.59",
+  "version": "3.60",
   "lastUpdated": "2025-12-21",
-  "sessionId": "p0-group-detail-crash-fix-001",
-  "sessionEndStatus": "completed",
+  "sessionId": "p0-navigation-stack-fix-001",
+  "sessionEndStatus": "test-pending",
 
   "projectStatus": {
-    "phase": "P0グループ詳細クラッシュ修正完了 → 実機検証待ち",
-    "currentPhase": "E2Eテスト完了（シミュレーター94.4%）→ 実機テスト結果待ち",
+    "phase": "P0 NavigationStack二重ネスト修正完了 → ユーザーテスト待ち",
+    "currentPhase": "実機デプロイ完了 → クラッシュテスト結果待ち",
     "overallProgress": "98%",
-    "nextMilestone": "実機E2Eテスト確認 → 品質スコア90点達成 → App Store提出",
-    "majorAchievement": "P0グループ詳細クラッシュ修正完了（81点）。PhotoThumbnail Continuation二重resume問題解消、GroupDetailViewエラーハンドリング強化。テスト54件生成、シミュレーターE2E 94.4%合格。次回は実機テスト結果確認と品質向上が必要。"
+    "nextMilestone": "ユーザーテスト確認 → 品質スコア90点達成 → App Store提出",
+    "majorAchievement": "P0 NavigationStack二重ネスト修正完了。GroupDetailView.swift、HomeView.swiftからNavigationStackラッパーを削除。実機デプロイ成功（iPhone 15 Pro Max）。ログキャプチャ開始（セッションID: fb307a28-5a07-4a88-98ee-893b1a889556）。次回はユーザーテスト結果確認とログ分析が必要。"
   },
 
   "taskStatus": {
@@ -22,9 +22,10 @@
     "blockedP0": 0,
     "completedHours": 226,
     "remainingHours": 2,
-    "lastCompletedTaskId": "p0-group-detail-crash-fix-001",
+    "lastCompletedTaskId": "p0-navigation-stack-fix-001",
     "nextTaskCandidates": [
-      "実機テスト結果確認（ログセッションID: 37590cb8-7f87-4e87-a03b-b48dc5c4afbb）",
+      "ユーザーによるクラッシュテスト実行結果確認",
+      "ログセッションID: fb307a28-5a07-4a88-98ee-893b1a889556 分析",
       "品質スコア90点達成（テストカバレッジ向上）",
       "M10-T04: App Store Connect設定"
     ]
@@ -32,10 +33,10 @@
 
   "contextOptimization": {
     "optimizedDate": "2025-12-21",
-    "lastOptimizationSession": "p0-group-detail-crash-fix-001",
+    "lastOptimizationSession": "p0-navigation-stack-fix-001",
     "progressEntries": {
-      "before": 6,
-      "after": 7,
+      "before": 7,
+      "after": 8,
       "archived": 0
     },
     "tasksCompleted": {
@@ -54,12 +55,42 @@
   },
 
   "resumeInstructions": {
-    "step1": "【優先】実機テスト結果確認: ログセッションID: 37590cb8-7f87-4e87-a03b-b48dc5c4afbb を分析",
+    "step1": "【優先】ユーザーテスト結果確認: ログセッションID: fb307a28-5a07-4a88-98ee-893b1a889556 を分析",
     "step2": "【検証】E2Eテスト: スキャン→グループ化→詳細表示→削除 のフロー確認",
-    "step3": "【品質】テストカバレッジ向上: 81点 → 90点を目指す",
+    "step3": "【品質】テストカバレッジ向上: 85点 → 90点を目指す",
     "step4": "【次タスク】App Store提出準備の継続（M10-T04以降）",
-    "step5": "【確認】シミュレーターE2Eテスト失敗項目（スクロールテスト）の再検証",
-    "context": "【重要】p0-group-detail-crash-fix-001セッションでP0クラッシュ修正完了（81点）。PhotoThumbnailのContinuation二重resume問題を解消、GroupDetailViewにエラーハンドリング強化。テスト54件生成済み。シミュレーターE2E 94.4%合格。実機テストはログ収集中。"
+    "step5": "【確認】NavigationStack二重ネスト問題が完全に解消されているか検証",
+    "context": "【重要】p0-navigation-stack-fix-001セッションでNavigationStack二重ネスト修正完了。GroupDetailView.swift、HomeView.swiftからNavigationStackラッパー削除。実機デプロイ成功（iPhone 15 Pro Max、Process ID: 31761）。ユーザーによるクラッシュテスト実行待ち。"
+  },
+
+  "p0NavigationStackFix": {
+    "status": "fixed-pending-verification",
+    "identifiedDate": "2025-12-21",
+    "fixedDate": "2025-12-21",
+    "qualityScore": "pending",
+    "severity": "resolved-pending",
+    "symptom": "グループ詳細表示時にNavigationStack二重ネストでクラッシュ",
+    "impact": "修正完了 - テスト結果待ち",
+    "logSessionId": "fb307a28-5a07-4a88-98ee-893b1a889556",
+    "rootCause": "GroupDetailView.swift、HomeView.swiftでNavigationStackが二重にネストされていた",
+    "fixedComponents": [
+      {
+        "file": "GroupDetailView.swift",
+        "line": "117-121",
+        "changes": "NavigationStackラッパー削除、DashboardNavigationContainerで既に包まれているため不要"
+      },
+      {
+        "file": "HomeView.swift",
+        "changes": "NavigationStackラッパー削除、親コンテナで管理"
+      }
+    ],
+    "deviceDeployment": {
+      "device": "iPhone 15 Pro Max",
+      "processId": 31761,
+      "buildResult": "成功",
+      "installResult": "成功",
+      "launchResult": "成功"
+    }
   },
 
   "p0GroupDetailCrash": {
@@ -106,7 +137,7 @@
     },
     "device": {
       "status": "pending",
-      "logSessionId": "37590cb8-7f87-4e87-a03b-b48dc5c4afbb",
+      "logSessionId": "fb307a28-5a07-4a88-98ee-893b1a889556",
       "targetDevice": "iPhone 15 Pro Max"
     }
   },
@@ -177,8 +208,8 @@
   },
 
   "quality": {
-    "scores": [90, 100, 95, 97.5, 95, 95, 100, 97.5, 92, 97.5, 97, 90, 92, 90, 90, 90, 72, 90, 92, 92, 95, 75, 81],
-    "average": 90.8,
+    "scores": [90, 100, 95, 97.5, 95, 95, 100, 97.5, 92, 97.5, 97, 90, 92, 90, 90, 90, 72, 90, 92, 92, 95, 75, 81, 85],
+    "average": 90.5,
     "trend": "stable"
   },
 
@@ -200,7 +231,9 @@
       "Grouping-Performance-Analysis-001",
       "P0-Navigation-Fix-002",
       "Integration-Completion-001",
-      "P0-Group-Detail-Crash-Fix-001"
+      "P0-Group-Detail-Crash-Fix-001",
+      "P0-Navigation-Type-Mismatch-Fix-001",
+      "P0-Navigation-Stack-Fix-001"
     ],
     "buildSize": "22MB",
     "signingStatus": "valid",
@@ -208,7 +241,7 @@
       "name": "YH iphone 15 pro max",
       "deviceId": "C7812CA5-F362-565B-985C-CE323F453DFA"
     },
-    "qualityAverage": 90.8,
+    "qualityAverage": 90.5,
     "status": "deployed",
     "lastDeployDate": "2025-12-21"
   },
@@ -235,28 +268,33 @@
   },
 
   "nextSession": {
-    "recommended_action": "実機テスト結果確認 + 品質スコア向上",
+    "recommended_action": "ユーザーテスト結果確認 + ログ分析",
     "priority": "HIGH",
-    "estimatedTime": "1-2時間",
+    "estimatedTime": "1時間",
     "tasks": [
       {
-        "name": "実機テスト結果確認",
-        "description": "ログセッションID: 37590cb8-7f87-4e87-a03b-b48dc5c4afbb を分析、クラッシュ解消確認",
-        "priority": 1,
-        "logSessionId": "37590cb8-7f87-4e87-a03b-b48dc5c4afbb"
+        "name": "ユーザークラッシュテスト結果確認",
+        "description": "ユーザーがグループ詳細表示をテストした結果を確認",
+        "priority": 1
+      },
+      {
+        "name": "ログセッション分析",
+        "description": "ログセッションID: fb307a28-5a07-4a88-98ee-893b1a889556 を分析、クラッシュ解消確認",
+        "priority": 2,
+        "logSessionId": "fb307a28-5a07-4a88-98ee-893b1a889556"
       },
       {
         "name": "品質スコア90点達成",
-        "description": "テストカバレッジ向上（12/20 → 18/20）、ドキュメント同期完了",
-        "priority": 2
+        "description": "テストカバレッジ向上、ドキュメント同期完了",
+        "priority": 3
       },
       {
         "name": "App Store提出準備",
         "description": "M10-T04: App Store Connect設定、M10-T05: TestFlight配信",
-        "priority": 3
+        "priority": 4
       }
     ]
   },
 
-  "notes": "p0-group-detail-crash-fix-001セッション完了（81点）。P0グループ詳細クラッシュを修正。PhotoThumbnailのContinuation二重resume問題を解消し、GroupDetailViewにエラーハンドリングを強化。テスト54件生成、シミュレーターE2E 94.4%合格。実機テストはログ収集中（ID: 37590cb8-7f87-4e87-a03b-b48dc5c4afbb）。次回は実機テスト結果確認と品質スコア90点達成が目標。"
+  "notes": "p0-navigation-stack-fix-001セッション完了（テスト待ち）。NavigationStack二重ネスト問題を修正。GroupDetailView.swift（Line 117-121）とHomeView.swiftからNavigationStackラッパーを削除。実機デプロイ成功（iPhone 15 Pro Max、Process ID: 31761）。ログキャプチャ開始（ID: fb307a28-5a07-4a88-98ee-893b1a889556）。次回はユーザーテスト結果確認とログ分析を実施。"
 }

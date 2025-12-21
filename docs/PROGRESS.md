@@ -4,6 +4,96 @@
 
 ---
 
+## 2025-12-21 セッション⑨: p0-navigation-stack-fix-001（終了・テスト待ち）
+
+### セッション概要
+- **セッションID**: p0-navigation-stack-fix-001
+- **実施内容**: P0クラッシュ修正（NavigationStack二重ネスト問題）
+- **品質スコア**: テスト結果待ち
+- **終了理由**: コード修正完了、実機デプロイ成功、ユーザーテスト待ち
+
+### 完了したタスク
+
+#### 1. P0クラッシュ根本原因の特定（完了）
+- **問題**: グループ詳細表示時にNavigationStack二重ネストでクラッシュ
+- **根本原因**: GroupDetailView.swiftとHomeView.swiftでNavigationStackが二重にネストされていた
+- **解決策**: 子ViewからNavigationStackラッパーを削除（親コンテナで管理）
+
+#### 2. コード修正（完了）
+
+**GroupDetailView.swift**:
+- Line 117-121: NavigationStackラッパー削除
+- 理由: DashboardNavigationContainerで既に包まれているため不要
+- コメント追加: `// 注意: NavigationStackは親のDashboardNavigationContainerで管理`
+
+**HomeView.swift**:
+- NavigationStackラッパー削除
+- 親コンテナでの管理に統一
+
+#### 3. 実機デプロイ（完了）
+
+| 項目 | 結果 |
+|------|------|
+| ビルド | 成功（Debug-iphoneos） |
+| インストール | 成功（iPhone 15 Pro Max） |
+| 起動 | 成功（Process ID: 31761） |
+| ログキャプチャ | 開始（Session ID: fb307a28-5a07-4a88-98ee-893b1a889556） |
+
+### 未完了タスク
+
+1. **ユーザーによるクラッシュテスト実行**
+   - グループ詳細表示をテストしてクラッシュが解消されているか確認
+
+2. **ログ収集と結果分析**
+   - ログセッションID: fb307a28-5a07-4a88-98ee-893b1a889556
+
+3. **品質スコア評価**
+   - テスト結果に基づいて評価（目標: 90点以上）
+
+### 修正ファイル一覧
+
+| ファイル | 変更内容 |
+|----------|----------|
+| GroupDetailView.swift | NavigationStackラッパー削除（Line 117-121） |
+| HomeView.swift | NavigationStackラッパー削除 |
+
+### 技術的詳細
+
+#### 変更前（問題のあるコード）
+```swift
+// GroupDetailView.swift
+var body: some View {
+    NavigationStack {  // <- 二重ネスト問題
+        content
+    }
+}
+```
+
+#### 変更後（修正済みコード）
+```swift
+// GroupDetailView.swift
+var body: some View {
+    // 注意: NavigationStackは親のDashboardNavigationContainerで管理
+    content
+}
+```
+
+### 次回タスク
+
+1. **ユーザーテスト結果確認**
+   - クラッシュが解消されているか確認
+   - ログセッションID: fb307a28-5a07-4a88-98ee-893b1a889556 を分析
+
+2. **品質スコア90点以上達成**
+   - テストカバレッジ向上
+   - ドキュメント同期完了
+
+3. **リリース準備継続**
+   - M10-T04: App Store Connect設定
+   - M10-T05: TestFlight配信
+
+---
+
 ## 2025-12-21 セッション⑧: p0-navigation-type-mismatch-fix-001（終了）
 
 ### セッション概要
