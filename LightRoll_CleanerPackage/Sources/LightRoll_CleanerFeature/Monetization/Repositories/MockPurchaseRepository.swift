@@ -22,6 +22,15 @@ public final class MockPurchaseRepository: PurchaseRepositoryProtocol {
     /// モック用製品情報
     public var mockProducts: [ProductInfo] = []
 
+    /// 互換性エイリアス: mockProductsと同期
+    public var availableProducts: [ProductInfo] {
+        get { mockProducts }
+        set { mockProducts = newValue }
+    }
+
+    /// ローディング状態（互換性のため追加）
+    public var loading: Bool = false
+
     /// モック用プレミアムステータス
     public var mockPremiumStatus: PremiumStatus = .free
 
@@ -64,6 +73,38 @@ public final class MockPurchaseRepository: PurchaseRepositoryProtocol {
     // MARK: - Initialization
 
     public init() {}
+
+    /// 製品リスト付きイニシャライザ（互換性のため追加）
+    public convenience init(products: [ProductInfo]) {
+        self.init()
+        self.mockProducts = products
+    }
+
+    /// ローディング状態付きイニシャライザ（互換性のため追加）
+    public convenience init(loading: Bool) {
+        self.init()
+        self.loading = loading
+    }
+
+    /// エラースロー設定付きイニシャライザ（互換性のため追加）
+    public convenience init(shouldThrowError: Bool) {
+        self.init()
+        self.shouldThrowError = shouldThrowError
+    }
+
+    /// 複合設定イニシャライザ（互換性のため追加）
+    public convenience init(
+        products: [ProductInfo] = [],
+        loading: Bool = false,
+        shouldThrowError: Bool = false,
+        errorToThrow: PurchaseError = .unknownError
+    ) {
+        self.init()
+        self.mockProducts = products
+        self.loading = loading
+        self.shouldThrowError = shouldThrowError
+        self.errorToThrow = errorToThrow
+    }
 
     // MARK: - PurchaseRepositoryProtocol
 

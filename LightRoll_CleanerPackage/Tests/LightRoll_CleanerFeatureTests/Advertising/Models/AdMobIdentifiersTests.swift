@@ -6,6 +6,7 @@
 //
 
 import Testing
+import Foundation
 @testable import LightRoll_CleanerFeature
 
 @Suite("AdMobIdentifiers Tests")

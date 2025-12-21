@@ -463,10 +463,11 @@ struct StateRefreshTests {
 }
 
 // MARK: - Test Tags
+// 注: integrationタグはTestTags.swiftで定義済み
 
 extension Tag {
-    @Tag static var component: Tag
-    @Tag static var feature: Tag
-    @Tag static var purchase: Tag
-    @Tag static var refresh: Tag
+    @Tag static var component: Self
+    @Tag static var feature: Self
+    @Tag static var purchase: Self
+    @Tag static var refresh: Self
 }

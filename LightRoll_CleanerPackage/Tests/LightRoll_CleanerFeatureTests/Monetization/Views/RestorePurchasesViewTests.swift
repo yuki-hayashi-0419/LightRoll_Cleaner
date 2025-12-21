@@ -139,7 +139,7 @@ struct RestorePurchasesViewTests {
         // Given
         let repository = mockRepository
         repository.shouldThrowError = true
-        repository.mockError = .networkError
+        repository.errorToThrow = .networkError
         let manager = PremiumManager(purchaseRepository: repository)
 
         // When
@@ -158,7 +158,7 @@ struct RestorePurchasesViewTests {
         // Given
         let repository = mockRepository
         repository.shouldThrowError = true
-        repository.mockError = .restorationFailed("Apple IDが一致しません")
+        repository.errorToThrow = .restorationFailed("Apple IDが一致しません")
         let manager = PremiumManager(purchaseRepository: repository)
 
         // When
@@ -218,7 +218,7 @@ struct RestorePurchasesViewTests {
         // Given
         let repository = mockRepository
         repository.mockRestoreResult = RestoreResult(transactions: [])
-        repository.mockPremiumStatus = .premiumMonthly(expiresAt: Date().addingTimeInterval(86400 * 30))
+        repository.mockPremiumStatus = .monthly(startDate: Date(), autoRenew: true)
         let manager = PremiumManager(purchaseRepository: repository)
 
         // When
@@ -255,7 +255,7 @@ struct RestorePurchasesViewTests {
         // Given
         let repository = mockRepository
         repository.shouldThrowError = true
-        repository.mockError = .purchaseCancelled
+        repository.errorToThrow = .purchaseCancelled
         let manager = PremiumManager(purchaseRepository: repository)
 
         // When
@@ -281,7 +281,7 @@ struct RestorePurchasesViewTests {
         // Given
         let repository = mockRepository
         repository.shouldThrowError = true
-        repository.mockError = .verificationFailed
+        repository.errorToThrow = .verificationFailed
         let manager = PremiumManager(purchaseRepository: repository)
 
         // When
@@ -297,14 +297,12 @@ struct RestorePurchasesViewTests {
 }
 
 // MARK: - Test Tags
+// 注: 共通タグは TestTags.swift で定義済み
+// success, failure タグはローカルで使用（共通タグと競合しない）
 
 extension Tag {
     @Tag static var success: Self
     @Tag static var failure: Self
-    @Tag static var boundary: Self
-    @Tag static var ui: Self
-    @Tag static var accessibility: Self
-    @Tag static var integration: Self
 }
 
 // Note: Transactionのモックは実装していません

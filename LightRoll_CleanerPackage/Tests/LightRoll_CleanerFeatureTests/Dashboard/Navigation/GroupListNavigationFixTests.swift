@@ -14,11 +14,11 @@ import Testing
 import Foundation
 @testable import LightRoll_CleanerFeature
 
-// MARK: - GroupListViewStateTests
+// MARK: - GroupListNavigationStateTests
 
-@Suite("GroupListView 状態管理テスト", .serialized)
+@Suite("GroupListView ナビゲーション状態管理テスト", .serialized)
 @MainActor
-struct GroupListViewStateTests {
+struct GroupListNavigationStateTests {
 
     // MARK: - Test Data
 

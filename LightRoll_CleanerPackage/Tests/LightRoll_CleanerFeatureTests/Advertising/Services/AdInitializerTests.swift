@@ -201,7 +201,10 @@ struct AdInitializerTests {
                 guard let initError = error as? AdInitializerError else {
                     return false
                 }
-                return initError == .sdkNotAvailable
+                if case .sdkNotAvailable = initError {
+                    return true
+                }
+                return false
             })
             #endif
         }
@@ -217,7 +220,9 @@ struct AdInitializerTests {
                 // 初期化成功または他のエラー
             } catch let error as AdInitializerError {
                 // SDK利用不可エラーは発生しない
-                #expect(error != .sdkNotAvailable)
+                if case .sdkNotAvailable = error {
+                    Issue.record("SDK利用不可エラーは発生しないはず")
+                }
             } catch {
                 // その他のエラーは許容
             }
@@ -229,7 +234,10 @@ struct AdInitializerTests {
                 guard let initError = error as? AdInitializerError else {
                     return false
                 }
-                return initError == .sdkNotAvailable
+                if case .sdkNotAvailable = initError {
+                    return true
+                }
+                return false
             })
             #endif
         }

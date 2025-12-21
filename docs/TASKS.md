@@ -208,36 +208,34 @@
 
 ## 🔴 P0（緊急・次セッション最優先）
 
-### ナビゲーション統合の修正
-- [ ] 「グループを確認」ボタンがホームに戻る問題の修正
+### グループ詳細クラッシュ修正 - 修正完了（検証待ち）
+- [x] グループ詳細表示時のクラッシュ修正（2025-12-21）
   - 優先度: P0
-  - セッション: ui-integration-fix-001
-  - 関連: DashboardRouter.navigateToGroupList()
-  - 影響: アプリの基本機能が使用不可
-  - 検証: docs/INTEGRATION_ANALYSIS_REPORT.md
+  - セッション: p0-group-detail-crash-fix-001
+  - 修正内容:
+    - PhotoThumbnail: Continuation二重resume問題を解消（withCheckedContinuation + onDisappear）
+    - GroupDetailView: 空グループチェックとエラーハンドリング追加
+  - 品質スコア: 81点 → 改善ループ実施中
+  - 次のステップ: 実機/シミュレーター検証
 
-- [ ] 2回目タップ時のクラッシュ修正
+### ナビゲーション統合の修正（前回セッションで修正済み）
+- [x] 「グループを確認」ボタンがホームに戻る問題の修正（2025-12-19）
   - 優先度: P0
-  - セッション: ui-integration-fix-001
-  - 関連: NavigationStack path管理
-  - 影響: アプリの安定性に重大な影響
-  - 症状: "App not running"エラー
+  - セッション: p0-navigation-fix-002
+  - 修正内容: NavigationStack二重ネスト問題を解消
+  - 品質スコア: 90点
 
-### 調査タスク
-- [ ] DashboardRouter.swift の詳細レビュー
-  - navigateToGroupList()メソッド検証
-  - @Observable state管理確認
+- [x] 2回目タップ時のクラッシュ修正（2025-12-19）
+  - 優先度: P0
+  - セッション: p0-navigation-fix-002
+  - 修正内容: NavigationStack path管理の修正
+  - 品質スコア: 92点
 
-- [ ] NavigationStack path デバッグ
-  - path更新ロジック検証
-  - タイミング問題調査
-
-- [ ] クラッシュログの取得と分析
-  - 実機でのクラッシュ再現
-  - Xcodeコンソールログ確認
-
-- [ ] DashboardDestination enum の検証
-  - groupList caseの正確な動作確認
+### 検証タスク（残り）
+- [ ] 実機E2Eテスト
+  - スキャン → グループ化 → 詳細表示 → 削除の一連フロー確認
+  - グループ詳細クラッシュが解消されているか確認
+  - 実機ログセッションID: 737e003e-5090-41b5-aafd-2f026ab00b0b
 
 ---
 
@@ -269,7 +267,7 @@
 
 ---
 
-*最終更新: 2025-12-18 (M9完了 100% + M10-T03完了 + P0タスク追加 / 121タスク 96.7%)*
+*最終更新: 2025-12-21 (P0グループ詳細クラッシュ修正完了・検証待ち / 117/117タスク完了 100% + 1P0検証待ち)*
 
 ---
 

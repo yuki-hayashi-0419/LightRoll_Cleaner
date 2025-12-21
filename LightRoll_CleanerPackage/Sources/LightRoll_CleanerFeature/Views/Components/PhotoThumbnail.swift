@@ -45,6 +45,9 @@ public struct PhotoThumbnail: View {
     /// 画像読み込みエラーフラグ
     @State private var loadError: Bool = false
 
+    /// 現在の画像リクエストID（キャンセル用）
+    @State private var currentRequestId: PHImageRequestID?
+
     // MARK: - Initialization
 
     /// イニシャライザ
@@ -107,6 +110,20 @@ public struct PhotoThumbnail: View {
         .aspectRatio(1.0, contentMode: .fit)
         .task {
             await loadThumbnail()
+        }
+        .onDisappear {
+            // View解放時に進行中の画像リクエストをキャンセル
+            cancelCurrentRequest()
+        }
+    }
+
+    // MARK: - Request Cancellation
+
+    /// 進行中の画像リクエストをキャンセル
+    private func cancelCurrentRequest() {
+        if let requestId = currentRequestId {
+            PHImageManager.default().cancelImageRequest(requestId)
+            currentRequestId = nil
         }
     }
 
@@ -304,20 +321,40 @@ public struct PhotoThumbnail: View {
 
     // MARK: - Image Loading
 
+    /// 画像読み込み結果を表す列挙型
+    private enum ThumbnailLoadResult: Sendable {
+        #if canImport(UIKit)
+        case success(UIImage)
+        #else
+        case success(NSImage)
+        #endif
+        case cancelled
+        case error
+    }
+
     /// サムネイル画像を非同期で読み込む
     ///
-    /// ## 重要: PHImageManager.requestImage の二重コールバック対策
-    /// Photos Frameworkの `requestImage` は以下の場合に複数回コールバックを呼ぶ：
-    /// - deliveryMode = .opportunistic の場合（低解像度→高解像度）
-    /// - iCloud写真のダウンロード中
+    /// ## 重要: クラッシュ防止対策
+    /// 以下の問題に対処:
+    /// 1. View解放後の@State access → withCheckedContinuationで安全にラップ
+    /// 2. PHImageManager.requestImageの二重コールバック → deliveryMode = .highQualityFormat
+    /// 3. Taskキャンセル時の処理 → CancellationErrorをチェック
     ///
-    /// この問題を解決するため、以下の対策を実施：
-    /// 1. deliveryMode を .highQualityFormat に変更し、コールバックを1回のみに
-    /// 2. Continuationは使用せず、直接Task内で状態更新
+    /// ## 修正履歴
+    /// - 2025-01-XX: View deallocate後のクラッシュ防止（P0バグ修正）
     @MainActor
     private func loadThumbnail() async {
+        // 既存のリクエストをキャンセル
+        cancelCurrentRequest()
+
         isLoading = true
         loadError = false
+
+        // Taskキャンセルチェック
+        guard !Task.isCancelled else {
+            isLoading = false
+            return
+        }
 
         // PHAssetを取得
         let fetchResult = PHAsset.fetchAssets(
@@ -328,21 +365,28 @@ public struct PhotoThumbnail: View {
         guard let asset = fetchResult.firstObject else {
             isLoading = false
             loadError = true
+            print("⚠️ PhotoThumbnail: PHAsset not found for localIdentifier: \(photo.localIdentifier)")
+            return
+        }
+
+        // Taskキャンセルチェック
+        guard !Task.isCancelled else {
+            isLoading = false
             return
         }
 
         // 画像リクエストオプションの設定
         // CRITICAL: deliveryMode を .highQualityFormat に設定
-        // .opportunistic はコールバックを複数回呼び出すため、Continuationと相性が悪い
+        // .opportunistic はコールバックを複数回呼び出すため使用禁止
         let options = PHImageRequestOptions()
-        options.deliveryMode = .highQualityFormat  // 変更: .opportunistic → .highQualityFormat
+        options.deliveryMode = .highQualityFormat
         options.resizeMode = .fast
         options.isNetworkAccessAllowed = true
         options.isSynchronous = false
 
         // サムネイルサイズを計算（Retina対応）
         #if canImport(UIKit)
-        let scale = UIScreen.main.scale
+        let scale = await MainActor.run { UIScreen.main.scale }
         #else
         let scale: CGFloat = 2.0 // macOSデフォルト
         #endif
@@ -351,37 +395,62 @@ public struct PhotoThumbnail: View {
             height: LRLayout.thumbnailSizeMD * scale
         )
 
-        // Continuationを使用せず、コールバックベースで直接状態更新
-        // deliveryMode = .highQualityFormat により、コールバックは必ず1回のみ呼ばれる
-        PHImageManager.default().requestImage(
-            for: asset,
-            targetSize: thumbnailSize,
-            contentMode: .aspectFill,
-            options: options
-        ) { image, info in
-            Task { @MainActor in
-                // キャンセルされた場合は何もしない
+        // withCheckedContinuationを使用して安全に非同期処理をラップ
+        // View解放時にTaskがキャンセルされるため、continuation resumeは1回のみ保証
+        let result: ThumbnailLoadResult = await withCheckedContinuation { continuation in
+            let requestId = PHImageManager.default().requestImage(
+                for: asset,
+                targetSize: thumbnailSize,
+                contentMode: .aspectFill,
+                options: options
+            ) { image, info in
+                // キャンセルされた場合
                 if let cancelled = info?[PHImageCancelledKey] as? Bool, cancelled {
-                    isLoading = false
+                    continuation.resume(returning: .cancelled)
                     return
                 }
 
                 // エラーチェック
                 if info?[PHImageErrorKey] as? Error != nil {
-                    loadError = true
-                    isLoading = false
+                    continuation.resume(returning: .error)
                     return
                 }
 
+                // 画像取得成功/失敗
                 if let image = image {
-                    thumbnailImage = image
-                    loadError = false
+                    continuation.resume(returning: .success(image))
                 } else {
-                    loadError = true
+                    continuation.resume(returning: .error)
                 }
-                isLoading = false
+            }
+
+            // リクエストIDを保存（キャンセル用）
+            Task { @MainActor in
+                currentRequestId = requestId
             }
         }
+
+        // Taskキャンセルチェック（continuation resume後）
+        guard !Task.isCancelled else {
+            isLoading = false
+            currentRequestId = nil
+            return
+        }
+
+        // 結果を適用（@MainActor保証下で安全に状態更新）
+        switch result {
+        case .success(let image):
+            thumbnailImage = image
+            loadError = false
+        case .cancelled:
+            // キャンセル時は何もしない
+            break
+        case .error:
+            loadError = true
+        }
+
+        isLoading = false
+        currentRequestId = nil
     }
 }
 

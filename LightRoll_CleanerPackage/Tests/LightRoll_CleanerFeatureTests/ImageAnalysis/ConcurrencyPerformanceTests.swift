@@ -173,7 +173,7 @@ struct PerformanceTests {
         }
 
         let endTime = ContinuousClock.now
-        return startTime.duration(to: endTime).components.attoseconds / 1_000_000_000_000_000
+        return Int(startTime.duration(to: endTime).components.attoseconds / 1_000_000_000_000_000)
     }
 
     /// 並列実行をシミュレート
@@ -189,7 +189,7 @@ struct PerformanceTests {
         }
 
         let endTime = ContinuousClock.now
-        return startTime.duration(to: endTime).components.attoseconds / 1_000_000_000_000_000
+        return Int(startTime.duration(to: endTime).components.attoseconds / 1_000_000_000_000_000)
     }
 
     // MARK: - テスト1: 直列vs並列の速度比較

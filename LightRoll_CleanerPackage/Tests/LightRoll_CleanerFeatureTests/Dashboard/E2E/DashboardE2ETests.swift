@@ -638,7 +638,4 @@ struct DashboardE2EScenarioTests {
 }
 
 // MARK: - Custom Test Tags
-
-extension Tag {
-    @Tag static var e2e: Self
-}
+// 注: e2e タグは TestTags.swift で定義済み

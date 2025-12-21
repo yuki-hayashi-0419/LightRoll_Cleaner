@@ -473,27 +473,78 @@ public struct GroupDetailView: View {
     // MARK: - Actions
 
     /// 写真を読み込み
+    ///
+    /// ## 修正履歴
+    /// - 2025-01-XX: エラーハンドリング追加（P0バグ修正）
+    ///   - 空のグループチェック追加
+    ///   - Taskキャンセルチェック追加
+    ///   - 詳細なログ出力追加
+    ///   - 読み込み失敗時の適切なエラー状態遷移
     private func loadPhotos() async {
         viewState = .loading
 
-        guard let provider = photoProvider else {
+        // 空のグループチェック
+        guard !group.photoIds.isEmpty else {
+            print("ℹ️ GroupDetailView: グループに写真IDがありません")
             photos = []
             viewState = .loaded
             return
         }
 
-        do {
-            // 写真データを取得
-            let loadedPhotos = await provider.photos(for: group.photoIds)
+        guard let provider = photoProvider else {
+            print("⚠️ GroupDetailView: photoProviderが設定されていません")
+            photos = []
+            viewState = .loaded
+            return
+        }
 
-            // グループ内の順序を維持
-            var orderedPhotos: [Photo] = []
-            for photoId in group.photoIds {
-                if let photo = loadedPhotos.first(where: { $0.id == photoId }) {
-                    orderedPhotos.append(photo)
-                }
+        // Taskキャンセルチェック
+        guard !Task.isCancelled else {
+            print("ℹ️ GroupDetailView: loadPhotos タスクがキャンセルされました")
+            return
+        }
+
+        // 写真データを取得
+        print("📸 GroupDetailView: \(group.photoIds.count)件の写真を読み込み開始")
+        let loadedPhotos = await provider.photos(for: group.photoIds)
+
+        // Taskキャンセルチェック（非同期処理後）
+        guard !Task.isCancelled else {
+            print("ℹ️ GroupDetailView: loadPhotos タスクがキャンセルされました（写真取得後）")
+            return
+        }
+
+        // グループ内の順序を維持
+        var orderedPhotos: [Photo] = []
+        orderedPhotos.reserveCapacity(group.photoIds.count)
+
+        for photoId in group.photoIds {
+            if let photo = loadedPhotos.first(where: { $0.id == photoId }) {
+                orderedPhotos.append(photo)
             }
+        }
 
+        // 読み込み結果のログ出力と状態更新
+        let loadedCount = orderedPhotos.count
+        let expectedCount = group.photoIds.count
+
+        if loadedCount == 0 && expectedCount > 0 {
+            // すべての写真読み込みに失敗
+            print("❌ GroupDetailView: 写真の読み込みに失敗しました（0/\(expectedCount)件）")
+            let errorMsg = NSLocalizedString(
+                "groupDetail.error.loadFailed",
+                value: "写真の読み込みに失敗しました。再度お試しください。",
+                comment: "Photo load error message"
+            )
+            viewState = .error(errorMsg)
+            errorMessage = errorMsg
+            showErrorAlert = true
+        } else if loadedCount < expectedCount {
+            print("⚠️ GroupDetailView: 一部の写真が読み込めませんでした（\(loadedCount)/\(expectedCount)件）")
+            photos = orderedPhotos
+            viewState = .loaded
+        } else {
+            print("✅ GroupDetailView: 写真読み込み完了（\(loadedCount)件）")
             photos = orderedPhotos
             viewState = .loaded
         }

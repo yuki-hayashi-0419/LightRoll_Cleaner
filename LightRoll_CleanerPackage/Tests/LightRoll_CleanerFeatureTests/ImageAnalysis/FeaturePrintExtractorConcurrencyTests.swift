@@ -51,7 +51,7 @@ struct FeaturePrintExtractorConcurrencyTests {
         print("  - アセット数: \(assets.count)")
         print("  - 抽出結果数: \(results.count)")
         print("  - 実行時間: \(elapsedMs) ms")
-        print("  - 平均処理時間: \(elapsedMs / results.count) ms/枚")
+        print("  - 平均処理時間: \(elapsedMs / Int64(results.count)) ms/枚")
 
         // 検証: 全てのアセットから特徴量が抽出された
         #expect(results.count == assets.count, "全てのアセットから特徴量が抽出されること")
@@ -213,7 +213,7 @@ struct FeaturePrintExtractorRealDeviceTests {
         print("✅ 実機テスト完了:")
         print("  - 抽出成功: \(results.count)/\(assets.count)枚")
         print("  - 実行時間: \(elapsedMs) ms")
-        print("  - 平均処理時間: \(results.count > 0 ? elapsedMs / results.count : 0) ms/枚")
+        print("  - 平均処理時間: \(results.count > 0 ? elapsedMs / Int64(results.count) : 0) ms/枚")
 
         // 検証
         #expect(results.count == assets.count, "全てのアセットから特徴量が抽出されること")
@@ -266,7 +266,7 @@ struct FeaturePrintExtractorRealDeviceTests {
             let endTime = ContinuousClock.now
             let elapsedMs = startTime.duration(to: endTime).components.attoseconds / 1_000_000_000_000_000
 
-            let avgTimePerImage = elapsedMs / batchSize
+            let avgTimePerImage = elapsedMs / Int64(batchSize)
 
             print("  - \(batchSize)枚: \(elapsedMs)ms (平均 \(avgTimePerImage)ms/枚)")
 
