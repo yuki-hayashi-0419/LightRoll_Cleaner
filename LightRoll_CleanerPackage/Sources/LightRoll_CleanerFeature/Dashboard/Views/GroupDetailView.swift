@@ -115,67 +115,68 @@ public struct GroupDetailView: View {
     // MARK: - Body
 
     public var body: some View {
-        NavigationStack {
-            ZStack {
-                // 背景グラデーション
-                backgroundGradient
+        // 注意: NavigationStackを削除
+        // このビューはDashboardNavigationContainerのnavigationDestinationから
+        // 表示されるため、独自のNavigationStackを持つと入れ子になりクラッシュする
+        ZStack {
+            // 背景グラデーション
+            backgroundGradient
 
-                // メインコンテンツ
-                mainContent
+            // メインコンテンツ
+            mainContent
+        }
+        .navigationTitle(group.displayName)
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.large)
+        #endif
+        .toolbar {
+            toolbarContent
+        }
+        .task {
+            await loadPhotos()
+        }
+        .alert(
+            NSLocalizedString(
+                "groupDetail.error.title",
+                value: "エラー",
+                comment: "Error alert title"
+            ),
+            isPresented: $showErrorAlert
+        ) {
+            Button(NSLocalizedString("common.ok", value: "OK", comment: "OK button")) {
+                showErrorAlert = false
             }
-            .navigationTitle(group.displayName)
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.large)
-            #endif
-            .toolbar {
-                toolbarContent
-            }
-            .task {
-                await loadPhotos()
-            }
-            .alert(
+        } message: {
+            Text(errorMessage)
+        }
+        .confirmationDialog(
+            NSLocalizedString(
+                "groupDetail.delete.title",
+                value: "選択した写真を削除",
+                comment: "Delete confirmation title"
+            ),
+            isPresented: $showDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button(
                 NSLocalizedString(
-                    "groupDetail.error.title",
-                    value: "エラー",
-                    comment: "Error alert title"
+                    "groupDetail.delete.confirm",
+                    value: "削除する",
+                    comment: "Delete confirm button"
                 ),
-                isPresented: $showErrorAlert
+                role: .destructive
             ) {
-                Button(NSLocalizedString("common.ok", value: "OK", comment: "OK button")) {
-                    showErrorAlert = false
+                Task {
+                    await deleteSelectedPhotos()
                 }
-            } message: {
-                Text(errorMessage)
             }
-            .confirmationDialog(
-                NSLocalizedString(
-                    "groupDetail.delete.title",
-                    value: "選択した写真を削除",
-                    comment: "Delete confirmation title"
-                ),
-                isPresented: $showDeleteConfirmation,
-                titleVisibility: .visible
-            ) {
-                Button(
-                    NSLocalizedString(
-                        "groupDetail.delete.confirm",
-                        value: "削除する",
-                        comment: "Delete confirm button"
-                    ),
-                    role: .destructive
-                ) {
-                    Task {
-                        await deleteSelectedPhotos()
-                    }
-                }
 
-                Button(
-                    NSLocalizedString("common.cancel", value: "キャンセル", comment: "Cancel button"),
-                    role: .cancel
-                ) {}
-            } message: {
-                Text(deleteConfirmationMessage)
-            }
+            Button(
+                NSLocalizedString("common.cancel", value: "キャンセル", comment: "Cancel button"),
+                role: .cancel
+            ) {}
+        } message: {
+            Text(deleteConfirmationMessage)
         }
     }
 

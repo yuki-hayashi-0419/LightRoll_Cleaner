@@ -128,74 +128,75 @@ public struct HomeView: View {
     // MARK: - Body
 
     public var body: some View {
-        NavigationStack {
-            ZStack {
-                // 背景グラデーション
-                backgroundGradient
+        // 注意: NavigationStackを削除
+        // このビューはDashboardNavigationContainerのNavigationStack内で
+        // 表示されるため、独自のNavigationStackを持つと入れ子になりクラッシュする
+        ZStack {
+            // 背景グラデーション
+            backgroundGradient
 
-                // メインコンテンツ
-                mainContent
+            // メインコンテンツ
+            mainContent
 
-                // バナー広告（画面下部に固定）
-                VStack {
-                    Spacer()
-                    BannerAdView()
-                }
+            // バナー広告（画面下部に固定）
+            VStack {
+                Spacer()
+                BannerAdView()
             }
-            .navigationTitle(NSLocalizedString(
-                "home.title",
-                value: "ホーム",
-                comment: "Home screen title"
-            ))
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.large)
-            #endif
-            .toolbar {
-                toolbarContent
+        }
+        .navigationTitle(NSLocalizedString(
+            "home.title",
+            value: "ホーム",
+            comment: "Home screen title"
+        ))
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.large)
+        #endif
+        .toolbar {
+            toolbarContent
+        }
+        .task {
+            await loadInitialData()
+        }
+        .refreshable {
+            await refreshData()
+        }
+        .alert(
+            NSLocalizedString(
+                "home.error.title",
+                value: "エラー",
+                comment: "Error alert title"
+            ),
+            isPresented: $showErrorAlert
+        ) {
+            Button(NSLocalizedString(
+                "common.ok",
+                value: "OK",
+                comment: "OK button"
+            )) {
+                showErrorAlert = false
             }
-            .task {
-                await loadInitialData()
-            }
-            .refreshable {
-                await refreshData()
-            }
-            .alert(
-                NSLocalizedString(
-                    "home.error.title",
-                    value: "エラー",
-                    comment: "Error alert title"
-                ),
-                isPresented: $showErrorAlert
-            ) {
-                Button(NSLocalizedString(
-                    "common.ok",
-                    value: "OK",
-                    comment: "OK button"
-                )) {
-                    showErrorAlert = false
-                }
-            } message: {
-                Text(errorMessage)
-            }
-            .overlay {
-                // スキャン中のプログレスオーバーレイ
-                if let progress = scanProgress, viewState.isScanning {
-                    ProgressOverlay(
-                        progress: progress.progress,
-                        message: progress.currentTask.isEmpty
-                            ? NSLocalizedString(
-                                "scan.progress.scanning",
-                                value: "スキャン中...",
-                                comment: "Scanning progress message"
-                              )
-                            : progress.currentTask,
-                        detail: progressDetailText(for: progress),
-                        showCancelButton: true,
-                        onCancel: { @MainActor in
-                            cancelScan()
-                        }
-                    )
-                }
+        } message: {
+            Text(errorMessage)
+        }
+        .overlay {
+            // スキャン中のプログレスオーバーレイ
+            if let progress = scanProgress, viewState.isScanning {
+                ProgressOverlay(
+                    progress: progress.progress,
+                    message: progress.currentTask.isEmpty
+                        ? NSLocalizedString(
+                            "scan.progress.scanning",
+                            value: "スキャン中...",
+                            comment: "Scanning progress message"
+                          )
+                        : progress.currentTask,
+                    detail: progressDetailText(for: progress),
+                    showCancelButton: true,
+                    onCancel: { @MainActor in
+                        cancelScan()
+                    }
+                )
             }
         }
     }
