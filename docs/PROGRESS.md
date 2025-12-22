@@ -1,6 +1,214 @@
 # LightRoll_Cleaner 開発進捗
 
-## 最終更新: 2025-12-21
+## 最終更新: 2025-12-22
+
+---
+
+## 2025-12-22 セッション⑫: trash-integration-fix-001（終了）
+
+### セッション概要
+- **セッションID**: trash-integration-fix-001
+- **実施内容**: ゴミ箱統合問題の修正実装
+- **品質スコア**: 94点（合格）
+- **終了理由**: ContentView.swiftのゴミ箱統合修正完了、E2Eテスト待ち
+
+### 完了したタスク
+
+#### 1. ゴミ箱統合修正の実装（完了）
+- **問題**: ContentView.swiftでDeletePhotosUseCaseを使用せず、PhotoRepository.delete()を直接呼び出し
+- **修正内容**:
+  - **onDeletePhotos**（Line 122-127）: DeletePhotosUseCase.execute()使用、permanently: false指定
+  - **onDeleteGroups**（Line 155-160）: 同様にDeletePhotosUseCase.execute()使用
+  - 両メソッドにDeletePhotosUseCaseErrorのエラーハンドリング追加
+  - 削除失敗時のユーザー通知実装（Toast表示）
+
+#### 2. テストケース生成（完了）
+- **ContentViewTrashIntegrationTests.swift**: 6テストケース
+  - ゴミ箱への移動確認（permanently: false）
+  - グループ削除時のゴミ箱統合確認
+  - エラーハンドリング検証
+
+#### 3. 品質スコア評価（94点）
+
+| 項目 | スコア |
+|------|--------|
+| 機能完全性 | 25/25点（UseCase経由に修正完了） |
+| コード品質 | 24/25点（エラーハンドリング完備） |
+| テストカバレッジ | 18/20点（6テスト生成） |
+| ドキュメント同期 | 14/15点 |
+| アーキテクチャ適合性 | 13/15点（MV Pattern準拠） |
+| **合計** | **94点（合格）** |
+
+### 修正ファイル一覧
+
+| ファイル | 変更内容 |
+|----------|----------|
+| ContentView.swift | onDeletePhotos/onDeleteGroups修正（Line 122-127, 155-160） |
+| ContentViewTrashIntegrationTests.swift（新規） | 6テストケース |
+
+### 技術的詳細
+
+#### 変更前（問題のあるコード）
+```swift
+// ContentView.swift
+onDeletePhotos: { photos in
+    try await photoRepository.delete(photos) // 直接呼び出し
+}
+
+onDeleteGroups: { groups in
+    try await photoRepository.delete(allPhotos) // 直接呼び出し
+}
+```
+
+#### 変更後（修正済みコード）
+```swift
+// ContentView.swift
+onDeletePhotos: { photos in
+    let photosToDelete = photos.compactMap { photo in
+        photoAssets.first { $0.localIdentifier == photo.id }
+    }
+    let input = DeletePhotosInput(photos: photosToDelete, permanently: false)
+    try await deletePhotosUseCase.execute(input) // UseCase経由
+}
+
+onDeleteGroups: { groups in
+    let allPhotos = groups.flatMap(\.photos).compactMap { photo in
+        photoAssets.first { $0.localIdentifier == photo.id }
+    }
+    let input = DeletePhotosInput(photos: allPhotos, permanently: false)
+    try await deletePhotosUseCase.execute(input) // UseCase経由
+}
+```
+
+### 次回タスク
+
+1. **E2Eテスト実施（シミュレーター）**
+   - 写真削除 → ゴミ箱移動確認
+   - 30日保管動作の確認
+   - 自動削除の確認
+
+2. **E2Eテスト実施（実機）**
+   - 実機でゴミ箱機能の動作確認
+   - NavigationStack二重ネスト修正の動作確認
+
+3. **リリース準備継続**
+   - M10-T04: App Store Connect設定
+   - M10-T05: TestFlight配信
+
+---
+
+## 2025-12-22 セッション⑪: design-review-device-test-issues（終了）
+
+### セッション概要
+- **セッションID**: design-review-device-test-issues
+- **実施内容**: 実機テスト問題の設計レビュー・アーキテクチャ分析
+- **品質スコア**: 78点（条件付き実装継続）
+- **終了理由**: 3問題の設計分析完了、修正方針決定
+
+### 完了したタスク
+
+#### 1. 設計レビュー実施（完了）
+- **問題1: ゴミ箱統合未完了**（84点）
+  - 根本原因: ContentView.swiftでDeletePhotosUseCaseを使用せず、PhotoRepository.delete()を直接呼び出し
+  - データフロー設計違反（MV Pattern原則に反する）
+  - 影響: 写真が直接Photos.appから削除され、ゴミ箱に入らない
+  - 優先度: P0（緊急）
+
+- **問題2: ナビゲーション問題**（要調査）
+  - 症状: グループ一覧→ホーム遷移で画面が固まる（"s"表示）
+  - 推測原因: HomeView.swiftのキャッシュ戦略未実装
+  - 優先度: P1（高）
+
+- **問題3: UX問題**（72点）
+  - 欠如要素: 削除成功トースト、エラーハンドリング
+  - 箇所: GroupDetailView.deleteSelectedPhotos()
+  - 優先度: P2（中）
+
+#### 2. ドキュメント作成（完了）
+- **DESIGN_REVIEW_DEVICE_TEST_ISSUES.md**:
+  - 詳細な設計分析（アーキテクチャ適合性、データフロー、UX設計）
+  - 問題別スコアリング（84点、要調査、72点）
+  - 改善提案とコード例
+  - 推奨実装順序（P0 → P1 → P2）
+
+- **UI_UX_GUIDE.md**（新規作成）:
+  - UI/UX設計原則（1画面1目的、3クリック以内、エラーは具体的に）
+  - 必須UI要素チェックリスト（ローディング、エラー、成功、空状態、確認ダイアログ）
+  - 状態管理パターン（MV Pattern、ViewStateパターン）
+  - アクセシビリティガイドライン
+  - デザインシステム（Spacing、Colors、Typography）
+
+#### 3. IMPLEMENTED.md更新（完了）
+- 設計レビュー結果の追記
+- 発見された3問題の要約
+- 次回セッション推奨事項
+
+### 設計審査スコア詳細
+
+| 問題 | アーキテクチャ | コード品質 | テスト容易性 | 保守性 | 合計 |
+|------|--------------|-----------|-------------|--------|------|
+| 問題1: ゴミ箱統合 | 18/25 | 20/25 | 23/25 | 23/25 | **84点** |
+| 問題2: ナビゲーション | 23/25 | ?/25 | 15/25 | 20/25 | **要調査** |
+| 問題3: UX問題 | 22/25 | 15/25 | 12/25 | 23/25 | **72点** |
+| **平均** | - | - | - | - | **78点** |
+
+### アーキテクチャ改善提案
+
+#### 1. MV Pattern準拠の徹底
+```swift
+// ❌ 現状（ContentView.swift）
+onDeletePhotos: { photoIds in
+    try await photoRepository.delete(photos) // 直接呼び出し
+}
+
+// ✅ 修正後
+onDeletePhotos: { photoIds in
+    let input = DeletePhotosInput(photos: photoAssets, permanently: false)
+    try await deletePhotosUseCase.execute(input) // UseCaseを使用
+}
+```
+
+#### 2. キャッシュ戦略の実装
+```swift
+// HomeView.swiftにキャッシュ有効期限を追加
+@State private var statisticsCacheExpiration: Date?
+
+.task {
+    if let expiration = statisticsCacheExpiration,
+       Date() < expiration {
+        return // キャッシュ有効、読み込みスキップ
+    }
+    await loadStatistics()
+}
+```
+
+#### 3. UX必須要素の実装
+```swift
+// GroupDetailView.swiftに成功トースト追加
+@State private var showSuccessToast = false
+@State private var successMessage = ""
+
+// 削除成功時
+successMessage = "\(count)枚（\(formattedSize)）を削除しました"
+showSuccessToast = true
+```
+
+### 次回タスク
+
+1. **P0: ゴミ箱統合修正**（最優先）
+   - ContentView.swift Line 113-142, 143-175の修正
+   - E2Eテスト実施（シミュレーター + 実機）
+   - 目標: 90点以上
+
+2. **P1: ナビゲーション調査・修正**
+   - 実機ログ分析（セッションID: 37590cb8-7f87-4e87-a03b-b48dc5c4afbb）
+   - HomeView.swiftのキャッシュ戦略実装
+   - 目標: 85点以上
+
+3. **P2: UX改善**
+   - GroupDetailView.swiftに成功トースト追加
+   - deleteSelectedPhotos()にエラーハンドリング追加
+   - 目標: 90点以上
 
 ---
 

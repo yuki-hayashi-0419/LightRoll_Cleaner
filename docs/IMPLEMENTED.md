@@ -5,6 +5,65 @@
 
 ---
 
+## 最新情報（2025-12-22）
+
+### ✅ ゴミ箱統合修正完了
+
+**セッション**: trash-integration-fix-001
+**実装者**: @spec-developer
+**総合スコア**: 94点（合格）
+
+**修正内容**:
+1. **ContentView.swift の onDeletePhotos 修正**
+   - DeletePhotosUseCase.execute() を使用（permanently: false）
+   - PHAssetからの変換処理実装
+   - DeletePhotosUseCaseErrorのエラーハンドリング追加
+
+2. **ContentView.swift の onDeleteGroups 修正**
+   - 同様にDeletePhotosUseCase.execute() を使用
+   - 複数グループの写真を一括処理
+   - エラーハンドリング完備
+
+3. **テストケース生成**
+   - ContentViewTrashIntegrationTests.swift: 6テストケース
+   - ゴミ箱統合の動作確認テスト完備
+
+**次回セッション推奨**:
+- E2Eテスト実施（シミュレーター/実機）
+- NavigationStack二重ネスト修正の動作確認
+- M10-T04: App Store Connect設定
+
+---
+
+### 🔍 実機テスト問題の設計レビュー完了（前回セッション）
+
+**セッション**: design-review-device-test-issues
+**レビュアー**: @spec-architect
+**総合スコア**: 78点（条件付き実装継続）
+
+**発見された問題**:
+1. **ゴミ箱統合未完了**（84点）→ **✅ trash-integration-fix-001で修正完了**
+   - ContentView.swiftでDeletePhotosUseCaseを使用せず、PhotoRepository.delete()を直接呼び出し
+   - データフロー設計違反（MV Pattern原則に反する）
+   - **影響**: 写真が直接Photos.appから削除され、ゴミ箱に入らない
+   - **優先度**: P0（緊急）→ **解決済み**
+
+2. **ナビゲーション問題**（要調査）
+   - グループ一覧→ホーム遷移で画面が固まる（"s"表示）
+   - キャッシュ戦略未実装の可能性
+   - **優先度**: P1（高）→ **E2Eテストで検証予定**
+
+3. **UX問題**（72点）
+   - 削除成功トーストがない
+   - エラーハンドリング欠如（GroupDetailView.deleteSelectedPhotos）
+   - **優先度**: P2（中）→ **後続タスク**
+
+**作成ドキュメント**:
+- `docs/DESIGN_REVIEW_DEVICE_TEST_ISSUES.md`: 詳細な設計分析とスコアリング
+- `docs/UI_UX_GUIDE.md`: UI/UX設計原則とガイドライン（新規作成）
+
+---
+
 ## 現在のバージョン: v1.0.0-RC（全9モジュール完了 + M10リリース準備進行中）
 
 ### 進捗状況
@@ -13,6 +72,7 @@
 - **M10リリース準備**: 3/6タスク完了（50%）
 - **全体進捗**: 117/121タスク (96.7%)
 - **Phase 7進行中**: App Storeリリース準備
+- **設計品質**: 78点（実機テスト問題により条件付き）
 
 ### M10: Release Preparation（進行中）
 

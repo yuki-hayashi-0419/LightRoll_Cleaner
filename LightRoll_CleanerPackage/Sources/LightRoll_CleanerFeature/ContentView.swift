@@ -119,14 +119,21 @@ public struct ContentView: View {
                             PhotoAsset(id: id, creationDate: Date(), fileSize: 0)
                         }
 
-                        // 写真を削除
-                        try await photoRepository.deletePhotos(photoAssets)
+                        // DeletePhotosUseCaseを使用してゴミ箱へ移動
+                        let input = DeletePhotosInput(
+                            photos: photoAssets,
+                            permanently: false // ゴミ箱へ移動
+                        )
+                        _ = try await deletePhotosUseCase.execute(input)
 
                         // 削除後、ストレージ情報キャッシュをクリア
                         photoRepository.clearStorageInfoCache()
 
+                    } catch let error as DeletePhotosUseCaseError {
+                        // DeletePhotosUseCaseエラーハンドリング
+                        print("写真削除エラー: \(error.localizedDescription)")
                     } catch let error as PhotoRepositoryError {
-                        // エラーハンドリング（ユーザーキャンセル含む）
+                        // PhotoRepositoryエラーハンドリング（ユーザーキャンセル含む）
                         print("写真削除エラー: \(error.localizedDescription)")
                     } catch {
                         print("予期しないエラー: \(error.localizedDescription)")
@@ -145,14 +152,21 @@ public struct ContentView: View {
                             PhotoAsset(id: id, creationDate: Date(), fileSize: 0)
                         }
 
-                        // 写真を削除
-                        try await photoRepository.deletePhotos(photoAssets)
+                        // DeletePhotosUseCaseを使用してゴミ箱へ移動
+                        let input = DeletePhotosInput(
+                            photos: photoAssets,
+                            permanently: false // ゴミ箱へ移動
+                        )
+                        _ = try await deletePhotosUseCase.execute(input)
 
                         // 削除後、ストレージ情報キャッシュをクリア
                         photoRepository.clearStorageInfoCache()
 
+                    } catch let error as DeletePhotosUseCaseError {
+                        // DeletePhotosUseCaseエラーハンドリング
+                        print("グループ削除エラー: \(error.localizedDescription)")
                     } catch let error as PhotoRepositoryError {
-                        // エラーハンドリング（ユーザーキャンセル含む）
+                        // PhotoRepositoryエラーハンドリング（ユーザーキャンセル含む）
                         print("グループ削除エラー: \(error.localizedDescription)")
                     } catch {
                         print("予期しないエラー: \(error.localizedDescription)")
