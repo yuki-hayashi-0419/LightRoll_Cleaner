@@ -1022,4 +1022,225 @@ struct CandidateAnalysis: Sendable {
 
 ---
 
-*アーカイブ更新: 2025-11-29 (M3 Image Analysis モジュール完了)*
+## 2025-12: M4-M8 完了アーカイブ
+
+### M4: UI Components（完了）
+
+**完了タスク（13タスク）**:
+- M4-T01: カラーパレット定義（16色、ダークモード対応）
+- M4-T02: タイポグラフィ定義（15フォントスタイル）
+- M4-T03: グラスモーフィズム実装（5スタイル、4シェイプ）
+- M4-T04: スペーシング定義（8ptグリッド）
+- M4-T05: PhotoThumbnailView（サムネイル表示）
+- M4-T06: PhotoGridView（グリッド表示）
+- M4-T07: StorageIndicator（ストレージ表示）
+- M4-T08: GroupCard（グループカード）
+- M4-T09: ActionButton（アクションボタン）
+- M4-T10: ProgressOverlay（進捗オーバーレイ）
+- M4-T11: ConfirmationDialog（確認ダイアログ）
+- M4-T12: EmptyStateView（空状態表示）
+- M4-T13: ToastNotification（トースト通知）
+
+**技術的特徴**:
+- iOS 26 Liquid Glass対応
+- Dynamic Type対応
+- VoiceOver完全対応
+- Swift 6 Concurrency準拠
+
+---
+
+### M5: Dashboard & Statistics（完了）
+
+**完了タスク（12タスク）**:
+- M5-T01〜T03: ホーム画面、ストレージカード、グループリスト
+- M5-T04〜T06: グループ詳細、結果サマリー、削除確認
+- M5-T07〜T09: ScanPhotosUseCase、GetStatisticsUseCase、DashboardRouter
+- M5-T10〜T12: DashboardNavigationContainer、ResultsView、テスト
+
+**4フェーズスキャン**:
+1. 写真取得（0-25%）
+2. 特徴量抽出（25-60%）
+3. グループ化（60-90%）
+4. 結果生成（90-100%）
+
+---
+
+### M6: Deletion & Trash（完了）
+
+**完了タスク（13タスク）**:
+- TrashPhoto.swift（672行、44テスト、100点）
+- TrashDataStore.swift（421行、22テスト、100点）
+- TrashManager.swift（417行、28テスト、100点）
+- DeletePhotosUseCase.swift（395行、14テスト、98点）
+- RestorePhotosUseCase.swift（357行、12テスト、100点）
+- DeletionConfirmationService.swift（593行、21テスト、95点）
+- TrashView.swift（797行、26テスト、98点）
+- DeletionConfirmationSheet.swift（728行、15テスト、97点）
+- PhotoRepository拡張（190行、17テスト、100点）
+
+**モジュール統計**:
+- 176テスト
+- 平均品質スコア: 97.5点
+
+---
+
+### M7: Notifications（完了）
+
+**完了タスク（12タスク）**:
+- M7-T01: NotificationSettings（28テスト、100点）
+- M7-T02: Info.plist権限設定
+- M7-T03: NotificationManager基盤（32テスト、98点）
+- M7-T04: 権限リクエスト実装
+- M7-T05: NotificationContentBuilder（22テスト）
+- M7-T06: StorageAlertScheduler（19テスト）
+- M7-T07: ReminderScheduler（21テスト）
+- M7-T08: ScanCompletionNotifier（18テスト）
+- M7-T09: TrashExpirationNotifier（18テスト）
+- M7-T10: 通知受信処理・DeepLink（24テスト）
+
+**通知タイプ**:
+- ストレージアラート
+- リマインダー（毎日/毎週/隔週/毎月）
+- スキャン完了
+- ゴミ箱期限警告
+
+---
+
+### M8: Settings & Preferences（完了）
+
+**完了タスク（14タスク）**:
+- M8-T01: UserSettingsモデル（43テスト、97点）
+- M8-T02: SettingsRepository（11テスト、97点）
+- M8-T03: PermissionManager（52テスト、100点）
+- M8-T04: SettingsService（17テスト、98点）
+- M8-T05: PermissionsView（13テスト、97点）
+- M8-T06: SettingsRow/Toggle
+- M8-T07: SettingsView（31テスト、95点）
+- M8-T08: ScanSettingsView（30テスト、93点）
+- M8-T09: AnalysisSettingsView（39テスト、97点）
+- M8-T10: NotificationSettingsView（39テスト、100点）
+- M8-T11〜T14: その他設定画面
+
+**設定カテゴリ**:
+- スキャン設定（自動スキャン、対象選択）
+- 分析設定（類似度閾値、ブレ感度）
+- 通知設定（警告、リマインダー、静寂時間帯）
+- 表示設定（グリッド列数、ソート順）
+- プレミアム設定
+
+---
+
+## 2025-12: M9 Monetization 詳細アーカイブ
+
+### M9-T01〜T06: 課金基盤
+
+**PremiumStatusモデル（269行、31テスト、100点）**:
+- サブスクリプション種別（無料/月額/年額）
+- 有効期限管理、トライアル機能
+- 状態判定（アクティブ/期限切れ）
+
+**ProductInfoモデル（304行、24テスト、95点）**:
+- StoreKit 2商品情報
+- サブスクリプション期間、特典オファー
+
+**StoreKit 2設定（444行、16テスト、92点）**:
+- 月額¥980（7日無料トライアル）
+- 年額¥9,800
+- Configuration.storekit（2製品定義）
+
+**PurchaseRepository（633行、32テスト、96点）**:
+- 製品情報取得、購入処理、復元処理
+- トランザクション監視、エラーハンドリング
+
+**PremiumManager（139行→199行、20テスト、96点）**:
+- 課金状態管理、削除制限判定
+- 削除カウント管理、日次リセット
+
+**FeatureGate（PremiumManager拡張）**:
+- 4機能判定（無制限削除、広告非表示、高度分析、クラウドバックアップ）
+- 残数取得、削除記録
+
+### M9-T07: 削除上限管理（678行、19テスト、95点）
+
+**実装内容**:
+- DeletePhotosUseCaseで削除前制限チェック
+- GroupDetailViewで削除前にUI統合
+- AppStateで日次リセット
+- LocalizedErrorエラーメッセージ
+
+### M9-T08〜T09: 広告統合
+
+**Google Mobile Ads（670行、27テスト、95点）**:
+- GoogleMobileAds SDK v11.0.0以上
+- ATTracking統合
+- テスト用App ID・Ad Unit ID
+
+**AdManager（1,288行、53テスト、93点）**:
+- バナー/インタースティシャル/リワード広告
+- Premium連携、表示間隔制御
+- タイムアウト処理、自動プリロード
+
+### M9-T10〜T14: UI実装
+
+**BannerAdView（1,048行、32テスト、92点）**:
+- UIViewRepresentable、Premium対応
+- ロード状態管理
+
+**PremiumView（1,525行、54テスト、93点）**:
+- 8コンポーネント設計
+- プラン表示、購入処理、復元機能
+- LoadingState汎用状態管理
+
+**LimitReachedSheet（596行、13テスト、100点）**:
+- 上限表示、プロモーション
+- 統計表示、機能紹介
+
+**RestorePurchasesView（746行、14テスト、100点）**:
+- 5状態管理（idle/restoring/success/noSubscription/error）
+- 視覚的フィードバック
+
+**統合テスト（466行、14テスト、100点）**:
+- E2E購入フロー、Premium機能、広告表示、状態管理
+
+---
+
+## パフォーマンス最適化詳細（2025-12-16〜18）
+
+### 並列処理対応（12並列）
+- TaskGroup活用
+- 大量写真のスキャン時間大幅短縮
+- 品質スコア: 95点
+
+### インクリメンタル分析
+- キャッシュ活用で新規写真のみ分析
+- 処理時間90%削減
+- 品質スコア: 100点
+
+### バッチ保存最適化
+- 100件ごとのバッチ処理
+- ディスクI/O回数99%削減
+- 処理時間30-40%高速化
+
+### 時間ベース事前グルーピング
+- O(n^2) → O(n*k)への計算量改善
+- TimeBasedGrouper.swift（121行）
+- OptimizedGroupingService.swift（178行）
+- 品質スコア: 92点
+
+### Accelerate SIMD最適化
+- vDSP_dotpr、vDSP_svesq活用
+- コサイン類似度計算5-10倍高速化
+- 品質スコア: 95点
+
+### キャッシュ検証不整合修正
+- Phase 2/Phase 3のキャッシュチェック条件統一
+- featurePrintHashの存在とサイズ検証
+
+### PhotoAssetCache導入
+- メモリキャッシュとディスク永続化
+- 1000枚スキャン: 30秒 → 1-2秒
+- 品質スコア: 97.5点
+
+---
+
+*アーカイブ更新: 2025-12-22 (M4-M9詳細アーカイブ追加)*

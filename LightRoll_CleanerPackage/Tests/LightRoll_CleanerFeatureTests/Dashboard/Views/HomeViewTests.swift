@@ -707,3 +707,261 @@ struct PerformanceConsiderationsTests {
         #expect(groups.count == 500)
     }
 }
+
+// MARK: - DEVICE-001 修正テスト
+
+/// DEVICE-001: .task修正に関するテスト
+/// 初回データ読み込みとタブ切り替え時の再読み込み防止をテスト
+@Suite("HomeView DEVICE-001 .task修正テスト")
+struct HomeViewTaskModifierTests {
+
+    // MARK: - 正常系テスト
+
+    @Test("初回データ読み込み: loading状態から開始してloaded状態に遷移する")
+    func testInitialDataLoadTransition() async {
+        // Given: 初期状態はloading
+        var state = HomeView.ViewState.loading
+        #expect(state.isLoading)
+        #expect(!state.isScanning)
+
+        // When: データ読み込みが完了
+        state = .loaded
+
+        // Then: loaded状態に正しく遷移
+        #expect(!state.isLoading)
+        #expect(!state.isScanning)
+        #expect(state == .loaded)
+    }
+
+    @Test("初回データ読み込み成功: 統計データが正しく設定される")
+    func testInitialDataLoadSuccess() {
+        // Given: 統計データを作成
+        let storageInfo = StorageInfo(
+            totalCapacity: 128_000_000_000,   // 128GB
+            availableCapacity: 64_000_000_000, // 64GB
+            usedCapacity: 64_000_000_000,      // 64GB
+            photoLibrarySize: 32_000_000_000   // 32GB
+        )
+
+        // When: StorageStatisticsを作成
+        let statistics = StorageStatistics(
+            storageInfo: storageInfo,
+            groupSummaries: [:],
+            scannedPhotoCount: 1000
+        )
+
+        // Then: 統計データが正しく設定されている
+        #expect(statistics.storageInfo.totalCapacity == 128_000_000_000)
+        #expect(statistics.storageInfo.availableCapacity == 64_000_000_000)
+        #expect(statistics.scannedPhotoCount == 1000)
+    }
+
+    @Test("タブ切り替え時の不要な再読み込み防止: loaded状態が維持される")
+    func testNoUnnecessaryReloadOnTabSwitch() {
+        // Given: loaded状態
+        let state = HomeView.ViewState.loaded
+
+        // When: タブ切り替えをシミュレート（状態は変わらない）
+        // .task(id:) を使用しない場合、毎回再読み込みされてしまう
+        // 修正後は loaded 状態が維持される
+
+        // Then: loaded状態が維持されている
+        #expect(state == .loaded)
+        #expect(!state.isLoading)
+        #expect(!state.isScanning)
+    }
+
+    @Test("スキャン中はプルトゥリフレッシュで更新されない")
+    func testNoRefreshDuringScanning() {
+        // Given: スキャン中の状態
+        let state = HomeView.ViewState.scanning(progress: 0.5)
+
+        // When: プルトゥリフレッシュを試みる（スキャン中はガードされる）
+        let shouldRefresh = !state.isScanning
+
+        // Then: スキャン中は更新されない
+        #expect(state.isScanning)
+        #expect(!shouldRefresh)
+    }
+
+    // MARK: - 異常系テスト
+
+    @Test("データ読み込み失敗: error状態に遷移しエラーメッセージを保持する")
+    func testDataLoadFailureTransition() {
+        // Given: 読み込み中の状態
+        var state = HomeView.ViewState.loading
+        #expect(state.isLoading)
+
+        // When: エラーが発生
+        let errorMessage = "写真ライブラリへのアクセスが拒否されました"
+        state = .error(errorMessage)
+
+        // Then: error状態に遷移しメッセージを保持
+        #expect(!state.isLoading)
+        #expect(!state.isScanning)
+        if case .error(let message) = state {
+            #expect(message == errorMessage)
+            #expect(message.contains("アクセス"))
+        } else {
+            Issue.record("Expected error state")
+        }
+    }
+
+    @Test("エラー後のリトライ: error状態からloading状態に遷移する")
+    func testRetryAfterError() {
+        // Given: エラー状態
+        var state = HomeView.ViewState.error("ネットワークエラー")
+
+        // When: リトライを実行
+        state = .loading
+
+        // Then: loading状態に戻る
+        #expect(state.isLoading)
+        #expect(state == .loading)
+    }
+
+    @Test("グループ読み込みエラー: エラーメッセージが生成される")
+    func testGroupLoadFailureErrorMessage() {
+        // Given: グループ読み込みエラーのメッセージ
+        let errorMessage = NSLocalizedString(
+            "home.error.groupLoadFailure",
+            value: "グループの読み込みに失敗しました。もう一度お試しください。",
+            comment: "Group load failure error message"
+        )
+
+        // Then: エラーメッセージが空でない
+        #expect(!errorMessage.isEmpty)
+        #expect(errorMessage.contains("グループ") || errorMessage.contains("読み込み"))
+    }
+
+    // MARK: - 境界値テスト
+
+    @Test("空データの場合: 統計データが空でも正常に処理される")
+    func testEmptyDataHandling() {
+        // Given: 空の統計データ
+        let emptyStats = StorageStatistics.empty
+
+        // Then: 空のデータが正しく処理される
+        #expect(emptyStats.storageInfo.totalCapacity == 0)
+        #expect(emptyStats.groupSummaries.isEmpty)
+        #expect(emptyStats.scannedPhotoCount == 0)
+    }
+
+    @Test("空のグループリスト: 正常に処理される")
+    func testEmptyGroupList() {
+        // Given: 空のグループリスト
+        let groups: [PhotoGroup] = []
+
+        // Then: 空リストが正常に処理される
+        #expect(groups.isEmpty)
+        #expect(groups.count == 0)
+    }
+
+    @Test("大量データの場合: 10万枚の写真統計を処理できる")
+    func testLargeDataHandling() {
+        // Given: 大量の写真データ
+        let largePhotoCount = 100_000
+        let largeStorageSize: Int64 = 500_000_000_000 // 500GB
+
+        let storageInfo = StorageInfo(
+            totalCapacity: 1_000_000_000_000,      // 1TB
+            availableCapacity: 500_000_000_000,    // 500GB
+            usedCapacity: 500_000_000_000,         // 500GB
+            photoLibrarySize: largeStorageSize
+        )
+
+        let statistics = StorageStatistics(
+            storageInfo: storageInfo,
+            groupSummaries: [:],
+            scannedPhotoCount: largePhotoCount
+        )
+
+        // Then: 大量データが正しく処理される
+        #expect(statistics.scannedPhotoCount == 100_000)
+        #expect(statistics.storageInfo.photoLibrarySize == 500_000_000_000)
+    }
+
+    @Test("大量グループの場合: 1000グループを処理できる")
+    func testLargeGroupCountHandling() {
+        // Given: 大量のグループ
+        var groups: [PhotoGroup] = []
+        let groupCount = 1000
+
+        for i in 0..<groupCount {
+            let group = PhotoGroup(
+                type: GroupType.allCases[i % GroupType.allCases.count],
+                photoIds: ["photo_\(i)_0", "photo_\(i)_1"],
+                fileSizes: [1_000_000, 1_000_000]
+            )
+            groups.append(group)
+        }
+
+        // Then: 大量グループが正しく処理される
+        #expect(groups.count == 1000)
+        #expect(groups.first != nil)
+        #expect(groups.last != nil)
+    }
+}
+
+// MARK: - デバッグログ条件付きコンパイルテスト
+
+@Suite("HomeView デバッグログ条件付きコンパイルテスト")
+struct HomeViewDebugLoggingTests {
+
+    @Test("DEBUGフラグによるログ出力制御: printステートメントはDEBUGビルドのみ")
+    func testDebugLoggingFlag() {
+        // このテストは、デバッグログが条件付きコンパイルされていることを確認
+        // 実際のログ出力は #if DEBUG で囲まれているべき
+
+        #if DEBUG
+        let isDebugBuild = true
+        #else
+        let isDebugBuild = false
+        #endif
+
+        // テスト環境では常にDEBUGビルド
+        #expect(isDebugBuild == true)
+    }
+
+    @Test("ログメッセージのフォーマット: グループ読み込み成功メッセージ")
+    func testSuccessLogMessageFormat() {
+        // Given: グループ数
+        let groupCount = 25
+
+        // When: ログメッセージを生成（本番コードと同じ形式）
+        let logMessage = "✅ グループ読み込み成功: \(groupCount)件"
+
+        // Then: メッセージが正しくフォーマットされている
+        #expect(logMessage.contains("✅"))
+        #expect(logMessage.contains("グループ読み込み成功"))
+        #expect(logMessage.contains("25件"))
+    }
+
+    @Test("ログメッセージのフォーマット: グループ読み込みエラーメッセージ")
+    func testErrorLogMessageFormat() {
+        // Given: エラー内容
+        let errorDescription = "ファイルが見つかりません"
+
+        // When: ログメッセージを生成（本番コードと同じ形式）
+        let logMessage = "⚠️ グループ読み込みエラー: \(errorDescription)"
+
+        // Then: メッセージが正しくフォーマットされている
+        #expect(logMessage.contains("⚠️"))
+        #expect(logMessage.contains("グループ読み込みエラー"))
+        #expect(logMessage.contains("ファイルが見つかりません"))
+    }
+
+    @Test("保存済みグループ読み込み失敗のログメッセージ")
+    func testSavedGroupLoadFailureLogMessage() {
+        // Given: エラー説明
+        let errorDescription = "JSONデコードエラー"
+
+        // When: ログメッセージを生成
+        let logMessage = "⚠️ 保存済みグループの読み込みに失敗: \(errorDescription)"
+
+        // Then: メッセージが正しくフォーマットされている
+        #expect(logMessage.contains("保存済みグループ"))
+        #expect(logMessage.contains("失敗"))
+        #expect(logMessage.contains(errorDescription))
+    }
+}

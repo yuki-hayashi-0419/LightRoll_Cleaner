@@ -9,6 +9,16 @@
 
 import Foundation
 import Observation
+import Photos
+#if canImport(UIKit)
+import UIKit
+/// プラットフォーム共通の画像型
+typealias PlatformImage = UIImage
+#else
+import AppKit
+/// プラットフォーム共通の画像型
+typealias PlatformImage = NSImage
+#endif
 
 // MARK: - TrashManager
 
@@ -34,6 +44,9 @@ public final class TrashManager: TrashManagerProtocol {
 
     /// 保持日数（デフォルト30日）
     private let retentionDays: Int
+
+    /// サムネイルサイズ（ポイント）
+    private static let thumbnailSizePoints: CGFloat = 200.0
 
     // MARK: - Computed Properties
 
@@ -97,6 +110,7 @@ public final class TrashManager: TrashManagerProtocol {
     }
 
     /// 写真をゴミ箱に移動
+    /// サムネイル生成を含む非同期処理
     /// - Parameters:
     ///   - photos: 移動する写真
     ///   - reason: 削除理由（オプション）
@@ -113,14 +127,19 @@ public final class TrashManager: TrashManagerProtocol {
             to: now
         ) ?? now.addingTimeInterval(TimeInterval(retentionDays * 86400))
 
-        // PhotoからTrashPhotoへ変換
-        let trashPhotos: [TrashPhoto] = photos.compactMap { photo in
-            createTrashPhoto(
+        // PhotoからTrashPhotoへ変換（非同期でサムネイル生成）
+        var trashPhotos: [TrashPhoto] = []
+        trashPhotos.reserveCapacity(photos.count)
+
+        for photo in photos {
+            if let trashPhoto = await createTrashPhoto(
                 from: photo,
                 deletedAt: now,
                 expiresAt: expirationDate,
                 reason: reason
-            )
+            ) {
+                trashPhotos.append(trashPhoto)
+            }
         }
 
         // バッチ追加
@@ -194,7 +213,8 @@ public final class TrashManager: TrashManagerProtocol {
 
     // MARK: - Private Methods
 
-    /// PhotoからTrashPhotoを作成
+    /// PhotoからTrashPhotoを作成（非同期版）
+    /// サムネイルをPHImageManagerから取得
     /// - Parameters:
     ///   - photo: 元の写真
     ///   - deletedAt: 削除日時
@@ -206,9 +226,9 @@ public final class TrashManager: TrashManagerProtocol {
         deletedAt: Date,
         expiresAt: Date,
         reason: TrashPhoto.DeletionReason?
-    ) -> TrashPhoto? {
-        // サムネイルデータの取得（失敗時はnil）
-        let thumbnailData: Data? = nil // 将来的に実装
+    ) async -> TrashPhoto? {
+        // サムネイルデータの取得（非同期）
+        let thumbnailData = await generateThumbnailData(for: photo.localIdentifier)
 
         // メタデータの構築
         let metadata = TrashPhotoMetadata(
@@ -231,6 +251,75 @@ public final class TrashManager: TrashManagerProtocol {
             metadata: metadata,
             deletionReason: reason
         )
+    }
+
+    /// PHImageManagerを使用してサムネイルDataを生成
+    /// - Parameter localIdentifier: PHAssetのlocalIdentifier
+    /// - Returns: JPEG形式のサムネイルData（失敗時はnil）
+    private func generateThumbnailData(for localIdentifier: String) async -> Data? {
+        // PHAssetを取得
+        let fetchResult = PHAsset.fetchAssets(
+            withLocalIdentifiers: [localIdentifier],
+            options: nil
+        )
+
+        guard let asset = fetchResult.firstObject else {
+            return nil
+        }
+
+        // サムネイルサイズを計算（Retina対応: 2x）
+        let scale: CGFloat = 2.0
+        let thumbnailSize = CGSize(
+            width: Self.thumbnailSizePoints * scale,
+            height: Self.thumbnailSizePoints * scale
+        )
+
+        // 画像リクエストオプションの設定
+        let options = PHImageRequestOptions()
+        options.deliveryMode = .highQualityFormat
+        options.resizeMode = .fast
+        options.isNetworkAccessAllowed = true
+        options.isSynchronous = false
+
+        // withCheckedContinuationを使用して非同期処理をラップ
+        let image: PlatformImage? = await withCheckedContinuation { continuation in
+            PHImageManager.default().requestImage(
+                for: asset,
+                targetSize: thumbnailSize,
+                contentMode: .aspectFill,
+                options: options
+            ) { image, info in
+                // キャンセルされた場合
+                if let cancelled = info?[PHImageCancelledKey] as? Bool, cancelled {
+                    continuation.resume(returning: nil)
+                    return
+                }
+
+                // エラーチェック
+                if info?[PHImageErrorKey] as? Error != nil {
+                    continuation.resume(returning: nil)
+                    return
+                }
+
+                continuation.resume(returning: image)
+            }
+        }
+
+        // 画像をJPEGデータに変換
+        guard let image = image else {
+            return nil
+        }
+
+        #if canImport(UIKit)
+        return image.jpegData(compressionQuality: 0.8)
+        #else
+        // macOS対応（必要に応じて）
+        guard let tiffData = image.tiffRepresentation,
+              let bitmap = NSBitmapImageRep(data: tiffData) else {
+            return nil
+        }
+        return bitmap.representation(using: .jpeg, properties: [.compressionFactor: 0.8])
+        #endif
     }
 
     /// キャッシュを更新

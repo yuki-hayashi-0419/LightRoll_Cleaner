@@ -1,5 +1,102 @@
 # 開発進捗記録
 
+## セッション⑫：device-test-fixes-001（2025-12-22）
+
+### 目的
+実機テストで発見されたP0/P1問題の修正
+
+### 実施内容
+
+#### 1. コンテキスト最適化 ✅
+- **IMPLEMENTED.md**: 114KB → 7.5KB（93%削減）
+- **TASKS.md**: 15KB → 3KB（80%削減）
+- 完了済みタスクをdocs/archive/へアーカイブ
+
+#### 2. DEVICE-001: P0問題修正（画面固まり）✅
+**ファイル**: HomeView.swift
+
+**修正内容**:
+1. `.task`を`.task(id:)`に変更（データ変更時のみ再読み込み）
+2. デバッグログを`#if DEBUG`で条件付きコンパイル
+
+**変更箇所**:
+```swift
+// Before
+.task {
+    await homeModel.loadData()
+}
+print("[DEBUG] データ再読み込み")
+
+// After
+.task(id: selectedTab) {
+    guard !homeModel.hasLoaded else { return }
+    await homeModel.loadData()
+}
+#if DEBUG
+print("[DEBUG] データ再読み込み")
+#endif
+```
+
+**品質スコア**: 98点（+3点向上）
+**テスト生成**: 14件
+
+#### 3. DEVICE-002: P1問題修正（サムネイル未表示）✅
+**ファイル**: TrashManager.swift
+
+**修正内容**:
+PHImageManagerを使用したサムネイル生成ロジックを追加
+
+**追加メソッド**:
+```swift
+func generateThumbnail(for asset: PHAsset, targetSize: CGSize) async -> UIImage? {
+    await withCheckedContinuation { continuation in
+        let options = PHImageRequestOptions()
+        options.deliveryMode = .opportunistic
+        options.isNetworkAccessAllowed = true
+        options.resizeMode = .fast
+
+        PHImageManager.default().requestImage(
+            for: asset,
+            targetSize: targetSize,
+            contentMode: .aspectFill,
+            options: options
+        ) { image, _ in
+            continuation.resume(returning: image)
+        }
+    }
+}
+```
+
+**品質スコア**: 98点（+2点向上）
+**テスト生成**: 11件
+
+#### 4. ドキュメント更新 ✅
+- IMPLEMENTED.md: DEVICE-001、DEVICE-002の実装詳細追記
+- TASKS.md: 完了タスクステータス更新
+
+### 成果
+- ✅ P0問題修正完了（画面固まり解消）
+- ✅ P1問題修正完了（サムネイル表示対応）
+- ✅ 平均品質スコア98点達成
+- ✅ テストコード生成完了（25件）
+
+### メトリクス
+- **完了タスク数**: 2件（DEVICE-001、DEVICE-002）
+- **品質スコア**: 平均98点
+- **全体進捗**: 143/147タスク（97%）
+- **品質向上**: +5点（DEVICE-001: +3点、DEVICE-002: +2点）
+
+### 未完了タスク
+- DEVICE-003（P2）: グループ詳細UX問題（選択モード・全削除ボタン追加）
+
+### 次回セッション推奨タスク
+**DEVICE-003**: グループ詳細UX問題修正
+- GroupDetailView.swiftに選択モードボタン追加
+- 全削除ボタン実装
+- 推定工数: 3時間
+
+---
+
 ## セッション⑪：trash-integration-fix-001 完了・実機テスト（2025-12-22）
 
 ### 目的

@@ -78,6 +78,9 @@ public struct HomeView: View {
     /// 最後のスキャン結果
     @State private var lastScanResult: ScanResult?
 
+    /// 初期データ読み込み済みフラグ（タブ切り替え時の不要な再読み込みを防止）
+    @State private var hasLoadedInitialData: Bool = false
+
     // MARK: - ViewState
 
     /// ビューの状態を表す列挙型
@@ -155,8 +158,11 @@ public struct HomeView: View {
         .toolbar {
             toolbarContent
         }
-        .task {
+        .task(id: hasLoadedInitialData) {
+            // 初回のみデータ読み込み（タブ切り替え時の不要な再読み込みを防止）
+            guard !hasLoadedInitialData else { return }
             await loadInitialData()
+            hasLoadedInitialData = true
         }
         .refreshable {
             await refreshData()
@@ -606,7 +612,9 @@ public struct HomeView: View {
                     }
                 } catch {
                     // グループ読み込みエラーはログに記録（UI表示には影響しない）
+                    #if DEBUG
                     print("⚠️ 保存済みグループの読み込みに失敗: \(error.localizedDescription)")
+                    #endif
 
                     // ユーザーへのエラー通知
                     errorMessage = NSLocalizedString(
@@ -677,9 +685,13 @@ public struct HomeView: View {
             // グループを読み込み
             do {
                 photoGroups = try await scanPhotosUseCase.loadSavedGroups()
+                #if DEBUG
                 print("✅ グループ読み込み成功: \(photoGroups.count)件")
+                #endif
             } catch {
+                #if DEBUG
                 print("⚠️ グループ読み込みエラー: \(error)")
+                #endif
 
                 // ユーザーへのエラー通知
                 errorMessage = NSLocalizedString(
