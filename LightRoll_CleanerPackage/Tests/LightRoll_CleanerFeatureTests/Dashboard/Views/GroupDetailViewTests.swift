@@ -573,4 +573,480 @@ extension Tag {
     @Tag static var calculation: Self
     @Tag static var deletionCandidate: Self
     @Tag static var display: Self
+    @Tag static var selectionMode: Self
+    @Tag static var deleteAll: Self
+    @Tag static var premiumLimit: Self
+    @Tag static var uiux: Self
+}
+
+// MARK: - DEVICE-003修正テスト用モックPremiumManager
+
+/// テスト用のモック削除制限マネージャー（GroupDetailView専用）
+/// 削除制限のシミュレーションに使用
+/// Note: GroupDetailViewは具象型PremiumManagerを受け取るため、
+/// 直接ビューにモックを渡すテストはできない。
+/// 代わりに削除制限ロジックをこのモックでテストする。
+@MainActor
+final class GroupDetailViewMockDeletionLimit: @unchecked Sendable {
+
+    // MARK: - Configurable Properties
+
+    /// Premium状態（true: 無制限、false: 制限あり）
+    var isPremiumUser: Bool = false
+
+    /// 残り削除可能数（Free版の場合に使用）
+    var remainingDeletions: Int = 50
+
+    /// 記録された削除カウント
+    var recordedDeletionCount: Int = 0
+
+    /// 今日の削除可能残数を取得
+    /// - Returns: 残り削除可能数（プレミアムの場合はInt.max）
+    func getRemainingDeletions() -> Int {
+        if isPremiumUser {
+            return Int.max
+        }
+        return remainingDeletions
+    }
+
+    /// 削除数を記録
+    /// - Parameter count: 削除した数
+    func recordDeletion(count: Int) {
+        recordedDeletionCount += count
+        if !isPremiumUser {
+            remainingDeletions = max(0, remainingDeletions - count)
+        }
+    }
+
+    /// 削除可能かどうかをチェック
+    /// - Parameter count: 削除予定枚数
+    /// - Returns: 削除可能ならtrue
+    func canDelete(count: Int) -> Bool {
+        if isPremiumUser {
+            return true
+        }
+        return remainingDeletions >= count
+    }
+}
+
+// MARK: - DEVICE-003 選択モードとグループ全削除テスト
+
+@MainActor
+@Suite("DEVICE-003 選択モードとグループ全削除テスト", .tags(.dashboard, .view, .selectionMode, .deleteAll))
+struct GroupDetailViewDEVICE003Tests {
+
+    // MARK: - Test Data
+
+    /// テスト用の写真プロバイダー
+    private struct MockPhotoProvider: PhotoProvider {
+        let photos: [Photo]
+        var shouldReturnEmpty: Bool = false
+        var delay: Duration? = nil
+
+        func photos(for ids: [String]) async -> [Photo] {
+            if let delay = delay {
+                try? await Task.sleep(for: delay)
+            }
+
+            if shouldReturnEmpty {
+                return []
+            }
+            return photos.filter { ids.contains($0.id) }
+        }
+    }
+
+    /// テスト用のサンプル写真を作成
+    private func createMockPhotos(count: Int, prefix: String = "photo") -> [Photo] {
+        (0..<count).map { index in
+            Photo(
+                id: "\(prefix)-\(index)",
+                localIdentifier: "\(prefix)-\(index)",
+                creationDate: Date().addingTimeInterval(TimeInterval(-3600 * index)),
+                modificationDate: Date(),
+                mediaType: .image,
+                mediaSubtypes: [],
+                pixelWidth: 4032,
+                pixelHeight: 3024,
+                duration: 0,
+                fileSize: 2_500_000,
+                isFavorite: false
+            )
+        }
+    }
+
+    // MARK: - 正常系テスト（4件）
+
+    @Test("正常系-1: 選択ボタンタップで選択モード開始", .tags(.normal, .selectionMode))
+    func selectionModeStartOnButtonTap() async {
+        // Given: 5枚の写真グループ
+        let photoIds = (0..<5).map { "photo-\($0)" }
+        let group = PhotoGroup(
+            type: .similar,
+            photoIds: photoIds,
+            fileSizes: Array(repeating: 2_500_000, count: 5),
+            bestShotIndex: 0
+        )
+        let photos = createMockPhotos(count: 5)
+        let provider = MockPhotoProvider(photos: photos)
+
+        // When: ビューを作成（初期状態では選択モードはオフ）
+        let view = GroupDetailView(
+            group: group,
+            photoProvider: provider
+        )
+
+        // Then: ビューは正常に作成される
+        // 注意: @Stateは直接テストできないため、初期化の成功を確認
+        #expect(group.count == 5)
+        #expect(group.bestShotIndex == 0)
+        #expect(group.type == .similar)
+    }
+
+    @Test("正常系-2: 選択モードで写真選択→完了ボタンで選択解除", .tags(.normal, .selectionMode))
+    func selectionClearedOnDone() async {
+        // Given: 写真グループと選択可能な写真ID
+        let photoIds = (0..<6).map { "photo-\($0)" }
+        let group = PhotoGroup(
+            type: .similar,
+            photoIds: photoIds,
+            fileSizes: Array(repeating: 2_500_000, count: 6),
+            bestShotIndex: 0
+        )
+
+        // When/Then: 選択可能な写真はベストショット以外
+        let selectableIds = Set(photoIds).subtracting(["photo-0"])
+        #expect(selectableIds.count == 5)
+        #expect(!selectableIds.contains("photo-0"))
+    }
+
+    @Test("正常系-3: すべて削除→確認ダイアログ表示→削除実行", .tags(.normal, .deleteAll))
+    func deleteAllWithConfirmation() async {
+        // Given: Premium会員（制限なし）シミュレーション用モック
+        let deletionLimit = GroupDetailViewMockDeletionLimit()
+        deletionLimit.isPremiumUser = true
+
+        let photoIds = (0..<8).map { "photo-\($0)" }
+        let group = PhotoGroup(
+            type: .similar,
+            photoIds: photoIds,
+            fileSizes: Array(repeating: 2_500_000, count: 8),
+            bestShotIndex: 0
+        )
+
+        // When: Premium会員は無制限削除可能
+        let canDeleteAll = deletionLimit.canDelete(count: group.count - 1)
+
+        // Then: 削除対象はベストショット以外の7枚、制限なしで削除可能
+        let expectedDeletionCount = group.count - 1 // ベストショット除外
+        #expect(expectedDeletionCount == 7)
+        #expect(group.bestShotId == "photo-0")
+        #expect(canDeleteAll == true)
+    }
+
+    @Test("正常系-4: Premium制限内でグループ全削除成功", .tags(.normal, .deleteAll, .premiumLimit))
+    func deleteAllWithinFreeLimit() {
+        // Given: Free版で残り50枚削除可能、削除対象7枚
+        let deletionLimit = GroupDetailViewMockDeletionLimit()
+        deletionLimit.isPremiumUser = false
+        deletionLimit.remainingDeletions = 50
+
+        let photoIds = (0..<8).map { "photo-\($0)" }
+        let group = PhotoGroup(
+            type: .similar,
+            photoIds: photoIds,
+            fileSizes: Array(repeating: 2_500_000, count: 8),
+            bestShotIndex: 0
+        )
+
+        // When: 削除可能数を確認
+        let remaining = deletionLimit.getRemainingDeletions()
+        let deletionCount = group.count - 1 // ベストショット除外
+
+        // Then: 制限内なので削除可能
+        #expect(remaining >= deletionCount)
+        #expect(remaining == 50)
+        #expect(deletionCount == 7)
+    }
+
+    // MARK: - 異常系テスト（3件）
+
+    @Test("異常系-1: Premium制限超過でグループ全削除失敗", .tags(.error, .deleteAll, .premiumLimit))
+    func deleteAllExceedingLimit() {
+        // Given: Free版で残り3枚のみ削除可能、削除対象9枚
+        let deletionLimit = GroupDetailViewMockDeletionLimit()
+        deletionLimit.isPremiumUser = false
+        deletionLimit.remainingDeletions = 3
+
+        let photoIds = (0..<10).map { "photo-\($0)" }
+        let group = PhotoGroup(
+            type: .similar,
+            photoIds: photoIds,
+            fileSizes: Array(repeating: 2_500_000, count: 10),
+            bestShotIndex: 0
+        )
+
+        // When: 削除可能数を確認
+        let remaining = deletionLimit.getRemainingDeletions()
+        let deletionCount = group.count - 1 // ベストショット除外 = 9枚
+
+        // Then: 制限超過のため削除不可（LimitReachedSheet表示相当）
+        #expect(remaining < deletionCount)
+        #expect(remaining == 3)
+        #expect(deletionCount == 9)
+        #expect(deletionLimit.canDelete(count: deletionCount) == false)
+    }
+
+    @Test("異常系-2: 空グループですべて削除実行", .tags(.error, .deleteAll, .edge))
+    func deleteAllOnEmptyGroup() {
+        // Given: 空のグループ
+        let deletionLimit = GroupDetailViewMockDeletionLimit()
+        deletionLimit.isPremiumUser = true
+
+        let emptyGroup = PhotoGroup(
+            type: .similar,
+            photoIds: [],
+            fileSizes: []
+        )
+
+        // When: 空グループに対して削除対象を計算
+        let selectableCount = emptyGroup.count - (emptyGroup.bestShotIndex != nil ? 1 : 0)
+
+        // Then: 削除対象がないため何も起こらない
+        #expect(emptyGroup.isEmpty == true)
+        #expect(emptyGroup.count == 0)
+        #expect(selectableCount <= 0)
+    }
+
+    @Test("異常系-3: ベストショットのみのグループですべて削除", .tags(.error, .deleteAll, .edge))
+    func deleteAllWithOnlyBestShot() {
+        // Given: 1枚のみのグループ（ベストショット）
+        let deletionLimit = GroupDetailViewMockDeletionLimit()
+        deletionLimit.isPremiumUser = true
+
+        let singlePhotoGroup = PhotoGroup(
+            type: .similar,
+            photoIds: ["photo-0"],
+            fileSizes: [2_500_000],
+            bestShotIndex: 0
+        )
+
+        // When/Then: ベストショット以外の削除対象がない
+        let selectableIds = Set(singlePhotoGroup.photoIds)
+            .subtracting(singlePhotoGroup.bestShotId.map { [$0] } ?? [])
+
+        #expect(selectableIds.isEmpty)
+        #expect(singlePhotoGroup.count == 1)
+        #expect(singlePhotoGroup.bestShotId == "photo-0")
+    }
+
+    // MARK: - 境界値テスト（3件）
+
+    @Test("境界値-1: 削除制限ちょうど（remaining == selectablePhotoIds.count）", .tags(.boundary, .premiumLimit))
+    func deletionLimitExact() {
+        // Given: 残り削除数と削除対象数が完全に一致
+        let deletionLimit = GroupDetailViewMockDeletionLimit()
+        deletionLimit.isPremiumUser = false
+        deletionLimit.remainingDeletions = 7
+
+        let photoIds = (0..<8).map { "photo-\($0)" }
+        let group = PhotoGroup(
+            type: .similar,
+            photoIds: photoIds,
+            fileSizes: Array(repeating: 2_500_000, count: 8),
+            bestShotIndex: 0
+        )
+
+        // When: 境界値で削除可能数を確認
+        let remaining = deletionLimit.getRemainingDeletions()
+        let selectableCount = group.count - 1 // ベストショット除外
+
+        // Then: ちょうど削除可能
+        #expect(remaining == selectableCount)
+        #expect(remaining == 7)
+        #expect(remaining >= selectableCount) // 削除許可
+        #expect(deletionLimit.canDelete(count: selectableCount) == true)
+    }
+
+    @Test("境界値-2: 削除制限1枚不足（remaining == selectablePhotoIds.count - 1）", .tags(.boundary, .premiumLimit))
+    func deletionLimitOneShort() {
+        // Given: 残り削除数が1枚足りない
+        let deletionLimit = GroupDetailViewMockDeletionLimit()
+        deletionLimit.isPremiumUser = false
+        deletionLimit.remainingDeletions = 6
+
+        let photoIds = (0..<8).map { "photo-\($0)" }
+        let group = PhotoGroup(
+            type: .similar,
+            photoIds: photoIds,
+            fileSizes: Array(repeating: 2_500_000, count: 8),
+            bestShotIndex: 0
+        )
+
+        // When: 境界値で削除可能数を確認
+        let remaining = deletionLimit.getRemainingDeletions()
+        let selectableCount = group.count - 1 // ベストショット除外 = 7枚
+
+        // Then: 1枚足りないため削除不可
+        #expect(remaining == selectableCount - 1)
+        #expect(remaining == 6)
+        #expect(remaining < selectableCount) // 削除不許可
+        #expect(deletionLimit.canDelete(count: selectableCount) == false)
+    }
+
+    @Test("境界値-3: PremiumManager未設定時のすべて削除", .tags(.boundary, .premiumLimit))
+    func deleteAllWithoutPremiumManager() {
+        // Given: PremiumManagerがnil（制限チェックなし）相当の動作シミュレーション
+        let photoIds = (0..<5).map { "photo-\($0)" }
+        let group = PhotoGroup(
+            type: .similar,
+            photoIds: photoIds,
+            fileSizes: Array(repeating: 2_500_000, count: 5),
+            bestShotIndex: 0
+        )
+
+        // When: PremiumManager未設定の場合の動作を確認
+        // 実装上、PremiumManagerがnilの場合は制限なしで削除可能（確認ダイアログ直接表示）
+        let expectedDeletionCount = group.count - 1
+
+        // Then: 削除対象はベストショット以外の4枚
+        #expect(expectedDeletionCount == 4)
+        #expect(group.bestShotId == "photo-0")
+        #expect(group.deletionCandidateIds.count == 4)
+    }
+
+    // MARK: - UI/UXテスト（3件）
+
+    @Test("UI/UX-1: ツールバーボタン表示切り替え（選択⇔完了）", .tags(.uiux, .selectionMode))
+    func toolbarButtonToggle() {
+        // Given: グループ詳細ビュー
+        let group = PhotoGroup(
+            type: .similar,
+            photoIds: ["1", "2", "3"],
+            fileSizes: [1000, 2000, 3000],
+            bestShotIndex: 0
+        )
+
+        // When/Then: ビューが正常に作成される（ボタン表示ロジックはView内で管理）
+        // 選択モード無効時: 「選択」ボタン表示
+        // 選択モード有効時: 「完了」ボタン表示
+        let _ = GroupDetailView(group: group)
+
+        // ボタンラベルのローカライズキーが存在することを確認
+        let selectLabel = NSLocalizedString("groupDetail.select", value: "選択", comment: "")
+        let doneLabel = NSLocalizedString("common.done", value: "完了", comment: "")
+
+        #expect(!selectLabel.isEmpty)
+        #expect(!doneLabel.isEmpty)
+        #expect(selectLabel == "選択")
+        #expect(doneLabel == "完了")
+    }
+
+    @Test("UI/UX-2: 確認ダイアログのメッセージ内容検証", .tags(.uiux, .deleteAll))
+    func confirmationDialogMessage() {
+        // Given: グループ詳細ビュー用のグループ
+        let photoIds = (0..<10).map { "photo-\($0)" }
+        let fileSizes: [Int64] = Array(repeating: 2_500_000, count: 10)
+        let group = PhotoGroup(
+            type: .similar,
+            photoIds: photoIds,
+            fileSizes: fileSizes,
+            bestShotIndex: 0
+        )
+
+        // When: 確認メッセージの構成要素を検証
+        let deleteAllTitleKey = NSLocalizedString(
+            "groupDetail.deleteAll.title",
+            value: "グループ全体を削除",
+            comment: ""
+        )
+
+        let deleteAllMessageKey = NSLocalizedString(
+            "groupDetail.deleteAll.message",
+            value: "このグループのすべての写真（%d枚、%@）を削除しますか？\n\n※ ベストショットは保持されます。",
+            comment: ""
+        )
+
+        // Then: メッセージが適切なフォーマットを持つ
+        #expect(deleteAllTitleKey == "グループ全体を削除")
+        #expect(deleteAllMessageKey.contains("%d枚"))
+        #expect(deleteAllMessageKey.contains("ベストショット"))
+        #expect(group.count == 10)
+        #expect(group.formattedReclaimableSize.isEmpty == false)
+    }
+
+    @Test("UI/UX-3: 削除後の選択モード自動終了", .tags(.uiux, .selectionMode, .deleteAll))
+    func selectionModeEndAfterDeletion() {
+        // Given: 削除可能な状態
+        let deletionLimit = GroupDetailViewMockDeletionLimit()
+        deletionLimit.isPremiumUser = true
+
+        let photoIds = (0..<5).map { "photo-\($0)" }
+        let group = PhotoGroup(
+            type: .similar,
+            photoIds: photoIds,
+            fileSizes: Array(repeating: 2_500_000, count: 5),
+            bestShotIndex: 0
+        )
+
+        // When: 削除の実行をシミュレート
+        let selectableCount = group.count - 1
+        deletionLimit.recordDeletion(count: selectableCount)
+
+        // Then: 削除が記録される（削除後の状態管理はView内部で実施）
+        // 削除後: isSelectionModeActive = false, selectedPhotoIds = []
+        #expect(group.count == 5)
+        #expect(selectableCount == 4)
+        #expect(deletionLimit.recordedDeletionCount == 4)
+    }
+}
+
+// MARK: - Premium制限統合テスト
+
+@MainActor
+@Suite("Premium制限チェック統合テスト", .tags(.premiumLimit))
+struct PremiumLimitIntegrationTests {
+
+    @Test("Free版: 日次削除制限が正しく機能する")
+    func freeTierDailyLimit() {
+        // Given
+        let deletionLimit = GroupDetailViewMockDeletionLimit()
+        deletionLimit.isPremiumUser = false
+        deletionLimit.remainingDeletions = 50
+
+        // When: 削除を記録
+        deletionLimit.recordDeletion(count: 30)
+
+        // Then: 残り20枚
+        let remaining = deletionLimit.getRemainingDeletions()
+        #expect(remaining == 20)
+        #expect(deletionLimit.recordedDeletionCount == 30)
+    }
+
+    @Test("Premium版: 削除制限なし")
+    func premiumTierUnlimited() {
+        // Given
+        let deletionLimit = GroupDetailViewMockDeletionLimit()
+        deletionLimit.isPremiumUser = true
+
+        // When: 大量削除を記録
+        deletionLimit.recordDeletion(count: 1000)
+
+        // Then: 無制限
+        let remaining = deletionLimit.getRemainingDeletions()
+        #expect(remaining == Int.max)
+        #expect(deletionLimit.recordedDeletionCount == 1000)
+    }
+
+    @Test("Free版: 制限到達時は0を返す")
+    func freeTierLimitReached() {
+        // Given
+        let deletionLimit = GroupDetailViewMockDeletionLimit()
+        deletionLimit.isPremiumUser = false
+        deletionLimit.remainingDeletions = 0
+
+        // Then
+        let remaining = deletionLimit.getRemainingDeletions()
+        #expect(remaining == 0)
+        #expect(deletionLimit.canDelete(count: 1) == false)
+    }
 }

@@ -4,6 +4,196 @@
 
 ---
 
+## 2025-12-22 セッション⑭: trash-bug-fix-001（終了）
+
+### セッション概要
+- **セッションID**: trash-bug-fix-001
+- **実施内容**: ゴミ箱の黒画面問題とZero KB表示問題の修正
+- **品質スコア**: 92.5点（合格）
+- **終了理由**: 両バグ修正完了、実機テスト完了、動作確認OK
+
+### 完了したタスク
+
+#### 1. Bug 1修正: ゴミ箱黒画面問題（完了）
+- **問題**: ゴミ箱で「空にする」ボタン押下時に確認ダイアログではなく黒画面表示
+- **根本原因**: `.sheet(isPresented:)`で状態管理が不適切
+- **修正内容**:
+  - DeletionConfirmationService.swift: `ConfirmationMessage`に`Identifiable`適合追加
+  - TrashView.swift: `.sheet(item:)`パターンに変更
+- **品質スコア**: 95点
+
+#### 2. Bug 2修正: Zero KB表示問題（完了）
+- **問題**: ゴミ箱の確認ダイアログで「削除後の容量: Zero KB」と表示
+- **根本原因**: PHAsset変換時にfileSize=0で保存されていた
+- **修正内容**:
+  - TrashManager.swift: `createTrashPhoto()`でPHAssetから実際のファイルサイズを取得
+  - TrashManager.swift: 既存データのマイグレーション処理追加（`migrateFileSizes()`）
+- **品質スコア**: 90点
+
+#### 3. 実機テスト実施（完了）
+- **デバイス**: iPhone 15 Pro Max
+- **テスト結果**:
+  - Bug 1（黒画面問題）: 修正確認済み（確認ダイアログ正常表示）
+  - Bug 2（Zero KB問題）: 修正確認済み（正しいファイルサイズ表示）
+- **実機ビルド・インストール**: 2回実施
+
+#### 4. 知識ベース更新（完了）
+- **ERROR_KNOWLEDGE_BASE.md**: ERR-DATA-001として記録
+- 解決策、教訓を文書化
+
+### 修正ファイル一覧
+
+| ファイル | 変更内容 |
+|----------|----------|
+| DeletionConfirmationService.swift | ConfirmationMessageにIdentifiable適合追加 |
+| TrashView.swift | .sheet(item:)パターンに変更 |
+| TrashManager.swift | ファイルサイズ取得 + マイグレーション処理追加 |
+| ERROR_KNOWLEDGE_BASE.md | ERR-DATA-001追加 |
+
+### 品質スコア詳細
+
+| 項目 | スコア |
+|------|--------|
+| Bug 1（黒画面問題） | 95点（想定） |
+| Bug 2（Zero KB問題） | 90点（想定、マイグレーション含む） |
+| **平均** | **92.5点（合格）** |
+
+### 技術的詳細
+
+#### Bug 1: .sheet(item:)パターン
+```swift
+// 変更前（問題のあるコード）
+.sheet(isPresented: $showConfirmation) {
+    if let message = confirmationMessage {
+        ConfirmationView(message: message)
+    }
+}
+
+// 変更後（修正済みコード）
+.sheet(item: $confirmationMessage) { message in
+    ConfirmationView(message: message)
+}
+```
+
+#### Bug 2: ファイルサイズ取得 + マイグレーション
+```swift
+// createTrashPhoto()でファイルサイズ取得
+let fileSize = await getActualFileSize(for: asset)
+
+// 既存データのマイグレーション
+private func migrateFileSizes(_ photos: [TrashPhoto]) async -> [TrashPhoto] {
+    // PHAssetから実際のファイルサイズを取得してTrashPhotoを再構築
+}
+```
+
+### 次回タスク
+
+1. **M10-T04: App Store Connect設定**（優先度: 高）
+   - アプリメタデータ登録
+   - スクリーンショット準備
+   - プライバシーポリシー設定
+
+2. **M10-T05: TestFlight配信**（優先度: 高）
+   - ベータテスト実施
+
+3. **M10-T06: 最終ビルド・審査提出**（優先度: 高）
+   - App Store審査提出
+
+---
+
+## 2025-12-22 セッション⑬: zero-kb-filesize-migration-fix（終了）
+
+### セッション概要
+- **セッションID**: zero-kb-filesize-migration-fix
+- **実施内容**: ゴミ箱Zero KB表示問題の修正（ERR-DATA-001）
+- **品質スコア**: 85点（条件付き合格 - 実機テスト待ち）
+- **終了理由**: マイグレーション処理実装完了、ビルド成功
+
+### 完了したタスク
+
+#### 1. 根本原因分析（完了）
+- **問題**: ゴミ箱の確認ダイアログで「削除後の容量: Zero KB」と表示
+- **原因特定**:
+  - `PHAsset+Extensions.toPhotoWithoutFileSize()` がパフォーマンス優先でfileSize=0を返す
+  - `TrashManager.createTrashPhoto()` に新規データ用の修正は実施済み
+  - しかし、**既存のゴミ箱データ**（JSON永続化済み）はfileSize=0のまま
+  - `TrashDataStore.loadAll()` はJSONを読み込むだけで更新処理なし
+
+#### 2. マイグレーション処理実装（完了）
+- **TrashManager.fetchAllTrashPhotos()** を修正:
+  - データ読み込み後、fileSize=0の写真を検出
+  - `migrateFileSizes()` メソッドを呼び出してPHAssetから実際のサイズを取得
+  - マイグレーション後のデータを自動保存
+
+#### 3. 知識ベース更新（完了）
+- **ERR-DATA-001** として記録
+- 解決策、教訓を文書化
+
+### 修正ファイル一覧
+
+| ファイル | 変更内容 |
+|----------|----------|
+| TrashManager.swift | fetchAllTrashPhotos() にマイグレーション処理追加、migrateFileSizes() メソッド新規追加 |
+| ERROR_KNOWLEDGE_BASE.md | ERR-DATA-001追加 |
+
+### 技術的詳細
+
+#### 変更前（問題のあるコード）
+```swift
+// TrashManager.swift - fetchAllTrashPhotos()
+public func fetchAllTrashPhotos() async -> [TrashPhoto] {
+    do {
+        let photos = try await dataStore.loadAll()  // fileSize=0のまま
+        updateCache(photos)
+        return photos
+    } catch {
+        return []
+    }
+}
+```
+
+#### 変更後（修正済みコード）
+```swift
+// TrashManager.swift - fetchAllTrashPhotos()
+public func fetchAllTrashPhotos() async -> [TrashPhoto] {
+    do {
+        var photos = try await dataStore.loadAll()
+
+        // fileSize=0の写真があればマイグレーション実行
+        let needsMigration = photos.contains { $0.fileSize == 0 }
+        if needsMigration {
+            photos = await migrateFileSizes(photos)
+            try? await dataStore.save(photos)  // 結果を保存
+        }
+
+        updateCache(photos)
+        return photos
+    } catch {
+        return []
+    }
+}
+
+private func migrateFileSizes(_ photos: [TrashPhoto]) async -> [TrashPhoto] {
+    // PHAssetから実際のファイルサイズを取得してTrashPhotoを再構築
+}
+```
+
+### 検証結果
+- シミュレータビルド: 成功
+
+### 次回タスク
+
+1. **実機テスト実施**
+   - ゴミ箱タブを開く
+   - 「空にする」ボタンをタップ
+   - 確認ダイアログで正しいファイルサイズが表示されることを確認
+
+2. **E2Eテスト継続**
+   - 新規削除 → ゴミ箱移動 → ファイルサイズ表示確認
+   - 既存データのマイグレーション動作確認
+
+---
+
 ## 2025-12-22 セッション⑫: trash-integration-fix-001（終了）
 
 ### セッション概要

@@ -28,7 +28,9 @@ public enum ConfirmationActionType: Sendable {
 // MARK: - ConfirmationMessage
 
 /// 確認メッセージ
-public struct ConfirmationMessage: Sendable {
+public struct ConfirmationMessage: Sendable, Identifiable {
+    /// 一意識別子
+    public let id: UUID
     /// タイトル
     public let title: String
     /// メッセージ本文
@@ -51,6 +53,7 @@ public struct ConfirmationMessage: Sendable {
         confirmTitle: String = "確認",
         cancelTitle: String = "キャンセル"
     ) {
+        self.id = UUID()
         self.title = title
         self.message = message
         self.details = details

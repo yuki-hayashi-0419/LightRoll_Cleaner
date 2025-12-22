@@ -32,7 +32,7 @@ struct PremiumViewTests {
 
         @Test("idle状態から自動ロード開始")
         func testIdleStateToLoadingTransition() async throws {
-            let mockManager = MockPremiumManager(isPremiumValue: false)
+            let mockManager = PremiumViewMockPremiumManager(isPremiumValue: false)
             let mockRepo = MockPurchaseRepository()
 
             // Given: idle状態
@@ -49,7 +49,7 @@ struct PremiumViewTests {
 
         @Test("商品ロード中はProgressView表示状態")
         func testLoadingStateShowsProgress() {
-            let mockManager = MockPremiumManager(isPremiumValue: false)
+            let mockManager = PremiumViewMockPremiumManager(isPremiumValue: false)
             let mockRepo = MockPurchaseRepository(loading: true)
 
             // Given: ロード中状態
@@ -62,7 +62,7 @@ struct PremiumViewTests {
 
         @Test("商品ロード成功後はプランカード表示可能")
         func testLoadedStateShowsPlans() async throws {
-            let mockManager = MockPremiumManager(isPremiumValue: false)
+            let mockManager = PremiumViewMockPremiumManager(isPremiumValue: false)
             let mockRepo = MockPurchaseRepository(products: [
                 .monthlyPlan(),
                 .yearlyPlan()
@@ -79,7 +79,7 @@ struct PremiumViewTests {
 
         @Test("商品ロード失敗時はエラー表示と再試行ボタン")
         func testErrorStateShowsRetryButton() {
-            let mockManager = MockPremiumManager(isPremiumValue: false)
+            let mockManager = PremiumViewMockPremiumManager(isPremiumValue: false)
             let mockRepo = MockPurchaseRepository(shouldThrowError: true)
 
             // Given: エラー状態
@@ -111,7 +111,7 @@ struct PremiumViewTests {
 
         @Test("非会員の場合は削除残数表示")
         func testFreeMemberShowsRemainingDeletions() {
-            let mockManager = MockPremiumManager(isPremiumValue: false)
+            let mockManager = PremiumViewMockPremiumManager(isPremiumValue: false)
             mockManager.dailyDeleteCount = 10
 
             // Given: 非会員で10枚削除済み
@@ -258,7 +258,7 @@ struct PremiumViewTests {
 
         @Test("購入成功後は成功アラート表示")
         func testPurchaseSuccessShowsAlert() async throws {
-            let mockManager = MockPremiumManager(isPremiumValue: false)
+            let mockManager = PremiumViewMockPremiumManager(isPremiumValue: false)
             let mockRepo = MockPurchaseRepository()
             let product = ProductInfo.monthlyPlan()
 
@@ -302,7 +302,7 @@ struct PremiumViewTests {
 
         @Test("購入後のPremium状態更新")
         func testPremiumStatusUpdateAfterPurchase() async throws {
-            let mockManager = MockPremiumManager(isPremiumValue: false)
+            let mockManager = PremiumViewMockPremiumManager(isPremiumValue: false)
             let mockRepo = MockPurchaseRepository()
 
             // When: 購入完了後にステータス確認
@@ -363,7 +363,7 @@ struct PremiumViewTests {
 
         @Test("復元成功後は成功アラート表示")
         func testRestoreSuccessShowsAlert() async throws {
-            let mockManager = MockPremiumManager(isPremiumValue: false)
+            let mockManager = PremiumViewMockPremiumManager(isPremiumValue: false)
             let mockRepo = MockPurchaseRepository()
 
             // When: 復元成功
@@ -404,7 +404,7 @@ struct PremiumViewTests {
 
         @Test("復元後のPremium状態更新")
         func testPremiumStatusUpdateAfterRestore() async throws {
-            let mockManager = MockPremiumManager(isPremiumValue: false)
+            let mockManager = PremiumViewMockPremiumManager(isPremiumValue: false)
             let mockRepo = MockPurchaseRepository()
 
             // When: 復元完了後にステータス確認
@@ -463,7 +463,7 @@ struct PremiumViewTests {
 
         @Test("非会員: 削除残数表示")
         func testFreeUserRemainingDeletions() {
-            let mockManager = MockPremiumManager(isPremiumValue: false)
+            let mockManager = PremiumViewMockPremiumManager(isPremiumValue: false)
             mockManager.dailyDeleteCount = 25
 
             // Given: 25枚削除済み
@@ -578,7 +578,7 @@ struct PremiumViewTests {
 
         @Test("Premium状態変更の監視（onChange）")
         func testPremiumStatusChangeObservation() {
-            let mockManager = MockPremiumManager(isPremiumValue: false)
+            let mockManager = PremiumViewMockPremiumManager(isPremiumValue: false)
 
             // When: Premium状態変更
             mockManager.isPremium = true
@@ -589,7 +589,7 @@ struct PremiumViewTests {
 
         @Test("Free→Premium遷移時のUI更新と成功アラート")
         func testFreeToPremiumTransition() {
-            let mockManager = MockPremiumManager(isPremiumValue: false)
+            let mockManager = PremiumViewMockPremiumManager(isPremiumValue: false)
 
             // When: Premiumに変更
             mockManager.isPremium = true
@@ -618,7 +618,7 @@ struct PremiumViewTests {
 
         @Test("削除残数の動的更新")
         func testDeleteCountDynamicUpdate() {
-            let mockManager = MockPremiumManager(isPremiumValue: false)
+            let mockManager = PremiumViewMockPremiumManager(isPremiumValue: false)
 
             // When: 削除カウント増加
             mockManager.dailyDeleteCount = 10
@@ -630,7 +630,7 @@ struct PremiumViewTests {
 
         @Test("複数回の状態変更に対応")
         func testMultipleStatusChanges() {
-            let mockManager = MockPremiumManager(isPremiumValue: false)
+            let mockManager = PremiumViewMockPremiumManager(isPremiumValue: false)
 
             // When: 複数回変更
             mockManager.isPremium = true
@@ -687,7 +687,7 @@ struct PremiumViewTests {
 
         @Test("Premium会員時はプランカード非表示")
         func testPremiumMemberHidesPlans() {
-            let mockManager = MockPremiumManager(isPremiumValue: true)
+            let mockManager = PremiumViewMockPremiumManager(isPremiumValue: true)
 
             // Given: Premium会員
             // Then: プランカードを表示しない
@@ -696,7 +696,7 @@ struct PremiumViewTests {
 
         @Test("Premium会員時は復元ボタン非表示")
         func testPremiumMemberHidesRestoreButton() {
-            let mockManager = MockPremiumManager(isPremiumValue: true)
+            let mockManager = PremiumViewMockPremiumManager(isPremiumValue: true)
 
             // Given: Premium会員
             // Then: 復元ボタンを表示しない
@@ -722,10 +722,10 @@ struct PremiumViewTests {
 
 // MARK: - Mock Objects
 
-/// MockPremiumManager
+/// PremiumView用MockPremiumManager
 @MainActor
 @Observable
-final class MockPremiumManager: PremiumManagerProtocol {
+final class PremiumViewMockPremiumManager: PremiumManagerProtocol {
     var isPremium: Bool
     var subscriptionStatus: PremiumStatus
     var dailyDeleteCount: Int = 0

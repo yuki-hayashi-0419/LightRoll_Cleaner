@@ -54,7 +54,7 @@ struct BannerAdViewTests {
     @Test("idle状態から自動ロード開始")
     func testIdleStateAutoLoads() async throws {
         // Given: idle状態のAdManager
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .idle
 
@@ -73,7 +73,7 @@ struct BannerAdViewTests {
     @Test("loading状態でProgressView表示")
     func testLoadingStateShowsProgressView() async throws {
         // Given: loading状態のAdManager
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .loading
 
@@ -90,7 +90,7 @@ struct BannerAdViewTests {
     @Test("Premium会員の場合は広告非表示")
     func testPremiumUserHidesAd() async throws {
         // Given: Premium会員
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: true)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: true)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
 
         // When: BannerAdViewを作成
@@ -107,7 +107,7 @@ struct BannerAdViewTests {
     @Test("エラー時の適切な表示")
     func testErrorStateDisplay() async throws {
         // Given: エラー状態のAdManager
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .failed(.loadFailed("Test Error"))
 
@@ -126,7 +126,7 @@ struct BannerAdViewTests {
     @Test("loadBannerAdが適切に呼ばれる")
     func testLoadBannerAdCalled() async throws {
         // Given: idle状態のAdManager
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .idle
 
@@ -141,7 +141,7 @@ struct BannerAdViewTests {
     @Test("showBannerAdからGADBannerViewを取得")
     func testShowBannerAdReturnsView() async throws {
         // Given: loaded状態のAdManager
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .loaded
         mockAdManager.mockBannerView = GADBannerView(adSize: GADAdSizeBanner)
@@ -157,7 +157,7 @@ struct BannerAdViewTests {
     @Test("AdLoadStateの各状態に対応")
     func testAllAdLoadStates() async throws {
         // Given: MockAdManager
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
 
         // When/Then: idle状態
@@ -184,7 +184,7 @@ struct BannerAdViewTests {
     @Test("Premium時はロードがスキップされる")
     func testPremiumSkipsLoad() async throws {
         // Given: Premium会員
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: true)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: true)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
 
         // When: loadBannerAdを試みる
@@ -206,7 +206,7 @@ struct BannerAdViewTests {
     @Test("Premium会員時は広告を表示しない - 詳細")
     func testPremiumUserDetailedCheck() async throws {
         // Given: Premium会員
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: true)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: true)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .loaded // ロード済みでも
         mockAdManager.mockBannerView = GADBannerView(adSize: GADAdSizeBanner)
@@ -224,7 +224,7 @@ struct BannerAdViewTests {
     @Test("premiumUserNoAdsエラー時は広告を表示しない")
     func testPremiumUserNoAdsError() async throws {
         // Given: premiumUserNoAdsエラー
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .failed(.premiumUserNoAds)
 
@@ -243,7 +243,7 @@ struct BannerAdViewTests {
     @Test("Free会員時は広告を表示")
     func testFreeUserShowsAd() async throws {
         // Given: Free会員
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .loaded
         mockAdManager.mockBannerView = GADBannerView(adSize: GADAdSizeBanner)
@@ -264,7 +264,7 @@ struct BannerAdViewTests {
     @Test("loading状態: ProgressView表示、高さ50pt")
     func testLoadingStateHeight() async throws {
         // Given: loading状態
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .loading
 
@@ -281,7 +281,7 @@ struct BannerAdViewTests {
     @Test("loaded状態: BannerAdViewRepresentable表示")
     func testLoadedStateShowsBanner() async throws {
         // Given: loaded状態
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .loaded
         mockAdManager.mockBannerView = GADBannerView(adSize: GADAdSizeBanner)
@@ -297,7 +297,7 @@ struct BannerAdViewTests {
     @Test("failed状態: EmptyView表示、高さ0")
     func testFailedStateEmptyView() async throws {
         // Given: failed状態
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .failed(.loadFailed("Error"))
 
@@ -314,7 +314,7 @@ struct BannerAdViewTests {
     @Test("idle状態: 自動ロード開始 - 詳細")
     func testIdleStateAutoLoadDetailed() async throws {
         // Given: idle状態
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .idle
 
@@ -333,7 +333,7 @@ struct BannerAdViewTests {
     @Test("loadFailedエラー時の表示")
     func testLoadFailedError() async throws {
         // Given: loadFailedエラー
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .failed(.loadFailed("Network error"))
 
@@ -350,7 +350,7 @@ struct BannerAdViewTests {
     @Test("timeoutエラー時の表示")
     func testTimeoutError() async throws {
         // Given: timeoutエラー
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .failed(.timeout)
 
@@ -367,7 +367,7 @@ struct BannerAdViewTests {
     @Test("networkErrorエラー時の表示")
     func testNetworkError() async throws {
         // Given: networkErrorエラー
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .failed(.networkError)
 
@@ -384,7 +384,7 @@ struct BannerAdViewTests {
     @Test("premiumUserNoAdsエラー時の表示 - 詳細")
     func testPremiumUserNoAdsErrorDetailed() async throws {
         // Given: premiumUserNoAdsエラー
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .failed(.premiumUserNoAds)
 
@@ -404,7 +404,7 @@ struct BannerAdViewTests {
     @Test("notInitializedエラー時の表示")
     func testNotInitializedError() async throws {
         // Given: notInitializedエラー
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .failed(.notInitialized)
 
@@ -421,7 +421,7 @@ struct BannerAdViewTests {
     @Test("adNotReadyエラー時の表示")
     func testAdNotReadyError() async throws {
         // Given: adNotReadyエラー
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .failed(.adNotReady)
 
@@ -440,7 +440,7 @@ struct BannerAdViewTests {
     @Test("広告に「広告」ラベルが設定されている")
     func testAdAccessibilityLabel() async throws {
         // Given: loaded状態
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .loaded
         mockAdManager.mockBannerView = GADBannerView(adSize: GADAdSizeBanner)
@@ -458,7 +458,7 @@ struct BannerAdViewTests {
     @Test("ローディングに「広告読み込み中」ラベル")
     func testLoadingAccessibilityLabel() async throws {
         // Given: loading状態
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .loading
 
@@ -475,7 +475,7 @@ struct BannerAdViewTests {
     @Test("エラー時はaccessibilityHiddenがtrue")
     func testErrorAccessibilityHidden() async throws {
         // Given: エラー状態
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .failed(.loadFailed("Error"))
 
@@ -533,7 +533,7 @@ struct BannerAdViewTests {
     @Test("バナーViewがnilの場合の処理")
     func testNilBannerView() async throws {
         // Given: loaded状態だがバナーViewがnil
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .loaded
         mockAdManager.mockBannerView = nil
@@ -548,7 +548,7 @@ struct BannerAdViewTests {
     @Test("複数回のロード試行")
     func testMultipleLoadAttempts() async throws {
         // Given: idle状態のAdManager
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .idle
 
@@ -568,7 +568,7 @@ struct BannerAdViewTests {
     @Test("状態遷移の正確性: idle → loading → loaded")
     func testStateTransitionSuccess() async throws {
         // Given: idle状態
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .idle
 
@@ -587,7 +587,7 @@ struct BannerAdViewTests {
     @Test("状態遷移の正確性: idle → loading → failed")
     func testStateTransitionFailure() async throws {
         // Given: idle状態
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
         mockAdManager.bannerAdState = .idle
 
@@ -606,7 +606,7 @@ struct BannerAdViewTests {
     @Test("Premium状態変更時の動作")
     func testPremiumStatusChange() async throws {
         // Given: Free会員から開始
-        let mockPremiumManager = MockPremiumManager(isPremiumValue: false)
+        let mockPremiumManager = BannerAdViewMockPremiumManager(isPremiumValue: false)
         let mockAdManager = MockAdManager(premiumManager: mockPremiumManager)
 
         // Then: Free会員
@@ -686,10 +686,10 @@ final class MockAdManager {
 
 // MARK: - MockPremiumManager
 
-/// テスト用のMockPremiumManager
+/// BannerAdView用MockPremiumManager
 @MainActor
 @Observable
-final class MockPremiumManager: PremiumManagerProtocol {
+final class BannerAdViewMockPremiumManager: PremiumManagerProtocol {
     var isPremium: Bool
     var subscriptionStatus: PremiumStatus
     var dailyDeleteCount: Int = 0

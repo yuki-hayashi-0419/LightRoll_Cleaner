@@ -178,6 +178,121 @@
 
 ---
 
+### ERR-DATA-001: ゴミ箱fileSize=0マイグレーション不足（Zero KB表示問題）
+- **発生日**: 2025-12-22
+- **問題の概要**:
+  - ゴミ箱の確認ダイアログで「削除後の容量: Zero KB」と表示される
+  - 新規削除時のfileSize取得修正は実施済みだが、既存データには適用されない
+  - 結果：既存のゴミ箱データはfileSize=0のまま保存されている
+
+- **症状**:
+  - ゴミ箱タブを開く
+  - 「空にする」ボタンをタップ
+  - 確認ダイアログに「削除後の容量: Zero KB」と表示される
+
+- **根本原因**:
+  1. `PHAsset+Extensions.swift` の `toPhotoWithoutFileSize()` はパフォーマンス優先でfileSize=0を返す
+  2. `TrashManager.createTrashPhoto()` には修正済み（photo.fileSize == 0の場合にfetchFileSizeを呼び出す）
+  3. しかし、**修正前に作成された既存のゴミ箱データ**（JSON永続化済み）はfileSize=0のまま
+  4. `TrashDataStore.loadAll()` はJSONを読み込むだけでfileSize更新処理がない
+  5. `TrashView` は `allPhotos.totalSize` で全写真のfileSizeを合計 → 0の合計で「Zero KB」
+
+- **問題のコード（修正前）**:
+  ```swift
+  // TrashManager.swift - fetchAllTrashPhotos()（修正前）
+  public func fetchAllTrashPhotos() async -> [TrashPhoto] {
+      if let expiration = cacheExpiration,
+         Date() < expiration {
+          return cachedPhotos
+      }
+
+      do {
+          let photos = try await dataStore.loadAll()  // ❌ fileSize=0のまま返す
+          updateCache(photos)
+          return photos
+      } catch {
+          return []
+      }
+  }
+  ```
+
+- **解決策**:
+  ```swift
+  // TrashManager.swift - fetchAllTrashPhotos()（修正後）
+  public func fetchAllTrashPhotos() async -> [TrashPhoto] {
+      if let expiration = cacheExpiration,
+         Date() < expiration {
+          return cachedPhotos
+      }
+
+      do {
+          var photos = try await dataStore.loadAll()
+
+          // ✅ fileSize=0の写真があればマイグレーション実行
+          let needsMigration = photos.contains { $0.fileSize == 0 }
+          if needsMigration {
+              photos = await migrateFileSizes(photos)
+              // ✅ マイグレーション結果を保存
+              try? await dataStore.save(photos)
+          }
+
+          updateCache(photos)
+          return photos
+      } catch {
+          return []
+      }
+  }
+
+  /// fileSize=0の写真についてPHAssetから実際のファイルサイズを取得してマイグレーション
+  private func migrateFileSizes(_ photos: [TrashPhoto]) async -> [TrashPhoto] {
+      var migratedPhotos: [TrashPhoto] = []
+      migratedPhotos.reserveCapacity(photos.count)
+
+      for photo in photos {
+          if photo.fileSize == 0 {
+              if let newFileSize = await fetchFileSize(for: photo.originalPhotoId),
+                 newFileSize > 0 {
+                  // ✅ 新しいファイルサイズで写真を再作成
+                  let migratedPhoto = TrashPhoto(
+                      id: photo.id,
+                      originalPhotoId: photo.originalPhotoId,
+                      originalAssetIdentifier: photo.originalAssetIdentifier,
+                      thumbnailData: photo.thumbnailData,
+                      deletedAt: photo.deletedAt,
+                      expiresAt: photo.expiresAt,
+                      fileSize: newFileSize,  // ✅ 正しいファイルサイズ
+                      metadata: photo.metadata,
+                      deletionReason: photo.deletionReason
+                  )
+                  migratedPhotos.append(migratedPhoto)
+              } else {
+                  migratedPhotos.append(photo)
+              }
+          } else {
+              migratedPhotos.append(photo)
+          }
+      }
+
+      return migratedPhotos
+  }
+  ```
+
+- **検証結果**:
+  - ✅ シミュレータビルド成功
+
+- **関連ファイル**:
+  - `/LightRoll_CleanerPackage/Sources/LightRoll_CleanerFeature/Deletion/Services/TrashManager.swift`
+  - `/LightRoll_CleanerPackage/Sources/LightRoll_CleanerFeature/Deletion/Views/TrashView.swift`
+  - `/LightRoll_CleanerPackage/Sources/LightRoll_CleanerFeature/Deletion/Services/DeletionConfirmationService.swift`
+
+- **教訓**:
+  - 既存データに影響する修正では、マイグレーション処理が必要
+  - データ取得時に自動マイグレーションを行うパターンが有効
+  - マイグレーション後は永続化ストアに保存して次回以降の処理を省略
+  - 読み込み時にデータ整合性チェックを入れることで、段階的なデータ修正が可能
+
+- **品質スコア**: 85点（条件付き合格 - 実機テスト待ち）
+
 ---
 
 ## SwiftUI関連
@@ -197,3 +312,4 @@
 | 日付 | 更新内容 | 担当者 |
 |------|----------|--------|
 | 2025-11-27 | 初期テンプレート作成 | - |
+| 2025-12-22 | ERR-DATA-001: ゴミ箱fileSize=0マイグレーション不足問題を追加 | @spec-orchestrator |

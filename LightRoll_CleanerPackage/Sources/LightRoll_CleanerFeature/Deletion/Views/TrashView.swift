@@ -69,10 +69,7 @@ public struct TrashView: View {
     /// 編集モードかどうか
     @State private var isEditMode: Bool = false
 
-    /// 確認ダイアログ表示フラグ
-    @State private var showConfirmation: Bool = false
-
-    /// 現在の確認メッセージ
+    /// 現在の確認メッセージ（nilでないときにシート表示）
     @State private var confirmationMessage: ConfirmationMessage?
 
     /// 現在の確認アクション
@@ -154,8 +151,8 @@ public struct TrashView: View {
             .refreshable {
                 await loadTrashPhotos()
             }
-            .sheet(isPresented: $showConfirmation) {
-                confirmationSheet
+            .sheet(item: $confirmationMessage) { message in
+                confirmationSheet(message: message)
             }
             .overlay {
                 if showToast {
@@ -530,24 +527,22 @@ public struct TrashView: View {
     // MARK: - Confirmation Sheet
 
     @ViewBuilder
-    private var confirmationSheet: some View {
-        if let message = confirmationMessage {
-            ConfirmationDialog(
-                title: message.title,
-                message: message.message,
-                details: message.details.isEmpty ? nil : message.details,
-                style: message.style,
-                confirmTitle: message.confirmTitle,
-                cancelTitle: message.cancelTitle,
-                onConfirm: { @MainActor in
-                    await executeConfirmedAction()
-                },
-                onCancel: { @MainActor in
-                    showConfirmation = false
-                }
-            )
-            .presentationDetents([.medium])
-        }
+    private func confirmationSheet(message: ConfirmationMessage) -> some View {
+        ConfirmationDialog(
+            title: message.title,
+            message: message.message,
+            details: message.details.isEmpty ? nil : message.details,
+            style: message.style,
+            confirmTitle: message.confirmTitle,
+            cancelTitle: message.cancelTitle,
+            onConfirm: { @MainActor in
+                await executeConfirmedAction()
+            },
+            onCancel: { @MainActor in
+                confirmationMessage = nil
+            }
+        )
+        .presentationDetents([.medium])
     }
 
     // MARK: - Toast Overlay
@@ -635,7 +630,6 @@ public struct TrashView: View {
                 actionType: .restore,
                 itemName: "写真"
             )
-            showConfirmation = true
         } else {
             await executeRestore()
         }
@@ -686,7 +680,6 @@ public struct TrashView: View {
             actionType: .permanentDelete,
             itemName: "写真"
         )
-        showConfirmation = true
     }
 
     /// 完全削除実行
@@ -729,7 +722,6 @@ public struct TrashView: View {
             actionType: .emptyTrash,
             itemName: "写真"
         )
-        showConfirmation = true
     }
 
     /// ゴミ箱を空にする実行
@@ -755,7 +747,7 @@ public struct TrashView: View {
 
     /// 確認済みアクション実行
     private func executeConfirmedAction() async {
-        showConfirmation = false
+        confirmationMessage = nil
 
         switch confirmationAction {
         case .restore:

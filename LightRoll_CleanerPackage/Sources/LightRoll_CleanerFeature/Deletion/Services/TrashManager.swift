@@ -91,6 +91,7 @@ public final class TrashManager: TrashManagerProtocol {
     // MARK: - Public Methods
 
     /// ゴミ箱内の全写真を取得
+    /// fileSize=0の既存データは自動的にPHAssetから再取得してマイグレーション
     /// - Returns: ゴミ箱内の写真配列
     public func fetchAllTrashPhotos() async -> [TrashPhoto] {
         // キャッシュが有効な場合はそれを返す
@@ -100,13 +101,58 @@ public final class TrashManager: TrashManagerProtocol {
         }
 
         do {
-            let photos = try await dataStore.loadAll()
+            var photos = try await dataStore.loadAll()
+
+            // fileSize=0の写真があればマイグレーション実行
+            let needsMigration = photos.contains { $0.fileSize == 0 }
+            if needsMigration {
+                photos = await migrateFileSizes(photos)
+                // マイグレーション結果を保存
+                try? await dataStore.save(photos)
+            }
+
             updateCache(photos)
             return photos
         } catch {
             // エラー時は空配列を返す（UIは影響を受けない）
             return []
         }
+    }
+
+    /// fileSize=0の写真についてPHAssetから実際のファイルサイズを取得してマイグレーション
+    /// - Parameter photos: マイグレーション対象の写真配列
+    /// - Returns: ファイルサイズ更新済みの写真配列
+    private func migrateFileSizes(_ photos: [TrashPhoto]) async -> [TrashPhoto] {
+        var migratedPhotos: [TrashPhoto] = []
+        migratedPhotos.reserveCapacity(photos.count)
+
+        for photo in photos {
+            if photo.fileSize == 0 {
+                // PHAssetから実際のファイルサイズを取得
+                if let newFileSize = await fetchFileSize(for: photo.originalPhotoId), newFileSize > 0 {
+                    // 新しいファイルサイズで写真を再作成
+                    let migratedPhoto = TrashPhoto(
+                        id: photo.id,
+                        originalPhotoId: photo.originalPhotoId,
+                        originalAssetIdentifier: photo.originalAssetIdentifier,
+                        thumbnailData: photo.thumbnailData,
+                        deletedAt: photo.deletedAt,
+                        expiresAt: photo.expiresAt,
+                        fileSize: newFileSize,
+                        metadata: photo.metadata,
+                        deletionReason: photo.deletionReason
+                    )
+                    migratedPhotos.append(migratedPhoto)
+                } else {
+                    // PHAssetが見つからない場合は元のまま
+                    migratedPhotos.append(photo)
+                }
+            } else {
+                migratedPhotos.append(photo)
+            }
+        }
+
+        return migratedPhotos
     }
 
     /// 写真をゴミ箱に移動
@@ -230,6 +276,14 @@ public final class TrashManager: TrashManagerProtocol {
         // サムネイルデータの取得（非同期）
         let thumbnailData = await generateThumbnailData(for: photo.localIdentifier)
 
+        // ファイルサイズの取得（0の場合はPHAssetから取得）
+        let fileSize: Int64
+        if photo.fileSize > 0 {
+            fileSize = photo.fileSize
+        } else {
+            fileSize = await fetchFileSize(for: photo.localIdentifier) ?? 0
+        }
+
         // メタデータの構築
         let metadata = TrashPhotoMetadata(
             creationDate: photo.creationDate,
@@ -247,7 +301,7 @@ public final class TrashManager: TrashManagerProtocol {
             thumbnailData: thumbnailData,
             deletedAt: deletedAt,
             expiresAt: expiresAt,
-            fileSize: photo.fileSize,
+            fileSize: fileSize,
             metadata: metadata,
             deletionReason: reason
         )
@@ -320,6 +374,34 @@ public final class TrashManager: TrashManagerProtocol {
         }
         return bitmap.representation(using: .jpeg, properties: [.compressionFactor: 0.8])
         #endif
+    }
+
+    /// PHAssetから実際のファイルサイズを取得
+    /// - Parameter localIdentifier: PHAssetのlocalIdentifier
+    /// - Returns: ファイルサイズ（バイト、失敗時はnil）
+    private func fetchFileSize(for localIdentifier: String) async -> Int64? {
+        // PHAssetを取得
+        let fetchResult = PHAsset.fetchAssets(
+            withLocalIdentifiers: [localIdentifier],
+            options: nil
+        )
+
+        guard let asset = fetchResult.firstObject else {
+            return nil
+        }
+
+        // リソース情報からファイルサイズを取得
+        let resources = PHAssetResource.assetResources(for: asset)
+
+        // すべてのリソースのサイズを合計
+        var totalSize: Int64 = 0
+        for resource in resources {
+            if let size = resource.value(forKey: "fileSize") as? Int64 {
+                totalSize += size
+            }
+        }
+
+        return totalSize > 0 ? totalSize : nil
     }
 
     /// キャッシュを更新

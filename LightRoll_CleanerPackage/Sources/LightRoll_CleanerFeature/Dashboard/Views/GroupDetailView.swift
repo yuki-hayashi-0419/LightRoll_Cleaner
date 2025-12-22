@@ -63,8 +63,14 @@ public struct GroupDetailView: View {
     /// 選択中の写真ID
     @State private var selectedPhotoIds: Set<String> = []
 
+    /// 選択モード有効フラグ
+    @State private var isSelectionModeActive: Bool = false
+
     /// 削除確認ダイアログ表示フラグ
     @State private var showDeleteConfirmation: Bool = false
+
+    /// グループ全削除確認ダイアログ表示フラグ
+    @State private var showDeleteAllConfirmation: Bool = false
 
     /// 削除上限到達シート表示フラグ（M9-T13で使用）
     @State private var showLimitReachedSheet: Bool = false
@@ -177,6 +183,35 @@ public struct GroupDetailView: View {
             ) {}
         } message: {
             Text(deleteConfirmationMessage)
+        }
+        .confirmationDialog(
+            NSLocalizedString(
+                "groupDetail.deleteAll.title",
+                value: "グループ全体を削除",
+                comment: "Delete all confirmation title"
+            ),
+            isPresented: $showDeleteAllConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button(
+                NSLocalizedString(
+                    "groupDetail.deleteAll.confirm",
+                    value: "すべて削除する",
+                    comment: "Delete all confirm button"
+                ),
+                role: .destructive
+            ) {
+                Task {
+                    await deleteAllPhotos()
+                }
+            }
+
+            Button(
+                NSLocalizedString("common.cancel", value: "キャンセル", comment: "Cancel button"),
+                role: .cancel
+            ) {}
+        } message: {
+            Text(deleteAllConfirmationMessage)
         }
     }
 
@@ -407,9 +442,37 @@ public struct GroupDetailView: View {
         }
 
         ToolbarItem(placement: .topBarTrailing) {
-            if !selectedPhotoIds.isEmpty {
-                Button(NSLocalizedString("common.done", value: "完了", comment: "Done button")) {
-                    selectedPhotoIds.removeAll()
+            HStack(spacing: LRSpacing.sm) {
+                // 選択モードトグルボタン
+                if !isSelectionModeActive {
+                    Button {
+                        toggleSelectionMode()
+                    } label: {
+                        Text(NSLocalizedString("groupDetail.select", value: "選択", comment: "Select button"))
+                    }
+                } else {
+                    Button {
+                        toggleSelectionMode()
+                    } label: {
+                        Text(NSLocalizedString("common.done", value: "完了", comment: "Done button"))
+                    }
+                }
+
+                // グループ全削除ボタン
+                Menu {
+                    Button(role: .destructive) {
+                        Task {
+                            await checkDeletionLimitForAllPhotos()
+                        }
+                    } label: {
+                        Label(
+                            NSLocalizedString("groupDetail.deleteAll", value: "すべて削除", comment: "Delete all button"),
+                            systemImage: "trash"
+                        )
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                        .accessibilityLabel(NSLocalizedString("common.more", value: "その他", comment: "More button"))
                 }
             }
         }
@@ -430,9 +493,37 @@ public struct GroupDetailView: View {
         }
 
         ToolbarItem(placement: .automatic) {
-            if !selectedPhotoIds.isEmpty {
-                Button(NSLocalizedString("common.done", value: "完了", comment: "Done button")) {
-                    selectedPhotoIds.removeAll()
+            HStack(spacing: LRSpacing.sm) {
+                // 選択モードトグルボタン
+                if !isSelectionModeActive {
+                    Button {
+                        toggleSelectionMode()
+                    } label: {
+                        Text(NSLocalizedString("groupDetail.select", value: "選択", comment: "Select button"))
+                    }
+                } else {
+                    Button {
+                        toggleSelectionMode()
+                    } label: {
+                        Text(NSLocalizedString("common.done", value: "完了", comment: "Done button"))
+                    }
+                }
+
+                // グループ全削除ボタン
+                Menu {
+                    Button(role: .destructive) {
+                        Task {
+                            await checkDeletionLimitForAllPhotos()
+                        }
+                    } label: {
+                        Label(
+                            NSLocalizedString("groupDetail.deleteAll", value: "すべて削除", comment: "Delete all button"),
+                            systemImage: "trash"
+                        )
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                        .accessibilityLabel(NSLocalizedString("common.more", value: "その他", comment: "More button"))
                 }
             }
         }
@@ -469,6 +560,15 @@ public struct GroupDetailView: View {
             value: "%d枚の写真（%@）を削除しますか？",
             comment: "Delete confirmation message"
         ), selectedPhotoIds.count, formattedSize)
+    }
+
+    /// グループ全削除確認メッセージ
+    private var deleteAllConfirmationMessage: String {
+        return String(format: NSLocalizedString(
+            "groupDetail.deleteAll.message",
+            value: "このグループのすべての写真（%d枚、%@）を削除しますか？\n\n※ ベストショットは保持されます。",
+            comment: "Delete all confirmation message"
+        ), group.count, group.formattedReclaimableSize)
     }
 
     // MARK: - Actions
@@ -551,6 +651,15 @@ public struct GroupDetailView: View {
         }
     }
 
+    /// 選択モードをトグル
+    private func toggleSelectionMode() {
+        isSelectionModeActive.toggle()
+        if !isSelectionModeActive {
+            // 選択モード終了時は選択をクリア
+            selectedPhotoIds.removeAll()
+        }
+    }
+
     /// 全選択/全解除
     private func toggleSelectAll() {
         if selectedPhotoIds.count == selectablePhotoIds.count {
@@ -560,7 +669,7 @@ public struct GroupDetailView: View {
         }
     }
 
-    /// 削除制限をチェックして確認ダイアログを表示
+    /// 削除制限をチェックして確認ダイアログを表示（選択写真）
     private func checkDeletionLimitAndShowConfirmation() async {
         guard let premiumManager = premiumManager else {
             // PremiumManagerが設定されていない場合は制限チェックなしで削除
@@ -578,6 +687,27 @@ public struct GroupDetailView: View {
         }
     }
 
+    /// 削除制限をチェックして確認ダイアログを表示（グループ全体）
+    private func checkDeletionLimitForAllPhotos() async {
+        guard let premiumManager = premiumManager else {
+            // PremiumManagerが設定されていない場合は制限チェックなしで削除
+            showDeleteAllConfirmation = true
+            return
+        }
+
+        // ベストショット以外の全写真を削除対象とする
+        let deletionCount = selectablePhotoIds.count
+
+        let remaining = await premiumManager.getRemainingDeletions()
+        if remaining >= deletionCount {
+            // 削除可能
+            showDeleteAllConfirmation = true
+        } else {
+            // 制限到達時はシートを表示
+            showLimitReachedSheet = true
+        }
+    }
+
     /// 選択した写真を削除
     private func deleteSelectedPhotos() async {
         guard !selectedPhotoIds.isEmpty else { return }
@@ -590,6 +720,30 @@ public struct GroupDetailView: View {
 
             // 削除後、選択をクリア
             selectedPhotoIds.removeAll()
+
+            // 写真リストから削除された写真を除外
+            photos = photos.filter { !idsToDelete.contains($0.id) }
+
+            viewState = .loaded
+        }
+    }
+
+    /// グループ全体の写真を削除（ベストショット以外）
+    private func deleteAllPhotos() async {
+        viewState = .processing
+
+        do {
+            // ベストショット以外の全写真IDを取得
+            let idsToDelete = Array(selectablePhotoIds)
+
+            // 削除実行
+            await onDeletePhotos?(idsToDelete)
+
+            // 選択をクリア
+            selectedPhotoIds.removeAll()
+
+            // 選択モードを終了
+            isSelectionModeActive = false
 
             // 写真リストから削除された写真を除外
             photos = photos.filter { !idsToDelete.contains($0.id) }
