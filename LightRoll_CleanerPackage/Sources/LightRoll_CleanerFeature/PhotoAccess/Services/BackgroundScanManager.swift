@@ -395,6 +395,31 @@ public final class BackgroundScanManager: BackgroundScanManagerProtocol, @unchec
         setNextScheduledScanDate(nil)
     }
 
+    // MARK: - Settings Synchronization
+
+    /// UserSettingsの変更を受け取り、BackgroundScanManagerに反映
+    /// - Parameters:
+    ///   - autoScanEnabled: 自動スキャン有効フラグ
+    ///   - scanInterval: スキャン間隔（TimeInterval）
+    /// - Note: この関数はContentViewなどから呼び出され、UserSettingsの変更をBackgroundScanManagerに同期する
+    public func syncSettings(autoScanEnabled: Bool, scanInterval: TimeInterval) {
+        // プロパティを更新（setterで自動的にUserDefaultsに保存される）
+        self.isBackgroundScanEnabled = autoScanEnabled
+        self.scanInterval = scanInterval
+
+        // 有効な場合はスケジュールを再設定、無効な場合はキャンセル
+        if autoScanEnabled {
+            do {
+                try scheduleBackgroundScan()
+            } catch {
+                // エラーは記録するが、例外は投げない（ContentViewでの処理を継続するため）
+                print("バックグラウンドスキャンのスケジューリングに失敗: \(error.localizedDescription)")
+            }
+        } else {
+            cancelScheduledTasks()
+        }
+    }
+
     // MARK: - Task Handlers (iOS/tvOS only)
 
     #if os(iOS) || os(tvOS)

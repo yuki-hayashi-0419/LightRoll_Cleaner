@@ -22,6 +22,7 @@ import Photos
 /// - ブレ写真グルーピング（BlurDetector連携）
 /// - 大容量動画グルーピング
 /// - 重複写真グルーピング
+/// - ScanSettingsに基づくフィルタリング（BUG-002対応）
 /// - バッチ処理と進捗通知
 public actor PhotoGrouper {
 
@@ -42,6 +43,9 @@ public actor PhotoGrouper {
     /// グルーピングオプション
     private let options: GroupingOptions
 
+    /// 写真フィルタリングサービス（BUG-002対応）
+    private let photoFilteringService: PhotoFilteringService
+
     // MARK: - Initialization
 
     /// イニシャライザ
@@ -50,18 +54,21 @@ public actor PhotoGrouper {
     ///   - faceDetector: 顔検出器（省略時は新規作成）
     ///   - blurDetector: ブレ検出器（省略時は新規作成）
     ///   - screenshotDetector: スクリーンショット検出器（省略時は新規作成）
+    ///   - photoFilteringService: 写真フィルタリングサービス（省略時は新規作成）
     ///   - options: グルーピングオプション
     public init(
         similarityAnalyzer: SimilarityAnalyzer? = nil,
         faceDetector: FaceDetector? = nil,
         blurDetector: BlurDetector? = nil,
         screenshotDetector: ScreenshotDetector? = nil,
+        photoFilteringService: PhotoFilteringService? = nil,
         options: GroupingOptions = .default
     ) {
         self.similarityAnalyzer = similarityAnalyzer ?? SimilarityAnalyzer()
         self.faceDetector = faceDetector ?? FaceDetector()
         self.blurDetector = blurDetector ?? BlurDetector()
         self.screenshotDetector = screenshotDetector ?? ScreenshotDetector()
+        self.photoFilteringService = photoFilteringService ?? PhotoFilteringService()
         self.options = options
     }
 
@@ -160,6 +167,61 @@ public actor PhotoGrouper {
         progress: (@Sendable (Double) async -> Void)? = nil
     ) async throws -> [PhotoGroup] {
         let assets = try await fetchPHAssets(from: photos)
+        return try await groupPhotos(assets, progress: progress)
+    }
+
+    /// PHAsset配列から全種類のグルーピングを実行（ScanSettings対応版）
+    ///
+    /// ScanSettingsに基づいてフィルタリングを行った後、グルーピングを実行します。
+    /// これにより、includeVideos/includeScreenshots/includeSelfiesの設定が
+    /// グルーピング処理に正しく反映されます。
+    ///
+    /// BUG-002修正: スキャン設定がグルーピングに反映されない問題を解決
+    ///
+    /// - Parameters:
+    ///   - assets: 対象のPHAsset配列
+    ///   - scanSettings: スキャン設定（フィルタリングに使用）
+    ///   - progress: 進捗コールバック（0.0〜1.0）
+    /// - Returns: 検出されたグループ配列
+    /// - Throws: AnalysisError
+    public func groupPhotos(
+        _ assets: [PHAsset],
+        scanSettings: ScanSettings,
+        progress: (@Sendable (Double) async -> Void)? = nil
+    ) async throws -> [PhotoGroup] {
+        // ScanSettingsに基づいてフィルタリング
+        let filteredAssets = photoFilteringService.filter(assets: assets, with: scanSettings)
+
+        logInfo("📋 PhotoGrouper: ScanSettingsフィルタリング \(assets.count)枚 → \(filteredAssets.count)枚", category: .analysis)
+
+        // フィルタリング後のアセットでグルーピングを実行
+        return try await groupPhotos(filteredAssets, progress: progress)
+    }
+
+    /// Photo配列から全種類のグルーピングを実行（ScanSettings対応版）
+    ///
+    /// ScanSettingsに基づいてフィルタリングを行った後、グルーピングを実行します。
+    ///
+    /// BUG-002修正: スキャン設定がグルーピングに反映されない問題を解決
+    ///
+    /// - Parameters:
+    ///   - photos: 対象のPhoto配列
+    ///   - scanSettings: スキャン設定（フィルタリングに使用）
+    ///   - progress: 進捗コールバック
+    /// - Returns: 検出されたグループ配列
+    /// - Throws: AnalysisError
+    public func groupPhotos(
+        _ photos: [Photo],
+        scanSettings: ScanSettings,
+        progress: (@Sendable (Double) async -> Void)? = nil
+    ) async throws -> [PhotoGroup] {
+        // ScanSettingsに基づいてフィルタリング
+        let filteredPhotos = photoFilteringService.filter(photos: photos, with: scanSettings)
+
+        logInfo("📋 PhotoGrouper: ScanSettingsフィルタリング \(photos.count)枚 → \(filteredPhotos.count)枚", category: .analysis)
+
+        // フィルタリング後の写真でグルーピングを実行
+        let assets = try await fetchPHAssets(from: filteredPhotos)
         return try await groupPhotos(assets, progress: progress)
     }
 

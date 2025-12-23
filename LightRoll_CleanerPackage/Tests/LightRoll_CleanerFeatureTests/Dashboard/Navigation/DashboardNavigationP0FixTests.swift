@@ -190,21 +190,27 @@ struct DashboardNavigationContainerP0FixTests {
     /// モック用のGetStatisticsUseCase
     @MainActor
     final class MockGetStatisticsUseCase: GetStatisticsUseCaseProtocol {
-        typealias Output = StorageStatistics
+        typealias Output = StatisticsOutput
 
-        func execute() async throws -> StorageStatistics {
+        func execute() async throws -> StatisticsOutput {
             let storageInfo = StorageInfo(
                 totalCapacity: 1_000_000_000,
                 availableCapacity: 500_000_000,
                 photosUsedCapacity: 100_000_000,
                 reclaimableCapacity: 10_000_000
             )
-            return StorageStatistics(
+            let groupStatistics = GroupStatistics(
+                similarGroupCount: 0,
+                screenshotCount: 0,
+                blurryCount: 0,
+                largeVideoCount: 0,
+                trashCount: 0
+            )
+            return StatisticsOutput(
                 storageInfo: storageInfo,
-                groupSummaries: [:],
-                timestamp: Date(),
-                scannedPhotoCount: 0,
-                scannedVideoCount: 0
+                totalPhotos: 0,
+                groupStatistics: groupStatistics,
+                lastScanDate: nil
             )
         }
     }

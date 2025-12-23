@@ -22,6 +22,7 @@ import Photos
 /// - 進捗通知とキャンセル対応
 /// - 時間ベース事前グルーピングによる最適化（O(n²) → O(n×k)）
 /// - キャッシュ利用による特徴量再抽出回避（パフォーマンス最適化）
+/// - ScanSettingsに基づくフィルタリング（BUG-002対応）
 public actor SimilarityAnalyzer {
 
     // MARK: - Properties
@@ -44,6 +45,9 @@ public actor SimilarityAnalyzer {
     /// 分析オプション
     private let options: SimilarityAnalysisOptions
 
+    /// 写真フィルタリングサービス（BUG-002対応）
+    private let photoFilteringService: PhotoFilteringService
+
     // MARK: - Initialization
 
     /// イニシャライザ
@@ -53,6 +57,7 @@ public actor SimilarityAnalyzer {
     ///   - timeBasedGrouper: 時間ベースグルーパー（省略時は新規作成、24時間単位）
     ///   - cacheManager: 分析キャッシュマネージャー（省略時は新規作成）
     ///   - lshHasher: LSHハッシャー（省略時は新規作成）
+    ///   - photoFilteringService: 写真フィルタリングサービス（省略時は新規作成）
     ///   - options: 分析オプション
     public init(
         featurePrintExtractor: FeaturePrintExtractor? = nil,
@@ -60,6 +65,7 @@ public actor SimilarityAnalyzer {
         timeBasedGrouper: TimeBasedGrouper? = nil,
         cacheManager: AnalysisCacheManager? = nil,
         lshHasher: LSHHasher? = nil,
+        photoFilteringService: PhotoFilteringService? = nil,
         options: SimilarityAnalysisOptions = .default
     ) {
         self.featurePrintExtractor = featurePrintExtractor ?? FeaturePrintExtractor()
@@ -67,6 +73,7 @@ public actor SimilarityAnalyzer {
         self.timeBasedGrouper = timeBasedGrouper ?? TimeBasedGrouper(timeWindow: 24 * 60 * 60)
         self.cacheManager = cacheManager ?? AnalysisCacheManager()
         self.lshHasher = lshHasher ?? LSHHasher()
+        self.photoFilteringService = photoFilteringService ?? PhotoFilteringService()
         self.options = options
     }
 
@@ -187,6 +194,60 @@ public actor SimilarityAnalyzer {
 
         // 写真数の多い順にソート
         return allSimilarGroups.sorted { $0.photoIds.count > $1.photoIds.count }
+    }
+
+    /// Photo配列から類似写真グループを検出（ScanSettings対応版）
+    ///
+    /// ScanSettingsに基づいてフィルタリングを行った後、類似グループを検出します。
+    /// これにより、includeVideos/includeScreenshots/includeSelfiesの設定が
+    /// グルーピング処理に正しく反映されます。
+    ///
+    /// BUG-002修正: スキャン設定がグルーピングに反映されない問題を解決
+    ///
+    /// - Parameters:
+    ///   - photos: 対象のPhoto配列
+    ///   - scanSettings: スキャン設定（フィルタリングに使用）
+    ///   - progress: 進捗コールバック
+    /// - Returns: 検出された類似グループ配列
+    /// - Throws: AnalysisError
+    public func findSimilarGroups(
+        in photos: [Photo],
+        scanSettings: ScanSettings,
+        progress: (@Sendable (Double) async -> Void)? = nil
+    ) async throws -> [SimilarPhotoGroup] {
+        // ScanSettingsに基づいてフィルタリング
+        let filteredPhotos = photoFilteringService.filter(photos: photos, with: scanSettings)
+
+        logInfo("📋 ScanSettingsフィルタリング: \(photos.count)枚 → \(filteredPhotos.count)枚 (除外: \(photos.count - filteredPhotos.count)枚)", category: .analysis)
+
+        // フィルタリング後の写真で類似グループを検出
+        return try await findSimilarGroups(in: filteredPhotos, progress: progress)
+    }
+
+    /// PHAsset配列から類似写真グループを検出（ScanSettings対応版）
+    ///
+    /// ScanSettingsに基づいてフィルタリングを行った後、類似グループを検出します。
+    ///
+    /// BUG-002修正: スキャン設定がグルーピングに反映されない問題を解決
+    ///
+    /// - Parameters:
+    ///   - assets: 対象のPHAsset配列
+    ///   - scanSettings: スキャン設定（フィルタリングに使用）
+    ///   - progress: 進捗コールバック
+    /// - Returns: 検出された類似グループ配列
+    /// - Throws: AnalysisError
+    public func findSimilarGroups(
+        in assets: [PHAsset],
+        scanSettings: ScanSettings,
+        progress: (@Sendable (Double) async -> Void)? = nil
+    ) async throws -> [SimilarPhotoGroup] {
+        // ScanSettingsに基づいてフィルタリング
+        let filteredAssets = photoFilteringService.filter(assets: assets, with: scanSettings)
+
+        logInfo("📋 ScanSettingsフィルタリング: \(assets.count)枚 → \(filteredAssets.count)枚 (除外: \(assets.count - filteredAssets.count)枚)", category: .analysis)
+
+        // フィルタリング後のアセットで類似グループを検出
+        return try await findSimilarGroups(in: filteredAssets, progress: progress)
     }
 
     /// 時間グループ内で類似写真を検出（内部メソッド）

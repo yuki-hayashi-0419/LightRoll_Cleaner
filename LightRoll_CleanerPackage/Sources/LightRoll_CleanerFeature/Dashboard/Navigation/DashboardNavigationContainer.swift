@@ -166,10 +166,7 @@ public struct DashboardNavigationContainer: View {
                 onGroupTap: { group in
                     router.navigateToGroupDetail(groupId: group.id)
                 },
-                onDeleteGroups: onDeleteGroups,
-                onBack: {
-                    router.navigateBack()
-                }
+                onDeleteGroups: onDeleteGroups
             )
 
         case .groupListFiltered(let groupType):
@@ -180,10 +177,7 @@ public struct DashboardNavigationContainer: View {
                 onGroupTap: { group in
                     router.navigateToGroupDetail(groupId: group.id)
                 },
-                onDeleteGroups: onDeleteGroups,
-                onBack: {
-                    router.navigateBack()
-                }
+                onDeleteGroups: onDeleteGroups
             )
 
         case .groupDetail(let groupId):
@@ -192,10 +186,7 @@ public struct DashboardNavigationContainer: View {
                 GroupDetailView(
                     group: group,
                     photoProvider: photoProvider,
-                    onDeletePhotos: onDeletePhotos,
-                    onBack: {
-                        router.navigateBack()
-                    }
+                    onDeletePhotos: onDeletePhotos
                 )
             } else {
                 // グループが見つからない場合はエラービューを表示

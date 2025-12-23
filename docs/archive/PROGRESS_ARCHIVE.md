@@ -4,6 +4,113 @@
 
 ---
 
+## アーカイブ: 2025-12-23 context-optimization-003 実行時
+
+以下のエントリは context-optimization-003 実行時（セッション18終了後）のコンテキスト最適化でアーカイブされました。
+（PROGRESS.md 12セッション → 6セッション、セッション7〜12を移動）
+
+---
+
+### 2025-12-21 セッション⑫: trash-integration-fix-001（アーカイブ）
+
+**セッション概要**:
+- セッションID: trash-integration-fix-001
+- 実施内容: ゴミ箱統合問題の修正実装
+- 品質スコア: 94点（合格）
+- 終了理由: ContentView.swiftのゴミ箱統合修正完了、E2Eテスト待ち
+
+**完了タスク**:
+1. ContentView.swift修正（DeletePhotosUseCase経由に変更）
+2. テストケース生成（6件）
+
+**修正ファイル**: ContentView.swift, ContentViewTrashIntegrationTests.swift
+
+---
+
+### 2025-12-21 セッション⑪: design-review-device-test-issues（アーカイブ）
+
+**セッション概要**:
+- セッションID: design-review-device-test-issues
+- 実施内容: 実機テスト問題の設計レビュー・アーキテクチャ分析
+- 品質スコア: 78点（条件付き実装継続）
+- 終了理由: 3問題の設計分析完了、修正方針決定
+
+**完了タスク**:
+1. 設計レビュー実施（問題1: ゴミ箱統合84点、問題2: ナビゲーション要調査、問題3: UX問題72点）
+2. ドキュメント作成（DESIGN_REVIEW_DEVICE_TEST_ISSUES.md、UI_UX_GUIDE.md）
+
+**修正ファイル**: DESIGN_REVIEW_DEVICE_TEST_ISSUES.md, UI_UX_GUIDE.md, IMPLEMENTED.md
+
+---
+
+### 2025-12-21 セッション⑩: trash-integration-analysis-001（アーカイブ）
+
+**セッション概要**:
+- セッションID: trash-integration-analysis-001
+- 実施内容: 実機テスト結果確認 + ゴミ箱機能未統合問題の発見と分析
+- 品質スコア: 84点（設計審査）
+- 終了理由: 問題分析完了、修正方針決定
+
+**完了タスク**:
+1. NavigationStack二重ネスト修正の動作確認
+2. ゴミ箱機能未統合問題の発見と根本原因特定
+
+**発見された問題**: ContentView.swiftでDeletePhotosUseCaseを使用せず、PhotoRepository.delete()を直接呼び出し
+
+---
+
+### 2025-12-21 セッション⑨: p0-navigation-stack-fix-001（アーカイブ）
+
+**セッション概要**:
+- セッションID: p0-navigation-stack-fix-001
+- 実施内容: P0クラッシュ修正（NavigationStack二重ネスト問題）
+- 品質スコア: テスト結果待ち
+- 終了理由: コード修正完了、実機デプロイ成功
+
+**完了タスク**:
+1. NavigationStack二重ネスト問題特定・修正
+2. GroupDetailView.swift、HomeView.swiftからNavigationStackラッパー削除
+3. 実機デプロイ成功（iPhone 15 Pro Max）
+
+**修正ファイル**: GroupDetailView.swift, HomeView.swift
+
+---
+
+### 2025-12-21 セッション⑧: p0-navigation-type-mismatch-fix-001（アーカイブ）
+
+**セッション概要**:
+- セッションID: p0-navigation-type-mismatch-fix-001
+- 実施内容: P0クラッシュ修正（SwiftUI.AnyNavigationPath.Error.comparisonTypeMismatch）
+- 品質スコア: 85点（条件付き合格）
+- 終了理由: コード修正完了、ビルド成功
+
+**完了タスク**:
+1. P0クラッシュ根本原因特定（NavigationPathにPhotoGroup型を直接格納）
+2. IDベースナビゲーションに変更（UUIDのみをPathに格納）
+3. テストファイル更新（UUIDベースに）
+
+**修正ファイル**: DashboardRouter.swift, DashboardNavigationContainer.swift, DashboardRouterTests.swift, DashboardNavigationP0FixTests.swift
+
+---
+
+### 2025-12-21 セッション⑦: p0-group-detail-crash-fix-001（アーカイブ）
+
+**セッション概要**:
+- セッションID: p0-group-detail-crash-fix-001
+- 実施内容: P0グループ詳細クラッシュ修正 + テスト生成 + E2Eテスト実施
+- 品質スコア: 81点（条件付き合格）
+- 終了理由: クラッシュ修正完了、テスト生成完了
+
+**完了タスク**:
+1. Continuation二重resume問題修正（PhotoThumbnail.swift、GroupDetailView.swift）
+2. TestTags.swift作成（共通Tag定義）
+3. テスト生成（54件）
+4. E2Eテスト実行（シミュレーター94.4%合格）
+
+**修正ファイル**: PhotoThumbnail.swift, GroupDetailView.swift, TestTags.swift, PhotoThumbnailTests.swift, GroupDetailViewTests.swift
+
+---
+
 ## アーカイブ: 2025-12-21 context-optimization-002 実行時
 
 以下のエントリは context-optimization-002 実行時（セッション9終了後）のコンテキスト最適化でアーカイブされました。

@@ -47,9 +47,6 @@ public struct GroupListView: View {
     /// 削除アクションのコールバック
     private let onDeleteGroups: (([PhotoGroup]) async -> Void)?
 
-    /// 戻るアクションのコールバック
-    private let onBack: (() -> Void)?
-
     /// 初期フィルタタイプ（nil の場合は全タイプ表示）
     private let initialFilterType: GroupType?
 
@@ -150,21 +147,18 @@ public struct GroupListView: View {
     ///   - initialFilterType: 初期フィルタタイプ（nil で全タイプ）
     ///   - onGroupTap: グループタップ時のコールバック
     ///   - onDeleteGroups: 削除アクションのコールバック
-    ///   - onBack: 戻るアクションのコールバック
     public init(
         groups: [PhotoGroup],
         photoProvider: PhotoProvider? = nil,
         initialFilterType: GroupType? = nil,
         onGroupTap: ((PhotoGroup) -> Void)? = nil,
-        onDeleteGroups: (([PhotoGroup]) async -> Void)? = nil,
-        onBack: (() -> Void)? = nil
+        onDeleteGroups: (([PhotoGroup]) async -> Void)? = nil
     ) {
         self.groups = groups
         self.photoProvider = photoProvider
         self.initialFilterType = initialFilterType
         self.onGroupTap = onGroupTap
         self.onDeleteGroups = onDeleteGroups
-        self.onBack = onBack
     }
 
     // MARK: - Body
@@ -651,24 +645,10 @@ public struct GroupListView: View {
     }
 
     /// ツールバーコンテンツ
+    /// NavigationStackの自動バックボタンを使用するため、カスタムバックボタンは不要
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         #if os(iOS)
-        ToolbarItem(placement: .topBarLeading) {
-            if onBack != nil {
-                Button {
-                    onBack?()
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .accessibilityLabel(NSLocalizedString(
-                            "common.back",
-                            value: "戻る",
-                            comment: "Back button"
-                        ))
-                }
-            }
-        }
-
         ToolbarItem(placement: .topBarTrailing) {
             if isSelectionMode {
                 Button(NSLocalizedString("common.done", value: "完了", comment: "Done button")) {
@@ -677,21 +657,6 @@ public struct GroupListView: View {
             }
         }
         #else
-        ToolbarItem(placement: .automatic) {
-            if onBack != nil {
-                Button {
-                    onBack?()
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .accessibilityLabel(NSLocalizedString(
-                            "common.back",
-                            value: "戻る",
-                            comment: "Back button"
-                        ))
-                }
-            }
-        }
-
         ToolbarItem(placement: .automatic) {
             if isSelectionMode {
                 Button(NSLocalizedString("common.done", value: "完了", comment: "Done button")) {

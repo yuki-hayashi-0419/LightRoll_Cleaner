@@ -46,9 +46,6 @@ public struct GroupDetailView: View {
     /// 削除アクションのコールバック
     private let onDeletePhotos: (([String]) async -> Void)?
 
-    /// 戻るアクションのコールバック
-    private let onBack: (() -> Void)?
-
     /// PremiumManager（削除制限チェック用）
     private let premiumManager: PremiumManager?
 
@@ -103,19 +100,16 @@ public struct GroupDetailView: View {
     ///   - photoProvider: 写真プロバイダー
     ///   - premiumManager: PremiumManager（削除制限チェック用）
     ///   - onDeletePhotos: 削除アクションのコールバック
-    ///   - onBack: 戻るアクションのコールバック
     public init(
         group: PhotoGroup,
         photoProvider: PhotoProvider? = nil,
         premiumManager: PremiumManager? = nil,
-        onDeletePhotos: (([String]) async -> Void)? = nil,
-        onBack: (() -> Void)? = nil
+        onDeletePhotos: (([String]) async -> Void)? = nil
     ) {
         self.group = group
         self.photoProvider = photoProvider
         self.premiumManager = premiumManager
         self.onDeletePhotos = onDeletePhotos
-        self.onBack = onBack
     }
 
     // MARK: - Body
@@ -423,24 +417,10 @@ public struct GroupDetailView: View {
     }
 
     /// ツールバーコンテンツ
+    /// NavigationStackの自動バックボタンを使用するため、カスタムバックボタンは不要
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         #if os(iOS)
-        ToolbarItem(placement: .topBarLeading) {
-            if onBack != nil {
-                Button {
-                    onBack?()
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .accessibilityLabel(NSLocalizedString(
-                            "common.back",
-                            value: "戻る",
-                            comment: "Back button"
-                        ))
-                }
-            }
-        }
-
         ToolbarItem(placement: .topBarTrailing) {
             HStack(spacing: LRSpacing.sm) {
                 // 選択モードトグルボタン
@@ -477,21 +457,6 @@ public struct GroupDetailView: View {
             }
         }
         #else
-        ToolbarItem(placement: .automatic) {
-            if onBack != nil {
-                Button {
-                    onBack?()
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .accessibilityLabel(NSLocalizedString(
-                            "common.back",
-                            value: "戻る",
-                            comment: "Back button"
-                        ))
-                }
-            }
-        }
-
         ToolbarItem(placement: .automatic) {
             HStack(spacing: LRSpacing.sm) {
                 // 選択モードトグルボタン

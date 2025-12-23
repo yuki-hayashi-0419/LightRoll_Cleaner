@@ -47,6 +47,9 @@ public struct ContentView: View {
     /// 削除確認サービス
     @State private var confirmationService: DeletionConfirmationService
 
+    /// バックグラウンドスキャンマネージャー
+    private let backgroundScanManager = BackgroundScanManager.shared
+
     /// 設定画面表示フラグ
     @State private var showingSettings = false
 
@@ -192,5 +195,31 @@ public struct ContentView: View {
                 .environment(trashManager)
             }
         }
+        .onChange(of: settingsService.settings.scanSettings.autoScanEnabled) { _, newValue in
+            syncBackgroundScanSettings()
+        }
+        .onChange(of: settingsService.settings.scanSettings.autoScanInterval) { _, newValue in
+            syncBackgroundScanSettings()
+        }
+        .task {
+            // 初回起動時にも同期を実行
+            syncBackgroundScanSettings()
+        }
+    }
+
+    // MARK: - Private Methods
+
+    /// UserSettingsの変更をBackgroundScanManagerに同期
+    private func syncBackgroundScanSettings() {
+        let scanSettings = settingsService.settings.scanSettings
+
+        // AutoScanIntervalをTimeIntervalに変換
+        let timeInterval = scanSettings.autoScanInterval.timeInterval ?? BackgroundScanManager.defaultScanInterval
+
+        // BackgroundScanManagerに同期
+        backgroundScanManager.syncSettings(
+            autoScanEnabled: scanSettings.autoScanEnabled,
+            scanInterval: timeInterval
+        )
     }
 }
