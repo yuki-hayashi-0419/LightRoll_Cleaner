@@ -1,43 +1,96 @@
 {
-  "version": "3.27",
-  "lastUpdated": "2025-12-17",
-  "sessionId": "lsh-bug-analysis-001",
+  "version": "3.28",
+  "lastUpdated": "2025-12-23",
+  "sessionId": "ui-scan-issues-analysis-001",
   "sessionEndStatus": "completed",
 
   "projectStatus": {
-    "phase": "Phase 6進行中 + パフォーマンス最適化",
-    "currentPhase": "M7＋M8完了（100%）+ M9 Monetization進行中（73.3%）+ LSHバグ対応中",
-    "overallProgress": "94.9%",
-    "nextMilestone": "LSHバグ修正（Critical優先度）",
-    "majorAchievement": "LSH重大バグ発見（候補ペア削減率0%）- lsh-bug-analysis-001"
+    "phase": "問題分析完了 + 修正計画立案済み",
+    "currentPhase": "M1-M9完了 + M10リリース準備50% + バグ修正対応中",
+    "overallProgress": "96.7%",
+    "nextMilestone": "UI/スキャン設定バグ修正（P0/P1）",
+    "majorAchievement": "3つの問題発見・分析完了（BUG-001, BUG-002, UX-001）- ui-scan-issues-analysis-001"
   },
 
   "designStatus": {
     "completed": true,
     "architecture": "MV Pattern + SwiftUI Native State",
     "architectureScore": 78.75,
-    "modules": 9,
-    "totalTasks": 117,
-    "estimatedHours": 181
+    "modules": 10,
+    "totalTasks": 121,
+    "estimatedHours": 193.5
   },
 
   "taskStatus": {
-    "total": 117,
-    "completed": 111,
+    "total": 121,
+    "completed": 117,
     "skipped": 5,
     "merged": 1,
     "inProgress": 0,
-    "pending": 4,
-    "completedHours": 173,
-    "remainingHours": 8,
-    "lastCompletedTaskId": "M9-T12",
+    "pending": 7,
+    "completedHours": 178.5,
+    "remainingHours": 22.5,
+    "lastCompletedTaskId": "M10-T03",
     "skippedTasks": ["M5-T05", "M5-T08", "M5-T10", "M6-T10", "M9-T11"],
     "mergedTasks": ["M8-T12 -> M8-T05"],
     "nextTaskCandidates": [
-      "M9-T13: LimitReachedSheet実装（中優先度、1h、M9-T05完了）",
-      "M9-T14: RestorePurchasesView実装（中優先度、1h、M9-T12完了）",
-      "M9-T15: Monetization統合テスト（低優先度、1.5h、M9-T14完了）"
+      "BUG-001: 自動スキャン設定同期修正（P0、5.5h）",
+      "BUG-002: グルーピング設定反映修正（P0、6.5h）",
+      "UX-001: NavigationStack戻るボタン二重表示修正（P1、2.5h）",
+      "M10-T04: App Store Connect設定（高優先度、3h）"
     ]
+  },
+
+  "discoveredIssues": {
+    "BUG-001": {
+      "id": "BUG-001",
+      "priority": "P0",
+      "title": "自動スキャン設定の同期不整合",
+      "description": "autoScanEnabled/scanIntervalをONにしてもBackgroundScanManagerに反映されない",
+      "rootCause": "UserSettingsChangesがBackgroundScanManagerに伝播していない",
+      "affectedFiles": ["BackgroundScanManager.swift", "ContentView.swift"],
+      "estimatedHours": 5.5,
+      "status": "pending"
+    },
+    "BUG-002": {
+      "id": "BUG-002",
+      "priority": "P0",
+      "title": "スキャン設定がグルーピングに反映されない",
+      "description": "includeSelfies/includeScreenshots等がグルーピング処理に反映されない",
+      "rootCause": "SimilarityAnalyzer.findSimilarGroups()がUserSettings参照していない",
+      "affectedFiles": ["SimilarityAnalyzer.swift"],
+      "estimatedHours": 6.5,
+      "status": "pending"
+    },
+    "UX-001": {
+      "id": "UX-001",
+      "priority": "P1",
+      "title": "NavigationStack戻るボタン二重表示",
+      "description": "グループ一覧/詳細画面でカスタムバックボタンと自動生成バックボタンが重複",
+      "rootCause": "NavigationStack自動戻るボタン + 独自実装の共存",
+      "affectedFiles": ["GroupListView.swift", "GroupDetailView.swift"],
+      "estimatedHours": 2.5,
+      "status": "pending"
+    }
+  },
+
+  "integrationFixPlan": {
+    "totalHours": 14.5,
+    "sessions": 2,
+    "session1": {
+      "hours": 7,
+      "tasks": [
+        "UX-001: 戻るボタン二重表示修正（2.5h）",
+        "BUG-001: 自動スキャン設定同期修正（4.5h / 部分）"
+      ]
+    },
+    "session2": {
+      "hours": 7.5,
+      "tasks": [
+        "BUG-001: 残り（1h）",
+        "BUG-002: グルーピング設定反映修正（6.5h）"
+      ]
+    }
   },
 
   "completedTasks": {
@@ -49,117 +102,42 @@
     "M6": ["M6-T01", "M6-T02", "M6-T03", "M6-T04", "M6-T05", "M6-T06", "M6-T07", "M6-T08", "M6-T09", "M6-T11", "M6-T12", "M6-T13", "M6-T14"],
     "M7": ["M7-T01", "M7-T02", "M7-T03", "M7-T04", "M7-T05", "M7-T06", "M7-T07", "M7-T08", "M7-T09", "M7-T10", "M7-T11", "M7-T12"],
     "M8": ["M8-T01", "M8-T02", "M8-T03", "M8-T04", "M8-T05", "M8-T06", "M8-T07", "M8-T08", "M8-T09", "M8-T10", "M8-T11", "M8-T13", "M8-T14"],
-    "M9": ["M9-T01", "M9-T02", "M9-T03", "M9-T04", "M9-T05", "M9-T06", "M9-T07", "M9-T08", "M9-T09", "M9-T10", "M9-T12"]
+    "M9": ["M9-T01", "M9-T02", "M9-T03", "M9-T04", "M9-T05", "M9-T06", "M9-T07", "M9-T08", "M9-T09", "M9-T10", "M9-T12"],
+    "M10": ["M10-T01", "M10-T02", "M10-T03"]
   },
 
   "moduleProgress": {
-    "M1_CoreInfrastructure": {
-      "completed": 10,
-      "remaining": 0,
-      "completedHours": 16,
-      "remainingHours": 0,
-      "percentage": 100,
-      "status": "完了"
-    },
-    "M2_PhotoAccess": {
-      "completed": 12,
-      "remaining": 0,
-      "completedHours": 20.5,
-      "remainingHours": 0,
-      "percentage": 100,
-      "status": "完了"
-    },
-    "M3_ImageAnalysis": {
-      "completed": 13,
-      "remaining": 0,
-      "completedHours": 26,
-      "remainingHours": 0,
-      "percentage": 100,
-      "status": "完了"
-    },
-    "M4_UIComponents": {
-      "completed": 14,
-      "remaining": 0,
-      "completedHours": 17,
-      "remainingHours": 0,
-      "percentage": 100,
-      "status": "完了"
-    },
-    "M5_Dashboard": {
-      "completed": 11,
-      "skipped": 3,
-      "remaining": 0,
-      "completedHours": 18,
-      "remainingHours": 0,
-      "percentage": 100,
-      "status": "完了"
-    },
-    "M6_DeletionSafety": {
-      "completed": 13,
-      "skipped": 1,
-      "remaining": 0,
-      "completedHours": 17.5,
-      "remainingHours": 0,
-      "percentage": 100,
-      "status": "完了"
-    },
-    "M7_Notifications": {
-      "completed": 12,
-      "merged": 1,
-      "remaining": 0,
-      "completedHours": 15.5,
-      "remainingHours": 0,
-      "percentage": 100,
-      "status": "完了"
-    },
-    "M8_Settings": {
-      "completed": 13,
-      "merged": 1,
-      "remaining": 0,
-      "completedHours": 19.5,
-      "remainingHours": 0,
-      "percentage": 100,
-      "status": "完了"
-    },
-    "M9_Monetization": {
-      "completed": 11,
-      "skipped": 1,
-      "remaining": 4,
-      "completedHours": 22.5,
-      "remainingHours": 5,
-      "percentage": 73.3,
-      "status": "進行中"
-    }
+    "M1_CoreInfrastructure": { "percentage": 100, "status": "完了" },
+    "M2_PhotoAccess": { "percentage": 100, "status": "完了" },
+    "M3_ImageAnalysis": { "percentage": 100, "status": "完了" },
+    "M4_UIComponents": { "percentage": 100, "status": "完了" },
+    "M5_Dashboard": { "percentage": 100, "status": "完了" },
+    "M6_DeletionSafety": { "percentage": 100, "status": "完了" },
+    "M7_Notifications": { "percentage": 100, "status": "完了" },
+    "M8_Settings": { "percentage": 100, "status": "完了" },
+    "M9_Monetization": { "percentage": 100, "status": "完了" },
+    "M10_ReleasePreparation": { "percentage": 50, "status": "進行中" }
   },
 
   "qualityMetrics": {
     "averageScore": 97.5,
-    "averagePercentage": 97.5,
     "totalTests": 1354,
     "testsPassed": 1354,
     "testsFailed": 0,
-    "failedTestNote": "全テスト成功",
     "latestScores": {
-      "M9-T12": 93,
-      "M9-T10": 92,
-      "M9-T09": 93,
-      "M9-T08": 95,
-      "M9-T07": 95
+      "ui-scan-issues-analysis-001": 82,
+      "trash-bug-fix-001": 92.5,
+      "trash-integration-fix-001": 94
     }
   },
 
   "contextOptimization": {
-    "progressEntries": 10,
+    "progressEntries": 15,
     "maxProgressEntries": 12,
     "archivedTasks": 62,
     "lastOptimization": "2025-12-12",
-    "optimizationSession": "impl-060",
-    "archivedEntries": ["impl-029", "impl-032", "impl-033", "impl-034", "impl-035"],
-    "nextOptimizationTrigger": "M9完了時",
-    "contextHealth": "良好（約55%使用）"
+    "contextHealth": "注意（エントリ数超過、アーカイブ推奨）"
   },
-
-  "archivedModules": ["M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8"],
 
   "criticalDocuments": [
     "docs/CRITICAL/CORE_RULES.md",
@@ -168,134 +146,48 @@
     "docs/CRITICAL/WORKFLOW_GUIDE.md"
   ],
 
-  "moduleDocuments": [
-    "docs/modules/MODULE_M1_CORE_INFRASTRUCTURE.md",
-    "docs/modules/MODULE_M2_PHOTO_ACCESS.md",
-    "docs/modules/MODULE_M3_IMAGE_ANALYSIS.md",
-    "docs/modules/MODULE_M4_UI_COMPONENTS.md",
-    "docs/modules/MODULE_M5_DASHBOARD.md",
-    "docs/modules/MODULE_M6_DELETION_SAFETY.md",
-    "docs/modules/MODULE_M7_NOTIFICATIONS.md",
-    "docs/modules/MODULE_M8_SETTINGS.md",
-    "docs/modules/MODULE_M9_MONETIZATION.md"
-  ],
-
-  "implementationPhases": [
-    {
-      "phase": 1,
-      "name": "基盤構築",
-      "modules": ["M1", "M4前半"],
-      "tasks": "M1-T01〜M1-T10, M4-T01〜M4-T04",
-      "status": "完了",
-      "progress": "14/14タスク完了（100%）"
-    },
-    {
-      "phase": 2,
-      "name": "データ層",
-      "modules": ["M2", "M3"],
-      "tasks": "M2-T01〜M2-T12, M3-T01〜M3-T13",
-      "status": "完了",
-      "progress": "25/25タスク完了（100%）"
-    },
-    {
-      "phase": 3,
-      "name": "UI層",
-      "modules": ["M4後半"],
-      "tasks": "M4-T05〜M4-T14",
-      "status": "完了",
-      "progress": "10/10タスク完了（100%）"
-    },
-    {
-      "phase": 4,
-      "name": "Dashboard",
-      "modules": ["M5"],
-      "tasks": "M5-T01〜M5-T13",
-      "status": "完了",
-      "progress": "11/11タスク完了 + 3スキップ（100%）"
-    },
-    {
-      "phase": 5,
-      "name": "機能完成",
-      "modules": ["M6", "M8"],
-      "tasks": "M6-T01〜M6-T14, M8-T01〜M8-14",
-      "status": "完了",
-      "progress": "26/28タスク完了（100%）"
-    },
-    {
-      "phase": 6,
-      "name": "仕上げ",
-      "modules": ["M7", "M9"],
-      "tasks": "M7-T01〜M7-T12, M9-T01〜M9-T15",
-      "status": "M7完了、M9進行中",
-      "progress": "23/27タスク完了（85.2%）",
-      "note": "M7完了（12/12 - 100%）、M9進行中（11/15完了 + 1スキップ - 73.3%）"
-    }
-  ],
-
   "gitHistory": {
     "commits": [
       {
-        "hash": "pending",
-        "message": "feat: impl-060完了 - M9-T12 PremiumView実装（1,525行、54テスト、93点）",
-        "date": "2025-12-12"
+        "hash": "f41fc10",
+        "message": "fix: ゴミ箱の黒画面問題とZero KB表示問題を修正（実機テスト完了）",
+        "date": "2025-12-22"
       },
       {
-        "hash": "d2c951e",
-        "message": "feat: impl-054完了 - M9-T02/T03実装（748行、53テスト、平均93.5点）",
-        "date": "2025-12-11"
-      },
-      {
-        "hash": "d790be0",
-        "message": "feat: impl-052完了 - M7 Notifications 100%完了（5タスク、1,538行、78テスト、平均97.6点）",
-        "date": "2025-12-11"
+        "hash": "e8ae1dd",
+        "message": "chore: device-test-fixes-001セッション終了 - P0/P1問題修正完了",
+        "date": "2025-12-22"
       }
     ],
     "branch": "main"
   },
 
   "nextSessionRecommendations": [
-    "LSHバグ修正: LSHHasher.swift / SimilarityAnalyzer.swift 調査・修正（Critical優先度）",
-    "M9-T13: LimitReachedSheet実装（中優先度、1h、M9-T05完了）",
-    "M9-T14: RestorePurchasesView実装（中優先度、1h、M9-T12完了）",
-    "M9-T15: Monetization統合テスト（低優先度、1.5h、M9-T14完了）"
+    "BUG-001修正: BackgroundScanManager設定同期実装（P0、5.5h）",
+    "BUG-002修正: SimilarityAnalyzer UserSettings依存注入（P0、6.5h）",
+    "UX-001修正: 戻るボタン二重表示解消（P1、2.5h）",
+    "M10-T04: App Store Connect設定（3h）"
   ],
 
   "resumeInstructions": {
-    "step1": "LSHバグ修正（LSHHasher.swift, SimilarityAnalyzer.swift調査）",
-    "step2": "修正後の検証（LSH削減率90%以上を目標）",
-    "step3": "M9-T13 LimitReachedSheet実装（LSH修正完了後）",
-    "context": "lsh-bug-analysis-001でLSH重大バグ発見。TimeBasedGrouperは正常（99.4%削減）だがLSHは完全に機能不全（0%削減）。全グループでLSH候補ペア数=全ペア数。根本原因: LSHHasher.generateHash()またはSimilarityAnalyzer統合部分。7000枚処理時間を10-30分→1-3分に短縮可能。"
+    "step1": "UX-001修正から開始（GroupListView.swift, GroupDetailView.swiftの独自戻るボタン削除）",
+    "step2": "BUG-001修正（BackgroundScanManagerにUserSettings監視追加、ContentView.swiftで.onChange実装）",
+    "step3": "BUG-002修正（SimilarityAnalyzer.swiftにUserSettings依存注入、フィルタリング処理追加）",
+    "step4": "統合テスト実施（E2E: 設定変更→スキャン→グルーピング確認）",
+    "context": "ui-scan-issues-analysis-001で3問題発見。問題1: 戻るボタン二重表示（P1）、問題2-1: 自動スキャン設定未反映（P0）、問題2-2: スキャンオプション未反映（P0）。統合修正計画14.5h、2セッションで修正予定。"
   },
 
-  "impl060SessionSummary": {
-    "completedTasks": ["M9-T12"],
-    "skippedTasks": ["M9-T11"],
-    "mergedTasks": [],
-    "addedTests": 54,
-    "totalTestsNow": 1354,
-    "totalCodeLines": 1525,
-    "qualityAverage": 93,
+  "uiScanIssuesAnalysisSessionSummary": {
+    "sessionId": "ui-scan-issues-analysis-001",
+    "completedTasks": ["問題1分析", "問題2分析", "統合修正計画立案"],
+    "discoveredIssues": 3,
+    "qualityScore": 82,
+    "implementedCode": false,
     "keyDeliverables": [
-      "M9-T11スキップ: MV Pattern準拠（ViewModelレイヤー不使用設計）",
-      "M9-T12 PremiumView実装: プレミアム機能画面（650行実装 + 875行テスト = 1,525行）",
-      "LoadingState enum: 3状態管理（idle/loading/loaded/error）",
-      "PremiumView: @Environment統合、3つのLoadingState、購入/復元処理",
-      "StatusCard: Premium/Free状態表示、視覚的差別化",
-      "PlanCard: プラン情報・価格・無料トライアル表示",
-      "FeatureRow: 機能説明行表示",
-      "RestoreButton: 購入復元ボタン",
-      "FooterLinks: 利用規約・プライバシーポリシーリンク",
-      "54テスト: 初期状態、プランカード、購入処理、復元処理、ステータス、エラー、Premium状態変更、UI要素"
+      "問題分析レポート×2",
+      "統合修正計画書（14.5h、2セッション）",
+      "TASKS.md追加タスク案"
     ],
-    "technicalHighlights": [
-      "MV Pattern準拠: @Environment依存注入、@State状態管理",
-      "Swift 6 Concurrency: @MainActor分離、async/await",
-      "LoadingState Pattern: 3つの独立した状態管理",
-      "エラーハンドリング: PurchaseError全7ケース対応",
-      "キャンセルエラー: UX配慮（アラート非表示）",
-      "4つのPreviewパターン: Free User、Premium User、Loading、Error"
-    ],
-    "milestoneAchieved": "M9 Monetization 73.3%完了（11/15タスク完了 + 1スキップ）- PremiumView実装完了",
     "status": "completed"
   },
 
@@ -306,46 +198,16 @@
   },
 
   "nextSession": {
-    "recommended_action": "LSHバグ修正（Critical優先度）",
+    "recommended_action": "修正実装セッション1開始",
     "priority_tasks": [
-      "LSHバグ修正: LSHHasher.swift / SimilarityAnalyzer.swift 調査・修正（Critical）",
-      "M9-T13: LimitReachedSheet実装（中優先度、1h、M9-T05完了）",
-      "M9-T14: RestorePurchasesView実装（中優先度、1h、M9-T12完了）",
-      "M9-T15: Monetization統合テスト（低優先度、1.5h、M9-T14完了）"
+      "UX-001: 戻るボタン二重表示修正（P1、2.5h）",
+      "BUG-001: 自動スキャン設定同期修正（P0、5.5h）"
     ],
-    "alternativePath": "LSH修正後、グループ化処理を1-3分に短縮可能",
-    "warnings": ["LSH機能不全（0%削減）- 早急な修正が必要"],
-    "contextHealthy": true,
-    "archiveRecommended": "不要（M8アーカイブ済み）"
+    "session_hours": 7,
+    "warnings": ["P0バグ2件が未修正 - リリース前に必須修正"],
+    "contextHealthy": false,
+    "archiveRecommended": "推奨（progressEntries超過）"
   },
 
-  "lshBugAnalysisSessionSummary": {
-    "sessionId": "lsh-bug-analysis-001",
-    "completedTasks": ["LSH動作検証", "グループ化詳細分析", "根本原因特定"],
-    "discoveredBug": {
-      "severity": "Critical",
-      "description": "LSHが全く機能していない（候補ペア削減率0%）",
-      "evidence": [
-        "グループID 7656F: 216枚、LSH候補=23,220組=全ペア",
-        "グループID DCFEC: 54枚、LSH候補=1,431組=全ペア",
-        "グループID C6016: 28枚、LSH候補=378組=全ペア"
-      ],
-      "rootCause": "LSHHasher.generateHash() または SimilarityAnalyzer統合部分",
-      "possibleCauses": [
-        "LSHHasher.generateHash()が全写真に同一ハッシュを返している",
-        "バンド数/行数の設定ミスでバケット衝突100%",
-        "SimilarityAnalyzer.findSimilarGroups()でLSH結果を無視",
-        "featurePrintHash→LSHハッシュ変換の失敗"
-      ]
-    },
-    "workingComponents": {
-      "TimeBasedGrouper": "正常動作（99.4%削減）"
-    },
-    "impactIfFixed": {
-      "processingTime": "10-30分 → 1-3分",
-      "comparisonReduction": "更に90%削減可能"
-    }
-  },
-
-  "notes": "lsh-bug-analysis-001セッション完了。LSH重大バグ発見：LSHが全く機能していない（全グループでLSH候補ペア数=全ペア数、削減率0%）。TimeBasedGrouperは正常（99.4%削減）。根本原因はLSHHasher.swiftまたはSimilarityAnalyzer.swift統合部分。次回はLSHバグ修正を最優先（Critical）。修正により7000枚処理を10-30分→1-3分に短縮可能。"
+  "notes": "ui-scan-issues-analysis-001セッション完了。3問題発見・分析完了（BUG-001: 自動スキャン設定未反映P0、BUG-002: スキャンオプション未反映P0、UX-001: 戻るボタン二重表示P1）。統合修正計画14.5h、2セッションで修正予定。次回はUX-001→BUG-001→BUG-002の順で修正実装。コンテキスト最適化（アーカイブ）推奨。"
 }
