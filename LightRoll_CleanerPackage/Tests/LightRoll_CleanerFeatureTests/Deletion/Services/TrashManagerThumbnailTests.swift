@@ -418,8 +418,8 @@ extension TrashPhotoMetadata {
         creationDate: Date = Date(),
         pixelWidth: Int = 1920,
         pixelHeight: Int = 1080,
-        mediaType: PHAssetMediaType = .image,
-        mediaSubtypes: PHAssetMediaSubtype = [],
+        mediaType: MediaType = .image,
+        mediaSubtypes: MediaSubtypes = [],
         isFavorite: Bool = false
     ) -> TrashPhotoMetadata {
         TrashPhotoMetadata(

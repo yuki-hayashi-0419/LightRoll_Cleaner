@@ -79,7 +79,7 @@ struct AnalysisRepositoryCacheValidationTests {
     }
 
     /// テスト用のUserDefaultsインスタンスを作成
-    private static func makeTestUserDefaults() -> UserDefaults {
+    private static nonisolated func makeTestUserDefaults() -> UserDefaults {
         let suiteName = "AnalysisCacheValidationTests_\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
         return defaults

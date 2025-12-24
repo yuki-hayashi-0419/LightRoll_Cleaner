@@ -214,12 +214,12 @@ struct RouterViewIntegrationTests {
 
         // When: グループ一覧から詳細へ
         router.navigateToGroupList()
-        router.navigateToGroupDetail(group: group)
+        router.navigateToGroupDetail(groupId: group.id)
 
         // Then
         #expect(router.path.count == 2)
         #expect(router.path[0] == .groupList)
-        #expect(router.path[1] == .groupDetail(group))
+        #expect(router.path[1] == .groupDetail(group.id))
     }
 
     @Test("統合: フィルタ付きナビゲーションフロー")
@@ -244,8 +244,8 @@ struct RouterViewIntegrationTests {
 
         // When: 複数画面を遷移
         router.navigateToGroupList()
-        router.navigateToGroupDetail(group: group1)
-        router.navigateToGroupDetail(group: group2)
+        router.navigateToGroupDetail(groupId: group1.id)
+        router.navigateToGroupDetail(groupId: group2.id)
 
         #expect(router.path.count == 3)
 
@@ -268,8 +268,8 @@ struct RouterViewIntegrationTests {
 
         // When
         router.navigateToGroupList()
-        router.navigateToGroupDetail(group: group)
-        router.navigateToGroupDetail(group: group)
+        router.navigateToGroupDetail(groupId: group.id)
+        router.navigateToGroupDetail(groupId: group.id)
 
         #expect(router.path.count == 3)
 
@@ -287,8 +287,8 @@ struct RouterViewIntegrationTests {
 
         // When
         router.navigateToGroupList()
-        router.navigateToGroupDetail(group: group)
-        router.navigateToGroupDetail(group: group)
+        router.navigateToGroupDetail(groupId: group.id)
+        router.navigateToGroupDetail(groupId: group.id)
 
         #expect(router.path.count == 3)
 

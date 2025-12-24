@@ -26,15 +26,15 @@ struct LimitReachedSheetTests {
         // When
         let sheet = LimitReachedSheet(
             currentCount: currentCount,
-            dailyLimit: dailyLimit,
-            onUpgradeTap: {
+            limit: dailyLimit,
+            onUpgrade: {
                 upgradeCalled = true
             }
         )
 
         // Then
         #expect(sheet.currentCount == currentCount)
-        #expect(sheet.dailyLimit == dailyLimit)
+        #expect(sheet.limit == dailyLimit)
         #expect(!upgradeCalled)
     }
 
@@ -46,11 +46,11 @@ struct LimitReachedSheetTests {
         // When
         let sheet = LimitReachedSheet(
             currentCount: currentCount,
-            onUpgradeTap: {}
+            onUpgrade: {}
         )
 
         // Then
-        #expect(sheet.dailyLimit == 50)
+        #expect(sheet.limit == 50)
     }
 
     @Test("onUpgradeTapコールバックが正しく呼ばれる")
@@ -59,8 +59,8 @@ struct LimitReachedSheetTests {
         var upgradeCalled = false
         let sheet = LimitReachedSheet(
             currentCount: 50,
-            dailyLimit: 50,
-            onUpgradeTap: {
+            limit: 50,
+            onUpgrade: {
                 upgradeCalled = true
             }
         )
@@ -83,12 +83,12 @@ struct LimitReachedSheetTests {
         // When
         let sheet = LimitReachedSheet(
             currentCount: count,
-            dailyLimit: limit,
-            onUpgradeTap: {}
+            limit: limit,
+            onUpgrade: {}
         )
 
         // Then
-        #expect(sheet.currentCount == sheet.dailyLimit)
+        #expect(sheet.currentCount == sheet.limit)
     }
 
     @Test("上限値を超えた場合（currentCount > dailyLimit）")
@@ -100,12 +100,12 @@ struct LimitReachedSheetTests {
         // When
         let sheet = LimitReachedSheet(
             currentCount: count,
-            dailyLimit: limit,
-            onUpgradeTap: {}
+            limit: limit,
+            onUpgrade: {}
         )
 
         // Then
-        #expect(sheet.currentCount > sheet.dailyLimit)
+        #expect(sheet.currentCount > sheet.limit)
     }
 
     @Test("カスタム上限値が正しく反映される")
@@ -117,12 +117,12 @@ struct LimitReachedSheetTests {
         // When
         let sheet = LimitReachedSheet(
             currentCount: count,
-            dailyLimit: customLimit,
-            onUpgradeTap: {}
+            limit: customLimit,
+            onUpgrade: {}
         )
 
         // Then
-        #expect(sheet.dailyLimit == customLimit)
+        #expect(sheet.limit == customLimit)
     }
 
     @Test("最小値での動作（0枚）")
@@ -134,13 +134,13 @@ struct LimitReachedSheetTests {
         // When
         let sheet = LimitReachedSheet(
             currentCount: count,
-            dailyLimit: limit,
-            onUpgradeTap: {}
+            limit: limit,
+            onUpgrade: {}
         )
 
         // Then
         #expect(sheet.currentCount == 0)
-        #expect(sheet.dailyLimit == 50)
+        #expect(sheet.limit == 50)
     }
 
     // MARK: - 異常系テスト
@@ -154,8 +154,8 @@ struct LimitReachedSheetTests {
         // When
         let sheet = LimitReachedSheet(
             currentCount: count,
-            dailyLimit: limit,
-            onUpgradeTap: {}
+            limit: limit,
+            onUpgrade: {}
         )
 
         // Then
@@ -172,12 +172,12 @@ struct LimitReachedSheetTests {
         // When
         let sheet = LimitReachedSheet(
             currentCount: count,
-            dailyLimit: limit,
-            onUpgradeTap: {}
+            limit: limit,
+            onUpgrade: {}
         )
 
         // Then
-        #expect(sheet.dailyLimit == 0)
+        #expect(sheet.limit == 0)
     }
 
     @Test("非常に大きな値でも初期化できる")
@@ -189,13 +189,13 @@ struct LimitReachedSheetTests {
         // When
         let sheet = LimitReachedSheet(
             currentCount: count,
-            dailyLimit: limit,
-            onUpgradeTap: {}
+            limit: limit,
+            onUpgrade: {}
         )
 
         // Then
         #expect(sheet.currentCount == Int.max)
-        #expect(sheet.dailyLimit == Int.max)
+        #expect(sheet.limit == Int.max)
     }
 
     // MARK: - UI コンポーネントテスト
@@ -212,8 +212,8 @@ struct LimitReachedSheetTests {
         // LimitReachedSheetのbodyに含まれることを確認
         let sheet = LimitReachedSheet(
             currentCount: 50,
-            dailyLimit: 50,
-            onUpgradeTap: {}
+            limit: 50,
+            onUpgrade: {}
         )
 
         // Then
@@ -233,8 +233,8 @@ struct LimitReachedSheetIntegrationTests {
         var callCount = 0
         let sheet = LimitReachedSheet(
             currentCount: 50,
-            dailyLimit: 50,
-            onUpgradeTap: {
+            limit: 50,
+            onUpgrade: {
                 callCount += 1
             }
         )
@@ -251,9 +251,9 @@ struct LimitReachedSheetIntegrationTests {
     @Test("異なるパラメータで複数のインスタンスを作成できる")
     func testMultipleInstances() {
         // Given & When
-        let sheet1 = LimitReachedSheet(currentCount: 50, dailyLimit: 50, onUpgradeTap: {})
-        let sheet2 = LimitReachedSheet(currentCount: 25, dailyLimit: 25, onUpgradeTap: {})
-        let sheet3 = LimitReachedSheet(currentCount: 100, dailyLimit: 100, onUpgradeTap: {})
+        let sheet1 = LimitReachedSheet(currentCount: 50, limit: 50, onUpgrade: {})
+        let sheet2 = LimitReachedSheet(currentCount: 25, limit: 25, onUpgrade: {})
+        let sheet3 = LimitReachedSheet(currentCount: 100, limit: 100, onUpgrade: {})
 
         // Then
         #expect(sheet1.currentCount == 50)

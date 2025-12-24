@@ -8,10 +8,19 @@
 //
 
 import Foundation
+import os.log
 
 #if canImport(BackgroundTasks)
 import BackgroundTasks
 #endif
+
+// MARK: - Logger
+
+/// バックグラウンドスキャン用ロガー
+private let backgroundScanLogger = Logger(
+    subsystem: Bundle.main.bundleIdentifier ?? "com.lightroll.cleaner",
+    category: "BackgroundScan"
+)
 
 // MARK: - BackgroundScanError
 
@@ -397,27 +406,124 @@ public final class BackgroundScanManager: BackgroundScanManagerProtocol, @unchec
 
     // MARK: - Settings Synchronization
 
+    /// 設定同期の最大リトライ回数
+    private static let maxSyncRetryCount = 3
+
+    /// 設定同期結果
+    public struct SyncSettingsResult: Sendable, Equatable {
+        /// 同期が成功したか
+        public let success: Bool
+
+        /// エラーメッセージ（失敗時のみ）
+        public let errorMessage: String?
+
+        /// リトライ回数
+        public let retryCount: Int
+
+        /// スケジュールされた次回実行日時（成功時のみ）
+        public let nextScheduledDate: Date?
+
+        /// 成功結果を作成
+        public static func success(nextScheduledDate: Date?, retryCount: Int = 0) -> SyncSettingsResult {
+            SyncSettingsResult(
+                success: true,
+                errorMessage: nil,
+                retryCount: retryCount,
+                nextScheduledDate: nextScheduledDate
+            )
+        }
+
+        /// 失敗結果を作成
+        public static func failure(error: String, retryCount: Int = 0) -> SyncSettingsResult {
+            SyncSettingsResult(
+                success: false,
+                errorMessage: error,
+                retryCount: retryCount,
+                nextScheduledDate: nil
+            )
+        }
+    }
+
     /// UserSettingsの変更を受け取り、BackgroundScanManagerに反映
     /// - Parameters:
     ///   - autoScanEnabled: 自動スキャン有効フラグ
     ///   - scanInterval: スキャン間隔（TimeInterval）
+    /// - Returns: 同期結果
     /// - Note: この関数はContentViewなどから呼び出され、UserSettingsの変更をBackgroundScanManagerに同期する
-    public func syncSettings(autoScanEnabled: Bool, scanInterval: TimeInterval) {
+    @discardableResult
+    public func syncSettings(autoScanEnabled: Bool, scanInterval: TimeInterval) -> SyncSettingsResult {
+        // バリデーション
+        guard validateSyncSettings(autoScanEnabled: autoScanEnabled, scanInterval: scanInterval) else {
+            let errorMessage = "無効な設定値: autoScanEnabled=\(autoScanEnabled), scanInterval=\(scanInterval)"
+            backgroundScanLogger.error("\(errorMessage, privacy: .public)")
+            return .failure(error: errorMessage)
+        }
+
         // プロパティを更新（setterで自動的にUserDefaultsに保存される）
         self.isBackgroundScanEnabled = autoScanEnabled
         self.scanInterval = scanInterval
 
-        // 有効な場合はスケジュールを再設定、無効な場合はキャンセル
+        backgroundScanLogger.info("設定同期開始: enabled=\(autoScanEnabled), interval=\(scanInterval / 3600, format: .fixed(precision: 1))h")
+
+        // 無効化の場合はキャンセルして完了
+        if !autoScanEnabled {
+            cancelScheduledTasks()
+            backgroundScanLogger.info("バックグラウンドスキャン無効化完了")
+            return .success(nextScheduledDate: nil)
+        }
+
+        // 有効な場合はリトライ付きでスケジュール
+        return scheduleWithRetry(maxRetries: Self.maxSyncRetryCount)
+    }
+
+    /// 設定値のバリデーション
+    /// - Parameters:
+    ///   - autoScanEnabled: 自動スキャン有効フラグ
+    ///   - scanInterval: スキャン間隔
+    /// - Returns: 有効な場合true
+    private func validateSyncSettings(autoScanEnabled: Bool, scanInterval: TimeInterval) -> Bool {
+        // スキャン間隔が有効範囲内か（無効時は任意の値でOK）
         if autoScanEnabled {
+            guard scanInterval >= Self.minimumScanInterval else {
+                backgroundScanLogger.warning("スキャン間隔が最小値未満: \(scanInterval)秒 < \(Self.minimumScanInterval)秒")
+                return true // クランプされるので警告のみ
+            }
+            guard scanInterval <= Self.maximumScanInterval else {
+                backgroundScanLogger.warning("スキャン間隔が最大値超過: \(scanInterval)秒 > \(Self.maximumScanInterval)秒")
+                return true // クランプされるので警告のみ
+            }
+        }
+        return true
+    }
+
+    /// リトライ付きスケジュール
+    /// - Parameter maxRetries: 最大リトライ回数
+    /// - Returns: 同期結果
+    private func scheduleWithRetry(maxRetries: Int) -> SyncSettingsResult {
+        var retryCount = 0
+
+        while retryCount <= maxRetries {
             do {
                 try scheduleBackgroundScan()
+                let nextDate = nextScheduledScanDate
+                backgroundScanLogger.info("スケジュール成功: 次回=\(nextDate?.description ?? "不明", privacy: .public), リトライ=\(retryCount)")
+                return .success(nextScheduledDate: nextDate, retryCount: retryCount)
             } catch {
-                // エラーは記録するが、例外は投げない（ContentViewでの処理を継続するため）
-                print("バックグラウンドスキャンのスケジューリングに失敗: \(error.localizedDescription)")
+                retryCount += 1
+                backgroundScanLogger.warning("スケジュール失敗 (\(retryCount)/\(maxRetries)): \(error.localizedDescription, privacy: .public)")
+
+                if retryCount > maxRetries {
+                    let errorMessage = "スケジューリング失敗（\(maxRetries)回リトライ後）: \(error.localizedDescription)"
+                    backgroundScanLogger.error("\(errorMessage, privacy: .public)")
+                    return .failure(error: errorMessage, retryCount: retryCount - 1)
+                }
+
+                // 短い待機後にリトライ（同期的に待機）
+                Thread.sleep(forTimeInterval: 0.1 * Double(retryCount))
             }
-        } else {
-            cancelScheduledTasks()
         }
+
+        return .failure(error: "予期しないエラー", retryCount: retryCount)
     }
 
     // MARK: - Task Handlers (iOS/tvOS only)

@@ -510,3 +510,346 @@ struct ScanSettingsGroupingIntegrationTests {
         #expect(filteredPhotos.isEmpty)
     }
 }
+
+// MARK: - BUG-002 Phase 2: E2E統合テスト
+
+@Suite("BUG-002 Phase 2: E2E統合テスト", .serialized)
+struct BUG002_E2EIntegrationTests {
+
+    // MARK: - PhotoFilteringService E2Eテスト
+
+    @Test("E2E-01: PhotoFilteringService.validateSettingsが正常設定を通過")
+    func testValidateSettingsWithValidSettings() {
+        // Given
+        let service = PhotoFilteringService()
+        let settings = ScanSettings.default
+
+        // When
+        let error = service.validateSettings(settings)
+
+        // Then
+        #expect(error == nil)
+    }
+
+    @Test("E2E-02: PhotoFilteringService.validateSettingsが無効設定を拒否")
+    func testValidateSettingsWithInvalidSettings() {
+        // Given
+        let service = PhotoFilteringService()
+        var settings = ScanSettings.default
+        settings.includeVideos = false
+        settings.includeScreenshots = false
+        settings.includeSelfies = false
+
+        // When
+        let error = service.validateSettings(settings)
+
+        // Then
+        #expect(error != nil)
+        if case .invalidSettings = error {
+            // 期待通り
+        } else {
+            Issue.record("期待するエラータイプではありません")
+        }
+    }
+
+    @Test("E2E-03: filterWithValidationが正常に動作")
+    func testFilterWithValidationSuccess() {
+        // Given
+        let service = PhotoFilteringService()
+        let settings = ScanSettings.default
+        let photos = createTestPhotos()
+
+        // When
+        let result = service.filterWithValidation(photos: photos, with: settings)
+
+        // Then
+        #expect(result.success == true)
+        #expect(result.result != nil)
+        #expect(result.error == nil)
+        #expect(result.result?.filteredCount == photos.count)
+    }
+
+    @Test("E2E-04: filterWithValidationが無効設定でエラーを返す")
+    func testFilterWithValidationFailure() {
+        // Given
+        let service = PhotoFilteringService()
+        var settings = ScanSettings.default
+        settings.includeVideos = false
+        settings.includeScreenshots = false
+        settings.includeSelfies = false
+        let photos = createTestPhotos()
+
+        // When
+        let result = service.filterWithValidation(photos: photos, with: settings)
+
+        // Then
+        #expect(result.success == false)
+        #expect(result.result == nil)
+        #expect(result.error != nil)
+    }
+
+    @Test("E2E-05: filterWithValidationが空結果時に警告を生成")
+    func testFilterWithValidationWarnsOnEmptyResult() {
+        // Given
+        let service = PhotoFilteringService()
+        var settings = ScanSettings.default
+        settings.includeVideos = false // 動画のみ無効
+
+        // 動画のみ含むリスト
+        let photos = [
+            Photo(
+                id: "video1",
+                localIdentifier: "video1",
+                creationDate: Date(),
+                modificationDate: Date(),
+                mediaType: .video,
+                mediaSubtypes: [],
+                pixelWidth: 1920,
+                pixelHeight: 1080,
+                duration: 10,
+                fileSize: 1024,
+                isFavorite: false
+            )
+        ]
+
+        // When
+        let result = service.filterWithValidation(photos: photos, with: settings)
+
+        // Then
+        #expect(result.success == true)
+        #expect(result.result?.filteredCount == 0)
+        #expect(!result.warnings.isEmpty)
+    }
+
+    @Test("E2E-06: PhotoFilteringError Equatable準拠確認")
+    func testPhotoFilteringErrorEquatable() {
+        // Given
+        let error1 = PhotoFilteringError.invalidSettings(reason: "テスト")
+        let error2 = PhotoFilteringError.invalidSettings(reason: "テスト")
+        let error3 = PhotoFilteringError.invalidSettings(reason: "異なる理由")
+        let error4 = PhotoFilteringError.invalidInput(reason: "テスト")
+
+        // Then
+        #expect(error1 == error2)
+        #expect(error1 != error3)
+        #expect(error1 != error4)
+    }
+
+    @Test("E2E-07: ValidatedPhotoFilteringResult ファクトリメソッド確認")
+    func testValidatedPhotoFilteringResultFactoryMethods() {
+        // Given
+        let mockResult = PhotoFilteringResult(
+            filteredPhotos: [],
+            originalCount: 0
+        )
+
+        // When: success
+        let successResult = ValidatedPhotoFilteringResult.success(
+            result: mockResult,
+            warnings: ["警告"]
+        )
+
+        // Then
+        #expect(successResult.success == true)
+        #expect(successResult.result != nil)
+        #expect(successResult.error == nil)
+        #expect(successResult.warnings.count == 1)
+
+        // When: failure
+        let failureResult = ValidatedPhotoFilteringResult.failure(
+            error: .invalidSettings(reason: "テスト")
+        )
+
+        // Then
+        #expect(failureResult.success == false)
+        #expect(failureResult.result == nil)
+        #expect(failureResult.error != nil)
+        #expect(failureResult.warnings.isEmpty)
+    }
+
+    @Test("E2E-08: ScanSettings → PhotoFilteringService → 結果の完全フロー")
+    func testCompleteE2EFlow() {
+        // Given: UserSettingsからScanSettingsを取得するシミュレーション
+        let userSettings = UserSettings.default
+        let scanSettings = userSettings.scanSettings
+
+        // 様々なタイプの写真を作成
+        let photos = [
+            Photo(
+                id: "photo1",
+                localIdentifier: "photo1",
+                creationDate: Date(),
+                modificationDate: Date(),
+                mediaType: .image,
+                mediaSubtypes: [],
+                pixelWidth: 1920,
+                pixelHeight: 1080,
+                duration: 0,
+                fileSize: 1024,
+                isFavorite: false
+            ),
+            Photo(
+                id: "video1",
+                localIdentifier: "video1",
+                creationDate: Date(),
+                modificationDate: Date(),
+                mediaType: .video,
+                mediaSubtypes: [],
+                pixelWidth: 1920,
+                pixelHeight: 1080,
+                duration: 10,
+                fileSize: 2048,
+                isFavorite: false
+            ),
+            Photo(
+                id: "screenshot1",
+                localIdentifier: "screenshot1",
+                creationDate: Date(),
+                modificationDate: Date(),
+                mediaType: .image,
+                mediaSubtypes: .screenshot,
+                pixelWidth: 1170,
+                pixelHeight: 2532,
+                duration: 0,
+                fileSize: 512,
+                isFavorite: false
+            )
+        ]
+
+        let service = PhotoFilteringService()
+
+        // When: バリデーション付きフィルタリング実行
+        let result = service.filterWithValidation(photos: photos, with: scanSettings)
+
+        // Then: デフォルト設定ではすべて含まれる
+        #expect(result.success == true)
+        #expect(result.result?.filteredCount == 3)
+        #expect(result.result?.originalCount == 3)
+        #expect(result.warnings.isEmpty)
+    }
+
+    @Test("E2E-09: 設定変更の連続適用が正しく動作")
+    func testSequentialSettingsChanges() {
+        // Given
+        let service = PhotoFilteringService()
+        let photos = createTestPhotosWithAllTypes()
+
+        // When: 段階的に設定を変更
+        var settings = ScanSettings.default
+
+        // Step 1: すべて有効
+        var result = service.filterWithValidation(photos: photos, with: settings)
+        #expect(result.result?.filteredCount == 3)
+
+        // Step 2: 動画除外
+        settings.includeVideos = false
+        result = service.filterWithValidation(photos: photos, with: settings)
+        #expect(result.result?.filteredCount == 2)
+
+        // Step 3: スクリーンショットも除外
+        settings.includeScreenshots = false
+        result = service.filterWithValidation(photos: photos, with: settings)
+        #expect(result.result?.filteredCount == 1)
+
+        // Step 4: セルフィーも除外（すべて除外ではない、通常写真が残る）
+        settings.includeSelfies = false
+        result = service.filterWithValidation(photos: photos, with: settings)
+        // includeSelfiesをfalseにしても、通常の写真は残る（selfieではないため）
+        #expect(result.result?.filteredCount == 1)
+    }
+
+    @Test("E2E-10: PhotoFilteringResult統計情報の正確性")
+    func testPhotoFilteringResultStatistics() {
+        // Given
+        let service = PhotoFilteringService()
+        var settings = ScanSettings.default
+        settings.includeVideos = false
+        settings.includeScreenshots = false
+
+        let photos = createTestPhotosWithAllTypes()
+
+        // When
+        let result = service.filterWithValidation(photos: photos, with: settings)
+
+        // Then
+        #expect(result.success == true)
+        guard let filterResult = result.result else {
+            Issue.record("結果がnil")
+            return
+        }
+
+        #expect(filterResult.originalCount == 3)
+        #expect(filterResult.excludedVideoCount == 1)
+        #expect(filterResult.excludedScreenshotCount == 1)
+        #expect(filterResult.filteredCount == 1)
+        #expect(filterResult.totalExcludedCount == 2)
+
+        // フィルタリング率の検証
+        let expectedRate = 1.0 / 3.0
+        #expect(abs(filterResult.filteringRate - expectedRate) < 0.01)
+    }
+
+    // MARK: - ヘルパーメソッド
+
+    private func createTestPhotos() -> [Photo] {
+        [
+            Photo(
+                id: "photo1",
+                localIdentifier: "photo1",
+                creationDate: Date(),
+                modificationDate: Date(),
+                mediaType: .image,
+                mediaSubtypes: [],
+                pixelWidth: 1920,
+                pixelHeight: 1080,
+                duration: 0,
+                fileSize: 1024,
+                isFavorite: false
+            )
+        ]
+    }
+
+    private func createTestPhotosWithAllTypes() -> [Photo] {
+        [
+            Photo(
+                id: "photo1",
+                localIdentifier: "photo1",
+                creationDate: Date(),
+                modificationDate: Date(),
+                mediaType: .image,
+                mediaSubtypes: [],
+                pixelWidth: 1920,
+                pixelHeight: 1080,
+                duration: 0,
+                fileSize: 1024,
+                isFavorite: false
+            ),
+            Photo(
+                id: "video1",
+                localIdentifier: "video1",
+                creationDate: Date(),
+                modificationDate: Date(),
+                mediaType: .video,
+                mediaSubtypes: [],
+                pixelWidth: 1920,
+                pixelHeight: 1080,
+                duration: 10,
+                fileSize: 2048,
+                isFavorite: false
+            ),
+            Photo(
+                id: "screenshot1",
+                localIdentifier: "screenshot1",
+                creationDate: Date(),
+                modificationDate: Date(),
+                mediaType: .image,
+                mediaSubtypes: .screenshot,
+                pixelWidth: 1170,
+                pixelHeight: 2532,
+                duration: 0,
+                fileSize: 512,
+                isFavorite: false
+            )
+        ]
+    }
+}

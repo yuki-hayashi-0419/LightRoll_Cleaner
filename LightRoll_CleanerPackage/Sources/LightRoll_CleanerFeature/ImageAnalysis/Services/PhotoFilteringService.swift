@@ -6,9 +6,22 @@
 //  BUG-002修正: スキャン設定がグルーピングに反映されない問題を解決
 //  Created by AI Assistant on 2025-12-23.
 //
+//  Phase 2強化 (2025-12-24):
+//  - OSLogによるロギング追加
+//  - バリデーションロジック強化
+//  - エラーハンドリング改善
+//  - PhotoFilteringError型追加
+//
 
 import Foundation
 import Photos
+import os.log
+
+/// PhotoFilteringService用ロガー
+private let filteringLogger = Logger(
+    subsystem: Bundle.main.bundleIdentifier ?? "com.lightroll.cleaner",
+    category: "PhotoFiltering"
+)
 
 // MARK: - PhotoFilteringService
 
@@ -284,5 +297,190 @@ extension PhotoFilteringResult: CustomStringConvertible {
             excluded: videos=\(excludedVideoCount), screenshots=\(excludedScreenshotCount), selfies=\(excludedSelfieCount)
         )
         """
+    }
+}
+
+// MARK: - PhotoFilteringError
+
+/// 写真フィルタリングエラー
+public enum PhotoFilteringError: LocalizedError, Sendable, Equatable {
+    /// 設定が無効（すべてのコンテンツタイプが無効）
+    case invalidSettings(reason: String)
+    /// 入力データが無効
+    case invalidInput(reason: String)
+    /// フィルタリング処理失敗
+    case filteringFailed(reason: String)
+
+    public var errorDescription: String? {
+        switch self {
+        case .invalidSettings(let reason):
+            return "設定エラー: \(reason)"
+        case .invalidInput(let reason):
+            return "入力エラー: \(reason)"
+        case .filteringFailed(let reason):
+            return "フィルタリングエラー: \(reason)"
+        }
+    }
+}
+
+// MARK: - ValidatedPhotoFilteringResult
+
+/// バリデーション付きフィルタリング結果
+public struct ValidatedPhotoFilteringResult: Sendable, Equatable {
+    /// フィルタリング成功フラグ
+    public let success: Bool
+    /// フィルタリング結果（成功時のみ）
+    public let result: PhotoFilteringResult?
+    /// エラー情報（失敗時のみ）
+    public let error: PhotoFilteringError?
+    /// バリデーション警告（設定に問題がある場合）
+    public let warnings: [String]
+
+    // MARK: - Factory Methods
+
+    /// 成功結果を生成
+    public static func success(
+        result: PhotoFilteringResult,
+        warnings: [String] = []
+    ) -> ValidatedPhotoFilteringResult {
+        ValidatedPhotoFilteringResult(
+            success: true,
+            result: result,
+            error: nil,
+            warnings: warnings
+        )
+    }
+
+    /// 失敗結果を生成
+    public static func failure(
+        error: PhotoFilteringError
+    ) -> ValidatedPhotoFilteringResult {
+        ValidatedPhotoFilteringResult(
+            success: false,
+            result: nil,
+            error: error,
+            warnings: []
+        )
+    }
+}
+
+// MARK: - PhotoFilteringService + Validation Extension
+
+extension PhotoFilteringService {
+
+    /// ScanSettingsのバリデーション
+    ///
+    /// - Parameter scanSettings: バリデーション対象の設定
+    /// - Returns: バリデーション結果（成功: nil、失敗: エラー）
+    public func validateSettings(_ scanSettings: ScanSettings) -> PhotoFilteringError? {
+        // 少なくとも1つのコンテンツタイプが有効であることを確認
+        guard scanSettings.hasAnyContentTypeEnabled else {
+            filteringLogger.error("バリデーション失敗: すべてのコンテンツタイプが無効")
+            return .invalidSettings(reason: "少なくとも1つのコンテンツタイプを有効にしてください")
+        }
+
+        filteringLogger.debug("バリデーション成功: videos=\(scanSettings.includeVideos), screenshots=\(scanSettings.includeScreenshots), selfies=\(scanSettings.includeSelfies)")
+        return nil
+    }
+
+    /// バリデーション付きでフィルタリングを実行
+    ///
+    /// - Parameters:
+    ///   - photos: 対象のPhoto配列
+    ///   - scanSettings: スキャン設定
+    /// - Returns: バリデーション付きフィルタリング結果
+    public func filterWithValidation(
+        photos: [Photo],
+        with scanSettings: ScanSettings
+    ) -> ValidatedPhotoFilteringResult {
+        filteringLogger.info("バリデーション付きフィルタリング開始: 入力=\(photos.count)枚")
+
+        // 設定バリデーション
+        if let error = validateSettings(scanSettings) {
+            filteringLogger.error("フィルタリング中止: 設定バリデーション失敗")
+            return .failure(error: error)
+        }
+
+        // 警告チェック
+        var warnings: [String] = []
+
+        // すべてのフィルタが有効な場合は警告
+        if scanSettings.includeVideos && scanSettings.includeScreenshots && scanSettings.includeSelfies {
+            filteringLogger.debug("すべてのコンテンツタイプが有効: フィルタリングなし")
+        }
+
+        // フィルタリング実行
+        let result = filterWithStats(photos: photos, with: scanSettings)
+
+        // 結果が空の場合の警告
+        if result.filteredCount == 0 && result.originalCount > 0 {
+            let warningMessage = "すべての写真がフィルタリングで除外されました（\(result.originalCount)枚）"
+            warnings.append(warningMessage)
+            filteringLogger.warning("\(warningMessage, privacy: .public)")
+        }
+
+        filteringLogger.info("フィルタリング完了: \(result.filteredCount)/\(result.originalCount)枚 (\(result.formattedFilteringRate, privacy: .public))")
+
+        return .success(result: result, warnings: warnings)
+    }
+
+    /// バリデーション付きでPHAssetフィルタリングを実行
+    ///
+    /// - Parameters:
+    ///   - assets: 対象のPHAsset配列
+    ///   - scanSettings: スキャン設定
+    /// - Returns: フィルタリング結果（エラー時はthrow）
+    public func filterAssetsWithValidation(
+        assets: [PHAsset],
+        with scanSettings: ScanSettings
+    ) throws -> [PHAsset] {
+        filteringLogger.info("PHAssetバリデーション付きフィルタリング開始: 入力=\(assets.count)枚")
+
+        // 設定バリデーション
+        if let error = validateSettings(scanSettings) {
+            filteringLogger.error("PHAssetフィルタリング中止: \(error.errorDescription ?? "不明なエラー", privacy: .public)")
+            throw error
+        }
+
+        // フィルタリング実行
+        let filteredAssets = filter(assets: assets, with: scanSettings)
+
+        filteringLogger.info("PHAssetフィルタリング完了: \(filteredAssets.count)/\(assets.count)枚")
+
+        return filteredAssets
+    }
+
+    /// バリデーション付きで分析結果付きフィルタリングを実行
+    ///
+    /// - Parameters:
+    ///   - photosWithResults: (Photo, PhotoAnalysisResult?)のペア配列
+    ///   - scanSettings: スキャン設定
+    /// - Returns: フィルタリング結果（エラー時はthrow）
+    public func filterWithAnalysisResultsValidated(
+        photosWithResults: [(photo: Photo, result: PhotoAnalysisResult?)],
+        with scanSettings: ScanSettings
+    ) throws -> [(photo: Photo, result: PhotoAnalysisResult?)] {
+        filteringLogger.info("分析結果付きバリデーションフィルタリング開始: 入力=\(photosWithResults.count)枚")
+
+        // 設定バリデーション
+        if let error = validateSettings(scanSettings) {
+            filteringLogger.error("分析結果付きフィルタリング中止: \(error.errorDescription ?? "不明なエラー", privacy: .public)")
+            throw error
+        }
+
+        // フィルタリング実行
+        let filteredResults = filterWithAnalysisResults(
+            photosWithResults: photosWithResults,
+            with: scanSettings
+        )
+
+        // 警告ログ
+        if filteredResults.isEmpty && !photosWithResults.isEmpty {
+            filteringLogger.warning("すべての写真がフィルタリングで除外されました: \(photosWithResults.count)枚")
+        }
+
+        filteringLogger.info("分析結果付きフィルタリング完了: \(filteredResults.count)/\(photosWithResults.count)枚")
+
+        return filteredResults
     }
 }

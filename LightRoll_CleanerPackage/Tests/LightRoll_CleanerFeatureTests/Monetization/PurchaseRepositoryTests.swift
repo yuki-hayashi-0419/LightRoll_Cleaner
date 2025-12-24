@@ -127,8 +127,8 @@ struct PurchaseRepositorySuccessTests {
     func restorePurchases_withValidTransactions_succeeds() async throws {
         // Arrange
         let repository = MockPurchaseRepository()
-        // Note: Cannot create Transaction in test, using empty array
-        repository.mockRestoreTransactions = []
+        // Note: Cannot create Transaction in test, using RestoreResult
+        repository.mockRestoreResult = RestoreResult(transactions: [])
 
         // Act
         let result = try await repository.restorePurchases()

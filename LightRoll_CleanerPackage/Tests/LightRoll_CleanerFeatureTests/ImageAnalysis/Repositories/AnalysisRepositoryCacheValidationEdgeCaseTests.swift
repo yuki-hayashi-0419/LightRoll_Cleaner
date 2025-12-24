@@ -38,7 +38,7 @@ struct AnalysisRepositoryCacheValidationEdgeCaseTests {
         )
     }
 
-    private static func makeTestUserDefaults() -> UserDefaults {
+    private static nonisolated func makeTestUserDefaults() -> UserDefaults {
         let suiteName = "AnalysisCacheValidationEdgeCaseTests_\(UUID().uuidString)"
         return UserDefaults(suiteName: suiteName)!
     }

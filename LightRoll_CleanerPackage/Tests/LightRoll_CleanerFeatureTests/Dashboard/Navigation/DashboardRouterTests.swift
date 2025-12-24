@@ -7,6 +7,7 @@
 //  Created by AI Assistant
 //
 
+import Foundation
 import Testing
 @testable import LightRoll_CleanerFeature
 

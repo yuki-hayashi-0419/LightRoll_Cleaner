@@ -339,6 +339,221 @@ struct BUG001_AutoScanSettingsSyncTests {
         #expect(manager2.isBackgroundScanEnabled == true)
         #expect(manager2.scanInterval == 172800.0)
     }
+
+    // MARK: - Phase 2 Tests: E2E Integration Tests
+
+    // MARK: - Test 13: syncSettings統合テスト（有効化フロー）
+
+    @Test("syncSettingsで有効化した場合、スケジュールが設定される")
+    func testSyncSettings_enable_schedulesTask() async throws {
+        // Arrange
+        let userDefaults = UserDefaults(suiteName: "test.bug001.sync.enable")!
+        userDefaults.removePersistentDomain(forName: "test.bug001.sync.enable")
+        let manager = BackgroundScanManager(userDefaults: userDefaults)
+
+        // Act: syncSettingsで有効化
+        let result = manager.syncSettings(
+            autoScanEnabled: true,
+            scanInterval: AutoScanInterval.daily.timeInterval!
+        )
+
+        // Assert: 成功し、次回日時が設定される
+        #expect(result.success == true)
+        #expect(result.errorMessage == nil)
+        #expect(manager.isBackgroundScanEnabled == true)
+        #expect(manager.scanInterval == AutoScanInterval.daily.timeInterval!)
+        #expect(manager.nextScheduledScanDate != nil)
+    }
+
+    // MARK: - Test 14: syncSettings統合テスト（無効化フロー）
+
+    @Test("syncSettingsで無効化した場合、スケジュールがキャンセルされる")
+    func testSyncSettings_disable_cancelsTask() async throws {
+        // Arrange
+        let userDefaults = UserDefaults(suiteName: "test.bug001.sync.disable")!
+        userDefaults.removePersistentDomain(forName: "test.bug001.sync.disable")
+        let manager = BackgroundScanManager(userDefaults: userDefaults)
+
+        // まず有効化
+        _ = manager.syncSettings(
+            autoScanEnabled: true,
+            scanInterval: AutoScanInterval.daily.timeInterval!
+        )
+        #expect(manager.nextScheduledScanDate != nil)
+
+        // Act: 無効化
+        let result = manager.syncSettings(
+            autoScanEnabled: false,
+            scanInterval: AutoScanInterval.daily.timeInterval!
+        )
+
+        // Assert: 成功し、次回日時がクリアされる
+        #expect(result.success == true)
+        #expect(result.nextScheduledDate == nil)
+        #expect(manager.isBackgroundScanEnabled == false)
+        #expect(manager.nextScheduledScanDate == nil)
+    }
+
+    // MARK: - Test 15: syncSettings結果オブジェクトの検証
+
+    @Test("SyncSettingsResultが正しく生成される")
+    func testSyncSettingsResult_creation() {
+        // Success case
+        let successDate = Date()
+        let successResult = BackgroundScanManager.SyncSettingsResult.success(
+            nextScheduledDate: successDate,
+            retryCount: 2
+        )
+        #expect(successResult.success == true)
+        #expect(successResult.errorMessage == nil)
+        #expect(successResult.retryCount == 2)
+        #expect(successResult.nextScheduledDate == successDate)
+
+        // Failure case
+        let failureResult = BackgroundScanManager.SyncSettingsResult.failure(
+            error: "テストエラー",
+            retryCount: 3
+        )
+        #expect(failureResult.success == false)
+        #expect(failureResult.errorMessage == "テストエラー")
+        #expect(failureResult.retryCount == 3)
+        #expect(failureResult.nextScheduledDate == nil)
+    }
+
+    // MARK: - Test 16: syncSettings間隔変更の即時反映
+
+    @Test("syncSettingsで間隔を変更すると、次回スケジュールが更新される")
+    func testSyncSettings_intervalChange_updatesSchedule() async throws {
+        // Arrange
+        let userDefaults = UserDefaults(suiteName: "test.bug001.sync.interval")!
+        userDefaults.removePersistentDomain(forName: "test.bug001.sync.interval")
+        let manager = BackgroundScanManager(userDefaults: userDefaults)
+
+        // Act: 毎日でスケジュール
+        let result1 = manager.syncSettings(
+            autoScanEnabled: true,
+            scanInterval: AutoScanInterval.daily.timeInterval!
+        )
+        let firstScheduledDate = result1.nextScheduledDate
+
+        // 毎週に変更
+        let result2 = manager.syncSettings(
+            autoScanEnabled: true,
+            scanInterval: AutoScanInterval.weekly.timeInterval!
+        )
+        let secondScheduledDate = result2.nextScheduledDate
+
+        // Assert: 間隔が変更され、次回日時も更新される
+        #expect(result1.success == true)
+        #expect(result2.success == true)
+        #expect(manager.scanInterval == AutoScanInterval.weekly.timeInterval!)
+
+        // 次回日時は週間隔になっているはず（毎日より後）
+        if let first = firstScheduledDate, let second = secondScheduledDate {
+            #expect(second > first)
+        }
+    }
+
+    // MARK: - Test 17: SettingsService → BackgroundScanManager E2Eフロー
+
+    @Test("SettingsService変更がsyncSettings経由でBackgroundScanManagerに反映される")
+    func testE2E_settingsService_to_backgroundScanManager() async throws {
+        // Arrange
+        let mockRepository = BUG001_MockSettingsRepository()
+        let service = SettingsService(repository: mockRepository)
+
+        let userDefaults = UserDefaults(suiteName: "test.bug001.e2e")!
+        userDefaults.removePersistentDomain(forName: "test.bug001.e2e")
+        let manager = BackgroundScanManager(userDefaults: userDefaults)
+
+        // Act: SettingsServiceで設定を変更
+        var updatedSettings = service.settings.scanSettings
+        updatedSettings.autoScanEnabled = true
+        updatedSettings.autoScanInterval = .daily
+        try service.updateScanSettings(updatedSettings)
+
+        // syncSettingsを呼び出し（ContentViewと同じフロー）
+        let timeInterval = updatedSettings.autoScanInterval.timeInterval ?? BackgroundScanManager.defaultScanInterval
+        let result = manager.syncSettings(
+            autoScanEnabled: updatedSettings.autoScanEnabled,
+            scanInterval: timeInterval
+        )
+
+        // Assert: 両方に正しく反映される
+        #expect(service.settings.scanSettings.autoScanEnabled == true)
+        #expect(service.settings.scanSettings.autoScanInterval == .daily)
+        #expect(result.success == true)
+        #expect(manager.isBackgroundScanEnabled == true)
+        #expect(manager.scanInterval == AutoScanInterval.daily.timeInterval!)
+    }
+
+    // MARK: - Test 18: 連続syncSettings呼び出しの安定性
+
+    @Test("連続syncSettings呼び出しが安定して動作する")
+    func testSyncSettings_rapidSuccessiveCalls() async throws {
+        // Arrange
+        let userDefaults = UserDefaults(suiteName: "test.bug001.sync.rapid")!
+        userDefaults.removePersistentDomain(forName: "test.bug001.sync.rapid")
+        let manager = BackgroundScanManager(userDefaults: userDefaults)
+
+        // Act: 連続で呼び出し
+        let intervals: [AutoScanInterval] = [.daily, .weekly, .monthly, .daily]
+        var results: [BackgroundScanManager.SyncSettingsResult] = []
+
+        for interval in intervals {
+            let result = manager.syncSettings(
+                autoScanEnabled: true,
+                scanInterval: interval.timeInterval ?? BackgroundScanManager.defaultScanInterval
+            )
+            results.append(result)
+        }
+
+        // Assert: 全て成功し、最後の値が反映される
+        for result in results {
+            #expect(result.success == true)
+        }
+        #expect(manager.scanInterval == AutoScanInterval.daily.timeInterval!)
+    }
+
+    // MARK: - Test 19: syncSettings Equatable確認
+
+    @Test("SyncSettingsResultがEquatableに準拠")
+    func testSyncSettingsResult_equatable() {
+        // Same values
+        let result1 = BackgroundScanManager.SyncSettingsResult.success(nextScheduledDate: nil, retryCount: 0)
+        let result2 = BackgroundScanManager.SyncSettingsResult.success(nextScheduledDate: nil, retryCount: 0)
+        #expect(result1 == result2)
+
+        // Different values
+        let result3 = BackgroundScanManager.SyncSettingsResult.failure(error: "error", retryCount: 1)
+        #expect(result1 != result3)
+    }
+
+    // MARK: - Test 20: 境界値でのsyncSettings動作
+
+    @Test("境界値間隔でsyncSettingsが正しく動作する")
+    func testSyncSettings_boundaryIntervals() async throws {
+        // Arrange
+        let userDefaults = UserDefaults(suiteName: "test.bug001.sync.boundary")!
+        userDefaults.removePersistentDomain(forName: "test.bug001.sync.boundary")
+        let manager = BackgroundScanManager(userDefaults: userDefaults)
+
+        // Act & Assert: 最小値
+        let resultMin = manager.syncSettings(
+            autoScanEnabled: true,
+            scanInterval: BackgroundScanManager.minimumScanInterval
+        )
+        #expect(resultMin.success == true)
+        #expect(manager.scanInterval == BackgroundScanManager.minimumScanInterval)
+
+        // Act & Assert: 最大値
+        let resultMax = manager.syncSettings(
+            autoScanEnabled: true,
+            scanInterval: BackgroundScanManager.maximumScanInterval
+        )
+        #expect(resultMax.success == true)
+        #expect(manager.scanInterval == BackgroundScanManager.maximumScanInterval)
+    }
 }
 
 // MARK: - BUG001_MockSettingsRepository
