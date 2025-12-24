@@ -55,6 +55,12 @@ public struct TrashView: View {
     /// DeletionConfirmationService
     private let confirmationService: DeletionConfirmationServiceProtocol
 
+    // MARK: - Environment
+
+    /// SettingsService（表示設定取得用）
+    /// DISPLAY-001: グリッド列数設定を統合
+    @Environment(SettingsService.self) private var settingsService
+
     // MARK: - State
 
     /// ビューの状態
@@ -99,12 +105,20 @@ public struct TrashView: View {
         case error(String)
     }
 
-    // MARK: - Constants
+    // MARK: - Computed Properties
 
     /// グリッド列数
-    private let gridColumns = [
-        GridItem(.adaptive(minimum: 100, maximum: 120), spacing: LRSpacing.sm)
-    ]
+    /// DISPLAY-001: SettingsServiceからグリッド列数を取得
+    /// 設定画面で変更可能（DisplaySettings.gridColumns）
+    private var gridColumns: [GridItem] {
+        Array(
+            repeating: GridItem(
+                .flexible(),
+                spacing: LRSpacing.sm
+            ),
+            count: settingsService.settings.displaySettings.gridColumns
+        )
+    }
 
     // MARK: - Initialization
 
@@ -150,6 +164,12 @@ public struct TrashView: View {
             }
             .refreshable {
                 await loadTrashPhotos()
+            }
+            // DISPLAY-003: 並び順設定変更時に即時反映
+            .onChange(of: settingsService.settings.displaySettings.sortOrder) { _, _ in
+                // 設定変更時はallPhotosを再並び替えしてからグルーピング
+                let sortedPhotos = applySortOrderToTrash(to: allPhotos)
+                groupedPhotos = sortedPhotos.groupedByDeletedDay
             }
             .sheet(item: $confirmationMessage) { message in
                 confirmationSheet(message: message)
@@ -387,6 +407,45 @@ public struct TrashView: View {
                         .padding(LRSpacing.xs)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
                 }
+
+                // 情報表示オーバーレイ（ファイルサイズ・撮影日）
+                // DISPLAY-002: 表示設定に基づく情報表示
+                if settingsService.settings.displaySettings.showFileSize ||
+                   settingsService.settings.displaySettings.showDate {
+                    VStack {
+                        Spacer()
+                        VStack(alignment: .leading, spacing: 1) {
+                            // 撮影日表示
+                            if settingsService.settings.displaySettings.showDate {
+                                Text(formattedCreationDate(for: photo))
+                                    .font(Font.LightRoll.caption2)
+                                    .foregroundColor(.white)
+                                    .lineLimit(1)
+                            }
+                            // ファイルサイズ表示
+                            if settingsService.settings.displaySettings.showFileSize {
+                                Text(photo.formattedFileSize)
+                                    .font(Font.LightRoll.caption2)
+                                    .foregroundColor(.white.opacity(0.9))
+                                    .lineLimit(1)
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, LRSpacing.xxs)
+                        .padding(.vertical, 2)
+                        .background {
+                            LinearGradient(
+                                colors: [
+                                    Color.black.opacity(0.7),
+                                    Color.black.opacity(0.4),
+                                    Color.clear
+                                ],
+                                startPoint: .bottom,
+                                endPoint: .top
+                            )
+                        }
+                    }
+                }
             }
             .clipShape(RoundedRectangle(cornerRadius: LRLayout.cornerRadiusSM))
             .overlay {
@@ -397,6 +456,14 @@ public struct TrashView: View {
             }
         }
         .buttonStyle(.plain)
+    }
+
+    /// 撮影日のフォーマット済み文字列
+    /// DISPLAY-002: 日付表示用ヘルパー
+    private func formattedCreationDate(for photo: TrashPhoto) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy/MM/dd"
+        return formatter.string(from: photo.metadata.creationDate)
     }
 
     // MARK: - Action Buttons View
@@ -592,12 +659,44 @@ public struct TrashView: View {
     // MARK: - Private Methods
 
     /// ゴミ箱写真を読み込み
+    ///
+    /// ## 修正履歴
+    /// - 2025-12-XX: DISPLAY-003 並び順設定の適用追加
+    ///   - SettingsServiceのsortOrderに基づく並び替え
     private func loadTrashPhotos() async {
         viewState = .loading
 
         let photos = await trashManager.fetchAllTrashPhotos()
-        groupedPhotos = photos.groupedByDeletedDay
+
+        // DISPLAY-003: SettingsServiceのsortOrderに基づいて並び替えてからグルーピング
+        let sortedPhotos = applySortOrderToTrash(to: photos)
+        groupedPhotos = sortedPhotos.groupedByDeletedDay
+
         viewState = .loaded
+    }
+
+    /// DISPLAY-003: ゴミ箱写真に並び順設定を適用
+    ///
+    /// SettingsServiceのsortOrder設定に基づいてゴミ箱写真を並び替える
+    /// - Parameter photos: 並び替え対象のゴミ箱写真配列
+    /// - Returns: 並び替え後のゴミ箱写真配列
+    private func applySortOrderToTrash(to photos: [TrashPhoto]) -> [TrashPhoto] {
+        let sortOrder = settingsService.settings.displaySettings.sortOrder
+
+        switch sortOrder {
+        case .dateDescending:
+            // 新しい順（元の写真の撮影日の降順）
+            return photos.sorted { $0.metadata.creationDate > $1.metadata.creationDate }
+        case .dateAscending:
+            // 古い順（元の写真の撮影日の昇順）
+            return photos.sorted { $0.metadata.creationDate < $1.metadata.creationDate }
+        case .sizeDescending:
+            // 容量大きい順（ファイルサイズの降順）
+            return photos.sorted { $0.fileSize > $1.fileSize }
+        case .sizeAscending:
+            // 容量小さい順（ファイルサイズの昇順）
+            return photos.sorted { $0.fileSize < $1.fileSize }
+        }
     }
 
     /// 選択トグル

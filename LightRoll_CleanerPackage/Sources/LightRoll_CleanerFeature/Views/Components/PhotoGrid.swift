@@ -15,6 +15,7 @@ import SwiftUI
 /// 写真グリッド表示コンポーネント
 /// LazyVGridを使用して写真を効率的にグリッド表示
 /// PhotoThumbnailを活用し、選択状態管理とタップハンドリングを実装
+/// DISPLAY-002: ファイルサイズ・撮影日表示機能を追加
 public struct PhotoGrid: View {
     // MARK: - Properties
 
@@ -29,6 +30,14 @@ public struct PhotoGrid: View {
 
     /// ベストショットを表示する写真のIDセット
     var bestShotPhotos: Set<String> = []
+
+    /// ファイルサイズを表示するか
+    /// DISPLAY-002: 表示設定からの反映
+    var showFileSize: Bool = false
+
+    /// 撮影日を表示するか
+    /// DISPLAY-002: 表示設定からの反映
+    var showDate: Bool = false
 
     /// 写真がタップされた時のコールバック
     var onPhotoTap: ((Photo) -> Void)?
@@ -57,6 +66,8 @@ public struct PhotoGrid: View {
     ///   - columns: グリッドの列数（デフォルト: 3）
     ///   - selectedPhotos: 選択された写真のIDセットのバインディング
     ///   - bestShotPhotos: ベストショットを表示する写真のIDセット（デフォルト: 空）
+    ///   - showFileSize: ファイルサイズを表示するか（デフォルト: false）
+    ///   - showDate: 撮影日を表示するか（デフォルト: false）
     ///   - onPhotoTap: 写真がタップされた時のコールバック
     ///   - onPhotoLongPress: 写真が長押しされた時のコールバック
     public init(
@@ -64,6 +75,8 @@ public struct PhotoGrid: View {
         columns: Int = 3,
         selectedPhotos: Binding<Set<String>>,
         bestShotPhotos: Set<String> = [],
+        showFileSize: Bool = false,
+        showDate: Bool = false,
         onPhotoTap: ((Photo) -> Void)? = nil,
         onPhotoLongPress: ((Photo) -> Void)? = nil
     ) {
@@ -71,6 +84,8 @@ public struct PhotoGrid: View {
         self.columns = columns
         self._selectedPhotos = selectedPhotos
         self.bestShotPhotos = bestShotPhotos
+        self.showFileSize = showFileSize
+        self.showDate = showDate
         self.onPhotoTap = onPhotoTap
         self.onPhotoLongPress = onPhotoLongPress
     }
@@ -103,6 +118,7 @@ public struct PhotoGrid: View {
     // MARK: - Subviews
 
     /// 写真セル
+    /// DISPLAY-002: showFileSize/showDateパラメータを追加
     @ViewBuilder
     private func photoCell(for photo: Photo) -> some View {
         let isSelected = selectedPhotos.contains(photo.id)
@@ -111,7 +127,9 @@ public struct PhotoGrid: View {
         PhotoThumbnail(
             photo: photo,
             isSelected: isSelected,
-            showBadge: showBadge
+            showBadge: showBadge,
+            showFileSize: showFileSize,
+            showDate: showDate
         )
         .aspectRatio(1.0, contentMode: .fit)
         .onTapGesture {

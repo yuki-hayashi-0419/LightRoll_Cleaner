@@ -17,7 +17,7 @@ import UIKit
 
 /// 写真サムネイル表示コンポーネント
 /// グリッド表示に最適化された正方形サムネイル
-/// 選択状態、ベストショットバッジ、動画アイコンに対応
+/// 選択状態、ベストショットバッジ、動画アイコン、ファイルサイズ・撮影日表示に対応
 public struct PhotoThumbnail: View {
     // MARK: - Properties
 
@@ -29,6 +29,14 @@ public struct PhotoThumbnail: View {
 
     /// ベストショットバッジを表示するか
     let showBadge: Bool
+
+    /// ファイルサイズを表示するか
+    /// DISPLAY-002: 表示設定からの反映
+    let showFileSize: Bool
+
+    /// 撮影日を表示するか
+    /// DISPLAY-002: 表示設定からの反映
+    let showDate: Bool
 
     // MARK: - State
 
@@ -55,14 +63,20 @@ public struct PhotoThumbnail: View {
     ///   - photo: 表示する写真
     ///   - isSelected: 選択状態（デフォルト: false）
     ///   - showBadge: ベストショットバッジ表示（デフォルト: false）
+    ///   - showFileSize: ファイルサイズ表示（デフォルト: false）
+    ///   - showDate: 撮影日表示（デフォルト: false）
     public init(
         photo: Photo,
         isSelected: Bool = false,
-        showBadge: Bool = false
+        showBadge: Bool = false,
+        showFileSize: Bool = false,
+        showDate: Bool = false
     ) {
         self.photo = photo
         self.isSelected = isSelected
         self.showBadge = showBadge
+        self.showFileSize = showFileSize
+        self.showDate = showDate
     }
 
     // MARK: - Body
@@ -76,6 +90,12 @@ public struct PhotoThumbnail: View {
                 // 動画アイコン（動画の場合のみ）
                 if photo.isVideo {
                     videoOverlay
+                }
+
+                // 情報表示オーバーレイ（ファイルサイズ・撮影日）
+                // DISPLAY-002: 表示設定に基づく情報表示
+                if showFileSize || showDate {
+                    photoInfoOverlay
                 }
 
                 // ベストショットバッジ
@@ -217,6 +237,57 @@ public struct PhotoThumbnail: View {
         }
     }
 
+    /// 情報表示オーバーレイ（ファイルサイズ・撮影日）
+    /// DISPLAY-002: 表示設定に基づく情報表示
+    /// 下部にグラデーションオーバーレイを配置し、テキストを表示
+    private var photoInfoOverlay: some View {
+        VStack {
+            Spacer()
+
+            // 下部にグラデーション背景とテキスト
+            VStack(alignment: .leading, spacing: LRSpacing.xxs) {
+                // 撮影日表示
+                if showDate {
+                    Text(formattedCreationDate)
+                        .font(Font.LightRoll.caption2)
+                        .foregroundColor(.white)
+                        .lineLimit(1)
+                }
+
+                // ファイルサイズ表示
+                if showFileSize {
+                    Text(photo.formattedFileSize)
+                        .font(Font.LightRoll.caption2)
+                        .foregroundColor(.white.opacity(0.9))
+                        .lineLimit(1)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, LRSpacing.xs)
+            .padding(.vertical, LRSpacing.xxs)
+            .background {
+                // グラデーション背景（下から上へ透明に）
+                LinearGradient(
+                    colors: [
+                        Color.black.opacity(0.7),
+                        Color.black.opacity(0.4),
+                        Color.clear
+                    ],
+                    startPoint: .bottom,
+                    endPoint: .top
+                )
+            }
+        }
+    }
+
+    /// 撮影日のフォーマット済み文字列
+    /// DISPLAY-002: 日付表示用ヘルパー
+    private var formattedCreationDate: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy/MM/dd"
+        return formatter.string(from: photo.creationDate)
+    }
+
     /// ベストショットバッジ
     private var bestShotBadge: some View {
         VStack {
@@ -289,17 +360,28 @@ public struct PhotoThumbnail: View {
     // MARK: - Accessibility
 
     /// アクセシビリティ用の説明文
+    /// DISPLAY-002: ファイルサイズ・撮影日情報を追加
     private var accessibilityDescription: String {
         var parts: [String] = []
 
         // メディアタイプ
         parts.append(photo.mediaType.localizedName)
 
-        // 作成日時
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .short
-        dateFormatter.timeStyle = .short
-        parts.append(dateFormatter.string(from: photo.creationDate))
+        // 作成日時（撮影日表示時のみ詳細を読み上げ）
+        if showDate {
+            parts.append("撮影日: \(formattedCreationDate)")
+        } else {
+            // 基本的な日時情報
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateStyle = .short
+            dateFormatter.timeStyle = .short
+            parts.append(dateFormatter.string(from: photo.creationDate))
+        }
+
+        // ファイルサイズ（表示時のみ）
+        if showFileSize {
+            parts.append("サイズ: \(photo.formattedFileSize)")
+        }
 
         // 動画の長さ
         if photo.isVideo, !photo.formattedDuration.isEmpty {

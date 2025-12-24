@@ -49,6 +49,12 @@ public struct GroupDetailView: View {
     /// PremiumManager（削除制限チェック用）
     private let premiumManager: PremiumManager?
 
+    // MARK: - Environment
+
+    /// SettingsService（表示設定取得用）
+    /// DISPLAY-001: グリッド列数設定を統合
+    @Environment(SettingsService.self) private var settingsService
+
     // MARK: - State
 
     /// ビューの状態
@@ -134,6 +140,11 @@ public struct GroupDetailView: View {
         }
         .task {
             await loadPhotos()
+        }
+        // DISPLAY-003: 並び順設定変更時に即時反映
+        .onChange(of: settingsService.settings.displaySettings.sortOrder) { _, _ in
+            // 設定変更時は読み込み済みの写真を再並び替え
+            photos = applySortOrder(to: photos)
         }
         .alert(
             NSLocalizedString(
@@ -261,17 +272,22 @@ public struct GroupDetailView: View {
     }
 
     /// 写真リストコンテンツ
+    /// DISPLAY-001: グリッド列数をSettingsServiceから取得
+    /// DISPLAY-002: ファイルサイズ・撮影日表示パラメータを追加
     private var photoListContent: some View {
         VStack(spacing: 0) {
             // サマリーヘッダー
             summaryHeader
 
             // 写真グリッド
+            // グリッド列数、ファイルサイズ表示、撮影日表示は設定画面から変更可能
             PhotoGrid(
                 photos: photos,
-                columns: 3,
+                columns: settingsService.settings.displaySettings.gridColumns,
                 selectedPhotos: $selectedPhotoIds,
-                bestShotPhotos: bestShotPhotoIds
+                bestShotPhotos: bestShotPhotoIds,
+                showFileSize: settingsService.settings.displaySettings.showFileSize,
+                showDate: settingsService.settings.displaySettings.showDate
             )
 
             // 選択モード時の一括操作バー
@@ -546,6 +562,8 @@ public struct GroupDetailView: View {
     ///   - Taskキャンセルチェック追加
     ///   - 詳細なログ出力追加
     ///   - 読み込み失敗時の適切なエラー状態遷移
+    /// - 2025-12-XX: DISPLAY-003 並び順設定の適用追加
+    ///   - SettingsServiceのsortOrderに基づく並び替え
     private func loadPhotos() async {
         viewState = .loading
 
@@ -590,6 +608,9 @@ public struct GroupDetailView: View {
             }
         }
 
+        // DISPLAY-003: SettingsServiceのsortOrderに基づいて並び替え
+        orderedPhotos = applySortOrder(to: orderedPhotos)
+
         // 読み込み結果のログ出力と状態更新
         let loadedCount = orderedPhotos.count
         let expectedCount = group.photoIds.count
@@ -613,6 +634,30 @@ public struct GroupDetailView: View {
             print("✅ GroupDetailView: 写真読み込み完了（\(loadedCount)件）")
             photos = orderedPhotos
             viewState = .loaded
+        }
+    }
+
+    /// DISPLAY-003: 並び順設定を適用
+    ///
+    /// SettingsServiceのsortOrder設定に基づいて写真を並び替える
+    /// - Parameter photos: 並び替え対象の写真配列
+    /// - Returns: 並び替え後の写真配列
+    private func applySortOrder(to photos: [Photo]) -> [Photo] {
+        let sortOrder = settingsService.settings.displaySettings.sortOrder
+
+        switch sortOrder {
+        case .dateDescending:
+            // 新しい順（撮影日の降順）
+            return photos.sorted { $0.creationDate > $1.creationDate }
+        case .dateAscending:
+            // 古い順（撮影日の昇順）
+            return photos.sorted { $0.creationDate < $1.creationDate }
+        case .sizeDescending:
+            // 容量大きい順（ファイルサイズの降順）
+            return photos.sorted { $0.fileSize > $1.fileSize }
+        case .sizeAscending:
+            // 容量小さい順（ファイルサイズの昇順）
+            return photos.sorted { $0.fileSize < $1.fileSize }
         }
     }
 
@@ -759,6 +804,7 @@ private let previewGroup = PhotoGroup(
             print("削除: \(photos.count)件")
         }
     )
+    .environment(SettingsService())
     .preferredColorScheme(.dark)
 }
 
@@ -767,6 +813,7 @@ private let previewGroup = PhotoGroup(
         group: previewGroup,
         photoProvider: PreviewPhotoProvider()
     )
+    .environment(SettingsService())
     .preferredColorScheme(.light)
 }
 
@@ -781,6 +828,7 @@ private let previewGroup = PhotoGroup(
         group: screenshotGroup,
         photoProvider: PreviewPhotoProvider()
     )
+    .environment(SettingsService())
     .preferredColorScheme(.dark)
 }
 
@@ -795,6 +843,7 @@ private let previewGroup = PhotoGroup(
         group: emptyGroup,
         photoProvider: PreviewPhotoProvider()
     )
+    .environment(SettingsService())
     .preferredColorScheme(.dark)
 }
 

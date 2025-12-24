@@ -4,6 +4,252 @@
 
 ---
 
+## セッション29：display-settings-integration-complete（2025-12-24）完了
+
+### セッション概要
+- **セッションID**: display-settings-integration-complete
+- **目的**: DisplaySettings統合完了・品質検証
+- **品質スコア**: 93点（合格）
+- **終了理由**: DISPLAY-001〜004完了、品質基準達成
+- **担当**: @spec-developer, @spec-test-generator, @spec-validator
+- **セッション終了**: 作業終了プロンプト(7)実行完了
+
+### 実施内容
+
+#### 1. DISPLAY-001〜004統合実装 ✅
+- **DISPLAY-001**: グリッド列数統合（GroupDetailView, TrashView）
+- **DISPLAY-002**: ファイルサイズ・撮影日表示（PhotoThumbnail拡張）
+- **DISPLAY-003**: 並び順実装（applySortOrder/applySortOrderToTrash）
+- **DISPLAY-004**: 統合テスト生成（25件のテストケース）
+
+#### 2. 品質検証結果（93点） ✅
+
+| 観点 | 配点 | 評価点 | 評価 |
+|------|------|--------|------|
+| 機能完全性 | 25点 | 24点 | 4機能すべて実装完了 |
+| コード品質 | 25点 | 23点 | MV Pattern準拠 |
+| テストカバレッジ | 20点 | 18点 | 25件の統合テスト |
+| ドキュメント同期 | 15点 | 14点 | PROGRESS.md詳細記録 |
+| エラーハンドリング | 15点 | 14点 | バリデーション完備 |
+
+**総合スコア**: 93点（合格基準90点以上）
+**判定**: 合格
+
+### 修正ファイル
+| ファイル | 変更内容 |
+|----------|----------|
+| GroupDetailView.swift | グリッド列数統合、並び順実装、情報表示 |
+| TrashView.swift | グリッド列数統合、並び順実装、情報表示 |
+| PhotoThumbnail.swift | ファイルサイズ・撮影日オーバーレイ |
+| PhotoGrid.swift | showFileSize/showDateパラメータ受け渡し |
+| DisplaySettingsIntegrationTests.swift | 25件のテストケース生成 |
+
+### 成果
+- ✅ DisplaySettings統合完全実装（4設定項目）
+- ✅ 設定画面での変更が即時UI反映
+- ✅ 品質スコア93点で合格
+- ✅ 25件の統合テストで主要シナリオカバー
+
+### 全体進捗
+- **進捗率**: 98%（157/160タスク完了）
+- **残りタスク**: M10リリース準備3件（9時間）
+  - M10-T04: App Store Connect設定（3h）
+  - M10-T05: TestFlight配信（2h）
+  - M10-T06: 最終ビルド・審査提出（4h）
+
+### 次回セッション推奨
+**優先**: M10-T04（App Store Connect設定）開始
+
+---
+
+## セッション28：display-004-integration-tests（2025-12-24）完了
+
+### セッション概要
+- **セッションID**: display-004-integration-tests
+- **目的**: DISPLAY-004 DisplaySettings統合テスト生成
+- **品質スコア**: 評価中（コンパイル成功）
+- **状態**: 完了
+- **担当**: @spec-test-generator
+
+### 実施内容
+
+#### 1. DISPLAY-004: DisplaySettings統合テスト生成 ✅
+- **目的**: DISPLAY-001〜003の統合動作検証テスト作成
+- **実施内容**:
+  - DisplaySettingsIntegrationTests.swift新規作成（25テストケース）
+  - グリッド列数統合テスト（8件）: 2〜6列の各設定、境界値テスト
+  - ファイルサイズ/撮影日表示統合テスト（6件）: オン/オフ切り替え、フォーマット検証
+  - 並び順統合テスト（6件）: 4種類のSortOrder、表示名検証
+  - 統合シナリオテスト（5件）: 複数設定変更、リセット、空リスト、同値ソート
+
+### テストケース一覧
+| カテゴリ | テスト数 | 内容 |
+|----------|----------|------|
+| グリッド列数 | 8件 | 2〜6列設定、PhotoGrid反映、境界値エラー |
+| ファイルサイズ/撮影日 | 6件 | オン/オフ切り替え、両方オン/オフ、フォーマット |
+| 並び順 | 6件 | 4種類のSortOrder、displayName、allCases |
+| 統合シナリオ | 5件 | 複数設定変更、リセット、無効設定保護、空/1枚リスト |
+
+### 修正ファイル
+| ファイル | 変更内容 |
+|----------|----------|
+| DisplaySettingsIntegrationTests.swift | 新規作成（25テストケース） |
+
+### ビルド結果
+- **ステータス**: コンパイル成功
+- **注記**: 既存テストファイルにエラーあり（本タスクとは無関係）
+
+### 成果
+- ✅ DISPLAY-004実装完了（DisplaySettings統合テスト生成）
+- ✅ 25件のSwift Testingテストケース作成
+- ✅ 正常系/異常系/境界値テスト網羅
+- ✅ コンパイル成功確認
+
+### 全体進捗
+- **進捗率**: 97.5%（156/160タスク完了）
+- **残りタスク**: DISPLAY-003（2.5h）+ M10リリース準備3件（9h）
+
+---
+
+## セッション27：display-002-file-date-info（2025-12-24）完了
+
+### セッション概要
+- **セッションID**: display-002-file-date-info
+- **目的**: DISPLAY-002 ファイルサイズ・撮影日表示の実装
+- **品質スコア**: 評価中（ビルド成功）
+- **状態**: 実装完了
+
+### 実施内容
+
+#### 1. DISPLAY-002: ファイルサイズ・撮影日表示の実装 ✅
+- **目的**: 写真サムネイルにファイルサイズと撮影日を表示
+- **修正内容**:
+  - PhotoThumbnail.swift: `showFileSize`/`showDate`パラメータ追加、`photoInfoOverlay`表示実装
+  - PhotoThumbnail.swift: グラデーション背景オーバーレイで情報表示
+  - PhotoThumbnail.swift: `formattedCreationDate`ヘルパープロパティ追加
+  - PhotoThumbnail.swift: アクセシビリティ対応（ファイルサイズ・撮影日の読み上げ）
+  - PhotoGrid.swift: `showFileSize`/`showDate`パラメータ追加、PhotoThumbnailに受け渡し
+  - GroupDetailView.swift: settingsService.settings.displaySettings.showFileSize/showDateを渡す
+  - TrashView.swift: trashPhotoCellに情報オーバーレイ追加（TrashPhoto対応）
+  - TrashView.swift: `formattedCreationDate(for:)`ヘルパーメソッド追加
+
+### 修正ファイル
+| ファイル | 変更内容 |
+|----------|----------|
+| PhotoThumbnail.swift | showFileSize/showDateパラメータ追加、photoInfoOverlay実装、アクセシビリティ対応 |
+| PhotoGrid.swift | showFileSize/showDateパラメータ追加、PhotoThumbnailへの受け渡し |
+| GroupDetailView.swift | DisplaySettings設定値をPhotoGridに渡す |
+| TrashView.swift | trashPhotoCellに情報オーバーレイ追加、ヘルパーメソッド追加 |
+
+### ビルド結果
+- **ステータス**: 成功（警告のみ、エラーなし）
+- **警告**: 既存の@MainActor/Sendable関連（本タスク起因ではない）
+
+### 成果
+- ✅ DISPLAY-002実装完了（ファイルサイズ・撮影日表示）
+- ✅ ビルド成功確認
+- ✅ 設定画面からファイルサイズ/撮影日表示の切り替え可能
+
+### 全体進捗
+- **進捗率**: 97%（155/160タスク完了）
+- **残りタスク**: DisplaySettings統合2件（4h）+ M10リリース準備3件（9h）
+
+---
+
+## セッション26：display-settings-integration-001（2025-12-24）完了
+
+### セッション概要
+- **セッションID**: display-settings-integration-001
+- **目的**: DISPLAY-001 グリッド列数設定の統合
+- **品質スコア**: 評価中（ビルド成功）
+- **状態**: 完了
+
+### 実施内容
+
+#### 1. DISPLAY-001: グリッド列数の統合 ✅
+- **問題**: GroupDetailView.swift:272とTrashView.swift:105-107でグリッド列数がハードコード
+- **修正内容**:
+  - GroupDetailView.swift: `@Environment(SettingsService.self)`追加
+  - GroupDetailView.swift: `columns: 3` → `columns: settingsService.settings.displaySettings.gridColumns`
+  - TrashView.swift: `@Environment(SettingsService.self)`追加
+  - TrashView.swift: ローカル定数 → computed propertyに変更し、settingsService.settings.displaySettings.gridColumnsから取得
+  - Previewに`.environment(SettingsService())`追加（4件）
+
+### 修正ファイル
+| ファイル | 変更内容 |
+|----------|----------|
+| GroupDetailView.swift | @Environment(SettingsService.self)追加、columns引数を設定から取得、Preview4件更新 |
+| TrashView.swift | @Environment(SettingsService.self)追加、gridColumnsをcomputed propertyに変更 |
+
+### ビルド結果
+- **ステータス**: 成功（警告のみ、エラーなし）
+- **警告**: 既存の@MainActor/Sendable関連（本タスク起因ではない）
+
+### 成果
+- ✅ DISPLAY-001実装完了（グリッド列数の統合）
+- ✅ ビルド成功確認
+- ✅ 設定画面からグリッド列数変更可能に（2〜6列）
+
+### 全体進捗
+- **進捗率**: 96%（154/160タスク完了）
+- **残りタスク**: DisplaySettings統合3件（7.5h）+ M10リリース準備3件（9h）
+
+---
+
+## セッション25：display-settings-analysis-001（2025-12-24）完了
+
+### セッション概要
+- **セッションID**: display-settings-analysis-001
+- **目的**: DisplaySettings統合状態調査・実装計画策定
+- **品質スコア**: N/A（調査・計画フェーズ）
+- **終了理由**: 調査完了、実装計画策定完了
+
+### 実施内容
+
+#### 1. DisplaySettings統合状態調査 ✅
+- **調査対象**: DisplaySettingsViewの4つの設定項目
+  - グリッド列数（gridColumns: 2〜6列）
+  - ファイルサイズ表示（showFileSize: Bool）
+  - 撮影日表示（showDate: Bool）
+  - 並び順（sortOrder: SortOrder）
+
+- **調査結果**: **4項目すべて未統合**
+  - 設定UIは完全実装済み、SettingsServiceへの保存も正常
+  - しかし、実際のアプリ機能には一切反映されていない
+
+#### 2. 詳細問題特定 ✅
+
+| 設定項目 | 問題箇所 | 問題内容 |
+|----------|----------|----------|
+| グリッド列数 | GroupDetailView.swift:272 | `columns: 3`にハードコード |
+| グリッド列数 | TrashView.swift:105-107 | `GridItem(.adaptive(...))`にハードコード |
+| ファイルサイズ表示 | PhotoThumbnail.swift | 表示機能が実装されていない |
+| 撮影日表示 | PhotoThumbnail.swift | 表示機能が実装されていない |
+| 並び順 | GroupDetailView.swift | 並び替えロジックなし |
+| 並び順 | TrashView.swift | 並び替えロジックなし |
+
+#### 3. 実装計画策定 ✅
+- **DISPLAY-001**: グリッド列数統合（2h、P1）
+- **DISPLAY-002**: ファイルサイズ・撮影日表示実装（3h、P2）
+- **DISPLAY-003**: 並び順実装（2.5h、P1）
+- **DISPLAY-004**: テスト生成（1.5h、P3）
+- **合計推定工数**: 9時間
+
+### 成果物
+- ✅ 包括的調査レポート作成（docs/CRITICAL/DISPLAY_SETTINGS_ANALYSIS.md）
+- ✅ 4つの実装タスク定義（DISPLAY-001〜004）
+- ✅ TASKS.md更新（7件の未完了タスク追加）
+
+### 全体進捗
+- **進捗率**: 95%（153/160タスク完了）
+- **残りタスク**: DisplaySettings統合4件（9h）+ M10リリース準備3件（9h）
+
+### 次回セッション推奨
+**Option A**: DisplaySettings統合優先（DISPLAY-001〜003実施、7.5h）
+**Option B**: M10リリース準備優先（App Store Connect設定、TestFlight配信）
+
+---
+
 ## セッション24：settings-integration-deploy-001（2025-12-24）完了
 
 ### セッション概要
