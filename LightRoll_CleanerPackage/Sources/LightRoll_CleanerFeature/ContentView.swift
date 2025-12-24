@@ -183,6 +183,7 @@ public struct ContentView: View {
                 showingSettings = true
             }
         )
+        .environment(settingsService)  // グループ詳細画面で必須（DISPLAY-001〜003で使用）
         .environment(premiumManager)
         .environment(adManager)
         .sheet(isPresented: $showingSettings) {

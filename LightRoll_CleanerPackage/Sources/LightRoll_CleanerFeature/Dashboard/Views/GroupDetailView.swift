@@ -130,14 +130,14 @@ public struct GroupDetailView: View {
 
             // メインコンテンツ
             mainContent
+
+            // 右下のフローティングアクションボタン
+            floatingActionButtons
         }
         .navigationTitle(group.displayName)
         #if os(iOS)
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
         #endif
-        .toolbar {
-            toolbarContent
-        }
         .task {
             await loadPhotos()
         }
@@ -289,10 +289,9 @@ public struct GroupDetailView: View {
                 showFileSize: settingsService.settings.displaySettings.showFileSize,
                 showDate: settingsService.settings.displaySettings.showDate
             )
-
-            // 選択モード時の一括操作バー
-            if !selectedPhotoIds.isEmpty {
-                selectionActionBar
+            // フローティングボタン用の下部スペース確保
+            .safeAreaInset(edge: .bottom) {
+                Color.clear.frame(height: 80)
             }
         }
     }
@@ -354,48 +353,6 @@ public struct GroupDetailView: View {
         .background(.ultraThinMaterial)
     }
 
-    /// 選択アクションバー
-    private var selectionActionBar: some View {
-        HStack(spacing: LRSpacing.lg) {
-            // 選択件数表示
-            Text(String(format: NSLocalizedString(
-                "groupDetail.selected.count",
-                value: "%d枚選択中",
-                comment: "Selected count"
-            ), selectedPhotoIds.count))
-            .font(.subheadline)
-            .foregroundStyle(.secondary)
-
-            Spacer()
-
-            // 全選択/全解除
-            Button {
-                toggleSelectAll()
-            } label: {
-                Text(selectedPhotoIds.count == selectablePhotoIds.count
-                    ? NSLocalizedString("groupDetail.deselectAll", value: "全解除", comment: "Deselect all")
-                    : NSLocalizedString("groupDetail.selectAll", value: "全選択", comment: "Select all"))
-                .font(.subheadline)
-            }
-
-            // 削除ボタン
-            Button(role: .destructive) {
-                Task {
-                    await checkDeletionLimitAndShowConfirmation()
-                }
-            } label: {
-                HStack(spacing: LRSpacing.xs) {
-                    Image(systemName: "trash")
-                    Text(NSLocalizedString("groupDetail.delete", value: "削除", comment: "Delete button"))
-                }
-            }
-            .disabled(selectedPhotoIds.isEmpty)
-        }
-        .padding(.horizontal, LRSpacing.lg)
-        .padding(.vertical, LRSpacing.md)
-        .background(.ultraThickMaterial)
-    }
-
     /// 空状態ビュー
     private var emptyStateView: some View {
         EmptyStateView(
@@ -432,83 +389,58 @@ public struct GroupDetailView: View {
         )
     }
 
-    /// ツールバーコンテンツ
-    /// NavigationStackの自動バックボタンを使用するため、カスタムバックボタンは不要
-    @ToolbarContentBuilder
-    private var toolbarContent: some ToolbarContent {
-        #if os(iOS)
-        ToolbarItem(placement: .topBarTrailing) {
-            HStack(spacing: LRSpacing.sm) {
-                // 選択モードトグルボタン
-                if !isSelectionModeActive {
-                    Button {
+    /// 右下のフローティングアクションボタン
+    /// 選択・全選択・削除の3つのボタンを常時表示
+    private var floatingActionButtons: some View {
+        VStack {
+            Spacer()
+            HStack {
+                Spacer()
+                HStack(spacing: LRSpacing.sm) {
+                    // 選択ボタン
+                    FloatingButton(
+                        title: isSelectionModeActive
+                            ? NSLocalizedString("common.done", value: "完了", comment: "Done button")
+                            : NSLocalizedString("groupDetail.select", value: "選択", comment: "Select button"),
+                        icon: isSelectionModeActive ? "checkmark.circle.fill" : "checkmark.circle",
+                        color: Color.LightRoll.primary
+                    ) {
                         toggleSelectionMode()
-                    } label: {
-                        Text(NSLocalizedString("groupDetail.select", value: "選択", comment: "Select button"))
                     }
-                } else {
-                    Button {
-                        toggleSelectionMode()
-                    } label: {
-                        Text(NSLocalizedString("common.done", value: "完了", comment: "Done button"))
-                    }
-                }
 
-                // グループ全削除ボタン
-                Menu {
-                    Button(role: .destructive) {
-                        Task {
-                            await checkDeletionLimitForAllPhotos()
-                        }
-                    } label: {
-                        Label(
-                            NSLocalizedString("groupDetail.deleteAll", value: "すべて削除", comment: "Delete all button"),
-                            systemImage: "trash"
-                        )
+                    // 全選択ボタン
+                    FloatingButton(
+                        title: selectedPhotoIds.count == selectablePhotoIds.count
+                            ? NSLocalizedString("groupDetail.deselectAll", value: "全解除", comment: "Deselect all")
+                            : NSLocalizedString("groupDetail.selectAll", value: "全選択", comment: "Select all"),
+                        icon: selectedPhotoIds.count == selectablePhotoIds.count ? "square" : "checkmark.square.fill",
+                        color: Color.LightRoll.secondary
+                    ) {
+                        toggleSelectAll()
                     }
-                } label: {
-                    Image(systemName: "ellipsis.circle")
-                        .accessibilityLabel(NSLocalizedString("common.more", value: "その他", comment: "More button"))
-                }
-            }
-        }
-        #else
-        ToolbarItem(placement: .automatic) {
-            HStack(spacing: LRSpacing.sm) {
-                // 選択モードトグルボタン
-                if !isSelectionModeActive {
-                    Button {
-                        toggleSelectionMode()
-                    } label: {
-                        Text(NSLocalizedString("groupDetail.select", value: "選択", comment: "Select button"))
-                    }
-                } else {
-                    Button {
-                        toggleSelectionMode()
-                    } label: {
-                        Text(NSLocalizedString("common.done", value: "完了", comment: "Done button"))
-                    }
-                }
+                    .disabled(!isSelectionModeActive && photos.isEmpty)
 
-                // グループ全削除ボタン
-                Menu {
-                    Button(role: .destructive) {
+                    // 削除ボタン
+                    FloatingButton(
+                        title: NSLocalizedString("groupDetail.delete", value: "削除", comment: "Delete button"),
+                        icon: "trash.fill",
+                        color: Color.LightRoll.error
+                    ) {
                         Task {
-                            await checkDeletionLimitForAllPhotos()
+                            await checkDeletionLimitAndShowConfirmation()
                         }
-                    } label: {
-                        Label(
-                            NSLocalizedString("groupDetail.deleteAll", value: "すべて削除", comment: "Delete all button"),
-                            systemImage: "trash"
-                        )
                     }
-                } label: {
-                    Image(systemName: "ellipsis.circle")
-                        .accessibilityLabel(NSLocalizedString("common.more", value: "その他", comment: "More button"))
+                    .disabled(selectedPhotoIds.isEmpty)
                 }
+                .padding(.horizontal, LRSpacing.lg)
+                .padding(.vertical, LRSpacing.md)
+                .background(.ultraThinMaterial)
+                .clipShape(Capsule())
+                .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
             }
+            .padding(.horizontal, LRSpacing.lg)
+            .padding(.bottom, LRSpacing.xl)
         }
-        #endif
     }
 
     // MARK: - Computed Properties
@@ -760,6 +692,32 @@ public struct GroupDetailView: View {
 
             viewState = .loaded
         }
+    }
+}
+
+// MARK: - FloatingButton
+
+/// フローティングアクションボタン
+/// アイコンとテキストを縦に配置したコンパクトなボタン
+private struct FloatingButton: View {
+    let title: String
+    let icon: String
+    let color: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 2) {
+                Image(systemName: icon)
+                    .font(.system(size: 18, weight: .semibold))
+                Text(title)
+                    .font(.caption2)
+                    .fontWeight(.medium)
+            }
+            .foregroundStyle(color)
+            .frame(minWidth: 50)
+        }
+        .buttonStyle(.plain)
     }
 }
 

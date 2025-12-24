@@ -1556,3 +1556,51 @@
 - **テスト**: 14テスト全パス
 
 ---
+
+## 2025-12-24 完了（DisplaySettings統合）
+
+### DISPLAY-001: グリッド列数の統合
+- **完了日**: 2025-12-24
+- **セッション**: display-settings-integration-complete
+- **品質スコア**: 93点
+- **成果物**:
+  - GroupDetailView.swift: SettingsService統合
+  - TrashView.swift: SettingsService統合
+  - 設定画面のグリッド列数（2〜6列）を写真一覧に反映
+- **推定時間**: 2時間 → **実績**: 30分
+
+### DISPLAY-002: ファイルサイズ・撮影日表示の実装
+- **完了日**: 2025-12-24
+- **セッション**: display-settings-integration-complete
+- **品質スコア**: 93点
+- **成果物**:
+  - PhotoThumbnail.swift: 情報オーバーレイ追加
+  - PhotoGrid.swift: showFileSize/showDateパラメータ追加
+  - GroupDetailView.swift: DisplaySettings設定値をPhotoGridに渡す
+  - TrashView.swift: trashPhotoCellに情報オーバーレイ追加
+- **推定時間**: 3時間 → **実績**: 1時間
+
+### DISPLAY-003: 並び順の実装
+- **完了日**: 2025-12-24
+- **セッション**: display-settings-integration-complete
+- **品質スコア**: 93点
+- **成果物**:
+  - GroupDetailView.swift: applySortOrder()実装
+  - TrashView.swift: applySortOrderToTrash()実装
+  - SortOrderに基づくsorted(by:)実装
+  - .onChange(of:)でリアルタイム反映対応
+- **推定時間**: 2.5時間 → **実績**: 既存実装確認
+
+### DISPLAY-004: DisplaySettings統合テスト生成
+- **完了日**: 2025-12-24
+- **セッション**: display-settings-integration-complete
+- **品質スコア**: 93点
+- **成果物**:
+  - DisplaySettingsIntegrationTests.swift: 新規作成（25テストケース）
+  - グリッド列数テスト（8件）
+  - ファイルサイズ・撮影日テスト（6件）
+  - 並び順テスト（6件）
+  - 統合シナリオテスト（5件）
+- **推定時間**: 1.5時間 → **実績**: 1時間
+
+---

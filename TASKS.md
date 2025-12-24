@@ -4,57 +4,34 @@
 
 ---
 
-## 未完了タスク（3件）
+## 未完了タスク（8件）
 
-### DisplaySettings統合（優先度：v1.1対応） ✅ 完了
+### ゴミ箱バグ修正（優先度：Critical/High）
 
-- [x] **DISPLAY-001: グリッド列数の統合** ✅ 完了（2025-12-24）
-  - 目的：設定画面のグリッド列数を写真一覧に反映
-  - 実施内容：
-    - GroupDetailView.swiftにSettingsService統合
-    - TrashView.swiftにSettingsService統合
-    - PhotoGridのcolumnsパラメータを設定から取得
-  - 推定時間：2時間 → 実績：30分
+- [ ] **BUG-TRASH-002-P1A: RestorePhotosUseCase ID不一致修正**
+  - 目的：復元時のIDマッチング問題解決
+  - 推定時間：1.5時間
   - 担当：@spec-developer
-  - 詳細：docs/CRITICAL/DISPLAY_SETTINGS_ANALYSIS.md
-  - 品質スコア：93点（合格）
 
-- [x] **DISPLAY-002: ファイルサイズ・撮影日表示の実装** ✅ 完了（2025-12-24）
-  - 目的：写真サムネイルにファイルサイズと撮影日を表示
-  - 実施内容：
-    - PhotoThumbnailに情報表示オーバーレイ追加
-    - showFileSize/showDateフラグに基づく表示切り替え
-    - レイアウト調整とアクセシビリティ対応
-    - TrashViewにも同等機能を追加
-  - 推定時間：3時間 → 実績：1時間
+- [ ] **BUG-TRASH-002-P1B: Photos Frameworkコールバック問題修正**
+  - 目的：withCheckedContinuation二重resume防止
+  - 推定時間：1時間
   - 担当：@spec-developer
-  - 詳細：docs/CRITICAL/DISPLAY_SETTINGS_ANALYSIS.md
-  - 品質スコア：93点（合格）
 
-- [x] **DISPLAY-003: 並び順の実装** ✅ 完了（2025-12-24）
-  - 目的：設定画面の並び順を写真一覧に反映
-  - 実施内容：
-    - GroupDetailView.swiftにapplySortOrder()実装済み
-    - TrashView.swiftにapplySortOrderToTrash()実装済み
-    - SortOrderに基づくsorted(by:)実装完了
-    - .onChange(of:)でリアルタイム反映対応済み
-  - 推定時間：2.5時間 → 実績：実装済み（以前のセッションで完了）
+- [ ] **BUG-TRASH-002-P1C: SwiftUI環境オブジェクト未注入修正**
+  - 目的：SettingsService環境注入確認・修正
+  - 推定時間：0.5時間
   - 担当：@spec-developer
-  - 詳細：docs/CRITICAL/DISPLAY_SETTINGS_ANALYSIS.md
-  - 品質スコア：93点（合格）
 
-- [x] **DISPLAY-004: DisplaySettings統合テスト生成** ✅ 完了（2025-12-24）
-  - 目的：DisplaySettings統合のテスト生成
-  - 実施内容：
-    - DisplaySettingsIntegrationTests.swift作成（25テストケース）
-    - グリッド列数テスト（8件）：2〜6列、境界値
-    - ファイルサイズ・撮影日テスト（6件）：表示切り替え、フォーマット
-    - 並び順テスト（6件）：4種類のSortOrder
-    - 統合シナリオテスト（5件）：複合設定、エッジケース
-  - 推定時間：1.5時間 → 実績：1時間
-  - 担当：@spec-test-generator
-  - 詳細：docs/CRITICAL/DISPLAY_SETTINGS_ANALYSIS.md
-  - 品質スコア：93点（合格）
+- [ ] **BUG-TRASH-002-P2A: 非同期処理中のビュー破棄対策**
+  - 目的：復元中ビュー遷移でのクラッシュ防止
+  - 推定時間：1時間
+  - 担当：@spec-developer
+
+- [ ] **BUG-TRASH-001-P2B: ゴミ箱選択UX改善**
+  - 目的：タップで自動編集モード開始
+  - 推定時間：1時間
+  - 担当：@spec-developer
 
 ### M10リリース準備（優先度：高）
 
@@ -85,9 +62,9 @@
 
 | 項目 | 値 |
 |------|-----|
-| 全体進捗 | 98%（157/160タスク完了） |
+| 全体進捗 | 95%（157/165タスク完了） |
 | 完了時間 | 254.5h |
-| 残作業時間 | 9h |
+| 残作業時間 | 15.5h（BUG修正6.5h + M10リリース9h） |
 | 品質スコア平均 | 92点 |
 
 ### 直近の品質スコア
@@ -106,13 +83,23 @@
 
 ### 推奨順序（優先度順）
 
-1. **M10-T04: App Store Connect設定**（3h）
-2. **M10-T05: TestFlight配信**（2h）
-3. **M10-T06: 最終ビルド・審査提出**（4h）
+#### Phase 1: クラッシュ修正（最優先、3h）
+1. **BUG-TRASH-002-P1A**: RestorePhotosUseCase ID不一致修正（1.5h）
+2. **BUG-TRASH-002-P1B**: Photos Frameworkコールバック問題修正（1h）
+3. **BUG-TRASH-002-P1C**: SwiftUI環境オブジェクト未注入修正（0.5h）
+
+#### Phase 2: UX改善（2h）
+4. **BUG-TRASH-002-P2A**: 非同期処理中のビュー破棄対策（1h）
+5. **BUG-TRASH-001-P2B**: ゴミ箱選択UX改善（1h）
+
+#### Phase 3: M10リリース準備（9h）
+6. **M10-T04**: App Store Connect設定（3h）
+7. **M10-T05**: TestFlight配信（2h）
+8. **M10-T06**: 最終ビルド・審査提出（4h）
 
 ### 期待される成果
-- App Store Connectメタデータ登録完了
-- TestFlightでのベータテスト実施
+- ゴミ箱機能のクラッシュ完全解消
+- ゴミ箱選択UXの直感化
 - App Store審査提出準備完了
 - プロジェクト100%完了
 
@@ -120,14 +107,10 @@
 
 ## アーカイブ情報
 
-完了タスク（148件）は `docs/archive/TASKS_COMPLETED.md` に移動済み
+完了タスク（157件）は `docs/archive/TASKS_COMPLETED.md` に移動済み
 
 ### 直近アーカイブ済みタスク（2025-12-24）
-- DISPLAY-004: DisplaySettings統合テスト生成（25テストケース）
-- DISPLAY-003: 並び順実装（コード確認済み）
-- DISPLAY-002: ファイルサイズ・撮影日表示（ビルド成功）
-- DISPLAY-001: グリッド列数統合（ビルド成功）
-- SETTINGS-001: 分析設定→SimilarityAnalyzer連携（ビルド成功）
-- SETTINGS-002: 通知設定→NotificationManager統合（ビルド成功）
-- UX-001: 戻るボタン二重表示修正（90点）
-- BUG-001 Phase 1/2: 自動スキャン設定同期（88点→90点）
+- DISPLAY-001〜004: DisplaySettings統合（品質スコア93点）
+- SETTINGS-001/002: 設定ページ統合（品質スコア95点）
+
+*詳細は `docs/archive/TASKS_COMPLETED.md` を参照*

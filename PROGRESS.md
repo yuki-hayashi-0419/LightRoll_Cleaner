@@ -4,6 +4,54 @@
 
 ---
 
+## セッション30：bug-analysis-trash-issues（2025-12-24）完了
+
+### セッション概要
+- **セッションID**: bug-analysis-trash-issues
+- **目的**: ゴミ箱機能のバグ分析・修正計画策定
+- **品質スコア**: N/A（分析・計画フェーズ）
+- **終了理由**: 分析完了、修正計画策定完了
+- **担当**: @spec-architect
+
+### 実施内容
+
+#### 1. グループ詳細ページUI/UX改善 ✅
+- **修正内容**: タイトルが固定され、右下に使いやすいボタンを配置
+- **対象**: GroupDetailView.swift
+
+#### 2. ゴミ箱問題分析 ✅
+
+| 問題ID | 問題名 | 影響度 |
+|--------|--------|--------|
+| BUG-TRASH-001 | ゴミ箱での写真選択問題 | Medium |
+| BUG-TRASH-002 | 復元操作時のクラッシュ問題 | Critical |
+
+**特定された根本原因**:
+- P1-A: RestorePhotosUseCaseでのID不一致問題
+- P1-B: Photos Frameworkコールバック複数呼び出し問題（withCheckedContinuation）
+- P1-C: SwiftUI環境オブジェクト未注入
+- P2-A: 非同期処理中のビュー破棄対策
+- P2-B: ゴミ箱選択UX改善（タップで自動編集モード開始）
+
+#### 3. 修正計画策定 ✅
+- **計画書**: docs/CRITICAL/BUG_FIX_PLAN_TRASH_ISSUES.md
+- **推定工数**: 6.5時間（Phase 1: 3h、Phase 2: 2h、Phase 3: 1h、Phase 4: 0.5h）
+
+### 成果物
+| ファイル | 内容 |
+|----------|------|
+| BUG_FIX_PLAN_TRASH_ISSUES.md | 修正計画書（詳細手順・テスト計画・チェックリスト含む） |
+
+### 全体進捗
+- **進捗率**: 98%（157/160タスク完了）
+- **残りタスク**: M10リリース準備3件（9h）+ BUG修正5件（6.5h）
+
+### 次回セッション推奨
+**優先Option A**: BUG修正計画実装（Phase 1: クラッシュ修正 3h）
+**代替Option B**: M10リリース準備（App Store Connect設定）
+
+---
+
 ## セッション29：display-settings-integration-complete（2025-12-24）完了
 
 ### セッション概要
