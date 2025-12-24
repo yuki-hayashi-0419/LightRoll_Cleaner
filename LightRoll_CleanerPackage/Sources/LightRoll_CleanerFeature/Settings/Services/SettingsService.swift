@@ -163,6 +163,61 @@ public final class SettingsService: Sendable {
         lastError = nil
     }
 
+    // MARK: - Analysis Integration (SETTINGS-001)
+
+    /// 現在の分析設定からSimilarityAnalysisOptionsを生成
+    ///
+    /// SimilarityAnalyzerを初期化する際に使用します。
+    /// ユーザーが設定画面で変更した分析設定が反映されます。
+    ///
+    /// - Returns: 現在の分析設定に基づくSimilarityAnalysisOptions
+    public var currentSimilarityAnalysisOptions: SimilarityAnalysisOptions {
+        settings.analysisSettings.toSimilarityAnalysisOptions()
+    }
+
+    /// 現在の設定でSimilarityAnalyzerを生成
+    ///
+    /// 新しいSimilarityAnalyzerインスタンスを現在のユーザー設定で生成します。
+    /// 分析処理を開始する前に呼び出してください。
+    ///
+    /// - Returns: 現在の設定で初期化されたSimilarityAnalyzer
+    public func createSimilarityAnalyzer() -> SimilarityAnalyzer {
+        return SimilarityAnalyzer(options: currentSimilarityAnalysisOptions)
+    }
+
+    // MARK: - Notification Integration (SETTINGS-002)
+
+    /// 通知設定をNotificationManagerに同期
+    ///
+    /// SettingsServiceで管理される通知設定をNotificationManagerに反映します。
+    /// 設定画面での変更がNotificationManagerに正しく反映されるように、
+    /// この関数を通知設定変更後に呼び出してください。
+    ///
+    /// - Parameter notificationManager: 同期先のNotificationManager
+    public func syncNotificationSettings(to notificationManager: NotificationManager) {
+        notificationManager.syncSettings(from: self)
+    }
+
+    /// 通知設定を更新し、NotificationManagerにも同期
+    ///
+    /// 通知設定を更新すると同時に、指定されたNotificationManagerにも反映します。
+    /// これにより、設定の二重管理を防ぎ、一貫性を保ちます。
+    ///
+    /// - Parameters:
+    ///   - notificationSettings: 新しい通知設定
+    ///   - notificationManager: 同期先のNotificationManager
+    /// - Throws: SettingsError（バリデーション失敗時）
+    public func updateNotificationSettings(
+        _ notificationSettings: NotificationSettings,
+        syncTo notificationManager: NotificationManager
+    ) throws {
+        // 通常の更新処理
+        try updateNotificationSettings(notificationSettings)
+
+        // NotificationManagerに同期
+        notificationManager.syncSettings(from: self)
+    }
+
     // MARK: - Private Methods
 
     /// 設定を保存

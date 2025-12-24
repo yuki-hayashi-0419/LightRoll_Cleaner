@@ -38,6 +38,9 @@ public struct NotificationSettingsView: View {
     /// 設定サービス
     @Environment(SettingsService.self) private var settingsService
 
+    /// 通知マネージャー（SETTINGS-002対応: 設定変更をNotificationManagerに反映）
+    @Environment(NotificationManager.self) private var notificationManager
+
     // MARK: - State
 
     /// 通知有効フラグ（ローカルステート）
@@ -389,6 +392,8 @@ public struct NotificationSettingsView: View {
     }
 
     /// 設定を保存
+    ///
+    /// SETTINGS-002対応: NotificationManagerにも設定を同期
     private func saveSettings() {
         let newSettings = NotificationSettings(
             isEnabled: isEnabled,
@@ -402,7 +407,8 @@ public struct NotificationSettingsView: View {
         )
 
         do {
-            try settingsService.updateNotificationSettings(newSettings)
+            // SettingsServiceとNotificationManagerの両方に設定を反映
+            try settingsService.updateNotificationSettings(newSettings, syncTo: notificationManager)
         } catch let error as SettingsError {
             errorMessage = error.localizedDescription
             showErrorAlert = true
@@ -422,6 +428,7 @@ public struct NotificationSettingsView: View {
     NavigationStack {
         NotificationSettingsView()
             .environment(SettingsService())
+            .environment(NotificationManager())
     }
 }
 
@@ -443,6 +450,7 @@ public struct NotificationSettingsView: View {
     return NavigationStack {
         NotificationSettingsView()
             .environment(service)
+            .environment(NotificationManager())
     }
 }
 
@@ -464,6 +472,7 @@ public struct NotificationSettingsView: View {
     return NavigationStack {
         NotificationSettingsView()
             .environment(service)
+            .environment(NotificationManager())
     }
 }
 
@@ -485,6 +494,7 @@ public struct NotificationSettingsView: View {
     return NavigationStack {
         NotificationSettingsView()
             .environment(service)
+            .environment(NotificationManager())
     }
 }
 
@@ -506,6 +516,7 @@ public struct NotificationSettingsView: View {
     return NavigationStack {
         NotificationSettingsView()
             .environment(service)
+            .environment(NotificationManager())
     }
 }
 
@@ -527,6 +538,7 @@ public struct NotificationSettingsView: View {
     return NavigationStack {
         NotificationSettingsView()
             .environment(service)
+            .environment(NotificationManager())
     }
     .preferredColorScheme(.dark)
 }
@@ -549,5 +561,6 @@ public struct NotificationSettingsView: View {
     return NavigationStack {
         NotificationSettingsView()
             .environment(service)
+            .environment(NotificationManager())
     }
 }

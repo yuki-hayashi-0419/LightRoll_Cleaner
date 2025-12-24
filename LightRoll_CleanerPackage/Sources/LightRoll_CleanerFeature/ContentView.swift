@@ -47,6 +47,9 @@ public struct ContentView: View {
     /// 削除確認サービス
     @State private var confirmationService: DeletionConfirmationService
 
+    /// 通知マネージャー（SettingsView用）
+    @State private var notificationManager = NotificationManager()
+
     /// バックグラウンドスキャンマネージャー
     private let backgroundScanManager = BackgroundScanManager.shared
 
@@ -193,6 +196,7 @@ public struct ContentView: View {
                 .environment(settingsPermissionManager)
                 .environment(premiumManager)
                 .environment(trashManager)
+                .environment(notificationManager)
             }
         }
         .onChange(of: settingsService.settings.scanSettings.autoScanEnabled) { _, newValue in

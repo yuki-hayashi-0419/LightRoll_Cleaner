@@ -297,7 +297,59 @@
 
 ## SwiftUI関連
 
-（エラー発生時に追記）
+### ERR-ENV-001: SwiftUI環境オブジェクト未注入によるクラッシュ
+- **発生日**: 2025-12-24
+- **エラーメッセージ**:
+  ```
+  Fatal error: No observable object of type NotificationManager found.
+  A View.environment(_:) for NotificationManager may be missing as an ancestor of this view.
+  ```
+
+- **症状**:
+  - 設定画面を開こうとするとアプリがクラッシュ
+  - 特定のsheet表示時のみ発生
+
+- **根本原因**:
+  SwiftUIの`.sheet(isPresented:)`で表示されるビューは、親ビューの環境オブジェクトを**自動的に継承しない**。
+  子ビューが`@Environment(NotificationManager.self)`で環境オブジェクトを参照している場合、
+  sheet表示時に明示的に`.environment()`で注入しないとクラッシュする。
+
+- **問題のコード（修正前）**:
+  ```swift
+  // ContentView.swift（修正前）
+  .sheet(isPresented: $isShowingSettings) {
+      SettingsView()  // SettingsViewはNotificationManagerを@Environmentで参照
+  }
+  ```
+
+- **解決策**:
+  ```swift
+  // ContentView.swift（修正後）
+  .sheet(isPresented: $isShowingSettings) {
+      SettingsView()
+          .environment(notificationManager)  // 明示的に環境オブジェクトを注入
+  }
+  ```
+
+- **検証結果**:
+  - 実機ビルド成功
+  - 実機デプロイ成功
+  - 設定画面正常表示確認
+
+- **関連ファイル**:
+  - `/LightRoll_CleanerPackage/Sources/LightRoll_CleanerFeature/Views/ContentView.swift`
+  - `/LightRoll_CleanerPackage/Sources/LightRoll_CleanerFeature/Settings/Views/SettingsView.swift`
+  - `/LightRoll_CleanerPackage/Sources/LightRoll_CleanerFeature/Settings/Views/NotificationSettingsView.swift`
+
+- **教訓**:
+  - `.sheet()`、`.fullScreenCover()`、`.popover()`などのモーダル表示では環境オブジェクトは自動継承されない
+  - 子ビューが必要とするすべての環境オブジェクトを明示的に`.environment()`で渡す必要がある
+  - 新しいビューを追加する際は、そのビューが参照する環境オブジェクトを確認し、親ビューで注入されているか確認すること
+  - テスト時は、sheet表示のケースも必ず実機で確認すること
+
+- **品質スコア**: 95点（合格）
+
+---
 
 ---
 
@@ -313,3 +365,4 @@
 |------|----------|--------|
 | 2025-11-27 | 初期テンプレート作成 | - |
 | 2025-12-22 | ERR-DATA-001: ゴミ箱fileSize=0マイグレーション不足問題を追加 | @spec-orchestrator |
+| 2025-12-24 | ERR-ENV-001: SwiftUI環境オブジェクト未注入によるクラッシュを追加 | @spec-orchestrator |

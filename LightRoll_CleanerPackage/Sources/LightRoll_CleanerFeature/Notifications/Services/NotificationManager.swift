@@ -224,6 +224,21 @@ public final class NotificationManager: Sendable {
         lastError = nil
     }
 
+    /// SettingsServiceから通知設定を同期（SETTINGS-002対応）
+    ///
+    /// SettingsServiceで管理されるNotificationSettingsを
+    /// NotificationManagerに反映します。
+    /// これによりSettingsViewでの設定変更がNotificationManagerに正しく反映されます。
+    ///
+    /// - Parameter settingsService: 設定サービス
+    public func syncSettings(from settingsService: SettingsService) {
+        let newSettings = settingsService.settings.notificationSettings
+        if newSettings.isValid {
+            settings = newSettings
+            lastError = nil
+        }
+    }
+
     // MARK: - Notification Scheduling
 
     /// 通知をスケジュール

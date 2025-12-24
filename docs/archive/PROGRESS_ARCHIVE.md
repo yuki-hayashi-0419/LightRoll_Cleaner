@@ -4,6 +4,83 @@
 
 ---
 
+## アーカイブ: 2025-12-24 context-optimization-004 実行時
+
+以下のエントリは context-optimization-004 実行時（セッション24終了後）のコンテキスト最適化でアーカイブされました。
+（PROGRESS.md 10セッション → 4セッション、セッション16〜20を移動）
+
+---
+
+### 2025-12-24 セッション20: bug-fixes-phase2-test-validation（アーカイブ）
+
+**セッション概要**:
+- セッションID: bug-fixes-phase2-test-validation
+- 目的: BUG-001/BUG-002 Phase 2 E2Eテスト生成・検証
+- 品質スコア: 85点（条件付き合格）
+
+**実施内容**:
+- BUG-001 Phase 2 E2Eテスト生成（16件）
+- BUG-002 Phase 2 E2E統合テスト生成（17件）
+- 既存テストファイルのエラー修正（部分完了）
+
+---
+
+### 2025-12-24 セッション19: bug-fixes-phase2-completion（アーカイブ）
+
+**セッション概要**:
+- セッションID: bug-fixes-phase2-completion
+- 目的: BUG-001/BUG-002 Phase 2完了
+- 品質スコア: BUG-001: 90点、BUG-002: 95点
+
+**実施内容**:
+- BackgroundScanManager強化（OSLog、リトライ機構）
+- PhotoFilteringService強化（エラー型、バリデーション付きAPI）
+- E2Eテスト18件追加
+
+---
+
+### 2025-12-23 セッション18: bug-001-phase1-foundation（アーカイブ）
+
+**セッション概要**:
+- セッションID: bug-001-phase1-foundation
+- 目的: BUG-001 自動スキャン設定同期修正（基盤実装）
+- 品質スコア: 82点（条件付き合格）
+
+**実施内容**:
+- BackgroundScanManager.swift syncSettings()メソッド追加
+- ContentView.swift .onChange監視、.task初期化
+- テストケース生成（12件）
+
+---
+
+### 2025-12-23 セッション17: bug-002-foundation-implementation（アーカイブ）
+
+**セッション概要**:
+- セッションID: bug-002-foundation-implementation
+- 目的: BUG-002 スキャン設定→グルーピング変換基盤構築
+- 品質スコア: 92点（合格）
+
+**実施内容**:
+- PhotoFilteringService.swift新規作成（289行）
+- SimilarityAnalyzer.swift、PhotoGrouper.swift統合
+- テストケース生成（33件）
+
+---
+
+### 2025-12-23 セッション16: ux-001-back-button-fix（アーカイブ）
+
+**セッション概要**:
+- セッションID: ux-001-back-button-fix
+- 目的: UX-001 NavigationStack戻るボタン二重表示修正
+- 品質スコア: 90点（合格）
+
+**実施内容**:
+- GroupListView.swift、GroupDetailView.swiftからカスタムバックボタン削除
+- DashboardNavigationContainer.swift修正
+- テストケース作成（18件）
+
+---
+
 ## アーカイブ: 2025-12-23 context-optimization-003 実行時
 
 以下のエントリは context-optimization-003 実行時（セッション18終了後）のコンテキスト最適化でアーカイブされました。

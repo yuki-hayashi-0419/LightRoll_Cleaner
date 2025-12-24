@@ -136,6 +136,24 @@ extension AnalysisSettings {
             throw SettingsError.invalidMinGroupSize
         }
     }
+
+    /// SimilarityAnalysisOptionsへの変換
+    ///
+    /// SettingsServiceで管理されるAnalysisSettingsを
+    /// SimilarityAnalyzerで使用するSimilarityAnalysisOptionsに変換します。
+    /// これによりユーザー設定がSimilarityAnalyzerに正しく反映されます。
+    ///
+    /// SETTINGS-001: 分析設定→SimilarityAnalyzer連携
+    ///
+    /// - Returns: SimilarityAnalysisOptions
+    public func toSimilarityAnalysisOptions() -> SimilarityAnalysisOptions {
+        return SimilarityAnalysisOptions(
+            similarityThreshold: similarityThreshold,
+            minGroupSize: minGroupSize,
+            batchSize: 100,  // デフォルト値を使用
+            maxConcurrentOperations: 4  // デフォルト値を使用
+        )
+    }
 }
 
 // MARK: - NotificationSettings

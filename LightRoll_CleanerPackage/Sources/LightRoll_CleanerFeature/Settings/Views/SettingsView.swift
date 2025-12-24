@@ -35,6 +35,9 @@ public struct SettingsView: View {
     /// ゴミ箱マネージャー（@Environment経由で注入）
     @Environment(TrashManager.self) private var trashManager
 
+    /// 通知マネージャー（SETTINGS-002対応: NotificationSettingsViewに渡す）
+    @Environment(NotificationManager.self) private var notificationManager
+
     // MARK: - Dependencies
 
     /// 写真削除ユースケース
@@ -328,6 +331,7 @@ public struct SettingsView: View {
             NavigationLink {
                 NotificationSettingsView()
                     .environment(settingsService)
+                    .environment(notificationManager)
             } label: {
                 HStack {
                     SettingsRow(
@@ -621,6 +625,7 @@ public struct SettingsView: View {
     .environment(PermissionManager())
     .environment(premiumManager)
     .environment(trashManager)
+    .environment(NotificationManager())
 }
 
 #Preview("自動スキャン有効") {
@@ -655,4 +660,5 @@ public struct SettingsView: View {
     .environment(PermissionManager())
     .environment(premiumManager)
     .environment(trashManager)
+    .environment(NotificationManager())
 }

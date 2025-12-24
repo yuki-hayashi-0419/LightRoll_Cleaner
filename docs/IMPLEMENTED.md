@@ -7,6 +7,47 @@
 
 ## 最新情報（2025-12-24）
 
+### 設定統合完了・実機デプロイ成功・クラッシュ修正: SETTINGS-001 & SETTINGS-002
+
+**セッション**: settings-integration-deploy-001（セッション24）
+**総合スコア**: 95点（両タスク合格）
+
+**実機デプロイ**:
+- **デバイス**: YH iPhone 15 Pro Max
+- **状態**: インストール成功、正常動作確認済み
+
+**クラッシュ修正**:
+- **問題**: 設定画面を開くとクラッシュ
+- **原因**: ContentViewでNotificationManager環境オブジェクト未注入
+- **解決**: ContentView.swiftの.sheet内に.environment(notificationManager)追加
+- **教訓**: SwiftUIのsheet表示時は、子ビューが必要とするすべての環境オブジェクトを注入する必要がある
+
+**セッション**: settings-integration-001（セッション23）
+**総合スコア**: 95点（両タスク合格）
+
+**ユーザーが出来るようになったこと**:
+- **分析設定の反映**: 設定画面で変更した類似度閾値・最小グループサイズが、実際の類似写真分析処理に反映されるようになりました
+- **通知設定の同期**: 設定画面で変更した通知ON/OFF・静寂時間帯設定が、NotificationManagerに即座に反映されるようになりました
+
+**SETTINGS-001: 分析設定→SimilarityAnalyzer連携**
+- **修正ファイル**: UserSettings.swift, SettingsService.swift
+- **追加機能**:
+  - `AnalysisSettings.toSimilarityAnalysisOptions()`: ユーザー設定をSimilarityAnalysisOptionsに変換
+  - `SettingsService.currentSimilarityAnalysisOptions`: 現在の分析設定を取得
+  - `SettingsService.createSimilarityAnalyzer()`: 現在の設定でAnalyzerを生成
+
+**SETTINGS-002: 通知設定→NotificationManager統合**
+- **修正ファイル**: NotificationManager.swift, SettingsService.swift, NotificationSettingsView.swift, SettingsView.swift
+- **追加機能**:
+  - `NotificationManager.syncSettings(from:)`: SettingsServiceから設定を同期
+  - `SettingsService.syncNotificationSettings(to:)`: NotificationManagerへ設定を反映
+  - `SettingsService.updateNotificationSettings(_:syncTo:)`: 設定更新と同期を一括実行
+  - NotificationSettingsView/SettingsViewにNotificationManager環境オブジェクト追加
+
+**ビルド結果**: 成功（警告のみ、エラーなし）
+
+---
+
 ### 実機デプロイ完了（最新版配信成功）
 
 **ユーザーが出来るようになったこと**:
@@ -18,26 +59,26 @@
 
 ---
 
-### 設定ページ機能調査完了
+### 設定ページ機能調査完了 → **全機能統合完了**
 
-**調査結果**:
+**最終状態**:
 
 | 設定項目 | 実装状態 | 動作状況 |
 |----------|----------|----------|
 | スキャン設定 | 完全実装・統合済み | **正常動作** |
 | 表示設定 | 完全実装・統合済み | **正常動作** |
-| 分析設定 | UI実装済み | 未接続（v1.1で対応予定） |
-| 通知設定 | UI・ロジック実装済み | 未統合（v1.1で対応予定） |
+| 分析設定 | 完全実装・統合済み | **正常動作**（SETTINGS-001完了） |
+| 通知設定 | 完全実装・統合済み | **正常動作**（SETTINGS-002完了） |
 
 **v1.0リリース時の機能**:
 - スキャン設定: 完全動作
 - 表示設定: 完全動作
-- 分析設定: UI表示のみ（設定変更は反映されない）
-- 通知設定: UI表示のみ（通知は発行されない）
+- 分析設定: 完全動作（SimilarityAnalyzer連携済み）
+- 通知設定: 完全動作（NotificationManager統合済み）
 
-**v1.1で対応予定**:
-- 分析設定のSimilarityAnalyzer連携（2時間）
-- 通知設定のNotificationManager統合（1.5時間）
+~~**v1.1で対応予定**:~~
+~~- 分析設定のSimilarityAnalyzer連携（2時間）~~ → **完了**
+~~- 通知設定のNotificationManager統合（1.5時間）~~ → **完了**
 
 ---
 
