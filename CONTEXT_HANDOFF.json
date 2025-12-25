@@ -1,51 +1,152 @@
 {
-  "version": "3.83",
+  "version": "3.84",
   "lastUpdated": "2025-12-25",
 
   "session_metadata": {
-    "session_id": "monetization-phase1-integration",
-    "started_at": "2025-12-25T13:00:00+09:00",
-    "ended_at": "2025-12-25T14:30:00+09:00",
+    "session_id": "performance-bottleneck-analysis-planning",
+    "started_at": "2025-12-25T15:00:00+09:00",
+    "ended_at": "2025-12-25T17:30:00+09:00",
     "status": "completed",
     "documents_updated": [
       "PROGRESS.md",
       "CONTEXT_HANDOFF.json",
-      "ContentView.swift",
-      "HomeView.swift",
-      "GroupDetailView.swift",
-      "ProductIdentifiers.swift",
-      "PurchaseRepository.swift"
+      "docs/PERFORMANCE_OPTIMIZATION_PLAN.md",
+      "docs/PHASE1_IMPLEMENTATION_GUIDE.md",
+      "docs/PHASE2_IMPLEMENTATION_GUIDE.md",
+      "docs/PHASE3_IMPLEMENTATION_GUIDE.md"
     ],
-    "session_closure": "マネタイズPhase 1統合完了、実機デプロイ成功"
+    "session_closure": "パフォーマンスボトルネック分析完了、3段階実装計画策定完了"
   },
 
   "contextOptimization": {
-    "lastOptimization": "2025-12-25T14:30:00+09:00",
-    "optimizationId": "context-optimization-008",
-    "progressEntries": 12,
+    "lastOptimization": "2025-12-25T17:30:00+09:00",
+    "optimizationId": "context-optimization-009",
+    "progressEntries": 13,
     "maxProgressEntries": 12,
     "archivedSessions": "Session 1-21 (21 sessions)",
-    "archivedTasks": "168件 → TASKS_COMPLETED.md",
+    "archivedTasks": "171件 → TASKS_COMPLETED.md",
     "contextHealth": "良好",
     "estimatedSizeReduction": "約80KB",
-    "nextOptimizationTrigger": "13セッション到達時",
-    "currentProgressSize": "約750行（セッション22-32）",
+    "nextOptimizationTrigger": "14セッション到達時",
+    "currentProgressSize": "約850行（セッション22-33）",
     "archiveThreshold": "12セッション または 600行超過時",
-    "lastAction": "セッション32追加、マネタイズPhase 1統合・実機デプロイ完了"
+    "lastAction": "セッション33追加、パフォーマンスボトルネック分析・実装計画策定完了"
   },
 
   "current_phase": {
-    "phase_name": "マネタイズPhase 1統合完了 → 手動テスト または App Store Connect設定",
+    "phase_name": "パフォーマンス最適化Phase 1実装 または マネタイズ手動テスト",
     "progress_percentage": "98%",
-    "description": "ScanLimitManager/AdInterstitialManager統合完了、実機デプロイ成功。次は手動テストまたはApp Store Connect製品登録。"
+    "description": "115GB/100,000枚で60-80分のパフォーマンス問題を特定。7つのボトルネック分析完了、3段階最適化計画（204時間）を策定。Phase 1で50%改善見込み。"
   },
 
   "projectStatus": {
-    "phase": "マネタイズPhase 1統合完了 → テスト待ち",
-    "currentPhase": "主要マネタイズ機能統合完了。手動テストまたはApp Store Connect設定待ち。",
+    "phase": "パフォーマンス最適化計画完了 → 実装待ち",
+    "currentPhase": "ボトルネック分析・実装計画策定完了。次はPhase 1実装（A1: groupDuplicates並列化）またはマネタイズ手動テスト。",
     "overallProgress": "98%",
-    "nextMilestone": "手動テスト（スキャン制限・広告表示）またはApp Store Connect製品登録（3h）",
-    "majorAchievement": "ScanLimitManager統合、AdInterstitialManager統合、コンパイルエラー修正、実機デプロイ成功"
+    "nextMilestone": "パフォーマンス最適化Phase 1実装（44h）またはマネタイズ手動テスト（1h）",
+    "majorAchievement": "7つのボトルネック特定、3段階最適化計画策定（204時間）、4つの詳細ドキュメント作成"
+  },
+
+  "performanceOptimization": {
+    "status": "planning_complete",
+    "currentPerformance": {
+      "dataSize": "115GB",
+      "photoCount": "100,000枚",
+      "processingTime": "60-80分",
+      "target": "1TBでも数分"
+    },
+    "bottlenecks": [
+      {
+        "rank": 1,
+        "name": "getFileSizes()の繰り返し呼び出し",
+        "impact": "40%",
+        "phase": 1
+      },
+      {
+        "rank": 2,
+        "name": "PHAsset.getFileSize()のI/Oコスト",
+        "impact": "25%",
+        "phase": 2
+      },
+      {
+        "rank": 3,
+        "name": "重複検出の逐次処理",
+        "impact": "15%",
+        "phase": 1
+      },
+      {
+        "rank": 4,
+        "name": "LSHHasherの非効率",
+        "impact": "10%",
+        "phase": 2
+      },
+      {
+        "rank": 5,
+        "name": "大容量動画の逐次処理",
+        "impact": "5%",
+        "phase": 3
+      },
+      {
+        "rank": 6,
+        "name": "UserDefaultsの使用",
+        "impact": "3%",
+        "phase": 3
+      }
+    ],
+    "phases": [
+      {
+        "phase": 1,
+        "name": "クイック修正",
+        "estimatedDays": 5.5,
+        "estimatedHours": 44,
+        "expectedImprovement": "50%",
+        "tasks": ["A1: groupDuplicates並列化（10h）", "A2: ファイルサイズキャッシュ（8h）", "A3: バッチ処理最適化（18h）", "A4: メモリ最適化（8h）"]
+      },
+      {
+        "phase": 2,
+        "name": "中規模改善",
+        "estimatedDays": 9,
+        "estimatedHours": 72,
+        "expectedImprovement": "追加30%",
+        "tasks": ["B1: 並列I/O（16h）", "B2: LSH最適化（20h）", "B3: インデックス最適化（20h）", "B4: 進捗報告最適化（16h）"]
+      },
+      {
+        "phase": 3,
+        "name": "大規模改修",
+        "estimatedDays": 11,
+        "estimatedHours": 88,
+        "expectedImprovement": "追加15%",
+        "tasks": ["C1: 動画並列処理（32h）", "C2: SwiftData移行（40h）", "C3: インクリメンタルスキャン（16h）"]
+      }
+    ],
+    "documentation": [
+      {
+        "name": "PERFORMANCE_OPTIMIZATION_PLAN.md",
+        "location": "docs/",
+        "size": "11.6KB",
+        "content": "全体ロードマップ・工数見積もり"
+      },
+      {
+        "name": "PHASE1_IMPLEMENTATION_GUIDE.md",
+        "location": "docs/",
+        "size": "22.6KB",
+        "content": "Phase 1詳細設計（A1-A4）"
+      },
+      {
+        "name": "PHASE2_IMPLEMENTATION_GUIDE.md",
+        "location": "docs/",
+        "size": "27.1KB",
+        "content": "Phase 2詳細設計（B1-B4）"
+      },
+      {
+        "name": "PHASE3_IMPLEMENTATION_GUIDE.md",
+        "location": "docs/",
+        "size": "41.5KB",
+        "content": "Phase 3詳細設計（C1-C3）"
+      }
+    ],
+    "totalEstimatedHours": 204,
+    "totalEstimatedDays": 25.5
   },
 
   "monetizationStatus": {
@@ -66,95 +167,25 @@
         "status": "enhanced",
         "files": ["GroupDetailView.swift"],
         "description": "値プロポジション追加（残り重複数・削減可能容量）"
-      },
-      "ProductIdentifiers": {
-        "status": "fixed",
-        "changes": "subscriptionPeriodをOptional型に変更"
-      },
-      "PurchaseRepository": {
-        "status": "fixed",
-        "changes": "switch文に.noneケース追加"
       }
     },
-    "components": [
-      {
-        "name": "ScanLimitManager",
-        "file": "ScanLimitManager.swift",
-        "status": "integrated",
-        "purpose": "初回スキャンのみ許可（Freeユーザー）"
-      },
-      {
-        "name": "PremiumManager",
-        "file": "PremiumManager.swift",
-        "status": "modified",
-        "changes": "日次削除制限 → 生涯削除制限（50枚）"
-      },
-      {
-        "name": "LimitReachedSheet",
-        "file": "LimitReachedSheet.swift",
-        "status": "integrated",
-        "features": [
-          "価値訴求カード（削除済み・残り重複・解放可能ストレージ）",
-          "7日間無料トライアルCTA",
-          "3プラン比較表示（年額推奨）",
-          "Premiumプラン特典表示"
-        ]
-      },
-      {
-        "name": "AdInterstitialManager",
-        "file": "AdInterstitialManager.swift",
-        "status": "integrated",
-        "features": [
-          "削除後インタースティシャル広告",
-          "セッション制限（1回/セッション）",
-          "時間制限（30分間隔）"
-        ]
-      },
-      {
-        "name": "ProductIdentifiers",
-        "file": "ProductIdentifiers.swift",
-        "status": "fixed",
-        "products": [
-          {
-            "id": "monthly_premium",
-            "price": "$3/month",
-            "trial": "7 days"
-          },
-          {
-            "id": "yearly_premium",
-            "price": "$20/year",
-            "discount": "50%"
-          },
-          {
-            "id": "lifetime_premium",
-            "price": "$30",
-            "type": "one-time"
-          }
-        ]
-      }
-    ],
-    "documentation": [
-      {
-        "name": "MONETIZATION_INTEGRATION.md",
-        "location": "docs/CRITICAL/",
-        "content": "統合手順、コード例、テスト手順、トラブルシューティング"
-      },
-      {
-        "name": "APP_STORE_CONNECT_SETUP.md",
-        "location": "docs/CRITICAL/",
-        "content": "3製品登録、7日間無料トライアル設定、価格設定、審査提出準備"
-      }
-    ],
     "nextSteps": [
       "手動テスト（スキャン制限、削除後広告、値プロポジション）",
       "プレミアム購入画面への遷移実装",
-      "App Store Connect製品登録（APP_STORE_CONNECT_SETUP.md参照）",
-      "Firebase Analytics統合（Phase 2）",
-      "A/Bテスト機能実装（Phase 2）"
+      "App Store Connect製品登録（APP_STORE_CONNECT_SETUP.md参照）"
     ]
   },
 
   "discovered_issues": [
+    {
+      "issue_id": "PERF-001",
+      "title": "115GB/100,000枚で60-80分のパフォーマンス問題",
+      "severity": "Critical",
+      "status": "planning_complete",
+      "discovered_at": "2025-12-25",
+      "solution": "3段階最適化計画策定済み（204時間）",
+      "estimated_hours": 204
+    },
     {
       "issue_id": "BUG-TRASH-001",
       "title": "ゴミ箱での写真選択問題",
@@ -198,44 +229,33 @@
 
   "completedTasks": [
     {
+      "taskId": "PERFORMANCE-ANALYSIS-PLANNING",
+      "title": "パフォーマンスボトルネック分析・実装計画策定",
+      "completedAt": "2025-12-25",
+      "components": [
+        "docs/PERFORMANCE_OPTIMIZATION_PLAN.md（11.6KB）",
+        "docs/PHASE1_IMPLEMENTATION_GUIDE.md（22.6KB）",
+        "docs/PHASE2_IMPLEMENTATION_GUIDE.md（27.1KB）",
+        "docs/PHASE3_IMPLEMENTATION_GUIDE.md（41.5KB）"
+      ],
+      "result": "7つのボトルネック特定、3段階最適化計画策定（204時間）"
+    },
+    {
       "taskId": "MONETIZATION-PHASE1-INTEGRATION",
       "title": "マネタイズPhase 1統合・実機デプロイ",
       "completedAt": "2025-12-25",
       "components": [
         "ContentView.swift（ScanLimitManager/AdInterstitialManager環境注入）",
         "HomeView.swift（スキャン制限ロジック追加）",
-        "GroupDetailView.swift（広告表示ロジック・値プロポジション追加）",
-        "ProductIdentifiers.swift（コンパイルエラー修正）",
-        "PurchaseRepository.swift（コンパイルエラー修正）"
+        "GroupDetailView.swift（広告表示ロジック・値プロポジション追加）"
       ],
-      "result": "Phase 1統合完了、実機デプロイ成功（YH iPhone 15 Pro Max）"
+      "result": "Phase 1統合完了、実機デプロイ成功"
     },
     {
       "taskId": "MONETIZATION-PHASE1",
       "title": "マネタイズ戦略Phase 1実装",
       "completedAt": "2025-12-25",
-      "components": [
-        "ScanLimitManager.swift（新規114行）",
-        "PremiumManager.swift（修正）",
-        "LimitReachedSheet.swift（完全改修569行）",
-        "AdInterstitialManager.swift（新規225行）",
-        "ProductIdentifiers.swift（更新）",
-        "MONETIZATION_INTEGRATION.md（新規500行）",
-        "APP_STORE_CONNECT_SETUP.md（新規513行）"
-      ],
-      "result": "Try & Lockモデル実装完了、3プラン課金システム構築、7日間無料トライアル実装"
-    },
-    {
-      "taskId": "GROUP-DETAIL-UX",
-      "title": "グループ詳細ページUI/UX改善",
-      "completedAt": "2025-12-24",
-      "result": "タイトル固定、右下ボタン配置"
-    },
-    {
-      "taskId": "TRASH-ANALYSIS",
-      "title": "ゴミ箱問題分析・修正計画策定",
-      "completedAt": "2025-12-24",
-      "result": "BUG_FIX_PLAN_TRASH_ISSUES.md作成"
+      "result": "Try & Lockモデル実装完了、3プラン課金システム構築"
     },
     {
       "taskId": "DISPLAY-001〜004",
@@ -259,7 +279,20 @@
 
   "next_actions": [
     {
-      "action": "手動テスト実施",
+      "action": "パフォーマンス最適化Phase 1実装",
+      "description": "A1: groupDuplicates並列化から開始",
+      "estimated_hours": 44,
+      "priority": "highest",
+      "details": [
+        "A1: groupDuplicates並列化（10h）",
+        "A2: ファイルサイズキャッシュ（8h）",
+        "A3: バッチ処理最適化（18h）",
+        "A4: メモリ最適化（8h）"
+      ],
+      "document": "docs/PHASE1_IMPLEMENTATION_GUIDE.md"
+    },
+    {
+      "action": "マネタイズPhase 1手動テスト",
       "description": "スキャン制限、削除後広告表示、値プロポジションの動作確認",
       "estimated_hours": 1,
       "priority": "high",
@@ -280,80 +313,55 @@
       "description": "APP_STORE_CONNECT_SETUP.md手順に従い製品登録",
       "estimated_hours": 3,
       "priority": "high",
-      "details": [
-        "サブスクリプショングループ作成",
-        "3製品登録（monthly_premium, yearly_premium, lifetime_premium）",
-        "7日間無料トライアル設定（月額プランのみ）",
-        "価格設定（$2.99, $19.99, $29.99）",
-        "Sandboxテスター作成",
-        "TestFlightテスト"
-      ]
-    },
-    {
-      "action": "BUG-TRASH-002-P1A: RestorePhotosUseCase ID不一致修正",
-      "description": "復元時のIDマッチング問題を解決",
-      "estimated_hours": 1.5,
-      "priority": "critical"
-    },
-    {
-      "action": "BUG-TRASH-002-P1B: Photos Frameworkコールバック問題修正",
-      "description": "withCheckedContinuation二重resume防止",
-      "estimated_hours": 1,
-      "priority": "critical"
+      "document": "docs/CRITICAL/APP_STORE_CONNECT_SETUP.md"
     }
   ],
 
   "taskStatus": {
-    "total": 172,
-    "completed": 168,
+    "total": 174,
+    "completed": 170,
     "skipped": 0,
     "merged": 0,
     "inProgress": 0,
     "pending": 4,
     "blockedP0": 0,
-    "completedHours": 265,
-    "remainingHours": 18.5,
-    "lastCompletedTaskId": "MONETIZATION-PHASE1-INTEGRATION",
-    "currentTask": "完了（マネタイズPhase 1統合）",
+    "completedHours": 267,
+    "remainingHours": 222.5,
+    "lastCompletedTaskId": "PERFORMANCE-ANALYSIS-PLANNING",
+    "currentTask": "完了（パフォーマンス分析・計画策定）",
     "nextTaskCandidates": [
-      "手動テスト（1h）",
+      "パフォーマンス最適化Phase 1実装（44h）",
+      "マネタイズPhase 1手動テスト（1h）",
       "プレミアム購入画面遷移実装（2h）",
-      "App Store Connect設定（3h）",
-      "BUG-TRASH-002-P1A（1.5h）→ P1B（1h）→ P1C（0.5h）",
-      "M10-T04（3h）→ M10-T05（2h）→ M10-T06（4h）"
+      "App Store Connect設定（3h）"
     ]
   },
 
   "sessionSummary": {
-    "sessionName": "monetization-phase1-integration",
+    "sessionName": "performance-bottleneck-analysis-planning",
     "date": "2025-12-25",
-    "completedTasks": 6,
-    "qualityScore": 90,
+    "completedTasks": 2,
+    "qualityScore": null,
     "achievements": [
-      "ScanLimitManager統合（ContentView.swift, HomeView.swift）",
-      "AdInterstitialManager統合（ContentView.swift, GroupDetailView.swift）",
-      "LimitReachedSheet値プロポジション追加",
-      "GoogleMobileAds SDK初期化確認",
-      "コンパイルエラー修正（ProductIdentifiers, PurchaseRepository）",
-      "実機デプロイ成功（YH iPhone 15 Pro Max）"
+      "開発準備実行（状態分析完了）",
+      "実機テストでパフォーマンス問題発見（115GB/100,000枚で60-80分）",
+      "7つのボトルネック特定・根本原因分析完了",
+      "3段階最適化計画策定（204時間）",
+      "4つの詳細ドキュメント作成"
     ],
-    "filesModified": [
-      "ContentView.swift（ScanLimitManager/AdInterstitialManager環境注入）",
-      "HomeView.swift（スキャン制限ロジック追加）",
-      "GroupDetailView.swift（広告表示ロジック・値プロポジション追加）",
-      "ProductIdentifiers.swift（subscriptionPeriodをOptional型に変更）",
-      "PurchaseRepository.swift（switch文に.noneケース追加）",
-      "PROGRESS.md（セッション32追加）",
-      "CONTEXT_HANDOFF.json（version 3.83）"
+    "filesCreated": [
+      "docs/PERFORMANCE_OPTIMIZATION_PLAN.md（11.6KB）",
+      "docs/PHASE1_IMPLEMENTATION_GUIDE.md（22.6KB）",
+      "docs/PHASE2_IMPLEMENTATION_GUIDE.md（27.1KB）",
+      "docs/PHASE3_IMPLEMENTATION_GUIDE.md（41.5KB）"
     ]
   },
 
   "resumeInstructions": {
-    "step1": "【Option A推奨】手動テスト実施（1h）- スキャン制限、削除後広告、値プロポジションの動作確認",
-    "step2": "【Option B】プレミアム購入画面への遷移実装（2h）",
+    "step1": "【最優先 Option A】パフォーマンス最適化Phase 1実装開始（44h）- A1: groupDuplicates並列化から",
+    "step2": "【Option B】マネタイズPhase 1手動テスト（1h）- スキャン制限・広告表示・値プロポジション確認",
     "step3": "【Option C】App Store Connect設定（3h）- APP_STORE_CONNECT_SETUP.md参照",
-    "step4": "【Option D】BUG-TRASH-002-P1A: RestorePhotosUseCase ID不一致修正（1.5h）",
-    "context": "【重要】Phase 1統合完了、実機デプロイ成功。次は手動テストで動作確認→プレミアム購入遷移実装→App Store Connect設定の順を推奨。BUG修正はクリティカルだが、マネタイズ完了後でもOK。"
+    "context": "【重要】115GB/100,000枚で60-80分かかるパフォーマンス問題を特定。7つのボトルネック分析完了、3段階最適化計画策定済み（204時間）。Phase 1実装で50%改善見込み。詳細はdocs/PHASE1_IMPLEMENTATION_GUIDE.md参照。"
   },
 
   "quality": {
@@ -369,8 +377,8 @@
       "DISPLAY-001〜004": 93,
       "SETTINGS-001": 95,
       "SETTINGS-002": 95,
-      "MONETIZATION-PHASE1": null,
       "MONETIZATION-PHASE1-INTEGRATION": 90,
+      "PERFORMANCE-ANALYSIS-PLANNING": null,
       "sessionAverage": 92
     }
   },
@@ -421,13 +429,26 @@
   },
 
   "nextSession": {
-    "recommended_action": "手動テスト実施またはプレミアム購入画面遷移実装",
-    "priority": "High",
-    "estimatedTime": "1-2h",
+    "recommended_action": "パフォーマンス最適化Phase 1実装",
+    "priority": "Highest",
+    "estimatedTime": "44h (5.5日)",
     "tasks": [
       {
-        "name": "【Option A推奨】手動テスト実施",
+        "name": "【最優先 Option A】パフォーマンス最適化Phase 1実装",
         "priority": 1,
+        "estimatedHours": 44,
+        "description": "60-80分 → 30-40分（50%改善）を目指す",
+        "subtasks": [
+          "A1: groupDuplicates並列化（10h）",
+          "A2: ファイルサイズキャッシュ（8h）",
+          "A3: バッチ処理最適化（18h）",
+          "A4: メモリ最適化（8h）"
+        ],
+        "document": "docs/PHASE1_IMPLEMENTATION_GUIDE.md"
+      },
+      {
+        "name": "【Option B】マネタイズPhase 1手動テスト",
+        "priority": 2,
         "estimatedHours": 1,
         "description": "統合したマネタイズ機能の動作確認",
         "subtasks": [
@@ -437,31 +458,13 @@
         ]
       },
       {
-        "name": "【Option B】プレミアム購入画面遷移実装",
-        "priority": 2,
-        "estimatedHours": 2,
-        "description": "LimitReachedSheetからプレミアム購入画面への導線実装"
-      },
-      {
         "name": "【Option C】App Store Connect設定",
         "priority": 3,
         "estimatedHours": 3,
-        "description": "APP_STORE_CONNECT_SETUP.md手順に従い製品登録、7日間無料トライアル設定",
-        "subtasks": [
-          "サブスクリプショングループ作成（0.5h）",
-          "3製品登録（1h）",
-          "7日間無料トライアル設定（0.5h）",
-          "Sandboxテスター作成・テスト（1h）"
-        ]
-      },
-      {
-        "name": "【Option D】BUG-TRASH-002-P1A修正",
-        "priority": 4,
-        "estimatedHours": 1.5,
-        "description": "RestorePhotosUseCase ID不一致修正"
+        "description": "APP_STORE_CONNECT_SETUP.md手順に従い製品登録"
       }
     ]
   },
 
-  "notes": "monetization-phase1-integrationセッション完了（2025-12-25）。ScanLimitManager統合（ContentView.swift, HomeView.swift）、AdInterstitialManager統合（ContentView.swift, GroupDetailView.swift）、LimitReachedSheet値プロポジション追加完了。コンパイルエラー修正（ProductIdentifiers.swift, PurchaseRepository.swift）。実機デプロイ成功（YH iPhone 15 Pro Max）。次は手動テストで動作確認→プレミアム購入遷移実装→App Store Connect設定を推奨。"
+  "notes": "performance-bottleneck-analysis-planningセッション完了（2025-12-25）。実機テストで115GB/100,000枚が60-80分かかるパフォーマンス問題を発見。7つのボトルネック特定（getFileSizes繰り返し40%、PHAsset.getFileSize I/O 25%、重複検出逐次処理15%など）。3段階最適化計画策定（Phase 1: 44h/50%改善、Phase 2: 72h/追加30%改善、Phase 3: 88h/追加15%改善）。4つの詳細ドキュメント作成（計102.8KB）。次はPhase 1実装開始（A1: groupDuplicates並列化）またはマネタイズ手動テストを推奨。"
 }

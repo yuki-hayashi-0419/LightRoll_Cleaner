@@ -1604,3 +1604,28 @@
 - **推定時間**: 1.5時間 → **実績**: 1時間
 
 ---
+
+## 2025-12-19〜22 完了（P0バグ修正）
+
+### BUG-FIX-001: グループ詳細クラッシュ修正
+- **完了日**: 2025-12-21
+- **説明**: PhotoThumbnailでのwithCheckedContinuation二重resume問題を修正
+- **品質スコア**: 81点
+- **原因**: PHImageManagerのprogressHandlerが完了後も呼ばれる場合があり、Continuationが複数回resumeされていた
+- **成果物**: PhotoThumbnail.swift修正
+
+### BUG-FIX-002: ナビゲーション統合修正
+- **完了日**: 2025-12-19
+- **説明**: NavigationStack二重ネスト問題を解消
+- **品質スコア**: 90点
+- **原因**: HomeViewとGroupListViewで二重にNavigationStackをネストしていた
+- **成果物**: HomeView.swift、GroupListView.swift修正
+
+### BUG-FIX-003: ゴミ箱統合修正
+- **完了日**: 2025-12-22
+- **説明**: DeletePhotosUseCase経由に変更し、統一された削除フローを実現
+- **品質スコア**: 94点
+- **原因**: TrashViewが独自の削除ロジックを持っており、DeletePhotosUseCaseと整合性がなかった
+- **成果物**: TrashView.swift、DeletePhotosUseCase.swift修正
+
+---
