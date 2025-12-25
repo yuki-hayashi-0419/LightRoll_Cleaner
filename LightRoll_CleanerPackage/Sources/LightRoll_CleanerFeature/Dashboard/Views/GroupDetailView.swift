@@ -55,6 +55,9 @@ public struct GroupDetailView: View {
     /// DISPLAY-001: グリッド列数設定を統合
     @Environment(SettingsService.self) private var settingsService
 
+    /// AdInterstitialManager（削除後の広告表示用）
+    @Environment(AdInterstitialManager.self) private var adInterstitialManager
+
     // MARK: - State
 
     /// ビューの状態
@@ -217,6 +220,23 @@ public struct GroupDetailView: View {
             ) {}
         } message: {
             Text(deleteAllConfirmationMessage)
+        }
+        .sheet(isPresented: $showLimitReachedSheet) {
+            // 削除制限到達時のペイウォール表示
+            // 値プロポジション：グループ内の残りの重複数と削減可能容量を表示
+            LimitReachedSheet(
+                currentCount: premiumManager?.totalDeleteCount ?? 0,
+                limit: 50,
+                remainingDuplicates: selectablePhotoIds.count,
+                potentialFreeSpace: ByteCountFormatter.string(
+                    fromByteCount: group.reclaimableSize,
+                    countStyle: .file
+                ),
+                onUpgrade: {
+                    showLimitReachedSheet = false
+                    // TODO: プレミアム購入画面への遷移
+                }
+            )
         }
     }
 
@@ -667,6 +687,9 @@ public struct GroupDetailView: View {
             photos = photos.filter { !idsToDelete.contains($0.id) }
 
             viewState = .loaded
+
+            // 削除成功後、インタースティシャル広告を表示（無料ユーザーのみ）
+            showInterstitialAdIfReady()
         }
     }
 
@@ -691,7 +714,27 @@ public struct GroupDetailView: View {
             photos = photos.filter { !idsToDelete.contains($0.id) }
 
             viewState = .loaded
+
+            // 削除成功後、インタースティシャル広告を表示（無料ユーザーのみ）
+            showInterstitialAdIfReady()
         }
+    }
+
+    /// インタースティシャル広告を表示（条件を満たす場合のみ）
+    private func showInterstitialAdIfReady() {
+        guard let premiumManager = premiumManager else { return }
+
+        // UIViewControllerを取得
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootViewController = windowScene.windows.first?.rootViewController else {
+            return
+        }
+
+        // 広告を表示（PremiumManagerのisPremiumで無料ユーザーをフィルタ）
+        adInterstitialManager.showIfReady(
+            from: rootViewController,
+            isPremium: premiumManager.isPremium
+        )
     }
 }
 

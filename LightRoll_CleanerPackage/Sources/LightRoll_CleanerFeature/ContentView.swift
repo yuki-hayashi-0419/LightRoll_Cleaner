@@ -35,6 +35,12 @@ public struct ContentView: View {
     /// 広告管理マネージャー
     @State private var adManager: AdManager
 
+    /// スキャン制限マネージャー
+    @State private var scanLimitManager = ScanLimitManager()
+
+    /// インタースティシャル広告マネージャー
+    @State private var adInterstitialManager = AdInterstitialManager()
+
     /// ゴミ箱マネージャー
     @State private var trashManager: TrashManager
 
@@ -186,6 +192,8 @@ public struct ContentView: View {
         .environment(settingsService)  // グループ詳細画面で必須（DISPLAY-001〜003で使用）
         .environment(premiumManager)
         .environment(adManager)
+        .environment(scanLimitManager)
+        .environment(adInterstitialManager)
         .sheet(isPresented: $showingSettings) {
             NavigationStack {
                 SettingsView(

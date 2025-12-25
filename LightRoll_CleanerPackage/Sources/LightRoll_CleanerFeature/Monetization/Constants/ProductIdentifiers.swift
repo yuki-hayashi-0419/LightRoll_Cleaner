@@ -19,11 +19,14 @@ public enum ProductIdentifier: String, CaseIterable, Sendable, Equatable, Hashab
 
     // MARK: - Cases
 
-    /// 月額プレミアムプラン（¥980/月、7日間無料トライアル付き）
+    /// 月額プレミアムプラン（$3/月、7日間無料トライアル付き）
     case monthlyPremium = "monthly_premium"
 
-    /// 年額プレミアムプラン（¥9,800/年）
+    /// 年額プレミアムプラン（$20/年、月額プランより50%割引）
     case yearlyPremium = "yearly_premium"
+
+    /// Lifetimeプラン（$30、一度きりの買い切り）
+    case lifetimePremium = "lifetime_premium"
 
     // MARK: - Properties
 
@@ -34,6 +37,8 @@ public enum ProductIdentifier: String, CaseIterable, Sendable, Equatable, Hashab
             return "月額プラン"
         case .yearlyPremium:
             return "年額プラン"
+        case .lifetimePremium:
+            return "Lifetimeプラン"
         }
     }
 
@@ -43,17 +48,21 @@ public enum ProductIdentifier: String, CaseIterable, Sendable, Equatable, Hashab
         case .monthlyPremium:
             return "毎月自動更新されるプレミアムプラン。7日間の無料トライアル付き。"
         case .yearlyPremium:
-            return "年1回自動更新されるプレミアムプラン。2ヶ月分お得です。"
+            return "年1回自動更新されるプレミアムプラン。月額プランより約50%お得です。"
+        case .lifetimePremium:
+            return "一度きりの支払いで永久にすべてのプレミアム機能へアクセスできます。サブスクリプションなし。"
         }
     }
 
-    /// サブスクリプション期間
-    public var subscriptionPeriod: SubscriptionPeriod {
+    /// サブスクリプション期間（買い切り製品の場合はnil）
+    public var subscriptionPeriod: SubscriptionPeriod? {
         switch self {
         case .monthlyPremium:
             return .monthly
         case .yearlyPremium:
             return .yearly
+        case .lifetimePremium:
+            return nil // 買い切り製品はサブスクリプションではない
         }
     }
 
@@ -63,6 +72,8 @@ public enum ProductIdentifier: String, CaseIterable, Sendable, Equatable, Hashab
         case .monthlyPremium:
             return true
         case .yearlyPremium:
+            return false
+        case .lifetimePremium:
             return false
         }
     }
@@ -74,7 +85,14 @@ public enum ProductIdentifier: String, CaseIterable, Sendable, Equatable, Hashab
             return 7
         case .yearlyPremium:
             return nil
+        case .lifetimePremium:
+            return nil
         }
+    }
+
+    /// 買い切り製品かどうか
+    public var isLifetime: Bool {
+        return self == .lifetimePremium
     }
 }
 
@@ -95,6 +113,11 @@ extension ProductIdentifier {
     /// 年額製品かどうか
     public var isYearly: Bool {
         return subscriptionPeriod == .yearly
+    }
+
+    /// サブスクリプション製品かどうか
+    public var isSubscription: Bool {
+        return subscriptionPeriod != nil
     }
 
     /// 製品情報テンプレート作成

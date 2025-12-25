@@ -27,25 +27,39 @@ public final class PremiumManager: PremiumManagerProtocol {
     /// 現在のサブスクリプション状態
     public private(set) var subscriptionStatus: PremiumStatus = .free
 
-    /// 本日の削除カウント（Free版制限用）
-    public private(set) var dailyDeleteCount: Int = 0
+    /// 生涯の総削除カウント（Free版制限用）
+    public private(set) var totalDeleteCount: Int = 0
 
     // MARK: - Private Properties
 
     private let purchaseRepository: any PurchaseRepositoryProtocol
     nonisolated(unsafe) private var transactionTask: Task<Void, Never>?
+    private let userDefaults: UserDefaults
 
     // MARK: - Constants
 
-    /// Free版の1日あたり削除上限
-    private static let freeDailyLimit = 50
+    /// Free版の生涯削除上限（"Try & Lock"モデル）
+    private static let freeTotalLimit = 50
+
+    private enum Keys {
+        static let totalDeleteCount = "free_total_delete_count"
+    }
 
     // MARK: - Initialization
 
     /// PremiumManagerを初期化
-    /// - Parameter purchaseRepository: 課金リポジトリ
-    public init(purchaseRepository: any PurchaseRepositoryProtocol) {
+    /// - Parameters:
+    ///   - purchaseRepository: 課金リポジトリ
+    ///   - userDefaults: 永続化ストレージ（デフォルトは.standard）
+    public init(
+        purchaseRepository: any PurchaseRepositoryProtocol,
+        userDefaults: UserDefaults = .standard
+    ) {
         self.purchaseRepository = purchaseRepository
+        self.userDefaults = userDefaults
+
+        // UserDefaultsから削除カウントを読み込み
+        self.totalDeleteCount = userDefaults.integer(forKey: Keys.totalDeleteCount)
     }
 
     deinit {
@@ -83,8 +97,8 @@ public final class PremiumManager: PremiumManagerProtocol {
             return true
         }
 
-        // Free版は1日50枚まで
-        return dailyDeleteCount + count <= Self.freeDailyLimit
+        // Free版は生涯50枚まで（"Try & Lock"モデル）
+        return totalDeleteCount + count <= Self.freeTotalLimit
     }
 
     /// 削除カウントを増加
@@ -92,14 +106,26 @@ public final class PremiumManager: PremiumManagerProtocol {
     /// - Parameter count: 削除した枚数
     /// - Note: 呼び出し前にcanDelete()で確認済みであること
     public func incrementDeleteCount(_ count: Int) {
-        dailyDeleteCount += count
+        totalDeleteCount += count
+
+        // UserDefaultsに永続化
+        userDefaults.set(totalDeleteCount, forKey: Keys.totalDeleteCount)
     }
 
-    /// 日次カウントをリセット
+    /// 日次カウントをリセット（互換性のため残すが、何もしない）
     ///
-    /// - Note: 日付変更時に呼び出される想定
+    /// - Note: "Try & Lock"モデルでは生涯カウントを使用するため、日次リセットは不要
+    @available(*, deprecated, message: "生涯削除制限モデルでは使用しません")
     public func resetDailyCount() {
-        dailyDeleteCount = 0
+        // 何もしない（互換性のため残す）
+    }
+
+    /// 削除カウントをリセット（テスト用）
+    ///
+    /// - Warning: 本番環境では使用しないこと。開発・テスト目的のみ。
+    public func resetDeleteCount() {
+        totalDeleteCount = 0
+        userDefaults.removeObject(forKey: Keys.totalDeleteCount)
     }
 
     /// トランザクション監視を開始
@@ -175,14 +201,14 @@ public final class PremiumManager: PremiumManagerProtocol {
         }
     }
 
-    /// 今日の削除可能残数を取得
+    /// 残り削除可能数を取得
     ///
     /// - Returns: 残り削除可能数（プレミアムの場合はInt.max）
     public func getRemainingDeletions() async -> Int {
         if isPremium {
             return Int.max
         }
-        return max(0, Self.freeDailyLimit - dailyDeleteCount)
+        return max(0, Self.freeTotalLimit - totalDeleteCount)
     }
 
     /// 削除数を記録

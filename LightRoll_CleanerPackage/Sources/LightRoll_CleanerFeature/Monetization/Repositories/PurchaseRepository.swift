@@ -300,6 +300,9 @@ public final class PurchaseRepository: PurchaseRepositoryProtocol {
                 return .monthly
             case .yearly:
                 return .yearly
+            case .none:
+                // 買い切り製品（Lifetime）の場合は年額相当として扱う
+                return .yearly
             }
         }()
 

@@ -46,6 +46,14 @@ public struct HomeView: View {
     /// 設定へのナビゲーション
     private let onNavigateToSettings: (() -> Void)?
 
+    // MARK: - Environment
+
+    /// PremiumManager（スキャン制限チェック用）
+    @Environment(PremiumManager.self) private var premiumManager
+
+    /// ScanLimitManager（無料ユーザーのスキャン制限管理）
+    @Environment(ScanLimitManager.self) private var scanLimitManager
+
     // MARK: - State
 
     /// 写真権限マネージャー
@@ -80,6 +88,9 @@ public struct HomeView: View {
 
     /// 初期データ読み込み済みフラグ（タブ切り替え時の不要な再読み込みを防止）
     @State private var hasLoadedInitialData: Bool = false
+
+    /// スキャン制限到達シート表示フラグ
+    @State private var showScanLimitPaywall: Bool = false
 
     // MARK: - ViewState
 
@@ -184,6 +195,18 @@ public struct HomeView: View {
             }
         } message: {
             Text(errorMessage)
+        }
+        .sheet(isPresented: $showScanLimitPaywall) {
+            LimitReachedSheet(
+                currentCount: 1,
+                limit: 1,
+                remainingDuplicates: nil,
+                potentialFreeSpace: nil,
+                onUpgrade: {
+                    showScanLimitPaywall = false
+                    // TODO: プレミアム購入画面への遷移
+                }
+            )
         }
         .overlay {
             // スキャン中のプログレスオーバーレイ
@@ -661,6 +684,12 @@ public struct HomeView: View {
         // 既にスキャン中の場合は何もしない
         guard !scanPhotosUseCase.isScanning else { return }
 
+        // スキャン制限チェック（無料ユーザーは1回のみ）
+        guard scanLimitManager.canScan(isPremium: premiumManager.isPremium) else {
+            showScanLimitPaywall = true
+            return
+        }
+
         viewState = .scanning(progress: 0)
         lastScanResult = nil
 
@@ -678,6 +707,9 @@ public struct HomeView: View {
             // progressTaskの完了を待つ（レースコンディション回避）
             progressTask.cancel()
             _ = await progressTask.result  // 完了を待機（成功/失敗を無視）
+
+            // スキャン成功後、制限カウンターを更新
+            scanLimitManager.recordScan()
 
             // スキャン完了後にグループを読み込む
             lastScanResult = result

@@ -1,43 +1,157 @@
 {
-  "version": "3.81",
-  "lastUpdated": "2025-12-24",
+  "version": "3.83",
+  "lastUpdated": "2025-12-25",
 
   "session_metadata": {
-    "session_id": "bug-analysis-trash-issues",
-    "started_at": "2025-12-24T20:00:00+09:00",
-    "ended_at": "2025-12-24T21:30:00+09:00",
+    "session_id": "monetization-phase1-integration",
+    "started_at": "2025-12-25T13:00:00+09:00",
+    "ended_at": "2025-12-25T14:30:00+09:00",
     "status": "completed",
-    "documents_updated": ["PROGRESS.md", "TASKS.md", "IMPLEMENTED.md", "CONTEXT_HANDOFF.json", "BUG_FIX_PLAN_TRASH_ISSUES.md"],
-    "session_closure": "作業終了プロンプト(7)実行完了"
+    "documents_updated": [
+      "PROGRESS.md",
+      "CONTEXT_HANDOFF.json",
+      "ContentView.swift",
+      "HomeView.swift",
+      "GroupDetailView.swift",
+      "ProductIdentifiers.swift",
+      "PurchaseRepository.swift"
+    ],
+    "session_closure": "マネタイズPhase 1統合完了、実機デプロイ成功"
   },
 
   "contextOptimization": {
-    "lastOptimization": "2025-12-24T21:30:00+09:00",
-    "optimizationId": "context-optimization-007",
-    "progressEntries": 10,
+    "lastOptimization": "2025-12-25T14:30:00+09:00",
+    "optimizationId": "context-optimization-008",
+    "progressEntries": 12,
     "maxProgressEntries": 12,
-    "archivedSessions": "Session 1-20 (20 sessions)",
-    "archivedTasks": "157件 → TASKS_COMPLETED.md",
+    "archivedSessions": "Session 1-21 (21 sessions)",
+    "archivedTasks": "168件 → TASKS_COMPLETED.md",
     "contextHealth": "良好",
-    "estimatedSizeReduction": "約75KB",
-    "nextOptimizationTrigger": "12セッション到達時またはBUG修正完了時",
-    "currentProgressSize": "約500行（セッション21-30）",
+    "estimatedSizeReduction": "約80KB",
+    "nextOptimizationTrigger": "13セッション到達時",
+    "currentProgressSize": "約750行（セッション22-32）",
     "archiveThreshold": "12セッション または 600行超過時",
-    "lastAction": "セッション30追加、BUG修正タスク5件追加"
+    "lastAction": "セッション32追加、マネタイズPhase 1統合・実機デプロイ完了"
   },
 
   "current_phase": {
-    "phase_name": "ゴミ箱バグ修正 + M10リリース準備",
-    "progress_percentage": "95%",
-    "description": "ゴミ箱問題分析完了。修正計画策定済み。Phase 1クラッシュ修正から着手予定。"
+    "phase_name": "マネタイズPhase 1統合完了 → 手動テスト または App Store Connect設定",
+    "progress_percentage": "98%",
+    "description": "ScanLimitManager/AdInterstitialManager統合完了、実機デプロイ成功。次は手動テストまたはApp Store Connect製品登録。"
   },
 
   "projectStatus": {
-    "phase": "ゴミ箱バグ修正 → M10リリース準備",
-    "currentPhase": "ゴミ箱問題分析完了。BUG修正計画策定済み。",
-    "overallProgress": "95%",
-    "nextMilestone": "BUG-TRASH-002-P1A: RestorePhotosUseCase ID不一致修正（1.5h）",
-    "majorAchievement": "ゴミ箱問題の根本原因特定、修正計画書作成"
+    "phase": "マネタイズPhase 1統合完了 → テスト待ち",
+    "currentPhase": "主要マネタイズ機能統合完了。手動テストまたはApp Store Connect設定待ち。",
+    "overallProgress": "98%",
+    "nextMilestone": "手動テスト（スキャン制限・広告表示）またはApp Store Connect製品登録（3h）",
+    "majorAchievement": "ScanLimitManager統合、AdInterstitialManager統合、コンパイルエラー修正、実機デプロイ成功"
+  },
+
+  "monetizationStatus": {
+    "phase": 1,
+    "status": "integration_complete",
+    "integrationStatus": {
+      "ScanLimitManager": {
+        "status": "integrated",
+        "files": ["ContentView.swift", "HomeView.swift"],
+        "description": "環境注入完了、スキャン制限ロジック追加"
+      },
+      "AdInterstitialManager": {
+        "status": "integrated",
+        "files": ["ContentView.swift", "GroupDetailView.swift"],
+        "description": "環境注入完了、削除後広告表示ロジック追加"
+      },
+      "LimitReachedSheet": {
+        "status": "enhanced",
+        "files": ["GroupDetailView.swift"],
+        "description": "値プロポジション追加（残り重複数・削減可能容量）"
+      },
+      "ProductIdentifiers": {
+        "status": "fixed",
+        "changes": "subscriptionPeriodをOptional型に変更"
+      },
+      "PurchaseRepository": {
+        "status": "fixed",
+        "changes": "switch文に.noneケース追加"
+      }
+    },
+    "components": [
+      {
+        "name": "ScanLimitManager",
+        "file": "ScanLimitManager.swift",
+        "status": "integrated",
+        "purpose": "初回スキャンのみ許可（Freeユーザー）"
+      },
+      {
+        "name": "PremiumManager",
+        "file": "PremiumManager.swift",
+        "status": "modified",
+        "changes": "日次削除制限 → 生涯削除制限（50枚）"
+      },
+      {
+        "name": "LimitReachedSheet",
+        "file": "LimitReachedSheet.swift",
+        "status": "integrated",
+        "features": [
+          "価値訴求カード（削除済み・残り重複・解放可能ストレージ）",
+          "7日間無料トライアルCTA",
+          "3プラン比較表示（年額推奨）",
+          "Premiumプラン特典表示"
+        ]
+      },
+      {
+        "name": "AdInterstitialManager",
+        "file": "AdInterstitialManager.swift",
+        "status": "integrated",
+        "features": [
+          "削除後インタースティシャル広告",
+          "セッション制限（1回/セッション）",
+          "時間制限（30分間隔）"
+        ]
+      },
+      {
+        "name": "ProductIdentifiers",
+        "file": "ProductIdentifiers.swift",
+        "status": "fixed",
+        "products": [
+          {
+            "id": "monthly_premium",
+            "price": "$3/month",
+            "trial": "7 days"
+          },
+          {
+            "id": "yearly_premium",
+            "price": "$20/year",
+            "discount": "50%"
+          },
+          {
+            "id": "lifetime_premium",
+            "price": "$30",
+            "type": "one-time"
+          }
+        ]
+      }
+    ],
+    "documentation": [
+      {
+        "name": "MONETIZATION_INTEGRATION.md",
+        "location": "docs/CRITICAL/",
+        "content": "統合手順、コード例、テスト手順、トラブルシューティング"
+      },
+      {
+        "name": "APP_STORE_CONNECT_SETUP.md",
+        "location": "docs/CRITICAL/",
+        "content": "3製品登録、7日間無料トライアル設定、価格設定、審査提出準備"
+      }
+    ],
+    "nextSteps": [
+      "手動テスト（スキャン制限、削除後広告、値プロポジション）",
+      "プレミアム購入画面への遷移実装",
+      "App Store Connect製品登録（APP_STORE_CONNECT_SETUP.md参照）",
+      "Firebase Analytics統合（Phase 2）",
+      "A/Bテスト機能実装（Phase 2）"
+    ]
   },
 
   "discovered_issues": [
@@ -84,6 +198,34 @@
 
   "completedTasks": [
     {
+      "taskId": "MONETIZATION-PHASE1-INTEGRATION",
+      "title": "マネタイズPhase 1統合・実機デプロイ",
+      "completedAt": "2025-12-25",
+      "components": [
+        "ContentView.swift（ScanLimitManager/AdInterstitialManager環境注入）",
+        "HomeView.swift（スキャン制限ロジック追加）",
+        "GroupDetailView.swift（広告表示ロジック・値プロポジション追加）",
+        "ProductIdentifiers.swift（コンパイルエラー修正）",
+        "PurchaseRepository.swift（コンパイルエラー修正）"
+      ],
+      "result": "Phase 1統合完了、実機デプロイ成功（YH iPhone 15 Pro Max）"
+    },
+    {
+      "taskId": "MONETIZATION-PHASE1",
+      "title": "マネタイズ戦略Phase 1実装",
+      "completedAt": "2025-12-25",
+      "components": [
+        "ScanLimitManager.swift（新規114行）",
+        "PremiumManager.swift（修正）",
+        "LimitReachedSheet.swift（完全改修569行）",
+        "AdInterstitialManager.swift（新規225行）",
+        "ProductIdentifiers.swift（更新）",
+        "MONETIZATION_INTEGRATION.md（新規500行）",
+        "APP_STORE_CONNECT_SETUP.md（新規513行）"
+      ],
+      "result": "Try & Lockモデル実装完了、3プラン課金システム構築、7日間無料トライアル実装"
+    },
+    {
       "taskId": "GROUP-DETAIL-UX",
       "title": "グループ詳細ページUI/UX改善",
       "completedAt": "2025-12-24",
@@ -117,6 +259,37 @@
 
   "next_actions": [
     {
+      "action": "手動テスト実施",
+      "description": "スキャン制限、削除後広告表示、値プロポジションの動作確認",
+      "estimated_hours": 1,
+      "priority": "high",
+      "details": [
+        "Freeユーザーで2回目スキャン時にLimitReachedSheet表示確認",
+        "Freeユーザーで削除後にインタースティシャル広告表示確認",
+        "LimitReachedSheetで残り重複数・削減可能容量が正しく表示されるか確認"
+      ]
+    },
+    {
+      "action": "プレミアム購入画面への遷移実装",
+      "description": "LimitReachedSheetからプレミアム購入画面への導線",
+      "estimated_hours": 2,
+      "priority": "high"
+    },
+    {
+      "action": "App Store Connect設定",
+      "description": "APP_STORE_CONNECT_SETUP.md手順に従い製品登録",
+      "estimated_hours": 3,
+      "priority": "high",
+      "details": [
+        "サブスクリプショングループ作成",
+        "3製品登録（monthly_premium, yearly_premium, lifetime_premium）",
+        "7日間無料トライアル設定（月額プランのみ）",
+        "価格設定（$2.99, $19.99, $29.99）",
+        "Sandboxテスター作成",
+        "TestFlightテスト"
+      ]
+    },
+    {
       "action": "BUG-TRASH-002-P1A: RestorePhotosUseCase ID不一致修正",
       "description": "復元時のIDマッチング問題を解決",
       "estimated_hours": 1.5,
@@ -127,70 +300,68 @@
       "description": "withCheckedContinuation二重resume防止",
       "estimated_hours": 1,
       "priority": "critical"
-    },
-    {
-      "action": "BUG-TRASH-002-P1C: SwiftUI環境オブジェクト未注入修正",
-      "description": "SettingsService環境注入確認・修正",
-      "estimated_hours": 0.5,
-      "priority": "critical"
-    },
-    {
-      "action": "M10-T04: App Store Connect設定",
-      "description": "App Store Connectでアプリ情報登録",
-      "estimated_hours": 3,
-      "priority": "high"
     }
   ],
 
   "taskStatus": {
-    "total": 165,
-    "completed": 157,
+    "total": 172,
+    "completed": 168,
     "skipped": 0,
     "merged": 0,
     "inProgress": 0,
-    "pending": 8,
+    "pending": 4,
     "blockedP0": 0,
-    "completedHours": 254.5,
-    "remainingHours": 15.5,
-    "lastCompletedTaskId": "TRASH-ANALYSIS",
-    "currentTask": "完了（ゴミ箱問題分析・修正計画策定）",
+    "completedHours": 265,
+    "remainingHours": 18.5,
+    "lastCompletedTaskId": "MONETIZATION-PHASE1-INTEGRATION",
+    "currentTask": "完了（マネタイズPhase 1統合）",
     "nextTaskCandidates": [
-      "BUG-TRASH-002-P1A（1.5h）→ P1B（1h）→ P1C（0.5h）→ P2A（1h）→ P2B（1h）",
+      "手動テスト（1h）",
+      "プレミアム購入画面遷移実装（2h）",
+      "App Store Connect設定（3h）",
+      "BUG-TRASH-002-P1A（1.5h）→ P1B（1h）→ P1C（0.5h）",
       "M10-T04（3h）→ M10-T05（2h）→ M10-T06（4h）"
     ]
   },
 
   "sessionSummary": {
-    "sessionName": "bug-analysis-trash-issues",
-    "date": "2025-12-24",
-    "completedTasks": 2,
-    "qualityScore": null,
+    "sessionName": "monetization-phase1-integration",
+    "date": "2025-12-25",
+    "completedTasks": 6,
+    "qualityScore": 90,
     "achievements": [
-      "グループ詳細ページUI/UX改善（タイトル固定、ボタン配置）",
-      "ゴミ箱選択問題の原因特定（isEditModeガード）",
-      "ゴミ箱クラッシュ問題の根本原因特定（4つの原因）",
-      "修正計画書作成（BUG_FIX_PLAN_TRASH_ISSUES.md）",
-      "6.5時間の詳細工数見積もり"
+      "ScanLimitManager統合（ContentView.swift, HomeView.swift）",
+      "AdInterstitialManager統合（ContentView.swift, GroupDetailView.swift）",
+      "LimitReachedSheet値プロポジション追加",
+      "GoogleMobileAds SDK初期化確認",
+      "コンパイルエラー修正（ProductIdentifiers, PurchaseRepository）",
+      "実機デプロイ成功（YH iPhone 15 Pro Max）"
     ],
     "filesModified": [
-      "GroupDetailView.swift（UI/UX改善）",
-      "BUG_FIX_PLAN_TRASH_ISSUES.md（新規作成）",
-      "PROGRESS.md（セッション30追加）",
-      "TASKS.md（BUG修正タスク5件追加）",
-      "IMPLEMENTED.md（UI/UX改善記録）",
-      "CONTEXT_HANDOFF.json（version 3.81）"
+      "ContentView.swift（ScanLimitManager/AdInterstitialManager環境注入）",
+      "HomeView.swift（スキャン制限ロジック追加）",
+      "GroupDetailView.swift（広告表示ロジック・値プロポジション追加）",
+      "ProductIdentifiers.swift（subscriptionPeriodをOptional型に変更）",
+      "PurchaseRepository.swift（switch文に.noneケース追加）",
+      "PROGRESS.md（セッション32追加）",
+      "CONTEXT_HANDOFF.json（version 3.83）"
     ]
   },
 
   "resumeInstructions": {
-    "step1": "【BUG-TRASH-002-P1A】RestorePhotosUseCase ID不一致修正（1.5h）",
-    "step2": "【BUG-TRASH-002-P1B】Photos Frameworkコールバック問題修正（1h）",
-    "step3": "【BUG-TRASH-002-P1C】SwiftUI環境オブジェクト未注入修正（0.5h）",
-    "context": "【重要】修正計画書（docs/CRITICAL/BUG_FIX_PLAN_TRASH_ISSUES.md）を参照。Phase 1のクラッシュ修正から着手。P1-A→P1-B→P1-Cの順で実装。"
+    "step1": "【Option A推奨】手動テスト実施（1h）- スキャン制限、削除後広告、値プロポジションの動作確認",
+    "step2": "【Option B】プレミアム購入画面への遷移実装（2h）",
+    "step3": "【Option C】App Store Connect設定（3h）- APP_STORE_CONNECT_SETUP.md参照",
+    "step4": "【Option D】BUG-TRASH-002-P1A: RestorePhotosUseCase ID不一致修正（1.5h）",
+    "context": "【重要】Phase 1統合完了、実機デプロイ成功。次は手動テストで動作確認→プレミアム購入遷移実装→App Store Connect設定の順を推奨。BUG修正はクリティカルだが、マネタイズ完了後でもOK。"
   },
 
   "quality": {
-    "scores": [90, 100, 95, 97.5, 95, 95, 100, 97.5, 92, 97.5, 97, 90, 92, 90, 90, 90, 72, 90, 92, 92, 95, 75, 81, 85, 84, 94, 98, 98, 92.5, 90, 92, 88, 90, 95, 90, 93],
+    "scores": [
+      90, 100, 95, 97.5, 95, 95, 100, 97.5, 92, 97.5, 97, 90, 92, 90, 90, 90,
+      72, 90, 92, 92, 95, 75, 81, 85, 84, 94, 98, 98, 92.5, 90, 92, 88, 90,
+      95, 90, 93, 90
+    ],
     "average": 92,
     "trend": "stable",
     "targetScore": 95,
@@ -198,7 +369,9 @@
       "DISPLAY-001〜004": 93,
       "SETTINGS-001": 95,
       "SETTINGS-002": 95,
-      "sessionAverage": 93
+      "MONETIZATION-PHASE1": null,
+      "MONETIZATION-PHASE1-INTEGRATION": 90,
+      "sessionAverage": 92
     }
   },
 
@@ -210,7 +383,7 @@
       "deviceId": "C7812CA5-F362-565B-985C-CE323F453DFA"
     },
     "status": "deployed",
-    "lastDeployDate": "2025-12-24"
+    "lastDeployDate": "2025-12-25"
   },
 
   "trashIssueStatus": {
@@ -248,30 +421,47 @@
   },
 
   "nextSession": {
-    "recommended_action": "BUG修正計画実装（Phase 1）",
-    "priority": "Critical",
-    "estimatedTime": "3h",
+    "recommended_action": "手動テスト実施またはプレミアム購入画面遷移実装",
+    "priority": "High",
+    "estimatedTime": "1-2h",
     "tasks": [
       {
-        "name": "BUG-TRASH-002-P1A: RestorePhotosUseCase ID不一致修正",
+        "name": "【Option A推奨】手動テスト実施",
         "priority": 1,
-        "estimatedHours": 1.5,
-        "description": "デバッグログ追加、IDマッチング確認、必要に応じて修正"
-      },
-      {
-        "name": "BUG-TRASH-002-P1B: Photos Frameworkコールバック問題修正",
-        "priority": 2,
         "estimatedHours": 1,
-        "description": "hasResumedフラグ追加、isDegradedチェック追加"
+        "description": "統合したマネタイズ機能の動作確認",
+        "subtasks": [
+          "Freeユーザーで2回目スキャン時にLimitReachedSheet表示確認",
+          "Freeユーザーで削除後にインタースティシャル広告表示確認",
+          "LimitReachedSheetで残り重複数・削減可能容量表示確認"
+        ]
       },
       {
-        "name": "BUG-TRASH-002-P1C: SwiftUI環境オブジェクト未注入修正",
+        "name": "【Option B】プレミアム購入画面遷移実装",
+        "priority": 2,
+        "estimatedHours": 2,
+        "description": "LimitReachedSheetからプレミアム購入画面への導線実装"
+      },
+      {
+        "name": "【Option C】App Store Connect設定",
         "priority": 3,
-        "estimatedHours": 0.5,
-        "description": "環境注入確認、Preview設定確認"
+        "estimatedHours": 3,
+        "description": "APP_STORE_CONNECT_SETUP.md手順に従い製品登録、7日間無料トライアル設定",
+        "subtasks": [
+          "サブスクリプショングループ作成（0.5h）",
+          "3製品登録（1h）",
+          "7日間無料トライアル設定（0.5h）",
+          "Sandboxテスター作成・テスト（1h）"
+        ]
+      },
+      {
+        "name": "【Option D】BUG-TRASH-002-P1A修正",
+        "priority": 4,
+        "estimatedHours": 1.5,
+        "description": "RestorePhotosUseCase ID不一致修正"
       }
     ]
   },
 
-  "notes": "bug-analysis-trash-issuesセッション完了（2025-12-24）。グループ詳細ページUI/UX改善実施。ゴミ箱問題（選択問題・クラッシュ問題）の分析完了。修正計画書（BUG_FIX_PLAN_TRASH_ISSUES.md）作成。5つの修正項目を特定（P1-A〜P1-C、P2-A〜P2-B）。推定工数6.5時間。次回はPhase 1のクラッシュ修正から着手。"
+  "notes": "monetization-phase1-integrationセッション完了（2025-12-25）。ScanLimitManager統合（ContentView.swift, HomeView.swift）、AdInterstitialManager統合（ContentView.swift, GroupDetailView.swift）、LimitReachedSheet値プロポジション追加完了。コンパイルエラー修正（ProductIdentifiers.swift, PurchaseRepository.swift）。実機デプロイ成功（YH iPhone 15 Pro Max）。次は手動テストで動作確認→プレミアム購入遷移実装→App Store Connect設定を推奨。"
 }
