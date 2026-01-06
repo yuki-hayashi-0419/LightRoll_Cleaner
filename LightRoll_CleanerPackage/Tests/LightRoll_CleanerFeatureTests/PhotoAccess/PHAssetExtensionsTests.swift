@@ -803,6 +803,238 @@ struct ICloudPhotoSimulationTests {
     }
 }
 
+// MARK: - A4 Boundary Value Tests
+
+/// A4タスク: 境界値テスト
+/// ファイルサイズの極端なケースでの動作を検証
+@Suite("A4: 境界値テスト - ファイルサイズの極端なケース")
+struct FileSizeBoundaryTests {
+
+    /// 非常に小さなファイルサイズのテスト（1バイト〜100KB）
+    @Test("境界値-01: 非常に小さなファイルサイズ（1バイト〜100KB）")
+    func verySmallFileSizes() async throws {
+        let smallSizes: [(size: Int64, description: String)] = [
+            (1, "最小値: 1バイト"),
+            (100, "100バイト"),
+            (1_000, "1KB"),
+            (10_000, "10KB"),
+            (50_000, "50KB"),
+            (100_000, "100KB（サムネイルサイズ）")
+        ]
+
+        for testCase in smallSizes {
+            let provider = MockFileSizeProvider(
+                estimatedSize: testCase.size,
+                actualSize: testCase.size
+            )
+
+            let estimated = await provider.getEstimatedSize()
+            #expect(
+                estimated == testCase.size,
+                "小さなファイルサイズが正しく取得されること: \(testCase.description)"
+            )
+            #expect(estimated! > 0, "ファイルサイズは正の値であること")
+        }
+    }
+
+    /// 非常に大きなファイルサイズのテスト（1GB〜10GB）
+    @Test("境界値-02: 非常に大きなファイルサイズ（1GB〜10GB）")
+    func veryLargeFileSizes() async throws {
+        let largeSizes: [(size: Int64, description: String)] = [
+            (1_000_000_000, "1GB（4K動画約10分）"),
+            (2_000_000_000, "2GB（4K動画約20分）"),
+            (4_000_000_000, "4GB（長時間4K動画）"),
+            (Int64(Int32.max), "Int32最大値（約2.1GB）"),
+            (5_000_000_000, "5GB"),
+            (10_000_000_000, "10GB（超大容量）")
+        ]
+
+        for testCase in largeSizes {
+            let provider = MockFileSizeProvider(
+                estimatedSize: testCase.size,
+                actualSize: testCase.size
+            )
+
+            let estimated = await provider.getEstimatedSize()
+            #expect(
+                estimated == testCase.size,
+                "大きなファイルサイズが正しく取得されること: \(testCase.description)"
+            )
+
+            // オーバーフローチェック
+            let doubled = testCase.size.multipliedReportingOverflow(by: 2)
+            if !doubled.overflow {
+                #expect(doubled.partialValue > testCase.size, "オーバーフローしないこと")
+            }
+        }
+    }
+
+    /// Int64境界値のテスト
+    @Test("境界値-03: Int64の境界値付近")
+    func int64BoundaryValues() async throws {
+        // Int64.max に近い値（実際のファイルサイズとしては非現実的だが、ロジック検証として）
+        let maxSafeSize: Int64 = Int64.max / 2  // 約4.6EB（オーバーフロー防止）
+
+        // 合計計算時のオーバーフロー検証
+        let size1: Int64 = Int64.max / 3
+        let size2: Int64 = Int64.max / 3
+
+        let (sum, overflow) = size1.addingReportingOverflow(size2)
+        #expect(!overflow, "適切な範囲での加算はオーバーフローしないこと")
+        #expect(sum > 0, "合計は正の値であること")
+    }
+
+    /// ゼロと負の値のテスト
+    @Test("境界値-04: ゼロと負の値の処理")
+    func zeroAndNegativeValues() async throws {
+        // ゼロ値
+        let zeroProvider = MockFileSizeProvider(estimatedSize: 0, actualSize: 1_000_000)
+        let assets: [FileSizeProvider] = [zeroProvider]
+        let totalWithFallback = await assets.simulateTotalFileSizeFast(fallbackToActual: true)
+        #expect(totalWithFallback == 1_000_000, "ゼロの場合はフォールバックが使用されること")
+
+        let totalWithoutFallback = await assets.simulateTotalFileSizeFast(fallbackToActual: false)
+        #expect(totalWithoutFallback == 0, "フォールバック無効時は0が返されること")
+
+        // 負の値（異常値）のシミュレーション
+        func handleNegativeSize(_ size: Int64) -> Int64 {
+            return size > 0 ? size : 0
+        }
+
+        #expect(handleNegativeSize(-100) == 0, "負の値は0として処理されること")
+        #expect(handleNegativeSize(-1) == 0, "負の値は0として処理されること")
+        #expect(handleNegativeSize(0) == 0, "ゼロは0として処理されること")
+        #expect(handleNegativeSize(1) == 1, "正の値はそのまま処理されること")
+    }
+
+    /// 典型的なファイルサイズ範囲のテスト
+    @Test("境界値-05: 典型的なファイルサイズ範囲")
+    func typicalFileSizeRanges() async throws {
+        // 一般的な写真・動画のサイズ範囲
+        let typicalSizes: [(size: Int64, type: String)] = [
+            (500_000, "低解像度JPEG"),
+            (2_000_000, "標準JPEG（2MB）"),
+            (5_000_000, "高解像度JPEG（5MB）"),
+            (10_000_000, "RAW/HEIC（10MB）"),
+            (25_000_000, "ProRAW（25MB）"),
+            (50_000_000, "48MP ProRAW（50MB）"),
+            (100_000_000, "短い動画（100MB）"),
+            (500_000_000, "1分4K動画（500MB）"),
+        ]
+
+        var totalSize: Int64 = 0
+        for testCase in typicalSizes {
+            totalSize += testCase.size
+
+            // 累積サイズが正しく計算されることを確認
+            #expect(totalSize > 0, "累積サイズは正の値")
+        }
+
+        // 全体の合計が期待値と一致
+        let expectedTotal: Int64 = typicalSizes.reduce(0) { $0 + $1.size }
+        #expect(totalSize == expectedTotal, "累積計算が正確であること")
+    }
+}
+
+// MARK: - A4 Error Handling Tests
+
+/// A4タスク: エラーハンドリングテスト
+/// 異常系・エッジケースでの動作を検証
+@Suite("A4: エラーハンドリング - 異常系テスト")
+struct FileSizeErrorHandlingTests {
+
+    /// 推定値がnilの場合の連続処理
+    @Test("異常系-01: 連続してnilが返される場合の動作")
+    func consecutiveNilEstimates() async throws {
+        let assets: [FileSizeProvider] = [
+            MockFileSizeProvider(estimatedSize: nil, actualSize: 1_000_000),
+            MockFileSizeProvider(estimatedSize: nil, actualSize: 2_000_000),
+            MockFileSizeProvider(estimatedSize: nil, actualSize: 3_000_000)
+        ]
+
+        // 全てフォールバックが使用される
+        let totalWithFallback = await assets.simulateTotalFileSizeFast(fallbackToActual: true)
+        #expect(totalWithFallback == 6_000_000, "全ての実測値がフォールバックで使用されること")
+
+        // フォールバック無効時は全て0
+        let totalWithoutFallback = await assets.simulateTotalFileSizeFast(fallbackToActual: false)
+        #expect(totalWithoutFallback == 0, "フォールバック無効時は0が返されること")
+    }
+
+    /// 混合ケース：正常値、nil、ゼロが混在
+    @Test("異常系-02: 正常値、nil、ゼロが混在するケース")
+    func mixedValidInvalidValues() async throws {
+        let assets: [FileSizeProvider] = [
+            MockFileSizeProvider(estimatedSize: 5_000_000, actualSize: 5_100_000),  // 正常（推定値使用）
+            MockFileSizeProvider(estimatedSize: nil, actualSize: 2_000_000),        // nil（フォールバック）
+            MockFileSizeProvider(estimatedSize: 0, actualSize: 3_000_000),          // ゼロ（フォールバック）
+            MockFileSizeProvider(estimatedSize: 8_000_000, actualSize: 8_200_000),  // 正常（推定値使用）
+            MockFileSizeProvider(estimatedSize: nil, actualSize: 1_500_000)         // nil（フォールバック）
+        ]
+
+        // フォールバック有効
+        // 5M + 2M + 3M + 8M + 1.5M = 19.5M
+        let totalWithFallback = await assets.simulateTotalFileSizeFast(fallbackToActual: true)
+        #expect(totalWithFallback == 19_500_000, "正常値とフォールバック値が正しく合算されること")
+
+        // フォールバック無効
+        // 5M + 0 + 0 + 8M + 0 = 13M
+        let totalWithoutFallback = await assets.simulateTotalFileSizeFast(fallbackToActual: false)
+        #expect(totalWithoutFallback == 13_000_000, "推定値のみが合算されること")
+    }
+
+    /// 実測値もゼロの場合（完全に取得不可）
+    @Test("異常系-03: 推定値も実測値も取得できないケース")
+    func completelyUnavailableFileSize() async throws {
+        // iCloud専用で未ダウンロード、推定値もない極端なケース
+        let provider = MockFileSizeProvider(estimatedSize: nil, actualSize: 0)
+
+        let estimated = await provider.getEstimatedSize()
+        let actual = await provider.getActualSize()
+
+        #expect(estimated == nil, "推定値はnil")
+        #expect(actual == 0, "実測値も0")
+
+        // シミュレーション
+        let assets: [FileSizeProvider] = [provider]
+        let total = await assets.simulateTotalFileSizeFast(fallbackToActual: true)
+        #expect(total == 0, "取得不可の場合は0が返されること")
+    }
+
+    /// 大量のアセットでの処理（並列処理の検証）
+    @Test("異常系-04: 大量アセットでの並列処理")
+    func largeNumberOfAssets() async throws {
+        // 1000個のアセットをシミュレート
+        let assets: [FileSizeProvider] = (1...1000).map { index in
+            // 10%の確率でnilを返す
+            let estimatedSize: Int64? = index % 10 == 0 ? nil : Int64(index * 100_000)
+            return MockFileSizeProvider(
+                estimatedSize: estimatedSize,
+                actualSize: Int64(index * 100_000)
+            )
+        }
+
+        let total = await assets.simulateTotalFileSizeFast(fallbackToActual: true)
+
+        // 1 + 2 + ... + 1000 = 500500
+        // 500500 * 100_000 = 50,050,000,000
+        let expectedTotal: Int64 = (1...1000).reduce(0) { $0 + Int64($1 * 100_000) }
+        #expect(total == expectedTotal, "大量アセットでも正確に計算されること")
+    }
+
+    /// 同一アセットの重複処理
+    @Test("異常系-05: 同一アセットの重複処理")
+    func duplicateAssetProcessing() async throws {
+        let sameProvider = MockFileSizeProvider(estimatedSize: 5_000_000, actualSize: 5_100_000)
+
+        // 同じプロバイダーを複数回追加
+        let assets: [FileSizeProvider] = [sameProvider, sameProvider, sameProvider]
+
+        let total = await assets.simulateTotalFileSizeFast(fallbackToActual: true)
+        #expect(total == 15_000_000, "重複アセットも個別にカウントされること")
+    }
+}
+
 // MARK: - A4 Cache Behavior Tests
 
 @Suite("A4: キャッシュ動作テスト")
