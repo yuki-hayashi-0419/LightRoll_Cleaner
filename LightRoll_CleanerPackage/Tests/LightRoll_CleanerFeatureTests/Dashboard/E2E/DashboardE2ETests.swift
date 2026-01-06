@@ -176,11 +176,11 @@ struct DashboardE2EScenarioTests {
 
         // Step 4: 特定グループを選択して詳細へ
         let selectedGroup = groups[0]
-        router.navigateToGroupDetail(group: selectedGroup)
+        router.navigateToGroupDetail(groupId: selectedGroup.id)
 
         // Then: 最終状態の確認
         #expect(router.path.count == 2)
-        #expect(router.path[1] == .groupDetail(selectedGroup))
+        #expect(router.path[1] == .groupDetail(selectedGroup.id))
         #expect(selectedGroup.type == .similar)
         #expect(selectedGroup.count == 10)
     }
@@ -211,7 +211,7 @@ struct DashboardE2EScenarioTests {
         #expect(screenshotGroups.count == 1)
 
         // Step 4: グループ詳細へ
-        router.navigateToGroupDetail(group: screenshotGroups[0])
+        router.navigateToGroupDetail(groupId: screenshotGroups[0].id)
         #expect(router.path.count == 2)
     }
 
@@ -314,9 +314,9 @@ struct DashboardE2EScenarioTests {
 
         // Step 1: 深いナビゲーションスタックを構築
         router.navigateToGroupList()
-        router.navigateToGroupDetail(group: groups[0])
+        router.navigateToGroupDetail(groupId: groups[0].id)
         router.navigateToGroupList(filterType: .screenshot)
-        router.navigateToGroupDetail(group: groups[1])
+        router.navigateToGroupDetail(groupId: groups[1].id)
 
         #expect(router.path.count == 4)
 
@@ -366,7 +366,7 @@ struct DashboardE2EScenarioTests {
         router.navigateToGroupList()
 
         // Step 2: グループ1の詳細へ
-        router.navigateToGroupDetail(group: groups[0])
+        router.navigateToGroupDetail(groupId: groups[0].id)
         #expect(router.path.count == 2)
 
         // Step 3: 一覧に戻る
@@ -374,9 +374,9 @@ struct DashboardE2EScenarioTests {
         #expect(router.path.count == 1)
 
         // Step 4: グループ2の詳細へ
-        router.navigateToGroupDetail(group: groups[1])
+        router.navigateToGroupDetail(groupId: groups[1].id)
         #expect(router.path.count == 2)
-        #expect(router.path[1] == .groupDetail(groups[1]))
+        #expect(router.path[1] == .groupDetail(groups[1].id))
     }
 
     // MARK: - Error Recovery Scenarios
@@ -570,7 +570,7 @@ struct DashboardE2EScenarioTests {
         #expect(selectedIds.count == 1)
 
         // Step 4: 詳細表示
-        router.navigateToGroupDetail(group: groups[0])
+        router.navigateToGroupDetail(groupId: groups[0].id)
         #expect(router.path.count == 2)
 
         // Step 5: 削除実行

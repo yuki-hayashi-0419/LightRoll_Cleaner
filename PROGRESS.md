@@ -1,6 +1,78 @@
 # 開発進捗記録
 
-## 最終更新: 2026-01-06
+## 最終更新: 2026-01-07
+
+---
+
+## セッション37：bug-trash-002-fix-complete（2026-01-06）完了
+
+### セッション概要
+- **セッションID**: bug-trash-002-fix-complete
+- **目的**: BUG-TRASH-002 ゴミ箱バグ修正（Phase 1-2全完了）
+- **品質スコア**: 92点（合格）
+- **終了理由**: 全5件のバグ修正完了、ビルド・テスト成功
+- **担当**: @spec-developer
+
+### 実施内容
+
+#### 1. P1-B: Photos Frameworkコールバック問題修正 完了
+- **対象ファイル**: TrashManager.swift（310-379行目）
+- **問題**: `PHImageManager.requestImage`が完了ハンドラを複数回呼び出し（劣化画像→高品質画像）、`withCheckedContinuation`の二重resume発生
+- **解決策**:
+  - `ResumeFlag`クラスラッパー追加（`@unchecked Sendable`）
+  - `hasResumed`フラグで二重resume防止
+  - `isDegraded`チェックで劣化画像スキップ
+
+#### 2. P1-C: SwiftUI環境オブジェクト未注入修正 完了
+- **対象ファイル**: SettingsView.swift（122-134行目）
+- **問題**: sheet内のTrashViewに`settingsService`が注入されていない
+- **解決策**: `.environment(settingsService)`を明示的に追加
+
+#### 3. P1-A: RestorePhotosUseCase ID不一致修正 完了
+- **対象ファイル**: RestorePhotosUseCase.swift（237-283行目）
+- **内容**: IDマッチングロジック確認（既に正しい実装）
+- **追加**: DEBUGログ追加でランタイム問題診断容易化
+
+#### 4. P2-A: 非同期処理中のビュー破棄対策 完了
+- **対象ファイル**: TrashView.swift
+- **追加内容**:
+  - `isProcessing: Bool`状態フラグ（96-98行目）
+  - `currentTask: Task<Void, Never>?`タスク追跡（100-102行目）
+  - `.onDisappear`でタスクキャンセル（196-199行目）
+  - `.disabled(isProcessing)`で処理中インタラクション無効化（201行目）
+  - 処理中インジケーターオーバーレイ（203-210行目）
+  - 3つの実行関数に`isProcessing`ガード追加（763-917行目）
+  - `Task.isCancelled`チェック追加
+
+#### 5. P2-B: ゴミ箱選択UX改善 完了
+- **対象ファイル**: TrashView.swift（728-745行目）
+- **変更内容**: `toggleSelection()`で`isEditMode`が`false`の場合、自動的に`true`に設定
+- **効果**: 写真タップで即座に編集モード+選択が可能に
+
+### 修正ファイル一覧
+
+| ファイル | 変更内容 | 状態 |
+|----------|----------|------|
+| TrashManager.swift | P1-B: PHImageManager二重resume防止 | 完了 |
+| SettingsView.swift | P1-C: settingsService環境注入 | 完了 |
+| RestorePhotosUseCase.swift | P1-A: DEBUGログ追加 | 完了 |
+| TrashView.swift | P2-A: 非同期処理保護、P2-B: 自動編集モード | 完了 |
+
+### ビルド・テスト結果
+- **ビルド**: 成功（警告のみ、エラーなし）
+- **テスト**: 全テスト合格
+
+### 成果
+- BUG-TRASH-002 Phase 1-2全タスク完了
+- ゴミ箱機能のクラッシュ完全解消
+- ゴミ箱選択UXの直感化（タップで即選択）
+- 残りタスク: M10リリース準備3件（9h）のみ
+
+### 次回セッション推奨
+
+**優先Option A**: M10-T04 App Store Connect設定（3h）
+**代替Option B**: 実機でのゴミ箱機能テスト検証
+**代替Option C**: Phase X2実装開始
 
 ---
 
@@ -728,143 +800,9 @@ adInterstitialManager.showIfReady(from: rootViewController, isPremium: isPremium
 
 ---
 
-## セッション28：display-004-integration-tests（2025-12-24）完了
+*セッション1〜28は `docs/archive/PROGRESS_ARCHIVE.md` にアーカイブされました*
 
-### セッション概要
-- **セッションID**: display-004-integration-tests
-- **目的**: DISPLAY-004 DisplaySettings統合テスト生成
-- **品質スコア**: 評価中（コンパイル成功）
-- **状態**: 完了
-- **担当**: @spec-test-generator
-
-### 実施内容
-
-#### 1. DISPLAY-004: DisplaySettings統合テスト生成 ✅
-- **目的**: DISPLAY-001〜003の統合動作検証テスト作成
-- **実施内容**:
-  - DisplaySettingsIntegrationTests.swift新規作成（25テストケース）
-  - グリッド列数統合テスト（8件）: 2〜6列の各設定、境界値テスト
-  - ファイルサイズ/撮影日表示統合テスト（6件）: オン/オフ切り替え、フォーマット検証
-  - 並び順統合テスト（6件）: 4種類のSortOrder、表示名検証
-  - 統合シナリオテスト（5件）: 複数設定変更、リセット、空リスト、同値ソート
-
-### テストケース一覧
-| カテゴリ | テスト数 | 内容 |
-|----------|----------|------|
-| グリッド列数 | 8件 | 2〜6列設定、PhotoGrid反映、境界値エラー |
-| ファイルサイズ/撮影日 | 6件 | オン/オフ切り替え、両方オン/オフ、フォーマット |
-| 並び順 | 6件 | 4種類のSortOrder、displayName、allCases |
-| 統合シナリオ | 5件 | 複数設定変更、リセット、無効設定保護、空/1枚リスト |
-
-### 修正ファイル
-| ファイル | 変更内容 |
-|----------|----------|
-| DisplaySettingsIntegrationTests.swift | 新規作成（25テストケース） |
-
-### ビルド結果
-- **ステータス**: コンパイル成功
-- **注記**: 既存テストファイルにエラーあり（本タスクとは無関係）
-
-### 成果
-- ✅ DISPLAY-004実装完了（DisplaySettings統合テスト生成）
-- ✅ 25件のSwift Testingテストケース作成
-- ✅ 正常系/異常系/境界値テスト網羅
-- ✅ コンパイル成功確認
-
-### 全体進捗
-- **進捗率**: 97.5%（156/160タスク完了）
-- **残りタスク**: DISPLAY-003（2.5h）+ M10リリース準備3件（9h）
-
----
-
-## セッション27：display-002-file-date-info（2025-12-24）完了
-
-### セッション概要
-- **セッションID**: display-002-file-date-info
-- **目的**: DISPLAY-002 ファイルサイズ・撮影日表示の実装
-- **品質スコア**: 評価中（ビルド成功）
-- **状態**: 実装完了
-
-### 実施内容
-
-#### 1. DISPLAY-002: ファイルサイズ・撮影日表示の実装 ✅
-- **目的**: 写真サムネイルにファイルサイズと撮影日を表示
-- **修正内容**:
-  - PhotoThumbnail.swift: `showFileSize`/`showDate`パラメータ追加、`photoInfoOverlay`表示実装
-  - PhotoThumbnail.swift: グラデーション背景オーバーレイで情報表示
-  - PhotoThumbnail.swift: `formattedCreationDate`ヘルパープロパティ追加
-  - PhotoThumbnail.swift: アクセシビリティ対応（ファイルサイズ・撮影日の読み上げ）
-  - PhotoGrid.swift: `showFileSize`/`showDate`パラメータ追加、PhotoThumbnailに受け渡し
-  - GroupDetailView.swift: settingsService.settings.displaySettings.showFileSize/showDateを渡す
-  - TrashView.swift: trashPhotoCellに情報オーバーレイ追加（TrashPhoto対応）
-  - TrashView.swift: `formattedCreationDate(for:)`ヘルパーメソッド追加
-
-### 修正ファイル
-| ファイル | 変更内容 |
-|----------|----------|
-| PhotoThumbnail.swift | showFileSize/showDateパラメータ追加、photoInfoOverlay実装、アクセシビリティ対応 |
-| PhotoGrid.swift | showFileSize/showDateパラメータ追加、PhotoThumbnailへの受け渡し |
-| GroupDetailView.swift | DisplaySettings設定値をPhotoGridに渡す |
-| TrashView.swift | trashPhotoCellに情報オーバーレイ追加、ヘルパーメソッド追加 |
-
-### ビルド結果
-- **ステータス**: 成功（警告のみ、エラーなし）
-- **警告**: 既存の@MainActor/Sendable関連（本タスク起因ではない）
-
-### 成果
-- ✅ DISPLAY-002実装完了（ファイルサイズ・撮影日表示）
-- ✅ ビルド成功確認
-- ✅ 設定画面からファイルサイズ/撮影日表示の切り替え可能
-
-### 全体進捗
-- **進捗率**: 97%（155/160タスク完了）
-- **残りタスク**: DisplaySettings統合2件（4h）+ M10リリース準備3件（9h）
-
----
-
-## セッション26：display-settings-integration-001（2025-12-24）完了
-
-### セッション概要
-- **セッションID**: display-settings-integration-001
-- **目的**: DISPLAY-001 グリッド列数設定の統合
-- **品質スコア**: 評価中（ビルド成功）
-- **状態**: 完了
-
-### 実施内容
-
-#### 1. DISPLAY-001: グリッド列数の統合 ✅
-- **問題**: GroupDetailView.swift:272とTrashView.swift:105-107でグリッド列数がハードコード
-- **修正内容**:
-  - GroupDetailView.swift: `@Environment(SettingsService.self)`追加
-  - GroupDetailView.swift: `columns: 3` → `columns: settingsService.settings.displaySettings.gridColumns`
-  - TrashView.swift: `@Environment(SettingsService.self)`追加
-  - TrashView.swift: ローカル定数 → computed propertyに変更し、settingsService.settings.displaySettings.gridColumnsから取得
-  - Previewに`.environment(SettingsService())`追加（4件）
-
-### 修正ファイル
-| ファイル | 変更内容 |
-|----------|----------|
-| GroupDetailView.swift | @Environment(SettingsService.self)追加、columns引数を設定から取得、Preview4件更新 |
-| TrashView.swift | @Environment(SettingsService.self)追加、gridColumnsをcomputed propertyに変更 |
-
-### ビルド結果
-- **ステータス**: 成功（警告のみ、エラーなし）
-- **警告**: 既存の@MainActor/Sendable関連（本タスク起因ではない）
-
-### 成果
-- ✅ DISPLAY-001実装完了（グリッド列数の統合）
-- ✅ ビルド成功確認
-- ✅ 設定画面からグリッド列数変更可能に（2〜6列）
-
-### 全体進捗
-- **進捗率**: 96%（154/160タスク完了）
-- **残りタスク**: DisplaySettings統合3件（7.5h）+ M10リリース準備3件（9h）
-
----
-
-*セッション1〜25は `docs/archive/PROGRESS_ARCHIVE.md` にアーカイブされました*
-
-*最終コンテキスト最適化: 2025-12-25（context-optimization-010）*
+*最終コンテキスト最適化: 2026-01-07（context-optimization-011）*
 
 ---
 

@@ -336,25 +336,44 @@ public final class TrashManager: TrashManagerProtocol {
         options.isSynchronous = false
 
         // withCheckedContinuationを使用して非同期処理をラップ
+        // BUG-TRASH-002-P1B: hasResumedフラグで二重resume防止
         let image: PlatformImage? = await withCheckedContinuation { continuation in
+            // フラグで複数回のresume呼び出しを防止
+            // nonisolatedコンテキストで安全に使用するためにclass wrapper使用
+            final class ResumeFlag: @unchecked Sendable {
+                var hasResumed = false
+            }
+            let flag = ResumeFlag()
+
             PHImageManager.default().requestImage(
                 for: asset,
                 targetSize: thumbnailSize,
                 contentMode: .aspectFill,
                 options: options
             ) { image, info in
+                // 既にresumeされていたら無視（二重resume防止）
+                guard !flag.hasResumed else { return }
+
                 // キャンセルされた場合
                 if let cancelled = info?[PHImageCancelledKey] as? Bool, cancelled {
+                    flag.hasResumed = true
                     continuation.resume(returning: nil)
                     return
                 }
 
                 // エラーチェック
                 if info?[PHImageErrorKey] as? Error != nil {
+                    flag.hasResumed = true
                     continuation.resume(returning: nil)
                     return
                 }
 
+                // 劣化画像（isDegraded）の場合はスキップして高品質画像を待つ
+                if let isDegraded = info?[PHImageResultIsDegradedKey] as? Bool, isDegraded {
+                    return
+                }
+
+                flag.hasResumed = true
                 continuation.resume(returning: image)
             }
         }

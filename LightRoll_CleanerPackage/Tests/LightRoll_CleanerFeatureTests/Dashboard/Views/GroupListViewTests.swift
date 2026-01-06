@@ -243,8 +243,7 @@ struct GroupListViewInitializationTests {
             photoProvider: nil,
             initialFilterType: .similar,
             onGroupTap: { _ in },
-            onDeleteGroups: { _ in },
-            onBack: { }
+            onDeleteGroups: { _ in }
         )
 
         #expect(type(of: view) == GroupListView.self)
@@ -271,8 +270,7 @@ struct GroupListViewInitializationTests {
         let view = GroupListView(
             groups: groups,
             onGroupTap: nil,
-            onDeleteGroups: nil,
-            onBack: nil
+            onDeleteGroups: nil
         )
         #expect(type(of: view) == GroupListView.self)
     }
@@ -852,8 +850,7 @@ struct CallbackTests {
         let view = GroupListView(
             groups: [],
             onGroupTap: nil,
-            onDeleteGroups: nil,
-            onBack: nil
+            onDeleteGroups: nil
         )
 
         #expect(type(of: view) == GroupListView.self)

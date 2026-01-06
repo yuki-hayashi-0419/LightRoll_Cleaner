@@ -93,6 +93,14 @@ public struct TrashView: View {
     /// エラーメッセージ
     @State private var errorMessage: String = ""
 
+    /// BUG-TRASH-002-P2A: 処理中フラグ
+    /// 非同期処理中のビュー破棄によるクラッシュを防止
+    @State private var isProcessing: Bool = false
+
+    /// BUG-TRASH-002-P2A: 現在実行中のタスク
+    /// ビュー破棄時にキャンセルするため保持
+    @State private var currentTask: Task<Void, Never>?
+
     // MARK: - View State
 
     /// ビューの状態
@@ -183,6 +191,22 @@ public struct TrashView: View {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text(errorMessage)
+            }
+            // BUG-TRASH-002-P2A: ビュー破棄時にタスクをキャンセル
+            .onDisappear {
+                currentTask?.cancel()
+                currentTask = nil
+            }
+            // BUG-TRASH-002-P2A: 処理中はインタラクション無効化
+            .disabled(isProcessing)
+            .overlay {
+                // BUG-TRASH-002-P2A: 処理中インジケーター
+                if isProcessing {
+                    ProgressView()
+                        .scaleEffect(1.5)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.black.opacity(0.2))
+                }
             }
         }
     }
@@ -471,8 +495,9 @@ public struct TrashView: View {
     private var actionButtonsView: some View {
         VStack(spacing: LRSpacing.sm) {
             // 復元ボタン
+            // BUG-TRASH-002-P2A: タスクをcurrentTaskに保持
             Button {
-                Task {
+                currentTask = Task {
                     await handleRestore()
                 }
             } label: {
@@ -491,8 +516,9 @@ public struct TrashView: View {
             }
 
             // 完全削除ボタン
+            // BUG-TRASH-002-P2A: タスクをcurrentTaskに保持
             Button {
-                Task {
+                currentTask = Task {
                     await handlePermanentDelete()
                 }
             } label: {
@@ -700,8 +726,16 @@ public struct TrashView: View {
     }
 
     /// 選択トグル
+    /// BUG-TRASH-001-P2B: タップで自動的に編集モードに入る
+    /// 従来は「選択」ボタンを押さないと選択できなかったが、
+    /// 写真タップで即座に編集モード+選択ができるように改善
     private func toggleSelection(_ photo: TrashPhoto) {
-        guard isEditMode else { return }
+        // BUG-TRASH-001-P2B: 編集モードでなければ自動で編集モードに入る
+        if !isEditMode {
+            withAnimation {
+                isEditMode = true
+            }
+        }
 
         if selectedPhotoIds.contains(photo.originalPhotoId) {
             selectedPhotoIds.remove(photo.originalPhotoId)
@@ -735,7 +769,16 @@ public struct TrashView: View {
     }
 
     /// 復元実行
+    /// BUG-TRASH-002-P2A: isProcessingフラグで二重実行防止・クラッシュ防止
     private func executeRestore() async {
+        // 二重実行防止
+        guard !isProcessing else { return }
+        isProcessing = true
+        defer { isProcessing = false }
+
+        // タスクキャンセルチェック
+        guard !Task.isCancelled else { return }
+
         let selectedPhotos = allPhotos.filter { selectedPhotoIds.contains($0.originalPhotoId) }
 
         do {
@@ -743,6 +786,9 @@ public struct TrashView: View {
                 photos: selectedPhotos.map { PhotoAsset(id: $0.originalPhotoId, creationDate: nil, fileSize: $0.fileSize) }
             )
             let result = try await restorePhotosUseCase.execute(input)
+
+            // タスクキャンセルチェック（UI更新前）
+            guard !Task.isCancelled else { return }
 
             // 成功トースト
             toastItem = ToastItem(
@@ -759,6 +805,9 @@ public struct TrashView: View {
             await loadTrashPhotos()
 
         } catch {
+            // タスクキャンセルチェック（エラー表示前）
+            guard !Task.isCancelled else { return }
+
             errorMessage = error.localizedDescription
             showError = true
         }
@@ -782,16 +831,29 @@ public struct TrashView: View {
     }
 
     /// 完全削除実行
+    /// BUG-TRASH-002-P2A: isProcessingフラグで二重実行防止・クラッシュ防止
     private func executePermanentDelete() async {
+        // 二重実行防止
+        guard !isProcessing else { return }
+        isProcessing = true
+        defer { isProcessing = false }
+
+        // タスクキャンセルチェック
+        guard !Task.isCancelled else { return }
+
         let selectedPhotos = allPhotos.filter { selectedPhotoIds.contains($0.originalPhotoId) }
+        let deleteCount = selectedPhotos.count
 
         do {
             try await trashManager.permanentlyDelete(selectedPhotos)
 
+            // タスクキャンセルチェック（UI更新前）
+            guard !Task.isCancelled else { return }
+
             // 成功トースト
             toastItem = ToastItem(
                 type: .success,
-                title: "\(selectedPhotos.count)枚の写真を完全に削除しました"
+                title: "\(deleteCount)枚の写真を完全に削除しました"
             )
             showToast = true
 
@@ -803,6 +865,9 @@ public struct TrashView: View {
             await loadTrashPhotos()
 
         } catch {
+            // タスクキャンセルチェック（エラー表示前）
+            guard !Task.isCancelled else { return }
+
             errorMessage = error.localizedDescription
             showError = true
         }
@@ -824,9 +889,21 @@ public struct TrashView: View {
     }
 
     /// ゴミ箱を空にする実行
+    /// BUG-TRASH-002-P2A: isProcessingフラグで二重実行防止・クラッシュ防止
     private func executeEmptyTrash() async {
+        // 二重実行防止
+        guard !isProcessing else { return }
+        isProcessing = true
+        defer { isProcessing = false }
+
+        // タスクキャンセルチェック
+        guard !Task.isCancelled else { return }
+
         do {
             try await trashManager.emptyTrash()
+
+            // タスクキャンセルチェック（UI更新前）
+            guard !Task.isCancelled else { return }
 
             // 成功トースト
             toastItem = ToastItem(
@@ -839,6 +916,9 @@ public struct TrashView: View {
             await loadTrashPhotos()
 
         } catch {
+            // タスクキャンセルチェック（エラー表示前）
+            guard !Task.isCancelled else { return }
+
             errorMessage = error.localizedDescription
             showError = true
         }

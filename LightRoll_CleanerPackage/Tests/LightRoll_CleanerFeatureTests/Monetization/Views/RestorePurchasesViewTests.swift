@@ -48,7 +48,6 @@ struct RestorePurchasesViewTests {
         // When
         let view = RestorePurchasesView()
             .environment(manager)
-            .environment(repository)
 
         // Then
         // ViewInspectorを使わずに、状態変数を確認
@@ -64,7 +63,6 @@ struct RestorePurchasesViewTests {
         // When
         let view = RestorePurchasesView()
             .environment(manager)
-            .environment(repository)
 
         // Then
         #expect(view != nil, "復元ボタンを含むViewが存在すること")
@@ -84,7 +82,6 @@ struct RestorePurchasesViewTests {
         // When
         _ = RestorePurchasesView()
             .environment(manager)
-            .environment(repository)
 
         // Then
         // 復元処理は非同期なので、実際の状態変化を確認
@@ -104,7 +101,6 @@ struct RestorePurchasesViewTests {
         // When
         _ = RestorePurchasesView()
             .environment(manager)
-            .environment(repository)
 
         let result = try await repository.restorePurchases()
 
@@ -125,7 +121,6 @@ struct RestorePurchasesViewTests {
         // When
         _ = RestorePurchasesView()
             .environment(manager)
-            .environment(repository)
 
         let result = try await repository.restorePurchases()
 
@@ -139,13 +134,12 @@ struct RestorePurchasesViewTests {
         // Given
         let repository = mockRepository
         repository.shouldThrowError = true
-        repository.errorToThrow = .networkError
+        repository.mockError = .networkError
         let manager = PremiumManager(purchaseRepository: repository)
 
         // When
         _ = RestorePurchasesView()
             .environment(manager)
-            .environment(repository)
 
         // Then
         await #expect(throws: PurchaseError.self) {
@@ -158,13 +152,12 @@ struct RestorePurchasesViewTests {
         // Given
         let repository = mockRepository
         repository.shouldThrowError = true
-        repository.errorToThrow = .restorationFailed("Apple IDが一致しません")
+        repository.mockError = .restorationFailed("Apple IDが一致しません")
         let manager = PremiumManager(purchaseRepository: repository)
 
         // When
         _ = RestorePurchasesView()
             .environment(manager)
-            .environment(repository)
 
         // Then
         do {
@@ -190,7 +183,6 @@ struct RestorePurchasesViewTests {
         // When
         let view = RestorePurchasesView()
             .environment(manager)
-            .environment(repository)
 
         // Then
         #expect(view != nil, "復元中のViewが存在すること")
@@ -205,7 +197,6 @@ struct RestorePurchasesViewTests {
         // When
         let view = RestorePurchasesView()
             .environment(manager)
-            .environment(repository)
 
         // Then
         #expect(view != nil, "アクセシビリティ対応のViewが存在すること")
@@ -224,7 +215,6 @@ struct RestorePurchasesViewTests {
         // When
         _ = RestorePurchasesView()
             .environment(manager)
-            .environment(repository)
 
         _ = try await repository.restorePurchases()
         try await manager.checkPremiumStatus()
@@ -242,7 +232,6 @@ struct RestorePurchasesViewTests {
         // When
         let view = RestorePurchasesView()
             .environment(manager)
-            .environment(repository)
 
         // Then
         #expect(view != nil, "復元中はボタンが無効化されるViewが存在すること")
@@ -255,13 +244,12 @@ struct RestorePurchasesViewTests {
         // Given
         let repository = mockRepository
         repository.shouldThrowError = true
-        repository.errorToThrow = .purchaseCancelled
+        repository.mockError = .purchaseCancelled
         let manager = PremiumManager(purchaseRepository: repository)
 
         // When
         _ = RestorePurchasesView()
             .environment(manager)
-            .environment(repository)
 
         // Then
         do {
@@ -281,13 +269,12 @@ struct RestorePurchasesViewTests {
         // Given
         let repository = mockRepository
         repository.shouldThrowError = true
-        repository.errorToThrow = .verificationFailed
+        repository.mockError = .verificationFailed
         let manager = PremiumManager(purchaseRepository: repository)
 
         // When
         _ = RestorePurchasesView()
             .environment(manager)
-            .environment(repository)
 
         // Then
         await #expect(throws: PurchaseError.self) {

@@ -119,7 +119,7 @@ struct ManagerRepositoryInteractionTests {
         await manager.recordDeletion(count: 10)
 
         // Then: カウントが増加
-        #expect(manager.dailyDeleteCount == 10)
+        #expect(manager.totalDeleteCount == 10)
 
         let remaining = await manager.getRemainingDeletions()
         #expect(remaining == 40) // 50 - 10
@@ -129,7 +129,7 @@ struct ManagerRepositoryInteractionTests {
         await manager.recordDeletion(count: 40)
 
         // Then: 上限到達
-        #expect(manager.dailyDeleteCount == 50)
+        #expect(manager.totalDeleteCount == 50)
         #expect(manager.canDelete(count: 1) == false)
 
         let remainingAfter = await manager.getRemainingDeletions()
@@ -430,11 +430,11 @@ struct StateRefreshTests {
         #expect(manager.subscriptionStatus.isActive == true)
     }
 
-    // MARK: - Test: 日次カウントリセット
+    // MARK: - Test: 生涯削除カウント累積
 
-    @Test("日次カウントリセット → 削除可能数復元")
+    @Test("生涯削除カウント → 累積・永続化")
     @MainActor
-    func dailyCountResetInteraction() async throws {
+    func lifetimeDeleteCountInteraction() async throws {
         // Given: 削除済みの無料ユーザー
         let repository = MockPurchaseRepository()
         let manager = PremiumManager(purchaseRepository: repository)
@@ -443,22 +443,23 @@ struct StateRefreshTests {
 
         // When: 30枚削除
         await manager.recordDeletion(count: 30)
-        #expect(manager.dailyDeleteCount == 30)
+        #expect(manager.totalDeleteCount == 30)
 
-        let beforeReset = await manager.getRemainingDeletions()
-        #expect(beforeReset == 20) // 50 - 30
+        let beforeMore = await manager.getRemainingDeletions()
+        #expect(beforeMore == 20) // 50 - 30
 
-        // When: 日次リセット（日付変更）
-        manager.resetDailyCount()
+        // When: さらに15枚削除
+        await manager.recordDeletion(count: 15)
 
-        // Then: カウントがリセット
-        #expect(manager.dailyDeleteCount == 0)
+        // Then: 累積される（生涯制限モデル）
+        #expect(manager.totalDeleteCount == 45)
 
-        let afterReset = await manager.getRemainingDeletions()
-        #expect(afterReset == 50)
+        let afterMore = await manager.getRemainingDeletions()
+        #expect(afterMore == 5) // 50 - 45
 
-        // Then: 再度削除可能
-        #expect(manager.canDelete(count: 50) == true)
+        // Then: 残り5枚しか削除できない
+        #expect(manager.canDelete(count: 6) == false)
+        #expect(manager.canDelete(count: 5) == true)
     }
 }
 

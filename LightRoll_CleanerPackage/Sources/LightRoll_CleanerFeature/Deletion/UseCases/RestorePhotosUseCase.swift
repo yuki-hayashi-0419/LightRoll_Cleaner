@@ -230,18 +230,40 @@ public final class RestorePhotosUseCase: RestorePhotosUseCaseProtocol {
     /// - Parameter photoAssets: 変換元のPhotoAsset配列
     /// - Returns: 変換後のTrashPhoto配列
     /// - Throws: RestorePhotosUseCaseError
+    ///
+    /// ## BUG-TRASH-002-P1A デバッグ情報追加
+    /// - IDマッチングの詳細ログを出力
+    /// - 不一致時の原因特定を容易化
     private func convertToTrashPhotos(_ photoAssets: [PhotoAsset]) async throws -> [TrashPhoto] {
         // ゴミ箱内の全写真を取得
         let allTrashPhotos = await trashManager.fetchAllTrashPhotos()
+
+        #if DEBUG
+        // BUG-TRASH-002-P1A: デバッグログ
+        print("[RestorePhotosUseCase] 復元リクエスト: \(photoAssets.count)件")
+        print("[RestorePhotosUseCase] ゴミ箱内写真数: \(allTrashPhotos.count)件")
+        print("[RestorePhotosUseCase] リクエストID: \(photoAssets.map { $0.id }.prefix(5))...")
+        print("[RestorePhotosUseCase] ゴミ箱originalPhotoId: \(allTrashPhotos.map { $0.originalPhotoId }.prefix(5))...")
+        #endif
 
         // PhotoAssetのIDとTrashPhotoのoriginalPhotoIdでマッチング
         let photoIdSet = Set(photoAssets.map { $0.id })
         let matchedPhotos = allTrashPhotos.filter { photoIdSet.contains($0.originalPhotoId) }
 
+        #if DEBUG
+        print("[RestorePhotosUseCase] マッチした写真数: \(matchedPhotos.count)件")
+        #endif
+
         // 見つからない写真があればエラー
         if matchedPhotos.count != photoAssets.count {
             let foundIds = Set(matchedPhotos.map { $0.originalPhotoId })
             let missingIds = photoIdSet.subtracting(foundIds)
+
+            #if DEBUG
+            print("[RestorePhotosUseCase] ERROR: 不一致検出")
+            print("[RestorePhotosUseCase] 見つからないID: \(missingIds)")
+            #endif
+
             throw RestorePhotosUseCaseError.restorationFailed(
                 underlying: NSError(
                     domain: "RestorePhotosUseCase",

@@ -414,16 +414,17 @@ struct MonetizationIntegrationTests {
         let remaining1 = await manager.getRemainingDeletions()
         #expect(remaining1 == 20)
 
-        // ステップ2: 日次リセット（日付変更時を想定）
-        manager.resetDailyCount()
+        // ステップ2: さらに削除（生涯制限モデルでは累積される）
+        await manager.recordDeletion(count: 15)
 
-        // ステップ3: カウントが0にリセット
-        #expect(manager.dailyDeleteCount == 0)
+        // ステップ3: カウントが累積
+        #expect(manager.totalDeleteCount == 45)
         let remaining2 = await manager.getRemainingDeletions()
-        #expect(remaining2 == 50)
+        #expect(remaining2 == 5) // 50 - 45
 
-        // ステップ4: 再度削除可能
-        #expect(manager.canDelete(count: 50) == true)
+        // ステップ4: 上限に近づいたため残り5枚のみ削除可能
+        #expect(manager.canDelete(count: 6) == false)
+        #expect(manager.canDelete(count: 5) == true)
     }
 
     // MARK: - シナリオ7: 複数機能の組み合わせ

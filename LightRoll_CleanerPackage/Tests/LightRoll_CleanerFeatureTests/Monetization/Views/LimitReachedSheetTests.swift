@@ -53,7 +53,7 @@ struct LimitReachedSheetTests {
         #expect(sheet.limit == 50)
     }
 
-    @Test("onUpgradeTapコールバックが正しく呼ばれる")
+    @Test("onUpgradeクロージャが正しく設定される")
     func testOnUpgradeCallback() {
         // Given
         var upgradeCalled = false
@@ -65,8 +65,8 @@ struct LimitReachedSheetTests {
             }
         )
 
-        // When
-        sheet.onUpgradeTap()
+        // When: クロージャを直接呼び出してテスト
+        sheet.onUpgrade()
 
         // Then
         #expect(upgradeCalled)
@@ -240,9 +240,9 @@ struct LimitReachedSheetIntegrationTests {
         )
 
         // When
-        sheet.onUpgradeTap()
-        sheet.onUpgradeTap()
-        sheet.onUpgradeTap()
+        sheet.onUpgrade()
+        sheet.onUpgrade()
+        sheet.onUpgrade()
 
         // Then
         #expect(callCount == 3)
@@ -259,8 +259,8 @@ struct LimitReachedSheetIntegrationTests {
         #expect(sheet1.currentCount == 50)
         #expect(sheet2.currentCount == 25)
         #expect(sheet3.currentCount == 100)
-        #expect(sheet1.dailyLimit == 50)
-        #expect(sheet2.dailyLimit == 25)
-        #expect(sheet3.dailyLimit == 100)
+        #expect(sheet1.limit == 50)
+        #expect(sheet2.limit == 25)
+        #expect(sheet3.limit == 100)
     }
 }

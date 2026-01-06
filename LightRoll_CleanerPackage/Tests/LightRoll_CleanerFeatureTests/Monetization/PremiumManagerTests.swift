@@ -140,22 +140,22 @@ struct PremiumManagerTests {
         manager.incrementDeleteCount(5)
 
         // Then: カウント合計
-        #expect(manager.dailyDeleteCount == 30)
+        #expect(manager.totalDeleteCount == 30)
     }
 
-    @Test("日次カウントのリセット")
+    @Test("削除カウントのリセット（テスト用）")
     @MainActor
-    func testResetDailyCount() {
+    func testResetDeleteCount() {
         // Given: カウントがある状態
         let mockRepo = MockPurchaseRepository()
         let manager = PremiumManager(purchaseRepository: mockRepo)
         manager.incrementDeleteCount(30)
 
-        // When: リセット
-        manager.resetDailyCount()
+        // When: リセット（テスト用、本番では使用しない）
+        manager.resetDeleteCount()
 
         // Then: カウントが0に
-        #expect(manager.dailyDeleteCount == 0)
+        #expect(manager.totalDeleteCount == 0)
         #expect(manager.canDelete(count: 50) == true)
     }
 
@@ -362,13 +362,13 @@ struct PremiumManagerTests {
         await manager.recordDeletion(count: 15)
 
         // Then: カウントが増加
-        #expect(manager.dailyDeleteCount == 15)
+        #expect(manager.totalDeleteCount == 15)
 
         // When: さらに記録
         await manager.recordDeletion(count: 10)
 
         // Then: カウント合計
-        #expect(manager.dailyDeleteCount == 25)
+        #expect(manager.totalDeleteCount == 25)
     }
 
     @Test("refreshStatus - ステータス更新")

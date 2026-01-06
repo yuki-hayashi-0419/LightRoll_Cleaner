@@ -4,6 +4,74 @@
 
 ---
 
+## アーカイブ: 2026-01-07 context-optimization-011 実行時
+
+以下のエントリは context-optimization-011 実行時（セッション37終了後）のコンテキスト最適化でアーカイブされました。
+（PROGRESS.md 12セッション → 9セッション、セッション26〜28を移動）
+
+---
+
+### 2025-12-24 セッション28: display-004-integration-tests（アーカイブ）
+
+**セッション概要**:
+- セッションID: display-004-integration-tests
+- 目的: DISPLAY-004 DisplaySettings統合テスト生成
+- 品質スコア: 評価中（コンパイル成功）
+- 状態: 完了
+- 担当: @spec-test-generator
+
+**実施内容**:
+- DisplaySettingsIntegrationTests.swift新規作成（25テストケース）
+- グリッド列数統合テスト（8件）
+- ファイルサイズ/撮影日表示統合テスト（6件）
+- 並び順統合テスト（6件）
+- 統合シナリオテスト（5件）
+
+**成果**:
+- DISPLAY-004実装完了
+- 25件のSwift Testingテストケース作成
+- コンパイル成功確認
+
+---
+
+### 2025-12-24 セッション27: display-002-file-date-info（アーカイブ）
+
+**セッション概要**:
+- セッションID: display-002-file-date-info
+- 目的: DISPLAY-002 ファイルサイズ・撮影日表示の実装
+- 品質スコア: 評価中（ビルド成功）
+- 状態: 実装完了
+
+**実施内容**:
+- PhotoThumbnail.swift: showFileSize/showDateパラメータ追加
+- PhotoGrid.swift: パラメータ追加、PhotoThumbnailへの受け渡し
+- GroupDetailView.swift: DisplaySettings設定値をPhotoGridに渡す
+- TrashView.swift: trashPhotoCellに情報オーバーレイ追加
+
+**成果**:
+- DISPLAY-002実装完了（ファイルサイズ・撮影日表示）
+- ビルド成功確認
+
+---
+
+### 2025-12-24 セッション26: display-settings-integration-001（アーカイブ）
+
+**セッション概要**:
+- セッションID: display-settings-integration-001
+- 目的: DISPLAY-001 グリッド列数設定の統合
+- 品質スコア: 評価中（ビルド成功）
+- 状態: 完了
+
+**実施内容**:
+- GroupDetailView.swift: @Environment(SettingsService.self)追加、columns引数を設定から取得
+- TrashView.swift: @Environment(SettingsService.self)追加、gridColumnsをcomputed propertyに変更
+
+**成果**:
+- DISPLAY-001実装完了（グリッド列数の統合）
+- ビルド成功確認
+
+---
+
 ## アーカイブ: 2025-12-25 context-optimization-010 実行時
 
 以下のエントリは context-optimization-010 実行時（セッション34終了後）のコンテキスト最適化でアーカイブされました。

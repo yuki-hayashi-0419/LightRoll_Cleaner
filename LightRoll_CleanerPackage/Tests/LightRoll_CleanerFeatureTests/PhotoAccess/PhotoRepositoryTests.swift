@@ -961,16 +961,16 @@ struct ThumbnailFetchTests {
         let repository = PhotoRepository(permissionManager: mockPermission)
 
         let options = ThumbnailRequestOptions.default
-        var progressCalls = 0
+        // Swift 6ではクロージャ内でvar変数を変更できないため、
+        // 空のプログレスクロージャを渡す
 
         let results = try await repository.fetchThumbnails(
             for: [],
             options: options,
-            progress: { _, _ in progressCalls += 1 }
+            progress: { _, _ in }
         )
 
         #expect(results.isEmpty)
-        #expect(progressCalls == 0)
     }
 
     @Test("存在しないIDでサムネイル取得時にエラー")

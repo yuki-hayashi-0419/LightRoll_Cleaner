@@ -487,7 +487,7 @@ struct NavigationEdgeCaseTests {
 
         // When: 50階層
         for _ in 0..<50 {
-            router.navigateToGroupDetail(group: group)
+            router.navigateToGroupDetail(groupId: group.id)
         }
 
         // Then
@@ -503,7 +503,7 @@ struct NavigationEdgeCaseTests {
         router.navigateToGroupList()
 
         // When: 存在しない画面へ戻ろうとする
-        router.navigateBackTo(.groupDetail(group))
+        router.navigateBackTo(.groupDetail(group.id))
 
         // Then: 変化なし
         #expect(router.path.count == 1)

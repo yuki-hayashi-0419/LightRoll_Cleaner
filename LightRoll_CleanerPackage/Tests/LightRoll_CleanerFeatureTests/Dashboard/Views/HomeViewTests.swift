@@ -737,10 +737,10 @@ struct HomeViewTaskModifierTests {
     func testInitialDataLoadSuccess() {
         // Given: 統計データを作成
         let storageInfo = StorageInfo(
-            totalCapacity: 128_000_000_000,   // 128GB
+            totalCapacity: 128_000_000_000,    // 128GB
             availableCapacity: 64_000_000_000, // 64GB
-            usedCapacity: 64_000_000_000,      // 64GB
-            photoLibrarySize: 32_000_000_000   // 32GB
+            photosUsedCapacity: 32_000_000_000, // 32GB
+            reclaimableCapacity: 5_000_000_000  // 5GB
         )
 
         // When: StorageStatisticsを作成
@@ -866,8 +866,8 @@ struct HomeViewTaskModifierTests {
         let storageInfo = StorageInfo(
             totalCapacity: 1_000_000_000_000,      // 1TB
             availableCapacity: 500_000_000_000,    // 500GB
-            usedCapacity: 500_000_000_000,         // 500GB
-            photoLibrarySize: largeStorageSize
+            photosUsedCapacity: largeStorageSize,   // 500GB
+            reclaimableCapacity: 50_000_000_000     // 50GB
         )
 
         let statistics = StorageStatistics(
@@ -878,7 +878,7 @@ struct HomeViewTaskModifierTests {
 
         // Then: 大量データが正しく処理される
         #expect(statistics.scannedPhotoCount == 100_000)
-        #expect(statistics.storageInfo.photoLibrarySize == 500_000_000_000)
+        #expect(statistics.storageInfo.photosUsedCapacity == 500_000_000_000)
     }
 
     @Test("大量グループの場合: 1000グループを処理できる")

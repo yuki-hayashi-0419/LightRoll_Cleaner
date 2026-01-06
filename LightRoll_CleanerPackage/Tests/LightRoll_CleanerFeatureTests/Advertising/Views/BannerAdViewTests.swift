@@ -694,7 +694,7 @@ final class MockAdManager {
 final class BannerAdViewMockPremiumManager: PremiumManagerProtocol {
     var isPremium: Bool
     var subscriptionStatus: PremiumStatus
-    var dailyDeleteCount: Int = 0
+    var totalDeleteCount: Int = 0
 
     init(isPremiumValue: Bool) {
         self.isPremium = isPremiumValue
@@ -719,11 +719,11 @@ final class BannerAdViewMockPremiumManager: PremiumManagerProtocol {
     }
 
     func getRemainingDeletions() async -> Int {
-        return isPremium ? Int.max : max(0, 50 - dailyDeleteCount)
+        return isPremium ? Int.max : max(0, 50 - totalDeleteCount)
     }
 
     func recordDeletion(count: Int) async {
-        dailyDeleteCount += count
+        totalDeleteCount += count
     }
 
     func refreshStatus() async {

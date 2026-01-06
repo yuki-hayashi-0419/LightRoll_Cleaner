@@ -86,7 +86,7 @@ struct PremiumViewTests {
 
         @Test("Premium会員の場合は既存ステータス表示")
         func testPremiumMemberShowsStatus() {
-            let mockManager = MockPremiumManager(
+            let mockManager = PremiumViewMockPremiumManager(
                 isPremiumValue: true,
                 status: .monthly(autoRenew: true)
             )
@@ -95,22 +95,18 @@ struct PremiumViewTests {
             // Given: Premium会員
             // Then: ステータスが正しい
             #expect(mockManager.isPremium == true)
-
-            if case .monthly = mockManager.subscriptionStatus {
-                // Success
-            } else {
-                Issue.record("Expected monthly subscription status")
-            }
+            #expect(mockManager.subscriptionStatus.subscriptionType == .monthly)
+            #expect(mockManager.subscriptionStatus.isPremium == true)
         }
 
         @Test("非会員の場合は削除残数表示")
         func testFreeMemberShowsRemainingDeletions() {
             let mockManager = PremiumViewMockPremiumManager(isPremiumValue: false)
-            mockManager.dailyDeleteCount = 10
+            mockManager.totalDeleteCount = 10
 
             // Given: 非会員で10枚削除済み
             // Then: 残数は40枚（50 - 10）
-            let remaining = 50 - mockManager.dailyDeleteCount
+            let remaining = 50 - mockManager.totalDeleteCount
             #expect(remaining == 40)
         }
 
@@ -268,7 +264,8 @@ struct PremiumViewTests {
         @Test("購入キャンセルは適切に処理（アラートなし）")
         func testPurchaseCancellationHandling() async throws {
             let mockRepo = MockPurchaseRepository()
-            mockRepo.shouldThrowCancelledError = true
+            mockRepo.shouldThrowError = true
+            mockRepo.errorToThrow = .purchaseCancelled
             let product = ProductInfo.monthlyPlan()
 
             // When: キャンセル
@@ -347,7 +344,7 @@ struct PremiumViewTests {
             try await mockRepo.restorePurchases()
 
             // Then: 復元が呼ばれた
-            #expect(mockRepo.restoreCalled == true)
+            #expect(mockRepo.restorePurchasesCalled == true)
         }
 
         @Test("復元中はローディング表示（ボタン無効化）")
@@ -367,13 +364,14 @@ struct PremiumViewTests {
             try await mockRepo.restorePurchases()
 
             // Then: 復元処理が完了
-            #expect(mockRepo.restoreCalled == true)
+            #expect(mockRepo.restorePurchasesCalled == true)
         }
 
         @Test("復元対象なしの場合のエラーアラート")
         func testRestoreNothingToRestoreError() async throws {
             let mockRepo = MockPurchaseRepository()
-            mockRepo.shouldThrowNoSubscriptionError = true
+            mockRepo.shouldThrowError = true
+            mockRepo.mockError = .noActiveSubscription
 
             // When: 復元対象なし
             do {
@@ -409,7 +407,7 @@ struct PremiumViewTests {
             try await mockManager.checkPremiumStatus()
 
             // Then: 復元処理が完了
-            #expect(mockRepo.restoreCalled == true)
+            #expect(mockRepo.restorePurchasesCalled == true)
         }
 
         @Test("復元完了後の状態リセット")
@@ -462,11 +460,11 @@ struct PremiumViewTests {
         @Test("非会員: 削除残数表示")
         func testFreeUserRemainingDeletions() {
             let mockManager = PremiumViewMockPremiumManager(isPremiumValue: false)
-            mockManager.dailyDeleteCount = 25
+            mockManager.totalDeleteCount = 25
 
             // Given: 25枚削除済み
             // Then: 残数は25枚
-            let remaining = 50 - mockManager.dailyDeleteCount
+            let remaining = 50 - mockManager.totalDeleteCount
             #expect(remaining == 25)
         }
 
@@ -602,7 +600,7 @@ struct PremiumViewTests {
 
         @Test("Premium→Free遷移時のUI更新")
         func testPremiumToFreeTransition() {
-            let mockManager = MockPremiumManager(
+            let mockManager = PremiumViewMockPremiumManager(
                 isPremiumValue: true,
                 status: .monthly()
             )
@@ -621,11 +619,11 @@ struct PremiumViewTests {
             let mockManager = PremiumViewMockPremiumManager(isPremiumValue: false)
 
             // When: 削除カウント増加
-            mockManager.dailyDeleteCount = 10
-            #expect(mockManager.dailyDeleteCount == 10)
+            mockManager.totalDeleteCount = 10
+            #expect(mockManager.totalDeleteCount == 10)
 
-            mockManager.dailyDeleteCount = 20
-            #expect(mockManager.dailyDeleteCount == 20)
+            mockManager.totalDeleteCount = 20
+            #expect(mockManager.totalDeleteCount == 20)
         }
 
         @Test("複数回の状態変更に対応")
@@ -729,7 +727,7 @@ struct PremiumViewTests {
 final class PremiumViewMockPremiumManager: PremiumManagerProtocol {
     var isPremium: Bool
     var subscriptionStatus: PremiumStatus
-    var dailyDeleteCount: Int = 0
+    var totalDeleteCount: Int = 0
 
     init(isPremiumValue: Bool, status: PremiumStatus = .free) {
         self.isPremium = isPremiumValue
@@ -757,11 +755,11 @@ final class PremiumViewMockPremiumManager: PremiumManagerProtocol {
         if isPremium {
             return Int.max
         }
-        return max(0, 50 - dailyDeleteCount)
+        return max(0, 50 - totalDeleteCount)
     }
 
     func recordDeletion(count: Int) async {
-        dailyDeleteCount += count
+        totalDeleteCount += count
     }
 
     func refreshStatus() async {

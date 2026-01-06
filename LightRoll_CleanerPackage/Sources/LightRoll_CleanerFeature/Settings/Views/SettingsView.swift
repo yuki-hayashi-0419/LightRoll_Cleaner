@@ -120,6 +120,8 @@ public struct SettingsView: View {
                 }
             }
             .sheet(isPresented: $showingTrash) {
+                // BUG-TRASH-002-P1C: 環境オブジェクト明示的注入
+                // sheet内のビューは親のEnvironmentを自動継承しないため、明示的に注入
                 NavigationStack {
                     TrashView(
                         trashManager: trashManager,
@@ -127,6 +129,7 @@ public struct SettingsView: View {
                         restorePhotosUseCase: restorePhotosUseCase,
                         confirmationService: confirmationService
                     )
+                    .environment(settingsService)
                 }
             }
         }
