@@ -1,401 +1,243 @@
 {
-  "version": "3.87",
-  "lastUpdated": "2026-01-06",
+  "version": "3.91",
+  "lastUpdated": "2026-01-07",
 
   "session_metadata": {
-    "session_id": "session36-phase1-real-device-test-and-phase-x-planning",
-    "started_at": "2026-01-06T14:00:00+09:00",
-    "ended_at": "2026-01-06T17:00:00+09:00",
+    "session_id": "performance-analysis-session-38",
+    "started_at": "2026-01-07T16:00:00+09:00",
+    "ended_at": "2026-01-07T17:30:00+09:00",
     "status": "completed",
     "documents_updated": [
       "PROGRESS.md",
-      "IMPLEMENTED.md",
       "CONTEXT_HANDOFF.json",
-      "docs/CRITICAL/PHASE_X_ULTRA_FAST_GROUPING_PLAN.md"
+      "TASKS.md"
     ],
-    "session_closure": "セッション36完了: Phase 1実機テスト（効果なし確認）、真のボトルネック特定、Phase X計画策定完了"
+    "session_closure": "セッション38完了: Sequential Thinking分析（28思考）、4本柱改善計画策定、重大バグ（FeaturePrintExtractor無制限並列）発見"
   },
 
   "contextOptimization": {
-    "lastOptimization": "2026-01-06T11:00:00+09:00",
-    "optimizationId": "context-optimization-011",
-    "progressEntries": 10,
+    "lastOptimization": "2026-01-07T17:30:00+09:00",
+    "optimizationId": "context-optimization-013",
+    "progressEntries": 5,
     "maxProgressEntries": 12,
-    "archivedSessions": "Session 1-25 (25 sessions)",
-    "archivedTasks": "171件 → TASKS_COMPLETED.md",
+    "archivedSessions": "Session 1-28 (28 sessions)",
+    "archivedTasks": "169件 → TASKS_COMPLETED.md",
     "contextHealth": "良好",
-    "estimatedSizeReduction": "約95KB",
-    "nextOptimizationTrigger": "セッション36開始時（11件到達）",
-    "currentProgressSize": "約820行（セッション26-35）",
-    "archiveThreshold": "12セッション または 600行超過時",
-    "lastAction": "セッション35完了時の最適化チェック実行（アーカイブ不要）"
+    "estimatedSizeReduction": "約115KB（累計）",
+    "nextOptimizationTrigger": "セッション45-48付近（10-12件到達時）",
+    "currentProgressSize": "約300行（セッション29-38、5エントリ）",
+    "archiveThreshold": "12セッション または 600行超過時"
   },
 
   "current_phase": {
-    "phase_name": "Phase X（超高速化）計画完了、実装待ち",
+    "phase_name": "4本柱計画策定完了 / Pillar 1実装待ち",
     "progress_percentage": "99%",
-    "description": "Phase 1効果なし確認。Phase X（ハイブリッド最適化）計画策定完了。64時間で80-90%改善を目指す。"
+    "description": "パフォーマンス4本柱計画策定完了。重大バグ発見。Pillar 1（4h）で5-7倍高速化可能。"
   },
 
   "projectStatus": {
-    "phase": "Phase X計画完了",
-    "currentPhase": "Phase 1は効果なし（真のボトルネック未対応）。Phase X1-X4計画策定完了。",
+    "phase": "パフォーマンス改善・リリース準備待ち",
+    "currentPhase": "4本柱計画策定完了。FeaturePrintExtractor無制限並列バグ発見。Pillar 1実装待ち。",
     "overallProgress": "99%",
-    "nextMilestone": "Phase X1実装開始（事前フィルタリング強化、16h）",
-    "majorAchievement": "Phase X計画策定（ハイブリッド最適化アーキテクチャ）"
+    "nextMilestone": "Pillar 1: Critical Fixes（4h）→ 3時間+ → 40-60分",
+    "majorAchievement": "Sequential Thinking分析（28思考）、重大バグ発見、4本柱計画策定"
   },
 
   "performanceOptimization": {
-    "status": "phase_x_planned",
+    "status": "four_pillars_planned",
+    "session38Analysis": {
+      "sequentialThinkingSteps": 28,
+      "criticalBugFound": "FeaturePrintExtractor無制限並列実行（メモリ枯渇原因）",
+      "bottleneckBreakdown": {
+        "similarityCalculation": "60%",
+        "lshProcessing": "15%",
+        "fileSizeRetrieval": "15%",
+        "other": "10%"
+      },
+      "visionFrameworkLimit": "1枚50-100ms（物理限界）"
+    },
     "currentPerformance": {
-      "dataSize": "115GB",
-      "photoCount": "100,000枚",
-      "processingTime": "60-80分（Phase 1実装後も効果なし）",
-      "target": "1TBでも数分（Phase Xで達成予定）"
+      "dataSize": "130GB",
+      "photoCount": "約130,000枚",
+      "processingTime": "3時間+（完了せず）",
+      "userRequest": "1TBでも数分"
+    },
+    "technicalFeasibility": {
+      "achievable": {
+        "130GB_first": "15-25分",
+        "130GB_second": "1-3分",
+        "1TB_first": "1.5-3時間",
+        "1TB_second": "5-10分"
+      },
+      "impossible": "1TB初回「数分」（Vision Framework物理限界）",
+      "reason": "1TB≒900,000枚 × 50ms/枚 = 12.5時間"
+    },
+    "fourPillarsPlan": {
+      "totalHours": 68,
+      "pillars": [
+        {
+          "id": "Pillar1",
+          "name": "Critical Fixes（緊急修正）",
+          "hours": 4,
+          "effect": "3時間+ → 40-60分（5-7倍高速化）",
+          "priority": "highest",
+          "tasks": [
+            {"id": "CF-1", "name": "FeaturePrintExtractor並列制限", "hours": 2},
+            {"id": "CF-2", "name": "メモリ使用量監視", "hours": 1},
+            {"id": "CF-3", "name": "プログレス精度改善", "hours": 1}
+          ]
+        },
+        {
+          "id": "Pillar2",
+          "name": "Phase X Optimizations",
+          "hours": 40,
+          "effect": "40-60分 → 15-25分",
+          "priority": "high",
+          "phases": ["X1事前フィルタリング", "X2LSH最適化", "X3SIMD", "X4メモリ"]
+        },
+        {
+          "id": "Pillar3",
+          "name": "Progressive Results（UX改善）",
+          "hours": 16,
+          "effect": "即座にプレビュー表示（UX劇的改善）",
+          "priority": "medium"
+        },
+        {
+          "id": "Pillar4",
+          "name": "Persistent Cache",
+          "hours": 8,
+          "effect": "2回目以降1-3分",
+          "priority": "medium"
+        }
+      ]
     },
     "phase1_result": {
       "status": "completed_but_ineffective",
-      "reason": "Phase 1はファイルサイズ取得（全体の3-5%）のみを最適化。真のボトルネック未対応",
-      "lesson_learned": "ボトルネック分析の誤り - ファイルサイズ取得を40%と見積もったが実際は3-5%"
-    },
-    "true_bottlenecks": [
-      {
-        "rank": 1,
-        "name": "類似度計算（O(n^2)の計算量爆発）",
-        "impact": "60%",
-        "phase": "X"
-      },
-      {
-        "rank": 2,
-        "name": "LSHパラメータの非最適化",
-        "impact": "15%",
-        "phase": "X"
-      },
-      {
-        "rank": 3,
-        "name": "ファイルサイズ取得",
-        "impact": "15%",
-        "phase": "1（対応済み・効果限定的）"
-      },
-      {
-        "rank": 4,
-        "name": "メモリアクセスパターン",
-        "impact": "10%",
-        "phase": "X"
-      }
-    ],
-    "phase_x_plan": {
-      "document": "docs/CRITICAL/PHASE_X_ULTRA_FAST_GROUPING_PLAN.md",
-      "approach": "ハイブリッド最適化アーキテクチャ",
-      "total_hours": 64,
-      "expected_improvement": "80-90%（60分→6-12分）",
-      "phases": [
-        {"id": "X1", "name": "事前フィルタリング強化", "hours": 16, "effect": "30%"},
-        {"id": "X2", "name": "LSH最適化", "hours": 16, "effect": "20%"},
-        {"id": "X3", "name": "SIMD類似度計算", "hours": 16, "effect": "20%"},
-        {"id": "X4", "name": "メモリアクセス最適化", "hours": 16, "effect": "10%"}
-      ]
-    },
-    "phases": [
-      {
-        "phase": 1,
-        "name": "クイック修正",
-        "estimatedDays": 5.5,
-        "estimatedHours": 44,
-        "expectedImprovement": "50%",
-        "tasks": ["A1: groupDuplicates並列化（10h）", "A2: ファイルサイズキャッシュ（8h）", "A3: バッチ処理最適化（18h）", "A4: メモリ最適化（8h）"]
-      },
-      {
-        "phase": 2,
-        "name": "中規模改善",
-        "estimatedDays": 9,
-        "estimatedHours": 72,
-        "expectedImprovement": "追加30%",
-        "tasks": ["B1: 並列I/O（16h）", "B2: LSH最適化（20h）", "B3: インデックス最適化（20h）", "B4: 進捗報告最適化（16h）"]
-      },
-      {
-        "phase": 3,
-        "name": "大規模改修",
-        "estimatedDays": 11,
-        "estimatedHours": 88,
-        "expectedImprovement": "追加15%",
-        "tasks": ["C1: 動画並列処理（32h）", "C2: SwiftData移行（40h）", "C3: インクリメンタルスキャン（16h）"]
-      }
-    ],
-    "documentation": [
-      {
-        "name": "PERFORMANCE_OPTIMIZATION_PLAN.md",
-        "location": "docs/",
-        "size": "11.6KB",
-        "content": "全体ロードマップ・工数見積もり"
-      },
-      {
-        "name": "PHASE1_IMPLEMENTATION_GUIDE.md",
-        "location": "docs/",
-        "size": "22.6KB",
-        "content": "Phase 1詳細設計（A1-A4）"
-      },
-      {
-        "name": "PHASE2_IMPLEMENTATION_GUIDE.md",
-        "location": "docs/",
-        "size": "27.1KB",
-        "content": "Phase 2詳細設計（B1-B4）"
-      },
-      {
-        "name": "PHASE3_IMPLEMENTATION_GUIDE.md",
-        "location": "docs/",
-        "size": "41.5KB",
-        "content": "Phase 3詳細設計（C1-C3）"
-      }
-    ],
-    "totalEstimatedHours": 204,
-    "totalEstimatedDays": 25.5
+      "reason": "Phase 1はファイルサイズ取得（全体の3-5%）のみを最適化。真のボトルネック未対応"
+    }
+  },
+
+  "bugTrash002Status": {
+    "status": "completed",
+    "completedAt": "2026-01-06",
+    "qualityScore": 92
   },
 
   "monetizationStatus": {
     "phase": 1,
-    "status": "integration_complete",
-    "integrationStatus": {
-      "ScanLimitManager": {
-        "status": "integrated",
-        "files": ["ContentView.swift", "HomeView.swift"],
-        "description": "環境注入完了、スキャン制限ロジック追加"
-      },
-      "AdInterstitialManager": {
-        "status": "integrated",
-        "files": ["ContentView.swift", "GroupDetailView.swift"],
-        "description": "環境注入完了、削除後広告表示ロジック追加"
-      },
-      "LimitReachedSheet": {
-        "status": "enhanced",
-        "files": ["GroupDetailView.swift"],
-        "description": "値プロポジション追加（残り重複数・削減可能容量）"
-      }
-    },
-    "nextSteps": [
-      "手動テスト（スキャン制限、削除後広告、値プロポジション）",
-      "プレミアム購入画面への遷移実装",
-      "App Store Connect製品登録（APP_STORE_CONNECT_SETUP.md参照）"
-    ]
+    "status": "integration_complete"
   },
 
   "discovered_issues": [
     {
-      "issue_id": "PERF-001",
-      "title": "115GB/100,000枚で60-80分のパフォーマンス問題",
+      "issue_id": "PERF-CRITICAL-001",
+      "title": "FeaturePrintExtractor無制限並列実行バグ",
       "severity": "Critical",
-      "status": "planning_complete",
-      "discovered_at": "2025-12-25",
-      "solution": "3段階最適化計画策定済み（204時間）",
-      "estimated_hours": 204
-    },
-    {
-      "issue_id": "BUG-TRASH-001",
-      "title": "ゴミ箱での写真選択問題",
-      "severity": "Medium",
-      "status": "analyzed",
-      "discovered_at": "2025-12-24",
-      "solution": "タップで自動編集モード開始",
-      "estimated_hours": 1
-    },
-    {
-      "issue_id": "BUG-TRASH-002",
-      "title": "復元操作時のクラッシュ問題",
-      "severity": "Critical",
-      "status": "analyzed",
-      "discovered_at": "2025-12-24",
-      "root_causes": [
-        "P1-A: RestorePhotosUseCaseでのID不一致",
-        "P1-B: Photos Frameworkコールバック複数呼び出し",
-        "P1-C: SwiftUI環境オブジェクト未注入",
-        "P2-A: 非同期処理中のビュー破棄"
-      ],
-      "estimated_hours": 5.5
-    },
-    {
-      "issue_id": "BUG-001",
-      "title": "自動スキャン設定の同期不整合",
-      "severity": "P0",
-      "status": "completed",
-      "phase2_score": 90,
-      "completed_at": "2025-12-24"
-    },
-    {
-      "issue_id": "BUG-002",
-      "title": "スキャン設定がグルーピングに反映されない",
-      "severity": "P0",
-      "status": "completed",
-      "phase2_score": 95,
-      "completed_at": "2025-12-24"
+      "status": "identified",
+      "discovered_at": "2026-01-07",
+      "fix_plan": "Pillar 1 CF-1で修正予定（2h）",
+      "impact": "メモリ枯渇、処理停止、3時間+の原因"
     }
   ],
 
   "completedTasks": [
     {
-      "taskId": "PERFORMANCE-ANALYSIS-PLANNING",
-      "title": "パフォーマンスボトルネック分析・実装計画策定",
-      "completedAt": "2025-12-25",
+      "taskId": "session38-performance-analysis",
+      "title": "パフォーマンス根本原因分析・4本柱計画策定",
+      "completedAt": "2026-01-07",
+      "qualityScore": 95,
       "components": [
-        "docs/PERFORMANCE_OPTIMIZATION_PLAN.md（11.6KB）",
-        "docs/PHASE1_IMPLEMENTATION_GUIDE.md（22.6KB）",
-        "docs/PHASE2_IMPLEMENTATION_GUIDE.md（27.1KB）",
-        "docs/PHASE3_IMPLEMENTATION_GUIDE.md（41.5KB）"
+        "Sequential Thinking分析（28思考）",
+        "ボトルネック特定（類似度60%、LSH15%）",
+        "重大バグ発見（FeaturePrintExtractor無制限並列）",
+        "4本柱改善計画策定（68h）",
+        "技術的実現可能性評価"
       ],
-      "result": "7つのボトルネック特定、3段階最適化計画策定（204時間）"
-    },
-    {
-      "taskId": "MONETIZATION-PHASE1-INTEGRATION",
-      "title": "マネタイズPhase 1統合・実機デプロイ",
-      "completedAt": "2025-12-25",
-      "components": [
-        "ContentView.swift（ScanLimitManager/AdInterstitialManager環境注入）",
-        "HomeView.swift（スキャン制限ロジック追加）",
-        "GroupDetailView.swift（広告表示ロジック・値プロポジション追加）"
-      ],
-      "result": "Phase 1統合完了、実機デプロイ成功"
-    },
-    {
-      "taskId": "MONETIZATION-PHASE1",
-      "title": "マネタイズ戦略Phase 1実装",
-      "completedAt": "2025-12-25",
-      "result": "Try & Lockモデル実装完了、3プラン課金システム構築"
-    },
-    {
-      "taskId": "DISPLAY-001〜004",
-      "title": "DisplaySettings統合完全実装・品質検証",
-      "completedAt": "2025-12-24",
-      "qualityScore": 93
-    },
-    {
-      "taskId": "SETTINGS-001",
-      "title": "分析設定→SimilarityAnalyzer連携",
-      "completedAt": "2025-12-24",
-      "qualityScore": 95
-    },
-    {
-      "taskId": "SETTINGS-002",
-      "title": "通知設定→NotificationManager統合",
-      "completedAt": "2025-12-24",
-      "qualityScore": 95
+      "result": "Pillar 1（4h）で5-7倍高速化可能"
     }
   ],
 
   "next_actions": [
     {
-      "action": "Phase 1実機検証（効果測定）",
-      "description": "A1-A4実装の効果を実機で検証",
+      "action": "Pillar 1: CF-1 FeaturePrintExtractor並列制限",
+      "description": "無制限並列 → 8同時に制限。AsyncSemaphore導入",
       "estimated_hours": 2,
       "priority": "highest",
-      "details": [
-        "100,000枚でのスキャン時間測定",
-        "メモリ使用量ピーク測定",
-        "処理時間50%改善の確認"
-      ]
+      "expected_effect": "メモリ枯渇解消、安定動作"
     },
     {
-      "action": "パフォーマンス最適化Phase 2実装",
-      "description": "B1-B4タスク実装開始",
-      "estimated_hours": 72,
-      "priority": "high",
-      "details": [
-        "B1: 並列I/O（16h）",
-        "B2: LSH最適化（20h）",
-        "B3: インデックス最適化（20h）",
-        "B4: 進捗報告最適化（16h）"
-      ],
-      "document": "docs/PHASE2_IMPLEMENTATION_GUIDE.md"
-    },
-    {
-      "action": "マネタイズPhase 1手動テスト",
-      "description": "スキャン制限、削除後広告表示、値プロポジションの動作確認",
+      "action": "Pillar 1: CF-2 メモリ使用量監視",
+      "description": "メモリ使用量をリアルタイム監視、閾値超過時にバッチ縮小",
       "estimated_hours": 1,
-      "priority": "high",
-      "details": [
-        "Freeユーザーで2回目スキャン時にLimitReachedSheet表示確認",
-        "Freeユーザーで削除後にインタースティシャル広告表示確認",
-        "LimitReachedSheetで残り重複数・削減可能容量が正しく表示されるか確認"
-      ]
+      "priority": "highest"
     },
     {
-      "action": "プレミアム購入画面への遷移実装",
-      "description": "LimitReachedSheetからプレミアム購入画面への導線",
-      "estimated_hours": 2,
-      "priority": "high"
+      "action": "Pillar 1: CF-3 プログレス精度改善",
+      "description": "実際の処理進捗に基づくプログレス更新",
+      "estimated_hours": 1,
+      "priority": "highest"
     },
     {
-      "action": "App Store Connect設定",
-      "description": "APP_STORE_CONNECT_SETUP.md手順に従い製品登録",
+      "action": "M10-T04: App Store Connect設定",
+      "description": "アプリメタデータ登録、スクリーンショット準備",
       "estimated_hours": 3,
-      "priority": "high",
-      "document": "docs/CRITICAL/APP_STORE_CONNECT_SETUP.md"
+      "priority": "high"
     }
   ],
 
   "taskStatus": {
-    "total": 174,
-    "completed": 170,
+    "total": 172,
+    "completed": 166,
     "skipped": 0,
     "merged": 0,
     "inProgress": 0,
-    "pending": 4,
+    "pending": 6,
     "blockedP0": 0,
-    "completedHours": 267,
-    "remainingHours": 222.5,
-    "lastCompletedTaskId": "PERFORMANCE-ANALYSIS-PLANNING",
-    "currentTask": "完了（パフォーマンス分析・計画策定）",
+    "completedHours": 296,
+    "remainingHours": 77,
+    "lastCompletedTaskId": "session38-performance-analysis",
+    "currentTask": "完了（4本柱計画策定）",
     "nextTaskCandidates": [
-      "パフォーマンス最適化Phase 1実装（44h）",
-      "マネタイズPhase 1手動テスト（1h）",
-      "プレミアム購入画面遷移実装（2h）",
-      "App Store Connect設定（3h）"
+      "Pillar 1 Critical Fixes（4h）- 最優先",
+      "M10-T04: App Store Connect設定（3h）",
+      "Pillar 2 Phase X（40h）"
     ]
   },
 
   "sessionSummary": {
-    "sessionName": "session36-phase1-real-device-test-and-phase-x-planning",
-    "date": "2026-01-06",
+    "sessionName": "performance-analysis-session-38",
+    "date": "2026-01-07",
     "completedTasks": 1,
-    "qualityScore": null,
+    "qualityScore": 95,
     "achievements": [
-      "Phase 1実機テスト実施（YH iPhone 15 Pro Max、115GB、100,000枚）",
-      "Phase 1効果なし確認（ファイルサイズ取得は全体の3-5%のみ）",
-      "真のボトルネック特定（特徴量抽出70%、類似度計算O(n^2)）",
-      "Phase X計画策定完了（64時間、80-90%改善目標）",
-      "5つのアーキテクチャ案比較検討（@spec-architect-multi）"
-    ],
-    "lessonsLearned": [
-      "ボトルネック分析の精度が重要（40%と見積もったが実際は3-5%）",
-      "実機テストで早期に効果検証することの重要性",
-      "真のボトルネックは特徴量抽出・類似度計算であった"
-    ],
-    "filesCreated": [
-      "docs/CRITICAL/PHASE_X_ULTRA_FAST_GROUPING_PLAN.md"
+      "Sequential Thinking分析（28思考）完了",
+      "ボトルネック特定（類似度60%、LSH15%）",
+      "重大バグ発見（FeaturePrintExtractor無制限並列）",
+      "4本柱改善計画策定（68h）",
+      "技術的実現可能性評価完了"
     ]
   },
 
   "resumeInstructions": {
-    "step1": "【最優先 Option A】Phase X1実装開始（16h）- 事前フィルタリング強化・日付ベース分割",
-    "step2": "【Option B】ゴミ箱バグ修正（BUG-TRASH-002）- 6.5h",
-    "step3": "【Option C】マネタイズPhase 1手動テスト - 1h",
-    "context": "【重要】Phase 1は効果なし（真のボトルネック未対応）。Phase X計画策定完了。詳細はdocs/CRITICAL/PHASE_X_ULTRA_FAST_GROUPING_PLAN.md参照。X1から開始し、80-90%改善を目指す。"
+    "step1": "【最優先】Pillar 1 Critical Fixes実装（4h）→ 3時間+ → 40-60分",
+    "step2": "【Option A】M10-T04 App Store Connect設定（3h）",
+    "step3": "【Option B】Pillar 2 Phase X実装開始（40h）",
+    "context": "セッション38で4本柱改善計画策定完了。重大バグ（FeaturePrintExtractor無制限並列）発見。Pillar 1（4h）で5-7倍高速化可能。"
   },
 
   "quality": {
     "scores": [
       90, 100, 95, 97.5, 95, 95, 100, 97.5, 92, 97.5, 97, 90, 92, 90, 90, 90,
       72, 90, 92, 92, 95, 75, 81, 85, 84, 94, 98, 98, 92.5, 90, 92, 88, 90,
-      95, 90, 93, 90
+      95, 90, 93, 90, 92, 95
     ],
     "average": 92,
     "trend": "stable",
     "targetScore": 95,
     "latestScores": {
-      "DISPLAY-001〜004": 93,
-      "SETTINGS-001": 95,
-      "SETTINGS-002": 95,
-      "MONETIZATION-PHASE1-INTEGRATION": 90,
-      "PERFORMANCE-ANALYSIS-PLANNING": null,
-      "sessionAverage": 92
+      "session38-performance-analysis": 95,
+      "BUG-TRASH-002": 92,
+      "sessionAverage": 93.5
     }
   },
 
@@ -407,75 +249,34 @@
       "deviceId": "C7812CA5-F362-565B-985C-CE323F453DFA"
     },
     "status": "deployed",
-    "lastDeployDate": "2025-12-25"
-  },
-
-  "trashIssueStatus": {
-    "analysisComplete": true,
-    "planDocument": "docs/CRITICAL/BUG_FIX_PLAN_TRASH_ISSUES.md",
-    "totalEstimatedHours": 6.5,
-    "phases": [
-      {
-        "phase": 1,
-        "name": "クラッシュ修正",
-        "tasks": ["P1-A", "P1-B", "P1-C"],
-        "estimatedHours": 3,
-        "status": "pending"
-      },
-      {
-        "phase": 2,
-        "name": "UX改善",
-        "tasks": ["P2-A", "P2-B"],
-        "estimatedHours": 2,
-        "status": "pending"
-      },
-      {
-        "phase": 3,
-        "name": "統合テスト・実機テスト",
-        "estimatedHours": 1,
-        "status": "pending"
-      },
-      {
-        "phase": 4,
-        "name": "ドキュメント更新",
-        "estimatedHours": 0.5,
-        "status": "pending"
-      }
-    ]
+    "lastDeployDate": "2026-01-06"
   },
 
   "nextSession": {
-    "recommended_action": "Phase X1実装開始（事前フィルタリング強化）",
+    "recommended_action": "Pillar 1 Critical Fixes実装",
     "priority": "Highest",
-    "estimatedTime": "16h (2日)",
+    "estimatedTime": "4h",
     "tasks": [
       {
-        "name": "【最優先 Option A】Phase X1実装開始",
+        "name": "【最優先】Pillar 1 Critical Fixes",
         "priority": 1,
-        "estimatedHours": 16,
-        "description": "事前フィルタリング強化で30%改善を目指す",
-        "subtasks": [
-          "X1-1: 日付ベース分割（8h）",
-          "X1-2: 時間窓最適化（4h）",
-          "X1-3: テスト・検証（4h）"
-        ],
-        "document": "docs/CRITICAL/PHASE_X_ULTRA_FAST_GROUPING_PLAN.md"
+        "estimatedHours": 4,
+        "description": "CF-1/2/3実装 → 3時間+ → 40-60分（5-7倍高速化）"
       },
       {
-        "name": "【Option B】ゴミ箱バグ修正（BUG-TRASH-002）",
+        "name": "【Option A】M10-T04 App Store Connect設定",
         "priority": 2,
-        "estimatedHours": 6.5,
-        "description": "復元操作時のクラッシュ修正",
-        "document": "docs/CRITICAL/BUG_FIX_PLAN_TRASH_ISSUES.md"
+        "estimatedHours": 3,
+        "description": "アプリメタデータ登録"
       },
       {
-        "name": "【Option C】マネタイズPhase 1手動テスト",
+        "name": "【Option B】Pillar 2 Phase X開始",
         "priority": 3,
-        "estimatedHours": 1,
-        "description": "統合したマネタイズ機能の動作確認"
+        "estimatedHours": 40,
+        "description": "40-60分 → 15-25分を目指す"
       }
     ]
   },
 
-  "notes": "Phase X計画ドキュメント作成完了（2026-01-06）。Phase 1は効果なし確認（真のボトルネックである類似度計算O(n^2)が未対応）。Phase X（ハイブリッド最適化）計画策定完了。X1-X4の4フェーズで64時間、80-90%改善（60分→6-12分）を目指す。詳細はdocs/CRITICAL/PHASE_X_ULTRA_FAST_GROUPING_PLAN.md参照。"
+  "notes": "セッション38完了（2026-01-07）。Sequential Thinking分析（28思考）でボトルネック特定。重大バグ（FeaturePrintExtractor無制限並列）発見。4本柱改善計画（68h）策定完了。Pillar 1（4h）で5-7倍高速化可能。1TB「数分」は物理的に不可能（Vision Framework制約）だが、1.5-3時間は達成可能。"
 }
