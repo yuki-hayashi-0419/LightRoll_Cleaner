@@ -43,6 +43,10 @@ let package = Package(
             dependencies: [
                 "LightRoll_CleanerFeature",
                 .product(name: "GoogleMobileAds", package: "swift-package-manager-google-mobile-ads")
+            ],
+            swiftSettings: [
+                .swiftLanguageMode(.v6)
+                // テストではSwift 6モードを有効化してSwift Testingを使用
             ]
         ),
         .testTarget(

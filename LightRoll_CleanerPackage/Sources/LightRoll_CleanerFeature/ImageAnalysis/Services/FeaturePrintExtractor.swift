@@ -75,13 +75,50 @@ public actor FeaturePrintExtractor {
 
     /// 複数の PHAsset から特徴量を一括抽出
     ///
-    /// - Parameter assets: 対象の PHAsset 配列
+    /// - Parameters:
+    ///   - assets: 対象の PHAsset 配列
+    ///   - progressHandler: 進捗報告コールバック（0.0〜1.0）
+    ///   - memoryMonitor: メモリ監視（省略時は新規作成）
     /// - Returns: 抽出された特徴量の配列
     /// - Throws: AnalysisError
     public func extractFeaturePrints(
-        from assets: [PHAsset]
+        from assets: [PHAsset],
+        progressHandler: (@Sendable (Double) async -> Void)? = nil,
+        memoryMonitor: MemoryPressureMonitor? = nil
     ) async throws -> [FeaturePrintResult] {
-        // TaskGroup を使用して並列処理
+        guard !assets.isEmpty else { return [] }
+
+        let totalCount = assets.count
+        let completedCount = LockIsolated(0)
+        let monitor = memoryMonitor ?? MemoryPressureMonitor()
+
+        // 動的に調整可能な並列数
+        let currentParallelism = LockIsolated(options.maxConcurrentOperations)
+
+        // 並列制限用のセマフォ
+        let semaphore = AsyncSemaphore(limit: options.maxConcurrentOperations)
+
+        // メモリ監視を開始
+        await monitor.startMonitoring { [currentParallelism] level in
+            let newParallelism: Int
+            switch level {
+            case .normal:
+                newParallelism = 8
+            case .warning:
+                newParallelism = 4
+            case .critical:
+                newParallelism = 2
+            }
+            currentParallelism.setValue(newParallelism)
+        }
+
+        defer {
+            Task {
+                await monitor.stopMonitoring()
+            }
+        }
+
+        // TaskGroup を使用して並列処理（セマフォで制限）
         return try await withThrowingTaskGroup(
             of: FeaturePrintResult.self,
             returning: [FeaturePrintResult].self
@@ -89,7 +126,34 @@ public actor FeaturePrintExtractor {
             // 各 Asset に対してタスクを追加
             for asset in assets {
                 group.addTask {
-                    try await self.extractFeaturePrint(from: asset)
+                    // セマフォで並列数を制限
+                    await semaphore.wait()
+                    defer {
+                        Task { await semaphore.signal() }
+                    }
+
+                    // メモリプレッシャーが危険レベルの場合、少し待機
+                    let pressureLevel = await monitor.currentPressureLevel()
+                    if pressureLevel == .critical {
+                        try await Task.sleep(for: .milliseconds(100))
+                    }
+
+                    let result = try await self.extractFeaturePrint(from: asset)
+
+                    // 進捗を更新
+                    let newCount = completedCount.withLock { count in
+                        count += 1
+                        return count
+                    }
+
+                    // 進捗を報告（10件ごと、または完了時）
+                    if let progressHandler = progressHandler,
+                       newCount % 10 == 0 || newCount == totalCount {
+                        let progress = Double(newCount) / Double(totalCount)
+                        await progressHandler(progress)
+                    }
+
+                    return result
                 }
             }
 
@@ -142,10 +206,14 @@ public struct ExtractionOptions: Sendable {
     // MARK: - Initialization
 
     /// イニシャライザ
+    /// - Parameters:
+    ///   - cropAndScaleOption: 画像のクロップ・スケール方法
+    ///   - revision: Vision APIリビジョン番号
+    ///   - maxConcurrentOperations: 最大同時実行数（デフォルト8）
     public init(
         cropAndScaleOption: VNImageCropAndScaleOption = .centerCrop,
         revision: Int = VNGenerateImageFeaturePrintRequestRevision2,
-        maxConcurrentOperations: Int = 4
+        maxConcurrentOperations: Int = 8
     ) {
         self.cropAndScaleOption = cropAndScaleOption
         self.revision = revision
@@ -158,10 +226,11 @@ public struct ExtractionOptions: Sendable {
     public static let `default` = ExtractionOptions()
 
     /// 高精度オプション（スケールダウンなし）
+    /// メモリ使用量が多いため、並列数を4に制限
     public static let highAccuracy = ExtractionOptions(
         cropAndScaleOption: .scaleFit,
         revision: VNGenerateImageFeaturePrintRequestRevision2,
-        maxConcurrentOperations: 2
+        maxConcurrentOperations: 4
     )
 
     /// 高速オプション（クロップして処理）
