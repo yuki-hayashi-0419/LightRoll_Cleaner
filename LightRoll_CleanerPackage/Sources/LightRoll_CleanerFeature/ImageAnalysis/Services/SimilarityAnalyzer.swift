@@ -634,42 +634,105 @@ public actor SimilarityAnalyzer {
         progressRange: (start: Double, end: Double),
         progress: (@Sendable (Double) async -> Void)?
     ) async throws -> [(id: String, observation: VNFeaturePrintObservation)] {
-        var observations: [(id: String, observation: VNFeaturePrintObservation)] = []
-        observations.reserveCapacity(assets.count)
+        guard !assets.isEmpty else { return [] }
 
+        let totalCount = assets.count
+        let completedCount = LockIsolated(0)
         let progressDelta = progressRange.end - progressRange.start
+
+        // メモリ監視とセマフォの初期化
+        let monitor = MemoryPressureMonitor()
+        let maxConcurrency = 8
+        let currentParallelism = LockIsolated(maxConcurrency)
+        let semaphore = AsyncSemaphore(limit: maxConcurrency)
+
+        // メモリ監視を開始
+        await monitor.startMonitoring { [currentParallelism] level in
+            let newParallelism: Int
+            switch level {
+            case .normal:
+                newParallelism = 8
+            case .warning:
+                newParallelism = 4
+            case .critical:
+                newParallelism = 2
+            }
+            currentParallelism.setValue(newParallelism)
+        }
+
+        defer {
+            Task {
+                await monitor.stopMonitoring()
+            }
+        }
+
+        // Vision リクエストハンドラー
+        let visionHandler = VisionRequestHandler()
 
         // 特徴量抽出リクエストを作成
         let request = VNGenerateImageFeaturePrintRequest()
         request.imageCropAndScaleOption = .centerCrop
         request.revision = VNGenerateImageFeaturePrintRequestRevision2
 
-        // Vision リクエストハンドラー
-        let visionHandler = VisionRequestHandler()
+        // TaskGroupを使用して並列処理（セマフォで制限）
+        return try await withThrowingTaskGroup(
+            of: (id: String, observation: VNFeaturePrintObservation)?.self,
+            returning: [(id: String, observation: VNFeaturePrintObservation)].self
+        ) { group in
+            // 各Assetに対してタスクを追加
+            for asset in assets {
+                group.addTask {
+                    // セマフォで並列数を制限
+                    await semaphore.wait()
+                    defer {
+                        Task { await semaphore.signal() }
+                    }
 
-        // 各アセットから特徴量を抽出
-        for (index, asset) in assets.enumerated() {
-            // Vision リクエストを実行
-            let result = try await visionHandler.perform(on: asset, request: request)
+                    // メモリプレッシャーが危険レベルの場合、少し待機
+                    let pressureLevel = await monitor.currentPressureLevel()
+                    if pressureLevel == .critical {
+                        try await Task.sleep(for: .milliseconds(100))
+                    }
 
-            // 結果を取得
-            guard let featurePrintRequest = result.request(ofType: VNGenerateImageFeaturePrintRequest.self),
-                  let observation = featurePrintRequest.results?.first as? VNFeaturePrintObservation else {
-                // 特徴量抽出失敗時はスキップ（処理は続行）
-                continue
+                    // Vision リクエストを実行
+                    let result = try await visionHandler.perform(on: asset, request: request)
+
+                    // 結果を取得
+                    guard let featurePrintRequest = result.request(ofType: VNGenerateImageFeaturePrintRequest.self),
+                          let observation = featurePrintRequest.results?.first as? VNFeaturePrintObservation else {
+                        // 特徴量抽出失敗時はnilを返す（スキップ）
+                        return nil
+                    }
+
+                    // 進捗を更新
+                    let newCount = completedCount.withLock { count in
+                        count += 1
+                        return count
+                    }
+
+                    // 進捗を報告（10件ごと、または完了時）
+                    if let progress = progress,
+                       newCount % 10 == 0 || newCount == totalCount {
+                        let currentProgress = progressRange.start + progressDelta * Double(newCount) / Double(totalCount)
+                        await progress(currentProgress)
+                    }
+
+                    return (id: asset.localIdentifier, observation: observation)
+                }
             }
 
-            observations.append((id: asset.localIdentifier, observation: observation))
+            // 結果を収集（nilをフィルタ）
+            var observations: [(id: String, observation: VNFeaturePrintObservation)] = []
+            observations.reserveCapacity(assets.count)
 
-            // 進捗通知
-            let currentProgress = progressRange.start + progressDelta * Double(index + 1) / Double(assets.count)
-            await progress?(currentProgress)
+            for try await result in group {
+                if let result = result {
+                    observations.append(result)
+                }
+            }
 
-            // キャンセルチェック
-            try Task.checkCancellation()
+            return observations
         }
-
-        return observations
     }
 
     /// グループ化フェーズ（Union-Findアルゴリズム）
