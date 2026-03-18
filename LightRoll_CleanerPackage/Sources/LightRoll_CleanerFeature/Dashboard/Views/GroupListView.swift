@@ -762,12 +762,10 @@ public struct GroupListView: View {
 
         let groupsToDelete = groups.filter { selectedGroupIds.contains($0.id) }
 
-        do {
-            await onDeleteGroups?(groupsToDelete)
-            selectedGroupIds.removeAll()
-            isSelectionMode = false
-            viewState = .loaded
-        }
+        await onDeleteGroups?(groupsToDelete)
+        selectedGroupIds.removeAll()
+        isSelectionMode = false
+        viewState = .loaded
     }
 
     /// 代表写真を読み込み

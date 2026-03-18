@@ -203,8 +203,11 @@ public struct HomeView: View {
                 remainingDuplicates: nil,
                 potentialFreeSpace: nil,
                 onUpgrade: {
-                    showScanLimitPaywall = false
-                    // TODO: プレミアム購入画面への遷移
+                    // 購入成功後にPremiumManagerのステータスを同期
+                    // Transaction.updatesで自動更新されるが、念のため手動でも確認
+                    Task {
+                        try? await premiumManager.checkPremiumStatus()
+                    }
                 }
             )
         }

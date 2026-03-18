@@ -1,46 +1,54 @@
 {
-  "version": "3.93",
-  "lastUpdated": "2026-01-10",
+  "version": "3.94",
+  "lastUpdated": "2026-03-18",
 
   "session_metadata": {
-    "session_id": "session40-pillar1-actual-deployment",
-    "started_at": "2026-01-10T21:45:00+09:00",
-    "ended_at": "2026-01-10T22:20:00+09:00",
+    "session_id": "session42-payment-flow-implementation",
+    "started_at": "2026-03-18T10:00:00+09:00",
+    "ended_at": "2026-03-18T12:00:00+09:00",
     "status": "completed",
     "documents_updated": [
       "CONTEXT_HANDOFF.json",
-      "SimilarityAnalyzer.swift"
+      "PROGRESS.md",
+      "TrashManager.swift",
+      "AppState.swift",
+      "AppStateEnvironment.swift",
+      "GroupDetailView.swift",
+      "GroupListView.swift",
+      "SettingsView.swift",
+      "LimitReachedSheet.swift",
+      "HomeView.swift"
     ],
-    "session_closure": "セッション40完了: Pillar 1改善の実際の適用完了。SimilarityAnalyzerを並列処理に修正、実機デプロイ完了。次セッションで130,000枚実機テスト実施予定。"
+    "session_closure": "セッション42完了: 決済フロー完全実装（StoreKit購入・復元・エラーハンドリング）、P0/P1バグ修正、@Observable移行、実機ビルド成功。次回はApp Store ConnectでプロダクトID登録・サンドボックステスト。"
   },
 
   "contextOptimization": {
-    "lastOptimization": "2026-01-10T22:30:00+09:00",
-    "optimizationId": "context-optimization-015",
-    "progressEntries": 9,
+    "lastOptimization": "2026-03-18T12:00:00+09:00",
+    "optimizationId": "context-optimization-016",
+    "progressEntries": 11,
     "maxProgressEntries": 12,
     "archivedSessions": "Session 1-28 (28 sessions)",
     "archivedTasks": "172件 → TASKS_COMPLETED.md",
     "contextHealth": "良好",
     "estimatedSizeReduction": "約120KB（累計）",
-    "nextOptimizationTrigger": "セッション48-51付近（12件到達時）",
-    "currentProgressSize": "約340行（セッション29-40、9エントリ）",
+    "nextOptimizationTrigger": "セッション44-45付近（12件到達時）",
+    "currentProgressSize": "約420行（セッション29-42、11エントリ）",
     "archiveThreshold": "12セッション または 600行超過時",
-    "optimizationNote": "session40終了時: PROGRESS.mdにsession40記録追加、TASKS.md更新日更新"
+    "optimizationNote": "session42終了時: PROGRESS.mdにsession42記録追加、決済フロー完全実装記録"
   },
 
   "current_phase": {
-    "phase_name": "Pillar 1実機デプロイ完了 / 実機テスト待ち",
+    "phase_name": "決済フロー完全実装 / App Store Connect設定待ち",
     "progress_percentage": "99%",
-    "description": "Pillar 1改善を実際に適用・デプロイ完了。SimilarityAnalyzerを並列処理（AsyncSemaphore + MemoryPressureMonitor）に修正。次セッションで130,000枚の実機テスト実施。"
+    "description": "決済フロー（StoreKit購入・復元・エラーハンドリング）を完全実装。P0/P1修正完了、@Observable移行完了。実機ビルド・起動成功。次はApp Store ConnectでプロダクトID登録。"
   },
 
   "projectStatus": {
-    "phase": "Pillar 1実装完了・実機デプロイ済み / 実機テスト待ち",
-    "currentPhase": "SimilarityAnalyzerの順次処理を並列処理に修正完了。実機デプロイ完了。次セッションで効果検証（130,000枚実機テスト）。",
+    "phase": "決済フロー完全実装 / App Store Connect設定待ち",
+    "currentPhase": "StoreKitによる決済フロー完全実装完了。LimitReachedSheetにプラン選択・購入・復元機能を実装。実機ビルド成功。",
     "overallProgress": "99%",
-    "nextMilestone": "実機テスト（130,000枚で40-60分の効果検証）",
-    "majorAchievement": "Pillar 1の実際の適用完了（session40）"
+    "nextMilestone": "App Store ConnectでプロダクトID登録・サンドボックステスト",
+    "majorAchievement": "決済フロー完全実装（session42）"
   },
 
   "performanceOptimization": {
@@ -61,28 +69,7 @@
         "FeaturePrintExtractor.swift",
         "SimilarityAnalyzer.swift (session40: 順次処理→並列処理に修正)"
       ],
-      "deploymentIssueFound": "SimilarityAnalyzerが独自のextractFeaturePrintsメソッドで順次処理していた",
-      "deploymentFix": "SimilarityAnalyzer.extractFeaturePrintsを並列処理（AsyncSemaphore + MemoryPressureMonitor + TaskGroup）に修正",
-      "expectedEffect": "3時間+ → 40-60分（5-7倍高速化）",
-      "nextAction": "130,000枚での実機テスト実施（次セッション）"
-    },
-    "session38Analysis": {
-      "sequentialThinkingSteps": 28,
-      "criticalBugFound": "FeaturePrintExtractor無制限並列実行（修正済み）",
-      "bottleneckBreakdown": {
-        "similarityCalculation": "60%",
-        "lshProcessing": "15%",
-        "fileSizeRetrieval": "15%",
-        "other": "10%"
-      },
-      "visionFrameworkLimit": "1枚50-100ms（物理限界）"
-    },
-    "currentPerformance": {
-      "dataSize": "130GB",
-      "photoCount": "約130,000枚",
-      "processingTime": "40-60分（Pillar 1適用後見込み）",
-      "previousTime": "3時間+（完了せず）",
-      "improvement": "5-7倍高速化"
+      "expectedEffect": "3時間+ → 40-60分（5-7倍高速化）"
     },
     "fourPillarsPlan": {
       "totalHours": 68,
@@ -132,7 +119,8 @@
 
   "monetizationStatus": {
     "phase": 1,
-    "status": "integration_complete"
+    "status": "payment_flow_complete",
+    "details": "StoreKitによる購入・復元・エラーハンドリング実装完了。App Store ConnectでプロダクトID登録待ち。"
   },
 
   "discovered_issues": [
@@ -150,31 +138,35 @@
 
   "completedTasks": [
     {
+      "taskId": "session42-payment-flow-implementation",
+      "title": "決済フロー完全実装・P0/P1修正・実機ビルド",
+      "completedAt": "2026-03-18",
+      "qualityScore": 95,
+      "components": [
+        "P0: TrashManager try! 除去",
+        "P1: AppState @Observable マイグレーション",
+        "P1: AppStateEnvironment Combine依存除去",
+        "P1: 空doブロック除去（GroupDetailView・GroupListView）",
+        "P2: SettingsViewにプライバシーURL・LimitReachedSheet追加",
+        "P2: LimitReachedSheet動的価格表示（StoreKit）",
+        "決済フロー: プラン選択・購入ロジック・復元機能",
+        "PurchaseErrorハンドリング（キャンセル=静かに無視）",
+        "GroupDetailView・HomeViewのonUpgrade統合",
+        "実機ビルド・起動成功（iOS 26.3.1）"
+      ],
+      "result": "決済フロー完全実装、App Store ConnectでプロダクトID登録が次ステップ"
+    },
+    {
       "taskId": "session40-pillar1-actual-deployment",
       "title": "Pillar 1実際の適用・デプロイ",
       "completedAt": "2026-01-10",
-      "qualityScore": 100,
-      "components": [
-        "SimilarityAnalyzer順次処理問題を発見・修正",
-        "extractFeaturePrintsを並列処理（TaskGroup）に書き換え",
-        "AsyncSemaphore + MemoryPressureMonitor適用",
-        "実機デプロイ完了"
-      ],
-      "result": "Pillar 1改善の実際の適用完了、次セッションで効果検証"
+      "qualityScore": 100
     },
     {
       "taskId": "session39-pillar1-critical-fixes",
       "title": "Pillar 1 Critical Fixes",
       "completedAt": "2026-01-09",
-      "qualityScore": 100,
-      "components": [
-        "CF-1: AsyncSemaphore導入（8並列制限）",
-        "CF-2: MemoryPressureMonitor導入（動的調整）",
-        "CF-3: プログレス精度改善（10件ごと報告）",
-        "19テストパス（100%）",
-        "Swift 6並行性エラー修正（LockIsolatedパターン）"
-      ],
-      "result": "5-7倍高速化基盤構築完了"
+      "qualityScore": 100
     },
     {
       "taskId": "session38-performance-analysis",
@@ -186,12 +178,12 @@
 
   "next_actions": [
     {
-      "action": "【最優先】Pillar 1実機テスト",
-      "description": "修正版アプリで130,000枚の実機テスト実施。40-60分に短縮されているか検証。",
-      "estimated_hours": 1,
+      "action": "【最優先】App Store ConnectでプロダクトID登録",
+      "description": "monthly_premium, yearly_premium, lifetime_premiumの3プロダクトを登録し、サンドボックス環境で決済テスト実施。",
+      "estimated_hours": 2,
       "priority": "critical",
       "recommended": true,
-      "note": "session40で修正・デプロイ完了。次セッションで必ず実施。"
+      "note": "session42で決済フロー実装完了。プロダクトIDが未登録のため、App Store Connectでの設定が必須。"
     },
     {
       "action": "【Option A】M10-T04: App Store Connect設定",
@@ -214,60 +206,62 @@
   ],
 
   "taskStatus": {
-    "total": 175,
-    "completed": 169,
+    "total": 181,
+    "completed": 175,
     "skipped": 0,
     "merged": 0,
     "inProgress": 0,
     "pending": 6,
     "blockedP0": 0,
-    "completedHours": 300,
-    "remainingHours": 73,
-    "lastCompletedTaskId": "session39-pillar1-critical-fixes",
-    "currentTask": "完了（Pillar 1 Critical Fixes）",
+    "completedHours": 304,
+    "remainingHours": 69,
+    "lastCompletedTaskId": "session42-payment-flow-implementation",
+    "currentTask": "完了（決済フロー完全実装）",
     "nextTaskCandidates": [
-      "M10-T04: App Store Connect設定（3h）- 推奨",
-      "M10-T05: TestFlight配信（2h）",
-      "Pillar 2 Phase X（40h）- 時間あれば"
+      "App Store ConnectプロダクトID登録・サンドボックステスト（2h）- 最優先",
+      "M10-T04: App Store Connect設定（3h）",
+      "M10-T05: TestFlight配信（2h）"
     ]
   },
 
   "sessionSummary": {
-    "sessionName": "session40-pillar1-actual-deployment",
-    "date": "2026-01-10",
-    "completedTasks": 2,
-    "qualityScore": 100,
+    "sessionName": "session42-payment-flow-implementation",
+    "date": "2026-03-18",
+    "completedTasks": 12,
+    "qualityScore": 95,
     "achievements": [
-      "SimilarityAnalyzer順次処理問題を発見",
-      "SimilarityAnalyzer.extractFeaturePrintsを並列処理に修正",
-      "AsyncSemaphore + MemoryPressureMonitor + TaskGroup適用",
-      "実機デプロイ完了（YH iPhone 15 Pro Max）",
-      "Pillar 1改善の実際の適用完了",
-      "次セッションで130,000枚実機テスト予定"
+      "P0修正: TrashManager try! 除去",
+      "P1修正: AppState @Observable マイグレーション",
+      "P1修正: AppStateEnvironment Combine依存除去",
+      "決済フロー完全実装（StoreKit購入・復元・エラーハンドリング）",
+      "LimitReachedSheet動的価格表示・プラン選択UI",
+      "GroupDetailView・HomeViewのonUpgrade統合",
+      "実機ビルド・起動成功（YH iPhone 15 Pro Max, iOS 26.3.1）"
     ]
   },
 
   "resumeInstructions": {
-    "step1": "【必須】Pillar 1実機テスト実施（1h）- 130,000枚で40-60分に短縮されているか検証",
-    "step2": "【効果確認後】テスト結果に応じてアクション選択：効果あり→M10リリース準備、効果なし→さらなる調査",
-    "step3": "【代替】Option B: Pillar 2 Phase X開始（40h）でさらなる高速化（効果確認後に検討）",
-    "criticalNote": "session40で重要な問題を発見・修正: SimilarityAnalyzerが独自の順次処理を使用していた→並列処理に修正・デプロイ完了。必ず実機テストで効果を確認すること。",
-    "context": "セッション40でPillar 1改善を実際に適用完了。SimilarityAnalyzer.extractFeaturePrintsを並列処理（AsyncSemaphore + MemoryPressureMonitor + TaskGroup）に修正。実機デプロイ完了。次セッションで効果検証必須。"
+    "step1": "【最優先】App Store ConnectでプロダクトID登録（monthly_premium, yearly_premium, lifetime_premium）",
+    "step2": "サンドボックス環境で決済フローのE2Eテスト実施",
+    "step3": "M10-T04: App Store Connect設定（メタデータ・スクリーンショット・プライバシーポリシー）",
+    "step4": "M10-T05: TestFlight配信でベータテスト開始",
+    "criticalNote": "session42で決済フロー実装完了。StoreKitコードは実装済みだが、App Store ConnectにプロダクトIDが未登録のため、実際の決済テストはApp Store Connect設定後に可能。",
+    "context": "セッション42で決済フロー完全実装。LimitReachedSheetにプラン選択・購入・復元機能を実装。P0/P1修正完了。@Observable移行完了。実機ビルド成功。"
   },
 
   "quality": {
     "scores": [
       90, 100, 95, 97.5, 95, 95, 100, 97.5, 92, 97.5, 97, 90, 92, 90, 90, 90,
       72, 90, 92, 92, 95, 75, 81, 85, 84, 94, 98, 98, 92.5, 90, 92, 88, 90,
-      95, 90, 93, 90, 92, 95, 100, 100
+      95, 90, 93, 90, 92, 95, 100, 100, 95
     ],
     "average": 92.5,
-    "trend": "improving",
+    "trend": "stable_high",
     "targetScore": 95,
     "latestScores": {
+      "session42-payment-flow-implementation": 95,
+      "session41-implementation-analysis": 100,
       "session40-pillar1-actual-deployment": 100,
-      "session39-pillar1-critical-fixes": 100,
-      "session38-performance-analysis": 95,
       "sessionAverage": 98.3
     }
   },
@@ -280,36 +274,36 @@
       "deviceId": "C7812CA5-F362-565B-985C-CE323F453DFA"
     },
     "status": "deployed",
-    "lastDeployDate": "2026-01-10",
-    "deployedVersion": "session40修正版（SimilarityAnalyzer並列処理適用）",
-    "note": "Pillar 1改善が実際に適用された版をデプロイ完了。次セッションで130,000枚実機テスト必須。"
+    "lastDeployDate": "2026-03-18",
+    "deployedVersion": "session42版（決済フロー実装・@Observable移行・P0/P1修正）",
+    "note": "決済フロー実装版をデプロイ完了。App Store ConnectでプロダクトID登録後にサンドボックステスト可能。"
   },
 
   "nextSession": {
-    "recommended_action": "M10リリース準備（App Store Connect設定）",
-    "priority": "High",
-    "estimatedTime": "3h",
+    "recommended_action": "App Store ConnectプロダクトID登録・サンドボックステスト",
+    "priority": "Critical",
+    "estimatedTime": "2h",
     "tasks": [
       {
-        "name": "【推奨】M10-T04 App Store Connect設定",
+        "name": "【最優先】App Store ConnectプロダクトID登録",
         "priority": 1,
+        "estimatedHours": 2,
+        "description": "monthly_premium, yearly_premium, lifetime_premiumを登録、サンドボックステスト"
+      },
+      {
+        "name": "M10-T04 App Store Connect設定",
+        "priority": 2,
         "estimatedHours": 3,
         "description": "アプリメタデータ登録、スクリーンショット準備"
       },
       {
         "name": "M10-T05 TestFlight配信",
-        "priority": 2,
-        "estimatedHours": 2,
-        "description": "ベータテスト実施、Pillar 1効果検証"
-      },
-      {
-        "name": "【Option B】Pillar 2 Phase X開始",
         "priority": 3,
-        "estimatedHours": 40,
-        "description": "40-60分 → 15-25分を目指す"
+        "estimatedHours": 2,
+        "description": "ベータテスト実施"
       }
     ]
   },
 
-  "notes": "セッション40完了（2026-01-10）。重要な問題を発見：SimilarityAnalyzerが独自のextractFeaturePrintsメソッドで順次処理（forループ）を使用しており、Pillar 1改善（AsyncSemaphore、MemoryPressureMonitor）が適用されていなかった。修正完了：SimilarityAnalyzer.extractFeaturePrintsを並列処理（TaskGroup + AsyncSemaphore + MemoryPressureMonitor）に書き換え。実機デプロイ完了。次セッションで130,000枚の実機テスト必須（40-60分に短縮されているか検証）。"
+  "notes": "セッション42完了（2026-03-18）。決済フロー完全実装: LimitReachedSheetにStoreKit購入・復元・エラーハンドリングを実装。P0修正（TrashManager try!除去）、P1修正（AppState @Observable移行、Combine依存除去）完了。実機ビルド・起動成功（iOS 26.3.1）。次回はApp Store ConnectでプロダクトID（monthly_premium, yearly_premium, lifetime_premium）を登録し、サンドボックスで決済テスト。"
 }

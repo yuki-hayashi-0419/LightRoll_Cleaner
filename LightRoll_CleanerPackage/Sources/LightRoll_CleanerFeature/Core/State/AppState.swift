@@ -8,14 +8,14 @@
 //
 
 import SwiftUI
-import Combine
 
 // MARK: - AppState
 
 /// アプリケーション状態管理
-/// アプリ全体の状態を一元管理するObservableObject
+/// アプリ全体の状態を一元管理する @Observable クラス
 @MainActor
-public final class AppState: ObservableObject {
+@Observable
+public final class AppState {
 
     // MARK: - Singleton
 
@@ -25,94 +25,99 @@ public final class AppState: ObservableObject {
     // MARK: - Navigation State
 
     /// 現在選択中のタブ
-    @Published public var currentTab: Tab = .dashboard
+    public var currentTab: Tab = .dashboard
 
     /// ナビゲーションパス（NavigationStack用）
-    @Published public var navigationPath: NavigationPath = NavigationPath()
+    public var navigationPath: NavigationPath = NavigationPath()
 
     /// モーダルで表示中の遷移先
-    @Published public var presentedDestination: NavigationDestination?
+    public var presentedDestination: NavigationDestination?
 
     // MARK: - Scan State
 
     /// スキャン中フラグ
-    @Published public var isScanning: Bool = false
+    public var isScanning: Bool = false
 
     /// スキャン進捗
-    @Published public var scanProgress: ScanProgress = .initial
+    public var scanProgress: ScanProgress = .initial
 
     /// 最後のスキャン日時
-    @Published public var lastScanDate: Date?
+    public var lastScanDate: Date?
 
     /// 最新のスキャン結果
-    @Published public var scanResult: ScanResult?
+    public var scanResult: ScanResult?
 
     // MARK: - Photo State
 
     /// 写真グループ一覧
-    @Published public var photoGroups: [PhotoGroup] = []
+    public var photoGroups: [PhotoGroup] = []
 
     /// 選択中の写真ID一覧
-    @Published public var selectedPhotos: Set<String> = []
+    public var selectedPhotos: Set<String> = []
 
     /// 写真の総数
-    @Published public var totalPhotosCount: Int = 0
+    public var totalPhotosCount: Int = 0
 
     // MARK: - Storage State
 
     /// ストレージ情報
-    @Published public var storageInfo: StorageInfo?
+    public var storageInfo: StorageInfo?
 
     /// 削減可能な容量（バイト）
-    @Published public var potentialSavings: Int64 = 0
+    public var potentialSavings: Int64 = 0
 
     // MARK: - UI State
 
     /// ローディング中フラグ
-    @Published public var isLoading: Bool = false
+    public var isLoading: Bool = false
 
     /// エラーメッセージ
-    @Published public var errorMessage: String?
+    public var errorMessage: String?
 
     /// 削除確認ダイアログ表示フラグ
-    @Published public var showingDeleteConfirmation: Bool = false
+    public var showingDeleteConfirmation: Bool = false
 
     /// 削除確認のコンテキスト
-    @Published public var deleteConfirmationContext: DeleteConfirmationContext?
+    public var deleteConfirmationContext: DeleteConfirmationContext?
 
     /// トースト表示用メッセージ
-    @Published public var toastMessage: String?
+    public var toastMessage: String?
 
     /// アラート表示フラグ
-    @Published public var showingAlert: Bool = false
+    public var showingAlert: Bool = false
 
     /// アラートのタイトル
-    @Published public var alertTitle: String = ""
+    public var alertTitle: String = ""
 
     /// アラートのメッセージ
-    @Published public var alertMessage: String = ""
+    public var alertMessage: String = ""
 
     // MARK: - Premium State
 
     /// プレミアムユーザーフラグ
-    @Published public var isPremium: Bool = false
+    public var isPremium: Bool = false
 
     /// 本日の削除件数（無料ユーザー向け制限用）
-    @Published public var todayDeleteCount: Int = 0
+    public var todayDeleteCount: Int = 0
 
     /// 最後の削除日
-    @Published public var lastDeleteDate: Date?
+    public var lastDeleteDate: Date?
 
     /// プレミアムアップグレード画面表示フラグ
-    @Published public var showingPremiumUpgrade: Bool = false
+    public var showingPremiumUpgrade: Bool = false
 
     // MARK: - Permission State
 
     /// 写真ライブラリアクセス権限
-    @Published public var photoPermissionGranted: Bool = false
+    public var photoPermissionGranted: Bool = false
 
     /// 通知権限
-    @Published public var notificationPermissionGranted: Bool = false
+    public var notificationPermissionGranted: Bool = false
+
+    // MARK: - Private State
+
+    /// トースト自動非表示タスク（キャンセル管理用）
+    private var toastTask: Task<Void, Never>?
 
     // MARK: - Initialization
 
@@ -367,9 +372,11 @@ public final class AppState: ObservableObject {
     public func showToast(_ message: String) {
         toastMessage = message
 
-        // 3秒後に自動で非表示
-        Task {
+        // 前のタスクをキャンセルして新しいタスクで3秒後に自動非表示
+        toastTask?.cancel()
+        toastTask = Task { @MainActor in
             try? await Task.sleep(nanoseconds: 3_000_000_000)
+            guard !Task.isCancelled else { return }
             if toastMessage == message {
                 toastMessage = nil
             }

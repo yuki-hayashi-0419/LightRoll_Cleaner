@@ -52,6 +52,23 @@ public struct LimitReachedSheet: View {
     /// シートを閉じるためのEnvironment
     @Environment(\.dismiss) private var dismiss
 
+    // MARK: - State
+
+    /// StoreKitから取得した製品情報（動的価格表示用）
+    @State private var loadedProducts: [ProductInfo] = []
+
+    /// 製品情報読み込み中フラグ
+    @State private var isLoadingProducts = false
+
+    /// 選択中のプラン（デフォルト: 月額プラン＝7日間無料トライアル付き）
+    @State private var selectedPlan: ProductIdentifier = .monthlyPremium
+
+    /// 購入処理中フラグ
+    @State private var isPurchasing = false
+
+    /// 購入エラーメッセージ
+    @State private var purchaseError: String? = nil
+
     // MARK: - Initialization
 
     /// LimitReachedSheetを初期化
@@ -118,6 +135,14 @@ public struct LimitReachedSheet: View {
         }
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
+        .task {
+            // シート表示時にStoreKitから最新の価格情報を取得
+            isLoadingProducts = true
+            if let products = try? await StoreKitManager.shared.loadProducts() {
+                loadedProducts = products
+            }
+            isLoadingProducts = false
+        }
     }
 
     // MARK: - Header Section
@@ -298,34 +323,74 @@ public struct LimitReachedSheet: View {
                 // 年額プラン（推奨）
                 PricingPlanRow(
                     title: "年額プラン",
-                    price: "¥2,000",
+                    price: yearlyPrice,
                     period: "/年",
                     badge: "50%割引",
-                    savings: "月額プランより約¥1,600お得",
-                    isRecommended: true
+                    savings: yearlySavingsText,
+                    isRecommended: true,
+                    isSelected: selectedPlan == .yearlyPremium,
+                    onSelect: { selectedPlan = .yearlyPremium }
                 )
 
                 // 月額プラン
                 PricingPlanRow(
                     title: "月額プラン",
-                    price: "¥300",
+                    price: monthlyPrice,
                     period: "/月",
                     badge: "7日間無料",
                     savings: nil,
-                    isRecommended: false
+                    isRecommended: false,
+                    isSelected: selectedPlan == .monthlyPremium,
+                    onSelect: { selectedPlan = .monthlyPremium }
                 )
 
                 // 買い切りプラン
                 PricingPlanRow(
                     title: "買い切りプラン",
-                    price: "¥3,000",
+                    price: lifetimePrice,
                     period: "（一度きり）",
                     badge: "サブスクなし",
                     savings: "永久にすべての機能を利用可能",
-                    isRecommended: false
+                    isRecommended: false,
+                    isSelected: selectedPlan == .lifetimePremium,
+                    onSelect: { selectedPlan = .lifetimePremium }
                 )
             }
         }
+    }
+
+    // MARK: - Dynamic Price Helpers
+
+    /// 年額プランの表示価格
+    private var yearlyPrice: String {
+        loadedProducts.first(where: { $0.id == ProductIdentifier.yearlyPremium.rawValue })?.priceFormatted ?? "¥2,000"
+    }
+
+    /// 月額プランの表示価格
+    private var monthlyPrice: String {
+        loadedProducts.first(where: { $0.id == ProductIdentifier.monthlyPremium.rawValue })?.priceFormatted ?? "¥300"
+    }
+
+    /// 買い切りプランの表示価格
+    private var lifetimePrice: String {
+        loadedProducts.first(where: { $0.id == ProductIdentifier.lifetimePremium.rawValue })?.priceFormatted ?? "¥3,000"
+    }
+
+    /// 年額プランのお得額テキスト
+    private var yearlySavingsText: String {
+        let yearly = loadedProducts.first(where: { $0.id == ProductIdentifier.yearlyPremium.rawValue })
+        let monthly = loadedProducts.first(where: { $0.id == ProductIdentifier.monthlyPremium.rawValue })
+        if let yearlyProduct = yearly, let monthlyProduct = monthly {
+            let savings = monthlyProduct.price * 12 - yearlyProduct.price
+            if savings > 0 {
+                let formatter = NumberFormatter()
+                formatter.numberStyle = .currency
+                formatter.locale = Locale.current
+                let savingsStr = formatter.string(from: savings as NSDecimalNumber) ?? ""
+                return "月額プランより約\(savingsStr)お得"
+            }
+        }
+        return "月額プランより約¥1,600お得"
     }
 
     // MARK: - Premium Features Section
@@ -381,14 +446,31 @@ public struct LimitReachedSheet: View {
 
     private var actionButtons: some View {
         VStack(spacing: 12) {
-            // Premiumを試す
+            // エラーメッセージ表示
+            if let error = purchaseError {
+                Text(error)
+                    .font(.caption)
+                    .foregroundColor(.red)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+            }
+
+            // メインCTAボタン（選択中プランを購入）
             Button {
-                dismiss()
-                onUpgrade()
+                Task {
+                    await purchaseSelectedPlan()
+                }
             } label: {
                 HStack {
-                    Image(systemName: "crown.fill")
-                    Text("7日間無料で試す")
+                    if isPurchasing {
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .tint(.white)
+                            .scaleEffect(0.8)
+                    } else {
+                        Image(systemName: "crown.fill")
+                    }
+                    Text(mainButtonLabel)
                         .font(.headline)
                 }
                 .frame(maxWidth: .infinity)
@@ -402,9 +484,26 @@ public struct LimitReachedSheet: View {
                 )
                 .foregroundColor(.white)
                 .cornerRadius(12)
+                .opacity(isPurchasing ? 0.8 : 1.0)
             }
-            .accessibilityLabel("7日間無料でPremiumを試す")
-            .accessibilityHint("すべてのプレミアム機能が1週間無料で利用できます")
+            .disabled(isPurchasing)
+            .accessibilityLabel(mainButtonLabel)
+            .accessibilityHint("選択中のプランで購入を開始します")
+
+            // 購入を復元
+            Button {
+                Task {
+                    await restorePurchases()
+                }
+            } label: {
+                Text("購入を復元")
+                    .font(.subheadline)
+                    .foregroundColor(.blue)
+                    .padding(.vertical, 4)
+            }
+            .disabled(isPurchasing)
+            .accessibilityLabel("購入を復元する")
+            .accessibilityHint("以前の購入履歴を復元します")
 
             // 後で
             Button {
@@ -413,11 +512,82 @@ public struct LimitReachedSheet: View {
                 Text("後で確認する")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
-                    .padding()
+                    .padding(.vertical, 4)
             }
+            .disabled(isPurchasing)
             .accessibilityLabel("後で確認する")
             .accessibilityHint("シートを閉じます")
         }
+    }
+
+    // MARK: - Main Button Label
+
+    /// 選択プランに応じたボタンラベル
+    private var mainButtonLabel: String {
+        switch selectedPlan {
+        case .monthlyPremium:
+            return "7日間無料で試す（月額プラン）"
+        case .yearlyPremium:
+            return "年額プランで始める"
+        case .lifetimePremium:
+            return "買い切りプランで購入"
+        }
+    }
+
+    // MARK: - Purchase Actions
+
+    /// 選択中プランを購入する
+    private func purchaseSelectedPlan() async {
+        isPurchasing = true
+        purchaseError = nil
+
+        do {
+            _ = try await StoreKitManager.shared.purchase(selectedPlan.rawValue)
+            // 購入成功 → シートを閉じてコールバック実行
+            dismiss()
+            onUpgrade()
+        } catch PurchaseError.purchaseCancelled {
+            // ユーザーがキャンセル → エラー表示なし
+        } catch PurchaseError.productNotFound {
+            // 製品が未ロードの場合は先にロードして再試行
+            if let _ = try? await StoreKitManager.shared.loadProducts() {
+                do {
+                    _ = try await StoreKitManager.shared.purchase(selectedPlan.rawValue)
+                    dismiss()
+                    onUpgrade()
+                } catch PurchaseError.purchaseCancelled {
+                    // キャンセル → 何もしない
+                } catch {
+                    purchaseError = error.localizedDescription
+                }
+            } else {
+                purchaseError = "製品情報の取得に失敗しました。ネットワーク接続を確認してください。"
+            }
+        } catch {
+            // その他のエラー → エラーメッセージを表示
+            purchaseError = error.localizedDescription
+        }
+
+        isPurchasing = false
+    }
+
+    /// 購入を復元する
+    private func restorePurchases() async {
+        isPurchasing = true
+        purchaseError = nil
+
+        do {
+            _ = try await StoreKitManager.shared.restorePurchases()
+            // 復元成功 → シートを閉じてコールバック実行
+            dismiss()
+            onUpgrade()
+        } catch PurchaseError.noActiveSubscription {
+            purchaseError = "復元できる購入履歴が見つかりませんでした"
+        } catch {
+            purchaseError = error.localizedDescription
+        }
+
+        isPurchasing = false
     }
 }
 
@@ -430,76 +600,103 @@ private struct PricingPlanRow: View {
     let badge: String
     let savings: String?
     let isRecommended: Bool
+    let isSelected: Bool
+    let onSelect: () -> Void
 
     var body: some View {
-        HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
-                    Text(title)
-                        .font(.subheadline.bold())
+        Button(action: onSelect) {
+            HStack(spacing: 12) {
+                // 選択インジケーター
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .font(.title3)
+                    .foregroundStyle(isSelected ?
+                        AnyShapeStyle(LinearGradient(
+                            colors: [.blue, .purple],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )) :
+                        AnyShapeStyle(Color.gray.opacity(0.4))
+                    )
 
-                    if isRecommended {
-                        Text("おすすめ")
-                            .font(.caption2.bold())
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(title)
+                            .font(.subheadline.bold())
+                            .foregroundColor(.primary)
+
+                        if isRecommended {
+                            Text("おすすめ")
+                                .font(.caption2.bold())
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(
+                                    LinearGradient(
+                                        colors: [.orange, .red],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .cornerRadius(4)
+                        }
+                    }
+
+                    if let savings = savings {
+                        Text(savings)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+
+                Spacer()
+
+                VStack(alignment: .trailing, spacing: 2) {
+                    HStack(alignment: .firstTextBaseline, spacing: 2) {
+                        Text(price)
+                            .font(.title3.bold())
+                            .foregroundColor(.primary)
+                        Text(period)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+
+                    Text(badge)
+                        .font(.caption2)
+                        .foregroundColor(.blue)
+                }
+            }
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(
+                        isSelected ?
+                            LinearGradient(
+                                colors: [.blue, .purple],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            ) :
+                            isRecommended ?
                                 LinearGradient(
                                     colors: [.orange, .red],
                                     startPoint: .leading,
                                     endPoint: .trailing
-                                )
-                            )
-                            .cornerRadius(4)
-                    }
-                }
-
-                if let savings = savings {
-                    Text(savings)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-            }
-
-            Spacer()
-
-            VStack(alignment: .trailing, spacing: 2) {
-                HStack(alignment: .firstTextBaseline, spacing: 2) {
-                    Text(price)
-                        .font(.title3.bold())
-                    Text(period)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-
-                Text(badge)
-                    .font(.caption2)
-                    .foregroundColor(.blue)
-            }
+                                ) :
+                                LinearGradient(
+                                    colors: [Color.gray.opacity(0.3)],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                ),
+                        lineWidth: isSelected ? 2 : (isRecommended ? 2 : 1)
+                    )
+            )
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(isSelected ? Color.blue.opacity(0.05) : (isRecommended ? Color.orange.opacity(0.05) : Color.clear))
+            )
         }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(
-                    isRecommended ?
-                        LinearGradient(
-                            colors: [.orange, .red],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        ) :
-                        LinearGradient(
-                            colors: [Color.gray.opacity(0.3)],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        ),
-                    lineWidth: isRecommended ? 2 : 1
-                )
-        )
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(isRecommended ? Color.orange.opacity(0.05) : Color.clear)
-        )
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(title): \(price)\(period)")
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 

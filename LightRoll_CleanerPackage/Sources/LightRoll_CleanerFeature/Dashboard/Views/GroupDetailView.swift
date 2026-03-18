@@ -233,8 +233,11 @@ public struct GroupDetailView: View {
                     countStyle: .file
                 ),
                 onUpgrade: {
-                    showLimitReachedSheet = false
-                    // TODO: プレミアム購入画面への遷移
+                    // 購入成功後にPremiumManagerのステータスを同期
+                    // Transaction.updatesで自動更新されるが、念のため手動でも確認
+                    Task {
+                        try? await premiumManager?.checkPremiumStatus()
+                    }
                 }
             )
         }
@@ -676,48 +679,44 @@ public struct GroupDetailView: View {
 
         viewState = .processing
 
-        do {
-            let idsToDelete = Array(selectedPhotoIds)
-            await onDeletePhotos?(idsToDelete)
+        let idsToDelete = Array(selectedPhotoIds)
+        await onDeletePhotos?(idsToDelete)
 
-            // 削除後、選択をクリア
-            selectedPhotoIds.removeAll()
+        // 削除後、選択をクリア
+        selectedPhotoIds.removeAll()
 
-            // 写真リストから削除された写真を除外
-            photos = photos.filter { !idsToDelete.contains($0.id) }
+        // 写真リストから削除された写真を除外
+        photos = photos.filter { !idsToDelete.contains($0.id) }
 
-            viewState = .loaded
+        viewState = .loaded
 
-            // 削除成功後、インタースティシャル広告を表示（無料ユーザーのみ）
-            showInterstitialAdIfReady()
-        }
+        // 削除成功後、インタースティシャル広告を表示（無料ユーザーのみ）
+        showInterstitialAdIfReady()
     }
 
     /// グループ全体の写真を削除（ベストショット以外）
     private func deleteAllPhotos() async {
         viewState = .processing
 
-        do {
-            // ベストショット以外の全写真IDを取得
-            let idsToDelete = Array(selectablePhotoIds)
+        // ベストショット以外の全写真IDを取得
+        let idsToDelete = Array(selectablePhotoIds)
 
-            // 削除実行
-            await onDeletePhotos?(idsToDelete)
+        // 削除実行
+        await onDeletePhotos?(idsToDelete)
 
-            // 選択をクリア
-            selectedPhotoIds.removeAll()
+        // 選択をクリア
+        selectedPhotoIds.removeAll()
 
-            // 選択モードを終了
-            isSelectionModeActive = false
+        // 選択モードを終了
+        isSelectionModeActive = false
 
-            // 写真リストから削除された写真を除外
-            photos = photos.filter { !idsToDelete.contains($0.id) }
+        // 写真リストから削除された写真を除外
+        photos = photos.filter { !idsToDelete.contains($0.id) }
 
-            viewState = .loaded
+        viewState = .loaded
 
-            // 削除成功後、インタースティシャル広告を表示（無料ユーザーのみ）
-            showInterstitialAdIfReady()
-        }
+        // 削除成功後、インタースティシャル広告を表示（無料ユーザーのみ）
+        showInterstitialAdIfReady()
     }
 
     /// インタースティシャル広告を表示（条件を満たす場合のみ）

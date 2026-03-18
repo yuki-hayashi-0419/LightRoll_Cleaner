@@ -78,14 +78,25 @@ public final class TrashManager: TrashManagerProtocol {
 
     /// イニシャライザ
     /// - Parameters:
-    ///   - dataStore: データストア（デフォルトは実装インスタンス）
+    ///   - dataStore: データストア（nil の場合はデフォルトの TrashDataStore を使用）
     ///   - retentionDays: 保持日数（デフォルト30日）
     public init(
-        dataStore: any TrashDataStoreProtocol = try! TrashDataStore(),
+        dataStore: (any TrashDataStoreProtocol)? = nil,
         retentionDays: Int = TrashPhoto.defaultRetentionDays
     ) {
-        self.dataStore = dataStore
+        self.dataStore = dataStore ?? Self.makeDefaultDataStore()
         self.retentionDays = retentionDays
+    }
+
+    /// デフォルトの TrashDataStore を安全に生成するヘルパー
+    /// - Returns: 生成された TrashDataStore
+    private static func makeDefaultDataStore() -> any TrashDataStoreProtocol {
+        do {
+            return try TrashDataStore()
+        } catch {
+            // iOSサンドボックス内では通常発生しないが、発生した場合は明確なエラーメッセージで終了
+            fatalError("TrashDataStoreの初期化に失敗しました: \(error.localizedDescription)\n原因: ファイルシステムへのアクセスに問題があります")
+        }
     }
 
     // MARK: - Public Methods

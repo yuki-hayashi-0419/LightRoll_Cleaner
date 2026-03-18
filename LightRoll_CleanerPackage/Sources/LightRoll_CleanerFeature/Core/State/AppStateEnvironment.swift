@@ -200,26 +200,7 @@ public extension View {
 }
 #endif
 
-// MARK: - Combine Extensions
-
-import Combine
-
-public extension AppState {
-
-    /// 特定のプロパティの変更を監視するPublisher
-    /// - Parameter keyPath: 監視するプロパティのKeyPath
-    /// - Returns: 値変更のPublisher
-    func publisher<T>(for keyPath: KeyPath<AppState, T>) -> AnyPublisher<T, Never> {
-        objectWillChange
-            .map { [weak self] _ in
-                self?[keyPath: keyPath]
-            }
-            .compactMap { $0 }
-            .eraseToAnyPublisher()
-    }
-}
-
-// MARK: - ObservableObject Binding Helper
+// MARK: - Binding Helper
 
 public extension AppState {
 

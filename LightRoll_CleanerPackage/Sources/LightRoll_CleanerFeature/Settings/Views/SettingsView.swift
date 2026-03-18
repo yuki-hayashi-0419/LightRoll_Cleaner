@@ -83,6 +83,17 @@ public struct SettingsView: View {
     /// ゴミ箱画面表示フラグ
     @State private var showingTrash = false
 
+    // MARK: - URL Constants
+
+    /// プライバシーポリシーURL
+    private static let privacyPolicyURL = URL(string: "https://lightroll-cleaner.app/privacy")!
+
+    /// 利用規約URL
+    private static let termsOfServiceURL = URL(string: "https://lightroll-cleaner.app/terms")!
+
+    /// サポートURL
+    private static let supportURL = URL(string: "https://lightroll-cleaner.app/support")!
+
     // MARK: - Body
 
     public var body: some View {
@@ -140,10 +151,33 @@ public struct SettingsView: View {
     /// プレミアムセクション
     private var premiumSection: some View {
         Section {
-            Button {
-                showingPremiumUpgrade = true
-            } label: {
-                VStack(spacing: 12) {
+            if premiumManager.isPremium {
+                // プレミアム会員の場合はステータス表示
+                HStack(spacing: 12) {
+                    Image(systemName: "crown.fill")
+                        .font(.system(size: 28))
+                        .foregroundStyle(.yellow.gradient)
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("プレミアム会員")
+                            .font(.headline)
+
+                        Text("すべての機能が利用可能です")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+
+                    Spacer()
+
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green)
+                }
+                .padding(.vertical, 8)
+            } else {
+                // 無料会員の場合はアップグレードボタンを表示
+                Button {
+                    showingPremiumUpgrade = true
+                } label: {
                     HStack(spacing: 12) {
                         Image(systemName: "star.circle.fill")
                             .font(.system(size: 40))
@@ -153,7 +187,7 @@ public struct SettingsView: View {
                             Text("プレミアムにアップグレード")
                                 .font(.headline)
 
-                            Text("すべての機能を解放")
+                            Text("無制限削除・広告なし・全機能解放")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
@@ -166,16 +200,22 @@ public struct SettingsView: View {
                     }
                     .padding(.vertical, 8)
                 }
-            }
-            .buttonStyle(.plain)
-            .contentShape(Rectangle())
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel("プレミアムにアップグレード。すべての機能を解放")
-            .accessibilityHint("タップして詳細を表示")
-            .alert("プレミアム機能", isPresented: $showingPremiumUpgrade) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text("プレミアム機能は準備中です。\n現在のステータス: \(premiumManager.isPremium ? "プレミアム会員" : "無料会員")")
+                .buttonStyle(.plain)
+                .contentShape(Rectangle())
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("プレミアムにアップグレード。無制限削除・広告なし・全機能解放")
+                .accessibilityHint("タップしてプランを選択")
+                .sheet(isPresented: $showingPremiumUpgrade) {
+                    LimitReachedSheet(
+                        currentCount: 0,
+                        limit: 50,
+                        remainingDuplicates: nil,
+                        potentialFreeSpace: nil,
+                        onUpgrade: {
+                            // アップグレード後のリフレッシュ（PremiumManagerが自動更新）
+                        }
+                    )
+                }
             }
         }
     }
@@ -499,9 +539,7 @@ public struct SettingsView: View {
             }
             .buttonStyle(.plain)
 
-            Button {
-                // TODO: ヘルプ・サポート画面への遷移
-            } label: {
+            Link(destination: Self.supportURL) {
                 SettingsRow(
                     icon: "questionmark.circle",
                     iconColor: .green,
@@ -511,9 +549,7 @@ public struct SettingsView: View {
             }
             .buttonStyle(.plain)
 
-            Button {
-                // TODO: プライバシーポリシー表示
-            } label: {
+            Link(destination: Self.privacyPolicyURL) {
                 SettingsRow(
                     icon: "hand.raised",
                     iconColor: .orange,
@@ -523,9 +559,7 @@ public struct SettingsView: View {
             }
             .buttonStyle(.plain)
 
-            Button {
-                // TODO: 利用規約表示
-            } label: {
+            Link(destination: Self.termsOfServiceURL) {
                 SettingsRow(
                     icon: "doc.text",
                     iconColor: .gray,
