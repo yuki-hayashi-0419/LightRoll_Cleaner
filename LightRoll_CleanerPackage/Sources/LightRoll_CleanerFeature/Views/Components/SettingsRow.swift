@@ -143,12 +143,12 @@ public struct SettingsRow<AccessoryContent: View>: View {
     /// テキストコンテンツ
     private var textContent: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(title)
+            Text(LocalizedStringKey(title))
                 .font(.body)
                 .foregroundStyle(.primary)
 
             if let subtitle = subtitle {
-                Text(subtitle)
+                Text(LocalizedStringKey(subtitle))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

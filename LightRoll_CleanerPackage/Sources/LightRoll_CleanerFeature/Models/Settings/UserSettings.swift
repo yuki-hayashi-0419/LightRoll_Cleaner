@@ -7,6 +7,33 @@
 
 import Foundation
 
+// MARK: - AppLanguage
+
+/// アプリの表示言語設定
+public enum AppLanguage: String, Codable, CaseIterable, Sendable {
+    case system = "system"   // デバイスのシステム言語に従う
+    case japanese = "ja"     // 日本語
+    case english = "en"      // English
+
+    /// 設定画面に表示するラベル（言語設定UIは常に固定表示）
+    public var displayName: String {
+        switch self {
+        case .system: return "自動（システム設定に従う）"
+        case .japanese: return "日本語"
+        case .english: return "English"
+        }
+    }
+
+    /// 対応する Locale（nil = システム設定使用）
+    public var locale: Locale? {
+        switch self {
+        case .system: return nil
+        case .japanese: return Locale(identifier: "ja")
+        case .english: return Locale(identifier: "en")
+        }
+    }
+}
+
 // MARK: - UserSettings
 
 /// アプリ全体のユーザー設定を管理するモデル
@@ -16,19 +43,22 @@ public struct UserSettings: Codable, Sendable, Equatable {
     public var notificationSettings: NotificationSettings
     public var displaySettings: DisplaySettings
     public var premiumStatus: PremiumStatus
+    public var appLanguage: AppLanguage
 
     public init(
         scanSettings: ScanSettings = .default,
         analysisSettings: AnalysisSettings = .default,
         notificationSettings: NotificationSettings = .default,
         displaySettings: DisplaySettings = .default,
-        premiumStatus: PremiumStatus = .free
+        premiumStatus: PremiumStatus = .free,
+        appLanguage: AppLanguage = .system
     ) {
         self.scanSettings = scanSettings
         self.analysisSettings = analysisSettings
         self.notificationSettings = notificationSettings
         self.displaySettings = displaySettings
         self.premiumStatus = premiumStatus
+        self.appLanguage = appLanguage
     }
 }
 
@@ -39,7 +69,8 @@ extension UserSettings {
         analysisSettings: .default,
         notificationSettings: .default,
         displaySettings: .default,
-        premiumStatus: .free
+        premiumStatus: .free,
+        appLanguage: .system
     )
 }
 

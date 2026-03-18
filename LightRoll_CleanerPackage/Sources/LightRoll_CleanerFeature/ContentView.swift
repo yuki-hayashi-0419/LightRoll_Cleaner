@@ -189,6 +189,7 @@ public struct ContentView: View {
                 showingSettings = true
             }
         )
+        .environment(\.locale, settingsService.currentLocale)  // アプリ内言語切り替え
         .environment(settingsService)  // グループ詳細画面で必須（DISPLAY-001〜003で使用）
         .environment(premiumManager)
         .environment(adManager)
@@ -207,6 +208,7 @@ public struct ContentView: View {
                 .environment(trashManager)
                 .environment(notificationManager)
             }
+            .environment(\.locale, settingsService.currentLocale)  // シートにもロケール注入
         }
         .onChange(of: settingsService.settings.scanSettings.autoScanEnabled) { _, newValue in
             syncBackgroundScanSettings()

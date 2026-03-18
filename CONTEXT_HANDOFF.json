@@ -1,54 +1,53 @@
 {
-  "version": "3.94",
+  "version": "3.95",
   "lastUpdated": "2026-03-18",
 
   "session_metadata": {
-    "session_id": "session42-payment-flow-implementation",
-    "started_at": "2026-03-18T10:00:00+09:00",
-    "ended_at": "2026-03-18T12:00:00+09:00",
+    "session_id": "session43-localization-implementation",
+    "started_at": "2026-03-18T14:00:00+09:00",
+    "ended_at": "2026-03-18T16:00:00+09:00",
     "status": "completed",
     "documents_updated": [
       "CONTEXT_HANDOFF.json",
       "PROGRESS.md",
-      "TrashManager.swift",
-      "AppState.swift",
-      "AppStateEnvironment.swift",
-      "GroupDetailView.swift",
-      "GroupListView.swift",
+      "Package.swift",
+      "ContentView.swift",
+      "UserSettings.swift",
+      "SettingsService.swift",
       "SettingsView.swift",
-      "LimitReachedSheet.swift",
-      "HomeView.swift"
+      "SettingsRow.swift",
+      "en.lproj/Localizable.strings"
     ],
-    "session_closure": "セッション42完了: 決済フロー完全実装（StoreKit購入・復元・エラーハンドリング）、P0/P1バグ修正、@Observable移行、実機ビルド成功。次回はApp Store ConnectでプロダクトID登録・サンドボックステスト。"
+    "session_closure": "セッション43完了: マルチ言語対応（ローカライゼーション）完全実装。AppLanguage enum追加、言語切替ピッカー・再起動アラート追加、英語翻訳ファイル（約150文字列）新規作成、LocalizedStringKey対応。ビルド成功確認済み。"
   },
 
   "contextOptimization": {
-    "lastOptimization": "2026-03-18T12:00:00+09:00",
-    "optimizationId": "context-optimization-016",
+    "lastOptimization": "2026-03-18T16:00:00+09:00",
+    "optimizationId": "context-optimization-017",
     "progressEntries": 11,
     "maxProgressEntries": 12,
     "archivedSessions": "Session 1-28 (28 sessions)",
     "archivedTasks": "172件 → TASKS_COMPLETED.md",
     "contextHealth": "良好",
     "estimatedSizeReduction": "約120KB（累計）",
-    "nextOptimizationTrigger": "セッション44-45付近（12件到達時）",
-    "currentProgressSize": "約420行（セッション29-42、11エントリ）",
+    "nextOptimizationTrigger": "セッション50-53付近（12件到達時）",
+    "currentProgressSize": "約470行（セッション29-43、11エントリ）",
     "archiveThreshold": "12セッション または 600行超過時",
-    "optimizationNote": "session42終了時: PROGRESS.mdにsession42記録追加、決済フロー完全実装記録"
+    "optimizationNote": "session43終了時: マルチ言語対応完全実装、en.lproj/Localizable.strings新規作成"
   },
 
   "current_phase": {
-    "phase_name": "決済フロー完全実装 / App Store Connect設定待ち",
+    "phase_name": "マルチ言語対応完了 / App Store Connect設定待ち",
     "progress_percentage": "99%",
-    "description": "決済フロー（StoreKit購入・復元・エラーハンドリング）を完全実装。P0/P1修正完了、@Observable移行完了。実機ビルド・起動成功。次はApp Store ConnectでプロダクトID登録。"
+    "description": "マルチ言語対応（日本語・英語）を完全実装。AppLanguage enum、言語切替UI、英語翻訳ファイル（約150文字列）を追加。決済フローも実装済み。次はApp Store ConnectでプロダクトID登録。"
   },
 
   "projectStatus": {
-    "phase": "決済フロー完全実装 / App Store Connect設定待ち",
-    "currentPhase": "StoreKitによる決済フロー完全実装完了。LimitReachedSheetにプラン選択・購入・復元機能を実装。実機ビルド成功。",
+    "phase": "マルチ言語対応完了 / App Store Connect設定待ち",
+    "currentPhase": "マルチ言語対応完了。日英2言語サポート。決済フロー実装済み。実機ビルド成功。",
     "overallProgress": "99%",
     "nextMilestone": "App Store ConnectでプロダクトID登録・サンドボックステスト",
-    "majorAchievement": "決済フロー完全実装（session42）"
+    "majorAchievement": "マルチ言語対応完全実装（session43）"
   },
 
   "performanceOptimization": {
@@ -123,6 +122,15 @@
     "details": "StoreKitによる購入・復元・エラーハンドリング実装完了。App Store ConnectでプロダクトID登録待ち。"
   },
 
+  "localizationStatus": {
+    "status": "implemented",
+    "completedAt": "2026-03-18",
+    "supportedLanguages": ["ja", "en"],
+    "defaultLocalization": "ja",
+    "translationCount": 150,
+    "details": "AppLanguage enum追加、言語ピッカーUI、再起動アラート、LocalizedStringKey対応、en.lproj/Localizable.strings新規作成"
+  },
+
   "discovered_issues": [
     {
       "issue_id": "PERF-CRITICAL-001",
@@ -138,23 +146,26 @@
 
   "completedTasks": [
     {
+      "taskId": "session43-localization-implementation",
+      "title": "マルチ言語対応（ローカライゼーション）完全実装",
+      "completedAt": "2026-03-18",
+      "qualityScore": 90,
+      "components": [
+        "Package.swift: defaultLocalization \"ja\" 追加",
+        "AppLanguage enum・appLanguageプロパティ追加（UserSettings.swift）",
+        "currentLocale・updateLanguage()メソッド追加（SettingsService.swift）",
+        "言語ピッカーセクション・再起動アラート追加（SettingsView.swift）",
+        "LocalizedStringKey対応（SettingsRow.swift）",
+        "ContentView: .environment(\\.locale) 注入",
+        "en.lproj/Localizable.strings 新規作成（約150文字列）"
+      ],
+      "result": "日英2言語対応完了、ビルド成功確認済み"
+    },
+    {
       "taskId": "session42-payment-flow-implementation",
       "title": "決済フロー完全実装・P0/P1修正・実機ビルド",
       "completedAt": "2026-03-18",
-      "qualityScore": 95,
-      "components": [
-        "P0: TrashManager try! 除去",
-        "P1: AppState @Observable マイグレーション",
-        "P1: AppStateEnvironment Combine依存除去",
-        "P1: 空doブロック除去（GroupDetailView・GroupListView）",
-        "P2: SettingsViewにプライバシーURL・LimitReachedSheet追加",
-        "P2: LimitReachedSheet動的価格表示（StoreKit）",
-        "決済フロー: プラン選択・購入ロジック・復元機能",
-        "PurchaseErrorハンドリング（キャンセル=静かに無視）",
-        "GroupDetailView・HomeViewのonUpgrade統合",
-        "実機ビルド・起動成功（iOS 26.3.1）"
-      ],
-      "result": "決済フロー完全実装、App Store ConnectでプロダクトID登録が次ステップ"
+      "qualityScore": 95
     },
     {
       "taskId": "session40-pillar1-actual-deployment",
@@ -206,17 +217,17 @@
   ],
 
   "taskStatus": {
-    "total": 181,
-    "completed": 175,
+    "total": 182,
+    "completed": 176,
     "skipped": 0,
     "merged": 0,
     "inProgress": 0,
     "pending": 6,
     "blockedP0": 0,
-    "completedHours": 304,
+    "completedHours": 306,
     "remainingHours": 69,
-    "lastCompletedTaskId": "session42-payment-flow-implementation",
-    "currentTask": "完了（決済フロー完全実装）",
+    "lastCompletedTaskId": "session43-localization-implementation",
+    "currentTask": "完了（マルチ言語対応完全実装）",
     "nextTaskCandidates": [
       "App Store ConnectプロダクトID登録・サンドボックステスト（2h）- 最優先",
       "M10-T04: App Store Connect設定（3h）",
@@ -225,18 +236,18 @@
   },
 
   "sessionSummary": {
-    "sessionName": "session42-payment-flow-implementation",
+    "sessionName": "session43-localization-implementation",
     "date": "2026-03-18",
-    "completedTasks": 12,
-    "qualityScore": 95,
+    "completedTasks": 7,
+    "qualityScore": 90,
     "achievements": [
-      "P0修正: TrashManager try! 除去",
-      "P1修正: AppState @Observable マイグレーション",
-      "P1修正: AppStateEnvironment Combine依存除去",
-      "決済フロー完全実装（StoreKit購入・復元・エラーハンドリング）",
-      "LimitReachedSheet動的価格表示・プラン選択UI",
-      "GroupDetailView・HomeViewのonUpgrade統合",
-      "実機ビルド・起動成功（YH iPhone 15 Pro Max, iOS 26.3.1）"
+      "Package.swift: defaultLocalization設定追加",
+      "AppLanguage enum・言語切替機能実装",
+      "SettingsView: 言語ピッカー・再起動アラート追加",
+      "ContentView: .environment(\\.locale) Locale注入",
+      "SettingsRow: LocalizedStringKey対応",
+      "en.lproj/Localizable.strings新規作成（約150文字列）",
+      "ビルド成功確認済み"
     ]
   },
 
@@ -245,24 +256,24 @@
     "step2": "サンドボックス環境で決済フローのE2Eテスト実施",
     "step3": "M10-T04: App Store Connect設定（メタデータ・スクリーンショット・プライバシーポリシー）",
     "step4": "M10-T05: TestFlight配信でベータテスト開始",
-    "criticalNote": "session42で決済フロー実装完了。StoreKitコードは実装済みだが、App Store ConnectにプロダクトIDが未登録のため、実際の決済テストはApp Store Connect設定後に可能。",
-    "context": "セッション42で決済フロー完全実装。LimitReachedSheetにプラン選択・購入・復元機能を実装。P0/P1修正完了。@Observable移行完了。実機ビルド成功。"
+    "criticalNote": "session43でマルチ言語対応完了。session42で決済フロー実装完了。App Store ConnectにプロダクトIDが未登録のため、実際の決済テストはApp Store Connect設定後に可能。",
+    "context": "セッション43でマルチ言語対応（日英）完全実装。セッション42で決済フロー完全実装。LimitReachedSheetにプラン選択・購入・復元機能を実装。P0/P1修正完了。@Observable移行完了。実機ビルド成功。"
   },
 
   "quality": {
     "scores": [
       90, 100, 95, 97.5, 95, 95, 100, 97.5, 92, 97.5, 97, 90, 92, 90, 90, 90,
       72, 90, 92, 92, 95, 75, 81, 85, 84, 94, 98, 98, 92.5, 90, 92, 88, 90,
-      95, 90, 93, 90, 92, 95, 100, 100, 95
+      95, 90, 93, 90, 92, 95, 100, 100, 95, 90
     ],
-    "average": 92.5,
+    "average": 92.4,
     "trend": "stable_high",
     "targetScore": 95,
     "latestScores": {
+      "session43-localization-implementation": 90,
       "session42-payment-flow-implementation": 95,
       "session41-implementation-analysis": 100,
-      "session40-pillar1-actual-deployment": 100,
-      "sessionAverage": 98.3
+      "sessionAverage": 95
     }
   },
 
@@ -276,7 +287,7 @@
     "status": "deployed",
     "lastDeployDate": "2026-03-18",
     "deployedVersion": "session42版（決済フロー実装・@Observable移行・P0/P1修正）",
-    "note": "決済フロー実装版をデプロイ完了。App Store ConnectでプロダクトID登録後にサンドボックステスト可能。"
+    "note": "session43のマルチ言語対応は実機デプロイ未実施。次回実機ビルド時に含まれる。"
   },
 
   "nextSession": {
@@ -305,5 +316,5 @@
     ]
   },
 
-  "notes": "セッション42完了（2026-03-18）。決済フロー完全実装: LimitReachedSheetにStoreKit購入・復元・エラーハンドリングを実装。P0修正（TrashManager try!除去）、P1修正（AppState @Observable移行、Combine依存除去）完了。実機ビルド・起動成功（iOS 26.3.1）。次回はApp Store ConnectでプロダクトID（monthly_premium, yearly_premium, lifetime_premium）を登録し、サンドボックスで決済テスト。"
+  "notes": "セッション43完了（2026-03-18）。マルチ言語対応（ローカライゼーション）完全実装: Package.swiftにdefaultLocalization追加、AppLanguage enum・言語切替ピッカー・再起動アラート実装、en.lproj/Localizable.strings（約150文字列）新規作成、SettingsRow LocalizedStringKey対応、ContentView Locale環境注入。ビルド成功確認済み。session42で決済フロー完全実装済み。次回はApp Store ConnectでプロダクトID登録・サンドボックステスト。"
 }

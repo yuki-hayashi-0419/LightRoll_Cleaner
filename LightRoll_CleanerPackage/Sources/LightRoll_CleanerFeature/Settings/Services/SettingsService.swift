@@ -163,6 +163,34 @@ public final class SettingsService: Sendable {
         lastError = nil
     }
 
+    /// 現在の表示言語に対応する Locale
+    ///
+    /// ContentView でSwiftUI環境に注入し、全Viewの言語を切り替える。
+    /// .system の場合はデバイスのロケールを使用。
+    public var currentLocale: Locale {
+        settings.appLanguage.locale ?? Locale.current
+    }
+
+    /// アプリの表示言語を更新
+    ///
+    /// UserDefaultsの "AppleLanguages" キーを更新することで、
+    /// アプリ再起動後にシステムが正しい言語でStringsファイルを読み込む。
+    /// - Parameter language: 新しい言語設定
+    public func updateLanguage(_ language: AppLanguage) {
+        updateSettings { $0.appLanguage = language }
+
+        // システム言語優先度を更新（再起動後に反映）
+        switch language {
+        case .system:
+            UserDefaults.standard.removeObject(forKey: "AppleLanguages")
+        case .japanese:
+            UserDefaults.standard.set(["ja"], forKey: "AppleLanguages")
+        case .english:
+            UserDefaults.standard.set(["en", "ja"], forKey: "AppleLanguages")
+        }
+        UserDefaults.standard.synchronize()
+    }
+
     // MARK: - Analysis Integration (SETTINGS-001)
 
     /// 現在の分析設定からSimilarityAnalysisOptionsを生成

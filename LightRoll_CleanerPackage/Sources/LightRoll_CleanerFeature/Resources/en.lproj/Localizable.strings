@@ -1,0 +1,222 @@
+/* LightRoll Cleaner - English Localizations */
+
+// MARK: - 設定画面 (Settings)
+"設定" = "Settings";
+"アプリ情報" = "App Info";
+"バージョン" = "Version";
+"ビルド番号" = "Build Number";
+"その他" = "Other";
+"エラー" = "Error";
+"OK" = "OK";
+
+// MARK: - プレミアム (Premium)
+"プレミアム会員" = "Premium Member";
+"すべての機能が利用可能です" = "All features are unlocked";
+"プレミアムにアップグレード" = "Upgrade to Premium";
+"無制限削除・広告なし・全機能解放" = "Unlimited deletion · No ads · All features";
+"プレミアムにアップグレード。無制限削除・広告なし・全機能解放" = "Upgrade to Premium. Unlimited deletion, no ads, all features";
+"タップしてプランを選択" = "Tap to select a plan";
+
+// MARK: - スキャン設定 (Scan Settings)
+"スキャン設定" = "Scan Settings";
+"自動スキャン" = "Auto Scan";
+"定期的に写真を自動でスキャン" = "Automatically scan photos periodically";
+"スキャン間隔" = "Scan Interval";
+"動画を含める" = "Include Videos";
+"スキャン対象に動画を含める" = "Include videos in scan";
+"スクリーンショットを含める" = "Include Screenshots";
+"スキャン対象にスクリーンショットを含める" = "Include screenshots in scan";
+"自撮りを含める" = "Include Selfies";
+"スキャン対象に自撮り写真を含める" = "Include selfie photos in scan";
+
+// MARK: - スキャン間隔 (AutoScanInterval)
+"毎日" = "Daily";
+"毎週" = "Weekly";
+"毎月" = "Monthly";
+"しない" = "Never";
+
+// MARK: - 分析設定 (Analysis Settings)
+"分析設定" = "Analysis Settings";
+"類似度しきい値" = "Similarity Threshold";
+"ブレ判定感度" = "Blur Detection";
+"最小グループサイズ" = "Min Group Size";
+"低" = "Low";
+"標準" = "Standard";
+"高" = "High";
+
+// MARK: - 通知 (Notifications)
+"通知" = "Notifications";
+"通知設定" = "Notification Settings";
+"通知が無効" = "Notifications disabled";
+"タップして詳細設定を表示" = "Tap to view settings";
+"オフ" = "Off";
+"容量警告" = "Storage Alert";
+"リマインダー" = "Reminder";
+"静寂時間" = "Quiet Hours";
+"オン（設定なし）" = "On (no settings)";
+
+// MARK: - 通知設定画面 (Notification Settings View)
+"通知設定画面" = "Notification Settings";
+"設定エラー" = "Settings Error";
+"通知を許可" = "Enable Notifications";
+"アプリからの通知を受け取る" = "Receive notifications from the app";
+"通知を許可すると、ストレージアラートやリマインダーを受け取ることができます。" = "Enabling notifications allows you to receive storage alerts and reminders.";
+"通知が無効の場合、すべての通知が停止されます。" = "All notifications will be stopped when disabled.";
+"ストレージアラート" = "Storage Alert";
+"ストレージ容量が不足した際に通知" = "Notify when storage is running low";
+"警告しきい値" = "Alert Threshold";
+"ストレージ使用率が設定したしきい値を超えると、削除可能なファイルがあることを通知します。" = "Notifies when storage usage exceeds the threshold.";
+"ストレージアラートを有効にすると、容量不足時に通知を受け取れます。" = "Enable to receive notifications when storage is low.";
+"定期的に写真整理をリマインド" = "Remind to organize photos periodically";
+"リマインダー間隔" = "Reminder Interval";
+"通知を受け取る頻度" = "Frequency of notifications";
+"リマインダーを有効にすると、定期的に写真整理を促す通知が届きます。" = "Enable to receive periodic reminders to organize photos.";
+"静寂時間帯" = "Quiet Hours";
+"指定した時間帯は通知を送信しない" = "No notifications during specified hours";
+"開始時刻" = "Start Time";
+"静寂時間帯の開始時刻" = "Start of quiet hours";
+"終了時刻" = "End Time";
+"静寂時間帯の終了時刻" = "End of quiet hours";
+"静寂時間帯を有効にすると、指定した時間帯は通知を受け取りません。" = "Enable to avoid notifications during specified hours.";
+
+// MARK: - 表示設定 (Display Settings)
+"表示" = "Display";
+"グリッド列数" = "Grid Columns";
+"ファイルサイズ表示" = "Show File Size";
+"写真のファイルサイズを表示" = "Show file size of photos";
+"撮影日表示" = "Show Date";
+"写真の撮影日を表示" = "Show date photos were taken";
+"並び順" = "Sort Order";
+
+// MARK: - ソート順 (SortOrder)
+"新しい順" = "Newest First";
+"古い順" = "Oldest First";
+"容量大きい順" = "Largest First";
+"容量小さい順" = "Smallest First";
+
+// MARK: - その他セクション (Other Section)
+"ゴミ箱" = "Trash";
+"権限の管理" = "Manage Permissions";
+"ヘルプ・サポート" = "Help & Support";
+"プライバシーポリシー" = "Privacy Policy";
+"利用規約" = "Terms of Service";
+
+// MARK: - 言語設定 (Language Settings)
+"言語設定" = "Language Settings";
+"言語" = "Language";
+"アプリの表示言語" = "App Display Language";
+"自動（システム設定に従う）" = "Auto (System Settings)";
+"日本語" = "日本語";
+"English" = "English";
+"言語の変更はアプリの再起動後に反映されます。" = "Language changes will take effect after restarting the app.";
+"再起動が必要です" = "Restart Required";
+"今すぐ再起動" = "Restart Now";
+"後で" = "Later";
+"言語を変更すると、アプリを再起動せずに即座に反映されます。" = "Language changes will take effect after restarting the app.";
+
+// MARK: - アクセシビリティ (Accessibility)
+"タップしてプランを選択" = "Tap to select a plan";
+"通知が無効" = "Notifications disabled";
+"タップして詳細設定を表示" = "Tap to view settings";
+"オン" = "On";
+"ダブルタップでオフにします" = "Double tap to turn off";
+"ダブルタップでオンにします" = "Double tap to turn on";
+"この設定は現在無効です" = "This setting is currently disabled";
+
+// MARK: - ホーム画面 (Home)
+"ホーム" = "Home";
+"スキャン開始" = "Start Scan";
+"スキャン中..." = "Scanning...";
+"完了" = "Done";
+"キャンセル" = "Cancel";
+"閉じる" = "Close";
+"削除" = "Delete";
+"復元" = "Restore";
+"確認" = "Confirm";
+"選択" = "Select";
+"すべて選択" = "Select All";
+"選択解除" = "Deselect All";
+
+// MARK: - 写真グループ (Photo Groups)
+"重複写真" = "Duplicate Photos";
+"類似写真" = "Similar Photos";
+"ブレた写真" = "Blurry Photos";
+"スクリーンショット" = "Screenshots";
+"サイズが大きい動画" = "Large Videos";
+"グループ" = "Groups";
+"写真" = "Photos";
+"動画" = "Videos";
+
+// MARK: - ストレージ (Storage)
+"ストレージ" = "Storage";
+"空き容量" = "Free Space";
+"使用済み" = "Used";
+"合計" = "Total";
+"節約可能" = "Saveable";
+
+// MARK: - プレミアムプラン・決済 (Premium / Paywall)
+"プレミアムプラン" = "Premium Plan";
+"7日間無料トライアル" = "7-Day Free Trial";
+"月額プラン" = "Monthly Plan";
+"年額プラン" = "Yearly Plan";
+"買い切りプラン" = "Lifetime Plan";
+"無料トライアルを開始" = "Start Free Trial";
+"購入する" = "Purchase";
+"購入を復元" = "Restore Purchases";
+"後で" = "Later";
+"無制限削除" = "Unlimited Deletion";
+"広告なし" = "No Ads";
+"詳細分析" = "Advanced Analysis";
+"無制限スキャン" = "Unlimited Scans";
+"割引" = "Off";
+"人気" = "Popular";
+"おすすめ" = "Best Value";
+"円/月" = "/month";
+"円/年" = "/year";
+"円（一回払い）" = " (one-time)";
+
+// MARK: - ゴミ箱 (Trash)
+"ゴミ箱は空です" = "Trash is Empty";
+"ゴミ箱を空にする" = "Empty Trash";
+"完全に削除" = "Permanently Delete";
+"日後に自動削除" = "days until auto-delete";
+
+// MARK: - 権限 (Permissions)
+"写真へのアクセス" = "Photo Library Access";
+"権限を許可" = "Grant Permission";
+"設定を開く" = "Open Settings";
+"フルアクセス" = "Full Access";
+"制限付きアクセス" = "Limited Access";
+"アクセスなし" = "No Access";
+
+// MARK: - エラーメッセージ (Error Messages)
+"設定の保存に失敗しました" = "Failed to save settings";
+"写真の読み込みに失敗しました" = "Failed to load photos";
+"削除に失敗しました" = "Failed to delete";
+"復元に失敗しました" = "Failed to restore";
+"少なくとも1つのコンテンツタイプを有効にしてください。" = "Please enable at least one content type.";
+"類似度閾値は0.0〜1.0の範囲で指定してください。" = "Similarity threshold must be between 0.0 and 1.0.";
+"ブレ閾値は0.0〜1.0の範囲で指定してください。" = "Blur threshold must be between 0.0 and 1.0.";
+"最小グループサイズは2以上を指定してください。" = "Minimum group size must be 2 or more.";
+"グリッドカラム数は1〜6の範囲で指定してください。" = "Grid columns must be between 1 and 6.";
+"静寂時間は0〜23の範囲で指定してください。" = "Quiet hours must be between 0 and 23.";
+
+// MARK: - 分析設定詳細 (Analysis Settings Detail)
+"類似度の設定" = "Similarity Settings";
+"値が高いほど厳密に一致した写真のみ検出" = "Higher values detect only very similar photos";
+"ブレ判定の設定" = "Blur Detection Settings";
+"値が高いほど多くのブレた写真を検出" = "Higher values detect more blurry photos";
+"最小グループサイズの設定" = "Min Group Size Settings";
+"指定した枚数以上の類似写真のみグループ化" = "Only groups photos meeting the minimum count";
+
+// MARK: - スキャン設定詳細 (Scan Settings Detail)
+"毎日自動スキャン" = "Auto Scan Daily";
+"毎週自動スキャン" = "Auto Scan Weekly";
+"毎月自動スキャン" = "Auto Scan Monthly";
+"自動スキャンなし" = "No Auto Scan";
+
+// MARK: - 空の状態 (Empty States)
+"写真が見つかりません" = "No Photos Found";
+"重複写真は見つかりません" = "No Duplicate Photos";
+"スキャンを実行してください" = "Run a scan to get started";
+"クリーンです！" = "All clean!";

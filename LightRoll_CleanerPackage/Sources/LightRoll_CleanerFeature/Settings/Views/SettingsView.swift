@@ -83,6 +83,9 @@ public struct SettingsView: View {
     /// ゴミ箱画面表示フラグ
     @State private var showingTrash = false
 
+    /// 言語変更後の再起動アラート表示フラグ
+    @State private var showingRestartAlert = false
+
     // MARK: - URL Constants
 
     /// プライバシーポリシーURL
@@ -104,6 +107,7 @@ public struct SettingsView: View {
                 analysisSettingsSection
                 notificationSection
                 displaySection
+                languageSection
                 otherSection
                 appInfoSection
             }
@@ -251,7 +255,7 @@ public struct SettingsView: View {
                 }
             )) {
                 ForEach(AutoScanInterval.allCases, id: \.self) { interval in
-                    Text(interval.rawValue).tag(interval)
+                    Text(LocalizedStringKey(interval.rawValue)).tag(interval)
                 }
             } label: {
                 SettingsRow(
@@ -339,7 +343,7 @@ public struct SettingsView: View {
 
                 Spacer()
 
-                Text(blurThresholdLabel)
+                Text(LocalizedStringKey(blurThresholdLabel))
                     .foregroundColor(.secondary)
             }
 
@@ -496,7 +500,7 @@ public struct SettingsView: View {
                 }
             )) {
                 ForEach(SortOrder.allCases, id: \.self) { order in
-                    Text(order.rawValue).tag(order)
+                    Text(LocalizedStringKey(order.rawValue)).tag(order)
                 }
             } label: {
                 SettingsRow(
@@ -570,6 +574,45 @@ public struct SettingsView: View {
             .buttonStyle(.plain)
         } header: {
             Text("その他")
+        }
+    }
+
+    // MARK: - Language Section
+
+    /// 言語設定セクション
+    private var languageSection: some View {
+        Section {
+            @Bindable var service = settingsService
+
+            Picker(selection: .init(
+                get: { service.settings.appLanguage },
+                set: { newLanguage in
+                    service.updateLanguage(newLanguage)
+                    showingRestartAlert = true
+                }
+            )) {
+                ForEach(AppLanguage.allCases, id: \.self) { language in
+                    Text(language.displayName).tag(language)
+                }
+            } label: {
+                SettingsRow(
+                    icon: "globe",
+                    iconColor: .teal,
+                    title: "言語"
+                )
+            }
+            .alert("再起動が必要です", isPresented: $showingRestartAlert) {
+                Button("今すぐ再起動", role: .destructive) {
+                    exit(0)
+                }
+                Button("後で", role: .cancel) { }
+            } message: {
+                Text("言語の変更はアプリの再起動後に反映されます。")
+            }
+        } header: {
+            Text("言語設定")
+        } footer: {
+            Text("言語の変更はアプリの再起動後に反映されます。")
         }
     }
 
