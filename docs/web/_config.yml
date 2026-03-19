@@ -1,0 +1,11 @@
+title: LightRoll Cleaner
+description: Detect duplicate, similar & blurry photos. All processing stays on-device.
+baseurl: "/LightRoll_Cleaner"
+url: "https://yuki-hayashi-0419.github.io"
+theme: null
+plugins: []
+exclude:
+  - README.md
+  - CHANGELOG.md
+  - Gemfile
+  - Gemfile.lock

@@ -613,6 +613,22 @@
 
 ---
 
+## session43 (2026-03-18): マルチ言語対応（ローカライゼーション）
+
+### ユーザーが出来るようになったこと
+
+1. **日本語・英語の自動対応**: デバイスの言語設定に応じてアプリ全体のUIテキストが自動的に切り替わるようになった
+2. **手動言語切り替え**: 設定画面から「自動 / 日本語 / English」を選択でき、言語変更後に再起動確認アラートで即時反映が可能になった
+
+**技術詳細**:
+- `en.lproj/Localizable.strings` 新規作成（約150文字列）
+- `AppLanguage` enum追加（UserSettings）、`SettingsService.updateLanguage()` でUserDefaults["AppleLanguages"]更新
+- SwiftUI `.environment(\.locale, ...)` をContentView・Sheetの両方に注入
+
+**セッション**: session43
+
+---
+
 *詳細な実装履歴は `docs/archive/IMPLEMENTED_HISTORY.md` を参照してください。*
 
-*最終更新: 2026-03-18 (session42-payment-flow完了)*
+*最終更新: 2026-03-18 (session43-localization完了)*

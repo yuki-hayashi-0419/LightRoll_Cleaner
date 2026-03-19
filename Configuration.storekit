@@ -4,7 +4,26 @@
 
   ],
   "products" : [
-
+    {
+      "displayPrice" : "4980",
+      "familyShareable" : false,
+      "internalID" : "6502345680",
+      "localizations" : [
+        {
+          "description" : "一度の購入で永久にプレミアム機能をご利用いただけます。",
+          "displayName" : "買い切りプラン",
+          "locale" : "ja_JP"
+        },
+        {
+          "description" : "One-time purchase for permanent access to all premium features.",
+          "displayName" : "Lifetime Premium",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "lifetime_premium",
+      "referenceName" : "Lifetime Premium",
+      "type" : "NonConsumable"
+    }
   ],
   "settings" : {
     "_applicationInternalID" : "6499123456",

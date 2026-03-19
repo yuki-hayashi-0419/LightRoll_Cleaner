@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help & Support - LightRoll Cleaner</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.7;
+            color: #333;
+            background: #f8f9fa;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 32px 20px;
+            text-align: center;
+            position: relative;
+        }
+        .header h1 { font-size: 1.8em; margin-bottom: 4px; }
+        .header p { font-size: 0.95em; opacity: 0.85; }
+        .lang-switch {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.4);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.2s;
+        }
+        .lang-switch:hover { background: rgba(255,255,255,0.35); }
+        .back-link {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            color: white;
+            text-decoration: none;
+            font-size: 0.9em;
+            opacity: 0.85;
+        }
+        .back-link:hover { opacity: 1; }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+        .content {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        h2 { font-size: 1.3em; margin: 28px 0 12px; color: #444; border-bottom: 2px solid #667eea; padding-bottom: 6px; }
+        h3 { font-size: 1.1em; margin: 20px 0 8px; color: #555; }
+        p { margin: 8px 0; color: #555; }
+        ul, ol { margin: 8px 0 8px 24px; color: #555; }
+        li { margin: 4px 0; }
+        strong { color: #333; }
+        table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.95em; }
+        th, td { border: 1px solid #e0e0e0; padding: 10px 12px; text-align: left; }
+        th { background: #f5f5f5; color: #444; }
+        a { color: #667eea; }
+        .faq-item { margin: 16px 0; }
+        .faq-q { font-weight: bold; color: #444; margin-bottom: 4px; }
+        .faq-a { color: #555; }
+        .contact-box {
+            background: #f0f0ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+        .footer {
+            text-align: center;
+            padding: 32px 20px;
+            color: #999;
+            font-size: 0.85em;
+            border-top: 1px solid #e9ecef;
+            margin-top: 40px;
+        }
+        .footer a { color: #667eea; text-decoration: none; }
+        @media (max-width: 600px) {
+            .content { padding: 20px 16px; }
+            .header h1 { font-size: 1.4em; }
+            table { font-size: 0.85em; }
+            th, td { padding: 6px 8px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="index.html" class="back-link">&larr; <span class="lang-ja">トップ</span><span class="lang-en" style="display:none;">Home</span></a>
+        <button class="lang-switch" onclick="toggleLang()">English</button>
+        <h1 class="lang-ja">ヘルプ・サポート</h1>
+        <h1 class="lang-en" style="display:none;">Help & Support</h1>
+        <p>LightRoll Cleaner</p>
+    </header>
+
+    <div class="container">
+        <div class="content">
+            <!-- Japanese -->
+            <div class="lang-ja">
+                <p>LightRoll Cleanerをご利用いただき、ありがとうございます。このページでは、アプリの使い方、よくある質問、トラブルシューティングについてご案内します。</p>
+
+                <h2>アプリの概要</h2>
+                <p>LightRoll Cleanerは、iPhone内の写真ライブラリから重複写真やブレた写真を自動で検出し、整理・削除を支援するアプリです。</p>
+                <ul>
+                    <li><strong>OS</strong>: iOS 18.0以降</li>
+                    <li><strong>デバイス</strong>: iPhone, iPad</li>
+                    <li><strong>言語</strong>: 日本語、英語</li>
+                    <li><strong>完全ローカル処理</strong>: 写真データは一切外部に送信されません</li>
+                </ul>
+
+                <h2>使い方ガイド</h2>
+                <h3>初回起動時</h3>
+                <ol>
+                    <li>アプリを起動</li>
+                    <li>写真ライブラリへのアクセスを許可（「選択した写真」または「すべての写真」）</li>
+                    <li>通知の許可（任意）</li>
+                </ol>
+
+                <h3>写真のスキャン</h3>
+                <ol>
+                    <li>ホーム画面で「スキャン開始」ボタンをタップ</li>
+                    <li>スキャンが完了すると検出結果が表示されます</li>
+                    <li>自動スキャンは「設定 > 通知設定 > 自動スキャン」で有効化可能</li>
+                </ol>
+
+                <h3>写真の確認と削除</h3>
+                <ol>
+                    <li>スキャン結果画面で重複・ブレた写真のグループを確認</li>
+                    <li>削除したい写真を選択して「削除」ボタンをタップ</li>
+                    <li>削除した写真は30日間ゴミ箱で復元可能</li>
+                </ol>
+
+                <h2>よくある質問（FAQ）</h2>
+
+                <div class="faq-item">
+                    <p class="faq-q">Q: 写真は外部に送信されますか?</p>
+                    <p class="faq-a">A: いいえ、一切送信されません。すべての処理はiPhone内で完結します。</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-q">Q: 誤って削除した写真を復元できますか?</p>
+                    <p class="faq-a">A: はい、30日以内であればゴミ箱から復元できます。30日経過後は完全に削除され復元できません。</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-q">Q: 無料版と有料版の違いは?</p>
+                    <p class="faq-a">A: 無料版は機能制限あり（スキャン・削除枚数制限、広告表示）。Pro版は無制限スキャン・削除、広告なし、すべてのプレミアム機能へのアクセスが可能です。</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-q">Q: サブスクリプションをキャンセルできますか?</p>
+                    <p class="faq-a">A: はい。iPhone設定 > [ユーザー名] > サブスクリプション > LightRoll Cleaner > キャンセル。キャンセル後も契約期間終了まで利用可能です。</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-q">Q: 検出精度を変更できますか?</p>
+                    <p class="faq-a">A: はい。設定 > 分析設定 から類似度のしきい値（デフォルト85%）、ブレのしきい値（デフォルト0.3）を調整できます。</p>
+                </div>
+
+                <h2>トラブルシューティング</h2>
+
+                <h3>スキャンが開始されない</h3>
+                <ul>
+                    <li>写真ライブラリの権限を確認（設定 > その他 > 権限の管理）</li>
+                    <li>写真が1枚以上保存されていることを確認</li>
+                    <li>アプリを最新版にアップデート</li>
+                </ul>
+
+                <h3>スキャンが途中で止まる</h3>
+                <ul>
+                    <li>他のアプリを終了してメモリを確保</li>
+                    <li>アプリをフォアグラウンドで開いたままにする</li>
+                    <li>10,000枚以上は時間がかかる場合があります</li>
+                </ul>
+
+                <h3>アプリがクラッシュする</h3>
+                <ul>
+                    <li>最新版にアップデート</li>
+                    <li>iPhoneを再起動</li>
+                    <li>アプリを再インストール</li>
+                </ul>
+
+                <h2>料金プラン</h2>
+                <table>
+                    <tr><th>プラン</th><th>料金</th><th>内容</th></tr>
+                    <tr><td>無料</td><td>$0</td><td>基本機能、広告あり、制限あり</td></tr>
+                    <tr><td>月額Pro</td><td>$2.99/月</td><td>広告なし、無制限、7日間無料トライアル</td></tr>
+                    <tr><td>年額Pro</td><td>$19.99/年</td><td>広告なし、無制限、約44%割引</td></tr>
+                    <tr><td>Lifetime</td><td>$29.99</td><td>永久アクセス、買い切り</td></tr>
+                </table>
+
+                <h2>お問い合わせ</h2>
+                <div class="contact-box">
+                    <p><strong>Email</strong>: <a href="mailto:support@lightrollcleaner.com">support@lightrollcleaner.com</a></p>
+                    <p><strong>運営者</strong>: Yuki Hayashi</p>
+                    <p style="margin-top: 12px;">お問い合わせ時には以下の情報をご記載ください：</p>
+                    <ul>
+                        <li>iOSバージョン（例: iOS 18.2）</li>
+                        <li>デバイス（例: iPhone 16 Pro）</li>
+                        <li>アプリバージョン</li>
+                        <li>問題の詳細・再現手順</li>
+                    </ul>
+                    <p>通常1〜3営業日以内に返信いたします。</p>
+                </div>
+
+                <p style="margin-top: 20px;">
+                    <a href="privacy-policy.html">プライバシーポリシー</a> |
+                    <a href="terms-of-service.html">利用規約</a>
+                </p>
+            </div>
+
+            <!-- English -->
+            <div class="lang-en" style="display:none;">
+                <p>Thank you for using LightRoll Cleaner. This page provides guidance on how to use the app, frequently asked questions, and troubleshooting.</p>
+
+                <h2>App Overview</h2>
+                <p>LightRoll Cleaner is an app that automatically detects duplicate and blurry photos from your iPhone's photo library and helps you organize and delete them.</p>
+                <ul>
+                    <li><strong>OS</strong>: iOS 18.0 or later</li>
+                    <li><strong>Devices</strong>: iPhone, iPad</li>
+                    <li><strong>Languages</strong>: Japanese, English</li>
+                    <li><strong>Fully Local Processing</strong>: Your photo data is never sent to external servers</li>
+                </ul>
+
+                <h2>User Guide</h2>
+                <h3>Initial Setup</h3>
+                <ol>
+                    <li>Launch the app</li>
+                    <li>Allow access to your photo library ("Selected Photos" or "All Photos")</li>
+                    <li>Allow notifications (optional)</li>
+                </ol>
+
+                <h3>Scanning Photos</h3>
+                <ol>
+                    <li>Tap the "Start Scan" button on the home screen</li>
+                    <li>Results are displayed after scanning completes</li>
+                    <li>Enable auto scan via Settings > Notification Settings > Auto Scan</li>
+                </ol>
+
+                <h3>Reviewing and Deleting Photos</h3>
+                <ol>
+                    <li>Review groups of duplicate/blurry photos on the scan results screen</li>
+                    <li>Select photos to delete and tap the "Delete" button</li>
+                    <li>Deleted photos can be restored from trash within 30 days</li>
+                </ol>
+
+                <h2>Frequently Asked Questions (FAQ)</h2>
+
+                <div class="faq-item">
+                    <p class="faq-q">Q: Are my photos sent to external servers?</p>
+                    <p class="faq-a">A: No, they are never sent externally. All processing is performed entirely on your iPhone.</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-q">Q: Can I restore accidentally deleted photos?</p>
+                    <p class="faq-a">A: Yes, you can restore photos from trash within 30 days. After 30 days, photos are permanently deleted and cannot be recovered.</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-q">Q: What is the difference between Free and Pro?</p>
+                    <p class="faq-a">A: The free version has limitations (scan/deletion count limits, ads displayed). The Pro version offers unlimited scans and deletions, no ads, and access to all premium features.</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-q">Q: Can I cancel my subscription?</p>
+                    <p class="faq-a">A: Yes. Go to iPhone Settings > [Your Name] > Subscriptions > LightRoll Cleaner > Cancel. You retain access until the end of the current billing period.</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-q">Q: Can I adjust detection accuracy?</p>
+                    <p class="faq-a">A: Yes. Go to Settings > Analysis Settings to adjust the similarity threshold (default: 85%) and blur threshold (default: 0.3).</p>
+                </div>
+
+                <h2>Troubleshooting</h2>
+
+                <h3>Scan Does Not Start</h3>
+                <ul>
+                    <li>Check photo library permissions (Settings > Other > Permission Management)</li>
+                    <li>Ensure at least one photo is saved in your library</li>
+                    <li>Update the app to the latest version</li>
+                </ul>
+
+                <h3>Scan Stops Midway</h3>
+                <ul>
+                    <li>Close other apps to free up memory</li>
+                    <li>Keep the app in the foreground while scanning</li>
+                    <li>Libraries with 10,000+ photos may take longer</li>
+                </ul>
+
+                <h3>App Crashes</h3>
+                <ul>
+                    <li>Update to the latest version</li>
+                    <li>Restart your iPhone</li>
+                    <li>Reinstall the app</li>
+                </ul>
+
+                <h2>Pricing Plans</h2>
+                <table>
+                    <tr><th>Plan</th><th>Price</th><th>Details</th></tr>
+                    <tr><td>Free</td><td>$0</td><td>Basic features, ads, limitations</td></tr>
+                    <tr><td>Monthly Pro</td><td>$2.99/mo</td><td>Ad-free, unlimited, 7-day free trial</td></tr>
+                    <tr><td>Annual Pro</td><td>$19.99/yr</td><td>Ad-free, unlimited, ~44% discount</td></tr>
+                    <tr><td>Lifetime</td><td>$29.99</td><td>Permanent access, one-time purchase</td></tr>
+                </table>
+
+                <h2>Contact Us</h2>
+                <div class="contact-box">
+                    <p><strong>Email</strong>: <a href="mailto:support@lightrollcleaner.com">support@lightrollcleaner.com</a></p>
+                    <p><strong>Developer</strong>: Yuki Hayashi</p>
+                    <p style="margin-top: 12px;">When contacting us, please include:</p>
+                    <ul>
+                        <li>iOS version (e.g., iOS 18.2)</li>
+                        <li>Device (e.g., iPhone 16 Pro)</li>
+                        <li>App version</li>
+                        <li>Issue details and steps to reproduce</li>
+                    </ul>
+                    <p>We typically respond within 1-3 business days.</p>
+                </div>
+
+                <p style="margin-top: 20px;">
+                    <a href="privacy-policy.html">Privacy Policy</a> |
+                    <a href="terms-of-service.html">Terms of Service</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 Yuki Hayashi. All rights reserved.</p>
+        <p style="margin-top: 8px;"><a href="index.html"><span class="lang-ja">トップページ</span><span class="lang-en" style="display:none;">Home</span></a></p>
+    </footer>
+
+    <script>
+        var currentLang = 'ja';
+        function toggleLang() {
+            currentLang = currentLang === 'ja' ? 'en' : 'ja';
+            var jaEls = document.querySelectorAll('.lang-ja');
+            var enEls = document.querySelectorAll('.lang-en');
+            var btn = document.querySelector('.lang-switch');
+            if (currentLang === 'en') {
+                jaEls.forEach(function(el) { el.style.display = 'none'; });
+                enEls.forEach(function(el) { el.style.display = ''; });
+                btn.textContent = 'Japanese';
+                document.documentElement.lang = 'en';
+            } else {
+                jaEls.forEach(function(el) { el.style.display = ''; });
+                enEls.forEach(function(el) { el.style.display = 'none'; });
+                btn.textContent = 'English';
+                document.documentElement.lang = 'ja';
+            }
+        }
+    </script>
+</body>
+</html>
