@@ -118,6 +118,22 @@ public struct ContentView: View {
     // MARK: - Body
 
     public var body: some View {
+        #if DEBUG
+        // スクリーンショットモード: ダミーデータでUI全体を表示
+        // 起動引数に -SCREENSHOT_MODE を指定して有効化
+        if ScreenshotMode.isEnabled {
+            ScreenshotModeContentView()
+        } else {
+            normalContentView
+        }
+        #else
+        normalContentView
+        #endif
+    }
+
+    /// 通常のコンテンツビュー
+    @ViewBuilder
+    private var normalContentView: some View {
         DashboardNavigationContainer(
             scanPhotosUseCase: scanPhotosUseCase,
             getStatisticsUseCase: getStatisticsUseCase,

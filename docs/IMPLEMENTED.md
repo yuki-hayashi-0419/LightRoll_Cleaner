@@ -629,6 +629,33 @@
 
 ---
 
+## session44 (2026-03-19): App Store提出準備完了
+
+### ユーザーが出来るようになったこと
+
+1. **プライバシーポリシー・利用規約・サポートページの公開**（日英対応）
+   - GitHub Pagesで公開: https://yuki-hayashi-0419.github.io/LightRoll_Cleaner/
+   - プライバシーポリシー、利用規約、サポートページが日本語・英語の両方で閲覧可能になった
+
+2. **買い切りプランの追加**
+   - ¥3,000の永久利用（買い切り）プランがアプリ内で選択可能になった
+
+3. **App Store掲載用スクリーンショット完成**
+   - iPhone 16 Pro Max対応サイズの画面キャプチャ5枚が完成した
+
+4. **App Storeメタデータのドラフト完成**
+   - 説明文・キーワード・サブタイトルのドラフトが作成された
+
+**技術的な変更**:
+- `Configuration.storekit`: lifetime_premium追加（NonConsumable、¥4,980）
+- `docs/web/`: GitHub Pages（HTML 4ページ、日英切り替え対応）
+- `.github/workflows/pages.yml`: 自動デプロイ設定
+- `ScreenshotMode.swift`: スクリーンショット撮影用プレビューモード実装
+
+**セッション**: session44
+
+---
+
 *詳細な実装履歴は `docs/archive/IMPLEMENTED_HISTORY.md` を参照してください。*
 
-*最終更新: 2026-03-18 (session43-localization完了)*
+*最終更新: 2026-03-19 (session44-appstore-submission-prep完了)*

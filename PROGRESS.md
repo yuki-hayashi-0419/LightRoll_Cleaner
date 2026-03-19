@@ -1,6 +1,57 @@
 # 開発進捗記録
 
-## 最終更新: 2026-03-18
+## 最終更新: 2026-03-19
+
+---
+
+## 2026-03-19 セッション44
+- 完了：App Store提出準備（メタデータ・法的ドキュメント・スクリーンショット・GitHub Pages）
+- 品質スコア：93点
+- ブロッカー：Apple Developer Program審査待ち
+- 次回：審査完了後にApp Store Connect登録・ビルドアップロードから再開
+
+### セッション概要
+- **セッションID**: session44-appstore-submission-prep
+- **目的**: App Store提出準備（メタデータ・法的ドキュメント・スクリーンショット・GitHub Pages）
+- **品質スコア**: 93点（合格）
+- **終了理由**: Apple Developer Program審査待ち（ブロッカー）
+- **担当**: @spec-orchestrator
+
+### 実施内容
+
+#### 1. Configuration.storekit更新 完了
+- lifetime_premium（買い切り4,980円、非消費型）を追加
+
+#### 2. 英語版法的ドキュメント作成 完了
+- PRIVACY_POLICY_EN.md、TERMS_OF_SERVICE_EN.md、HELP_SUPPORT_EN.md
+
+#### 3. GitHub Pages用HTML作成 完了
+- index / privacy-policy / terms-of-service / support（日英切り替え対応）
+
+#### 4. GitHub Actions自動デプロイ設定 完了
+- .github/workflows/pages.yml
+
+#### 5. GitHub Pages有効化・デプロイ成功 完了
+- URL: https://yuki-hayashi-0419.github.io/LightRoll_Cleaner/
+
+#### 6. App Storeメタデータドラフト作成 完了
+- docs/APP_STORE_METADATA.md
+
+#### 7. スクリーンショットモード実装 完了
+- LightRollCleanerPackage/Sources/.../Views/Preview/ScreenshotMode.swift
+
+#### 8. iPhone 16 Pro Maxスクリーンショット撮影 完了
+- docs/screenshots_promax/（1320x2868px、5枚）
+
+#### 9. PROGRESS.mdアーカイブ 完了
+- セッション29-33をアーカイブに移動
+
+### ブロッカー
+- Apple Developer Program審査待ち（12,900円/年、申請済み）
+- 審査完了後：App Store Connectでアプリ登録 → ビルドアップロード → IAP登録 → 審査提出
+
+### 次回セッション推奨
+- 審査完了後：App Store ConnectでアプリID登録 → xcrun altoolでビルドアップロード → IAP登録 → TestFlight → 審査提出
 
 ---
 

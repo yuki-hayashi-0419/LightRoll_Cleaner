@@ -1,53 +1,66 @@
 {
-  "version": "3.95",
-  "lastUpdated": "2026-03-18",
+  "version": "3.96",
+  "lastUpdated": "2026-03-19",
 
   "session_metadata": {
-    "session_id": "session43-localization-implementation",
-    "started_at": "2026-03-18T14:00:00+09:00",
-    "ended_at": "2026-03-18T16:00:00+09:00",
+    "session_id": "session44-appstore-submission-prep",
+    "session_number": 44,
+    "started_at": "2026-03-19T10:00:00+09:00",
+    "ended_at": "2026-03-19T12:00:00+09:00",
     "status": "completed",
+    "last_completed": "App Store提出準備完了（メタデータ・法的ドキュメント・スクリーンショット・GitHub Pages）",
+    "current_blocker": "Apple Developer Program審査待ち（申請済み）",
+    "next_action": "審査完了後：App Store ConnectでアプリID登録 → xcrun altoolでビルドアップロード → IAP登録（monthly_premium/yearly_premium/lifetime_premium）→ TestFlight → 審査提出",
     "documents_updated": [
       "CONTEXT_HANDOFF.json",
       "PROGRESS.md",
-      "Package.swift",
+      "IMPLEMENTED.md",
       "ContentView.swift",
-      "UserSettings.swift",
-      "SettingsService.swift",
-      "SettingsView.swift",
-      "SettingsRow.swift",
-      "en.lproj/Localizable.strings"
+      "Configuration.storekit",
+      "docs/APP_STORE_METADATA.md",
+      "docs/PRIVACY_POLICY_EN.md",
+      "docs/TERMS_OF_SERVICE_EN.md",
+      "docs/HELP_SUPPORT_EN.md",
+      ".github/workflows/pages.yml",
+      "docs/pages/*.html",
+      "Views/Preview/ScreenshotMode.swift"
     ],
-    "session_closure": "セッション43完了: マルチ言語対応（ローカライゼーション）完全実装。AppLanguage enum追加、言語切替ピッカー・再起動アラート追加、英語翻訳ファイル（約150文字列）新規作成、LocalizedStringKey対応。ビルド成功確認済み。"
+    "session_closure": "セッション44完了: App Store提出準備。lifetime_premium追加、英語版法的ドキュメント3件作成、GitHub Pages（日英切替対応）デプロイ成功、App Storeメタデータドラフト作成、スクリーンショットモード実装、iPhone 16 Pro Maxスクリーンショット5枚撮影。ブロッカー: Apple Developer Program審査待ち。"
   },
 
   "contextOptimization": {
-    "lastOptimization": "2026-03-18T16:00:00+09:00",
-    "optimizationId": "context-optimization-017",
-    "progressEntries": 11,
+    "lastOptimization": "2026-03-19T12:00:00+09:00",
+    "optimizationId": "context-optimization-018",
+    "progressEntries": 12,
     "maxProgressEntries": 12,
-    "archivedSessions": "Session 1-28 (28 sessions)",
+    "archivedSessions": "Session 1-28 (28 sessions), Session 29-33 (archived in session44)",
     "archivedTasks": "172件 → TASKS_COMPLETED.md",
     "contextHealth": "良好",
-    "estimatedSizeReduction": "約120KB（累計）",
-    "nextOptimizationTrigger": "セッション50-53付近（12件到達時）",
-    "currentProgressSize": "約470行（セッション29-43、11エントリ）",
+    "estimatedSizeReduction": "約125KB（累計）",
+    "nextOptimizationTrigger": "セッション47-48付近（12件到達時）",
+    "currentProgressSize": "約520行（セッション34-44、12エントリ）",
     "archiveThreshold": "12セッション または 600行超過時",
-    "optimizationNote": "session43終了時: マルチ言語対応完全実装、en.lproj/Localizable.strings新規作成"
+    "optimizationNote": "session44終了時: App Store提出準備完了、PROGRESS.mdセッション29-33アーカイブ済み"
   },
 
   "current_phase": {
-    "phase_name": "マルチ言語対応完了 / App Store Connect設定待ち",
+    "phase_name": "App Store提出準備完了 / Apple Developer Program審査待ち",
     "progress_percentage": "99%",
-    "description": "マルチ言語対応（日本語・英語）を完全実装。AppLanguage enum、言語切替UI、英語翻訳ファイル（約150文字列）を追加。決済フローも実装済み。次はApp Store ConnectでプロダクトID登録。"
+    "description": "App Store提出に必要な全準備が完了。メタデータ・法的ドキュメント・スクリーンショット・GitHub Pages全て整備済み。Apple Developer Program審査完了待ち。"
   },
 
   "projectStatus": {
-    "phase": "マルチ言語対応完了 / App Store Connect設定待ち",
-    "currentPhase": "マルチ言語対応完了。日英2言語サポート。決済フロー実装済み。実機ビルド成功。",
+    "phase": "App Store提出準備完了 / Apple Developer Program審査待ち",
+    "currentPhase": "App Store提出準備完了。メタデータ・法的ドキュメント・スクリーンショット・GitHub Pages全て整備済み。",
     "overallProgress": "99%",
-    "nextMilestone": "App Store ConnectでプロダクトID登録・サンドボックステスト",
-    "majorAchievement": "マルチ言語対応完全実装（session43）"
+    "nextMilestone": "Apple Developer Program審査完了後にApp Store Connect登録・ビルドアップロード",
+    "majorAchievement": "App Store提出準備完了（session44）",
+    "github_pages_url": "https://yuki-hayashi-0419.github.io/LightRoll_Cleaner/",
+    "screenshots_ready": true,
+    "screenshots_path": "docs/screenshots_promax/",
+    "screenshots_device": "iPhone 16 Pro Max",
+    "screenshots_resolution": "1320x2868px",
+    "screenshots_count": 5
   },
 
   "performanceOptimization": {
@@ -119,7 +132,8 @@
   "monetizationStatus": {
     "phase": 1,
     "status": "payment_flow_complete",
-    "details": "StoreKitによる購入・復元・エラーハンドリング実装完了。App Store ConnectでプロダクトID登録待ち。"
+    "details": "StoreKitによる購入・復元・エラーハンドリング実装完了。lifetime_premium（買い切り4,980円）追加済み。App Store ConnectでプロダクトID登録待ち。",
+    "products": ["monthly_premium", "yearly_premium", "lifetime_premium"]
   },
 
   "localizationStatus": {
@@ -129,6 +143,27 @@
     "defaultLocalization": "ja",
     "translationCount": 150,
     "details": "AppLanguage enum追加、言語ピッカーUI、再起動アラート、LocalizedStringKey対応、en.lproj/Localizable.strings新規作成"
+  },
+
+  "appStoreSubmissionStatus": {
+    "status": "preparation_complete",
+    "blocker": "Apple Developer Program審査待ち（申請済み）",
+    "completedItems": {
+      "metadata": "docs/APP_STORE_METADATA.md（日英対応）",
+      "legalDocs": ["PRIVACY_POLICY_EN.md", "TERMS_OF_SERVICE_EN.md", "HELP_SUPPORT_EN.md"],
+      "githubPages": "https://yuki-hayashi-0419.github.io/LightRoll_Cleaner/",
+      "screenshots": "docs/screenshots_promax/（iPhone 16 Pro Max、1320x2868px、5枚）",
+      "screenshotMode": "ScreenshotMode.swift実装済み",
+      "storekitConfig": "Configuration.storekit（lifetime_premium追加済み）",
+      "cicd": ".github/workflows/pages.yml"
+    },
+    "remainingAfterApproval": [
+      "App Store ConnectでアプリID登録",
+      "xcrun altoolでビルドアップロード",
+      "IAP登録（monthly_premium/yearly_premium/lifetime_premium）",
+      "TestFlight配信",
+      "審査提出"
+    ]
   },
 
   "discovered_issues": [
@@ -146,20 +181,28 @@
 
   "completedTasks": [
     {
+      "taskId": "session44-appstore-submission-prep",
+      "title": "App Store提出準備（メタデータ・法的ドキュメント・スクリーンショット・GitHub Pages）",
+      "completedAt": "2026-03-19",
+      "qualityScore": 93,
+      "components": [
+        "Configuration.storekit: lifetime_premium追加",
+        "英語版法的ドキュメント3件作成",
+        "GitHub Pages用HTML作成（日英切替対応）",
+        "GitHub Actions自動デプロイ設定",
+        "GitHub Pagesデプロイ成功",
+        "App Storeメタデータドラフト作成",
+        "スクリーンショットモード実装",
+        "iPhone 16 Pro Maxスクリーンショット5枚撮影",
+        "PROGRESS.mdアーカイブ（セッション29-33）"
+      ],
+      "result": "App Store提出に必要な全準備完了。Apple Developer Program審査待ち。"
+    },
+    {
       "taskId": "session43-localization-implementation",
       "title": "マルチ言語対応（ローカライゼーション）完全実装",
       "completedAt": "2026-03-18",
-      "qualityScore": 90,
-      "components": [
-        "Package.swift: defaultLocalization \"ja\" 追加",
-        "AppLanguage enum・appLanguageプロパティ追加（UserSettings.swift）",
-        "currentLocale・updateLanguage()メソッド追加（SettingsService.swift）",
-        "言語ピッカーセクション・再起動アラート追加（SettingsView.swift）",
-        "LocalizedStringKey対応（SettingsRow.swift）",
-        "ContentView: .environment(\\.locale) 注入",
-        "en.lproj/Localizable.strings 新規作成（約150文字列）"
-      ],
-      "result": "日英2言語対応完了、ビルド成功確認済み"
+      "qualityScore": 90
     },
     {
       "taskId": "session42-payment-flow-implementation",
@@ -189,22 +232,28 @@
 
   "next_actions": [
     {
-      "action": "【最優先】App Store ConnectでプロダクトID登録",
-      "description": "monthly_premium, yearly_premium, lifetime_premiumの3プロダクトを登録し、サンドボックス環境で決済テスト実施。",
-      "estimated_hours": 2,
-      "priority": "critical",
+      "action": "【ブロッカー解除待ち】Apple Developer Program審査完了",
+      "description": "審査完了後にApp Store Connect設定を開始",
+      "estimated_hours": 0,
+      "priority": "blocker",
       "recommended": true,
-      "note": "session42で決済フロー実装完了。プロダクトIDが未登録のため、App Store Connectでの設定が必須。"
+      "note": "申請済み。審査完了まで待機。"
     },
     {
-      "action": "【Option A】M10-T04: App Store Connect設定",
-      "description": "アプリメタデータ登録、スクリーンショット準備、プライバシーポリシー設定",
-      "estimated_hours": 3,
-      "priority": "high"
+      "action": "【審査完了後1】App Store ConnectでアプリID登録・ビルドアップロード",
+      "description": "xcrun altoolでアーカイブビルドをアップロード",
+      "estimated_hours": 2,
+      "priority": "critical"
     },
     {
-      "action": "【Option A続き】M10-T05: TestFlight配信",
-      "description": "ベータテスト実施",
+      "action": "【審査完了後2】IAP登録（3プロダクト）",
+      "description": "monthly_premium, yearly_premium, lifetime_premiumを登録",
+      "estimated_hours": 1,
+      "priority": "critical"
+    },
+    {
+      "action": "【審査完了後3】TestFlight配信・審査提出",
+      "description": "ベータテスト後にApp Store審査提出",
       "estimated_hours": 2,
       "priority": "high"
     },
@@ -217,63 +266,67 @@
   ],
 
   "taskStatus": {
-    "total": 182,
-    "completed": 176,
+    "total": 183,
+    "completed": 177,
     "skipped": 0,
     "merged": 0,
     "inProgress": 0,
     "pending": 6,
-    "blockedP0": 0,
-    "completedHours": 306,
-    "remainingHours": 69,
-    "lastCompletedTaskId": "session43-localization-implementation",
-    "currentTask": "完了（マルチ言語対応完全実装）",
+    "blockedP0": 1,
+    "completedHours": 310,
+    "remainingHours": 65,
+    "lastCompletedTaskId": "session44-appstore-submission-prep",
+    "currentTask": "完了（App Store提出準備完了）",
+    "currentBlocker": "Apple Developer Program審査待ち",
     "nextTaskCandidates": [
-      "App Store ConnectプロダクトID登録・サンドボックステスト（2h）- 最優先",
-      "M10-T04: App Store Connect設定（3h）",
-      "M10-T05: TestFlight配信（2h）"
+      "App Store ConnectアプリID登録・ビルドアップロード（2h）- 審査完了後",
+      "IAP登録（1h）- 審査完了後",
+      "TestFlight配信・審査提出（2h）- 審査完了後"
     ]
   },
 
   "sessionSummary": {
-    "sessionName": "session43-localization-implementation",
-    "date": "2026-03-18",
-    "completedTasks": 7,
-    "qualityScore": 90,
+    "sessionName": "session44-appstore-submission-prep",
+    "date": "2026-03-19",
+    "completedTasks": 9,
+    "qualityScore": 93,
     "achievements": [
-      "Package.swift: defaultLocalization設定追加",
-      "AppLanguage enum・言語切替機能実装",
-      "SettingsView: 言語ピッカー・再起動アラート追加",
-      "ContentView: .environment(\\.locale) Locale注入",
-      "SettingsRow: LocalizedStringKey対応",
-      "en.lproj/Localizable.strings新規作成（約150文字列）",
-      "ビルド成功確認済み"
+      "Configuration.storekit: lifetime_premium（買い切り4,980円）追加",
+      "英語版法的ドキュメント3件作成",
+      "GitHub Pages用HTML作成・デプロイ成功",
+      "GitHub Actions自動デプロイ設定",
+      "App Storeメタデータドラフト作成",
+      "スクリーンショットモード実装",
+      "iPhone 16 Pro Maxスクリーンショット5枚撮影",
+      "PROGRESS.mdアーカイブ（セッション29-33）"
     ]
   },
 
   "resumeInstructions": {
-    "step1": "【最優先】App Store ConnectでプロダクトID登録（monthly_premium, yearly_premium, lifetime_premium）",
-    "step2": "サンドボックス環境で決済フローのE2Eテスト実施",
-    "step3": "M10-T04: App Store Connect設定（メタデータ・スクリーンショット・プライバシーポリシー）",
-    "step4": "M10-T05: TestFlight配信でベータテスト開始",
-    "criticalNote": "session43でマルチ言語対応完了。session42で決済フロー実装完了。App Store ConnectにプロダクトIDが未登録のため、実際の決済テストはApp Store Connect設定後に可能。",
-    "context": "セッション43でマルチ言語対応（日英）完全実装。セッション42で決済フロー完全実装。LimitReachedSheetにプラン選択・購入・復元機能を実装。P0/P1修正完了。@Observable移行完了。実機ビルド成功。"
+    "step1": "【ブロッカー確認】Apple Developer Program審査が完了しているか確認",
+    "step2": "【審査完了後】App Store ConnectでアプリID登録",
+    "step3": "xcrun altoolでビルドアップロード",
+    "step4": "IAP登録（monthly_premium/yearly_premium/lifetime_premium）",
+    "step5": "スクリーンショット・メタデータ入力（docs/APP_STORE_METADATA.md参照）",
+    "step6": "TestFlight配信 → 審査提出",
+    "criticalNote": "Apple Developer Program審査待ち（申請済み）。審査完了までApp Store Connect操作は不可。GitHub Pages（https://yuki-hayashi-0419.github.io/LightRoll_Cleaner/）でプライバシーポリシー・利用規約を公開済み。",
+    "context": "セッション44でApp Store提出準備完了。メタデータ・法的ドキュメント（日英）・スクリーンショット（iPhone 16 Pro Max 5枚）・GitHub Pages全て整備済み。セッション43でマルチ言語対応完了。セッション42で決済フロー完了。"
   },
 
   "quality": {
     "scores": [
       90, 100, 95, 97.5, 95, 95, 100, 97.5, 92, 97.5, 97, 90, 92, 90, 90, 90,
       72, 90, 92, 92, 95, 75, 81, 85, 84, 94, 98, 98, 92.5, 90, 92, 88, 90,
-      95, 90, 93, 90, 92, 95, 100, 100, 95, 90
+      95, 90, 93, 90, 92, 95, 100, 100, 95, 90, 93
     ],
     "average": 92.4,
     "trend": "stable_high",
     "targetScore": 95,
     "latestScores": {
+      "session44-appstore-submission-prep": 93,
       "session43-localization-implementation": 90,
       "session42-payment-flow-implementation": 95,
-      "session41-implementation-analysis": 100,
-      "sessionAverage": 95
+      "sessionAverage": 93
     }
   },
 
@@ -287,34 +340,47 @@
     "status": "deployed",
     "lastDeployDate": "2026-03-18",
     "deployedVersion": "session42版（決済フロー実装・@Observable移行・P0/P1修正）",
-    "note": "session43のマルチ言語対応は実機デプロイ未実施。次回実機ビルド時に含まれる。"
+    "note": "session43-44の変更は実機デプロイ未実施。次回実機ビルド時に含まれる。"
   },
 
   "nextSession": {
-    "recommended_action": "App Store ConnectプロダクトID登録・サンドボックステスト",
-    "priority": "Critical",
-    "estimatedTime": "2h",
+    "recommended_action": "Apple Developer Program審査完了後にApp Store Connect設定開始",
+    "priority": "Blocked",
+    "blocker": "Apple Developer Program審査待ち",
+    "estimatedTime": "5h（審査完了後）",
     "tasks": [
       {
-        "name": "【最優先】App Store ConnectプロダクトID登録",
+        "name": "App Store ConnectでアプリID登録",
         "priority": 1,
-        "estimatedHours": 2,
-        "description": "monthly_premium, yearly_premium, lifetime_premiumを登録、サンドボックステスト"
+        "estimatedHours": 1,
+        "description": "Bundle ID登録、アプリ情報入力"
       },
       {
-        "name": "M10-T04 App Store Connect設定",
+        "name": "ビルドアップロード（xcrun altool）",
         "priority": 2,
-        "estimatedHours": 3,
-        "description": "アプリメタデータ登録、スクリーンショット準備"
+        "estimatedHours": 1,
+        "description": "アーカイブビルド作成・アップロード"
       },
       {
-        "name": "M10-T05 TestFlight配信",
+        "name": "IAP登録（3プロダクト）",
         "priority": 3,
-        "estimatedHours": 2,
-        "description": "ベータテスト実施"
+        "estimatedHours": 1,
+        "description": "monthly_premium, yearly_premium, lifetime_premium登録"
+      },
+      {
+        "name": "メタデータ・スクリーンショット入力",
+        "priority": 4,
+        "estimatedHours": 1,
+        "description": "docs/APP_STORE_METADATA.md、docs/screenshots_promax/ を使用"
+      },
+      {
+        "name": "TestFlight配信・審査提出",
+        "priority": 5,
+        "estimatedHours": 1,
+        "description": "ベータテスト後に審査提出"
       }
     ]
   },
 
-  "notes": "セッション43完了（2026-03-18）。マルチ言語対応（ローカライゼーション）完全実装: Package.swiftにdefaultLocalization追加、AppLanguage enum・言語切替ピッカー・再起動アラート実装、en.lproj/Localizable.strings（約150文字列）新規作成、SettingsRow LocalizedStringKey対応、ContentView Locale環境注入。ビルド成功確認済み。session42で決済フロー完全実装済み。次回はApp Store ConnectでプロダクトID登録・サンドボックステスト。"
+  "notes": "セッション44完了（2026-03-19）。App Store提出準備完了: lifetime_premium追加、英語版法的ドキュメント3件作成、GitHub Pages（日英切替対応）デプロイ成功（https://yuki-hayashi-0419.github.io/LightRoll_Cleaner/）、App Storeメタデータドラフト作成、スクリーンショットモード実装、iPhone 16 Pro Maxスクリーンショット5枚撮影。ブロッカー: Apple Developer Program審査待ち（申請済み）。審査完了後にApp Store Connect登録・ビルドアップロード・IAP登録・審査提出を実施。"
 }
